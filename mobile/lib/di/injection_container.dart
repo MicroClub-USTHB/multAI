@@ -1,0 +1,52 @@
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import '../core/network/network_info.dart';
+import '../features/onboarding/data/repositories/onboarding_repository_impl.dart';
+import '../features/onboarding/domain/repositories/onboarding_repository.dart';
+import '../features/onboarding/domain/usecases/get_onboarding_seen.dart';
+import '../features/onboarding/domain/usecases/save_onboarding_seen.dart';
+import '../features/onboarding/presentation/bloc/onboarding_bloc.dart';
+import 'dart:async';
+final sl = GetIt.instance;
+
+FutureOr<void> init() async {
+  await sl.reset();
+
+  // External dependencies
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+  sl.registerLazySingleton<InternetConnection>(() => InternetConnection());
+  sl.registerLazySingleton<Connectivity>(() => Connectivity());
+  sl.registerLazySingleton<http.Client>(() => http.Client());
+
+  // Core
+  sl.registerLazySingleton<NetworkInfo>(
+    () => NetworkInfoImpl(
+      connectivity: sl<Connectivity>(),
+      connectionChecker: sl<InternetConnection>(),
+    ),
+  );
+
+  
+
+  // Onboarding Repository
+  sl.registerLazySingleton<OnboardingRepository>(
+    () => OnboardingRepositoryImpl(sl<SharedPreferences>()),
+  );
+
+  // Onboarding Use Cases
+  sl.registerLazySingleton<GetOnboardingSeen>(
+      () => GetOnboardingSeen(sl<OnboardingRepository>()));
+  sl.registerLazySingleton<SaveOnboardingSeen>(
+      () => SaveOnboardingSeen(sl<OnboardingRepository>()));
+
+  sl.registerFactory<OnboardingBloc>(
+    () => OnboardingBloc(
+      getSeen: sl<GetOnboardingSeen>(),
+      saveSeen: sl<SaveOnboardingSeen>(),
+    ),
+  );
+}
