@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { allBlogs } from 'content-collections'
-import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '#/shared/utils/site'
+import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '@/shared/utils/site'
 
 export const Route = createFileRoute('/rss.xml')({
   server: {

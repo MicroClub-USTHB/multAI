@@ -10,19 +10,35 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
-import { Route as AboutRouteImport } from './routes/about'
+import { Route as MultiRouteImport } from './routes/multi'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as BlogIndexRouteImport } from './routes/blog.index'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as MultiIndexRouteImport } from './routes/multi/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as MultiUploadRouteImport } from './routes/multi/upload'
+import { Route as MultiTeamRouteImport } from './routes/multi/team'
+import { Route as MultiRequestsRouteImport } from './routes/multi/requests'
+import { Route as MultiNotificationsRouteImport } from './routes/multi/notifications'
+import { Route as MultiEventsRouteImport } from './routes/multi/events'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
+import { Route as AdminLogsRouteImport } from './routes/admin/logs'
+import { Route as AdminEventsRouteImport } from './routes/admin/events'
 
 const RssDotxmlRoute = RssDotxmlRouteImport.update({
   id: '/rss.xml',
   path: '/rss.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const MultiRoute = MultiRouteImport.update({
+  id: '/multi',
+  path: '/multi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -30,53 +46,181 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
+const MultiIndexRoute = MultiIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MultiRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const MultiUploadRoute = MultiUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => MultiRoute,
+} as any)
+const MultiTeamRoute = MultiTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => MultiRoute,
+} as any)
+const MultiRequestsRoute = MultiRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => MultiRoute,
+} as any)
+const MultiNotificationsRoute = MultiNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => MultiRoute,
+} as any)
+const MultiEventsRoute = MultiEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => MultiRoute,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
-  getParentRoute: () => rootRouteImport,
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLogsRoute = AdminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEventsRoute = AdminEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/multi': typeof MultiRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/blog/': typeof BlogIndexRoute
+  '/admin/events': typeof AdminEventsRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/multi/events': typeof MultiEventsRoute
+  '/multi/notifications': typeof MultiNotificationsRoute
+  '/multi/requests': typeof MultiRequestsRoute
+  '/multi/team': typeof MultiTeamRoute
+  '/multi/upload': typeof MultiUploadRoute
+  '/admin/': typeof AdminIndexRoute
+  '/multi/': typeof MultiIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/rss.xml': typeof RssDotxmlRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/blog': typeof BlogIndexRoute
+  '/admin/events': typeof AdminEventsRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/multi/events': typeof MultiEventsRoute
+  '/multi/notifications': typeof MultiNotificationsRoute
+  '/multi/requests': typeof MultiRequestsRoute
+  '/multi/team': typeof MultiTeamRoute
+  '/multi/upload': typeof MultiUploadRoute
+  '/admin': typeof AdminIndexRoute
+  '/multi': typeof MultiIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/multi': typeof MultiRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/blog/': typeof BlogIndexRoute
+  '/admin/events': typeof AdminEventsRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/multi/events': typeof MultiEventsRoute
+  '/multi/notifications': typeof MultiNotificationsRoute
+  '/multi/requests': typeof MultiRequestsRoute
+  '/multi/team': typeof MultiTeamRoute
+  '/multi/upload': typeof MultiUploadRoute
+  '/admin/': typeof AdminIndexRoute
+  '/multi/': typeof MultiIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/rss.xml' | '/blog/$slug' | '/blog/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/multi'
+    | '/rss.xml'
+    | '/admin/events'
+    | '/admin/logs'
+    | '/admin/notifications'
+    | '/admin/users'
+    | '/auth/login'
+    | '/multi/events'
+    | '/multi/notifications'
+    | '/multi/requests'
+    | '/multi/team'
+    | '/multi/upload'
+    | '/admin/'
+    | '/multi/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/rss.xml' | '/blog/$slug' | '/blog'
-  id: '__root__' | '/' | '/about' | '/rss.xml' | '/blog/$slug' | '/blog/'
+  to:
+    | '/'
+    | '/rss.xml'
+    | '/admin/events'
+    | '/admin/logs'
+    | '/admin/notifications'
+    | '/admin/users'
+    | '/auth/login'
+    | '/multi/events'
+    | '/multi/notifications'
+    | '/multi/requests'
+    | '/multi/team'
+    | '/multi/upload'
+    | '/admin'
+    | '/multi'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/multi'
+    | '/rss.xml'
+    | '/admin/events'
+    | '/admin/logs'
+    | '/admin/notifications'
+    | '/admin/users'
+    | '/auth/login'
+    | '/multi/events'
+    | '/multi/notifications'
+    | '/multi/requests'
+    | '/multi/team'
+    | '/multi/upload'
+    | '/admin/'
+    | '/multi/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  MultiRoute: typeof MultiRouteWithChildren
   RssDotxmlRoute: typeof RssDotxmlRoute
-  BlogSlugRoute: typeof BlogSlugRoute
-  BlogIndexRoute: typeof BlogIndexRoute
+  AuthLoginRoute: typeof AuthLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -88,11 +232,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RssDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/multi': {
+      id: '/multi'
+      path: '/multi'
+      fullPath: '/multi'
+      preLoaderRoute: typeof MultiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -102,29 +253,137 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
+    '/multi/': {
+      id: '/multi/'
+      path: '/'
+      fullPath: '/multi/'
+      preLoaderRoute: typeof MultiIndexRouteImport
+      parentRoute: typeof MultiRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/multi/upload': {
+      id: '/multi/upload'
+      path: '/upload'
+      fullPath: '/multi/upload'
+      preLoaderRoute: typeof MultiUploadRouteImport
+      parentRoute: typeof MultiRoute
+    }
+    '/multi/team': {
+      id: '/multi/team'
+      path: '/team'
+      fullPath: '/multi/team'
+      preLoaderRoute: typeof MultiTeamRouteImport
+      parentRoute: typeof MultiRoute
+    }
+    '/multi/requests': {
+      id: '/multi/requests'
+      path: '/requests'
+      fullPath: '/multi/requests'
+      preLoaderRoute: typeof MultiRequestsRouteImport
+      parentRoute: typeof MultiRoute
+    }
+    '/multi/notifications': {
+      id: '/multi/notifications'
+      path: '/notifications'
+      fullPath: '/multi/notifications'
+      preLoaderRoute: typeof MultiNotificationsRouteImport
+      parentRoute: typeof MultiRoute
+    }
+    '/multi/events': {
+      id: '/multi/events'
+      path: '/events'
+      fullPath: '/multi/events'
+      preLoaderRoute: typeof MultiEventsRouteImport
+      parentRoute: typeof MultiRoute
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/logs': {
+      id: '/admin/logs'
+      path: '/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AdminLogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/events': {
+      id: '/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRoute
     }
   }
 }
 
+interface AdminRouteChildren {
+  AdminEventsRoute: typeof AdminEventsRoute
+  AdminLogsRoute: typeof AdminLogsRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminEventsRoute: AdminEventsRoute,
+  AdminLogsRoute: AdminLogsRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface MultiRouteChildren {
+  MultiEventsRoute: typeof MultiEventsRoute
+  MultiNotificationsRoute: typeof MultiNotificationsRoute
+  MultiRequestsRoute: typeof MultiRequestsRoute
+  MultiTeamRoute: typeof MultiTeamRoute
+  MultiUploadRoute: typeof MultiUploadRoute
+  MultiIndexRoute: typeof MultiIndexRoute
+}
+
+const MultiRouteChildren: MultiRouteChildren = {
+  MultiEventsRoute: MultiEventsRoute,
+  MultiNotificationsRoute: MultiNotificationsRoute,
+  MultiRequestsRoute: MultiRequestsRoute,
+  MultiTeamRoute: MultiTeamRoute,
+  MultiUploadRoute: MultiUploadRoute,
+  MultiIndexRoute: MultiIndexRoute,
+}
+
+const MultiRouteWithChildren = MultiRoute._addFileChildren(MultiRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
+  MultiRoute: MultiRouteWithChildren,
   RssDotxmlRoute: RssDotxmlRoute,
-  BlogSlugRoute: BlogSlugRoute,
-  BlogIndexRoute: BlogIndexRoute,
+  AuthLoginRoute: AuthLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
