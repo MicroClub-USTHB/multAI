@@ -2,73 +2,89 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Primary Colors - Based on new color palette
+  // Primary Colors - Based on MultiAi color palette
   static const Color primaryColor =
-      Color(0xFF188762); // Main green from palette
-  static const Color secondaryColor = Color(0xFF289180); // Teal from palette
-  static const Color accentColor = Color(0xFF2a2a2a); // Dark gray from palette
+      Color(0xFFE8A020); // Golden/amber accent from palette
+  static const Color secondaryColor =
+      Color(0xFFD4901A); // Darker golden for secondary
+  static const Color accentColor =
+      Color(0xFFFFB830); // Bright golden highlight
 
   // Background Colors
   static const Color backgroundColor =
-      Color(0xFFd8e1dd); // Light gray from palette
-  static const Color surfaceColor = Color(0xFFFFFFFF); // Pure white surfaces
-  static const Color cardColor = Color(0xFFFFFFFF); // White cards
+      Color(0xFF1A1008); // Very dark brown/black background
+  static const Color surfaceColor =
+      Color(0xFF2A1E0F); // Slightly lighter dark brown surface
+  static const Color cardColor =
+      Color(0xFF2A1E0F); // Dark brown card background
 
-  // Text Colors - Academic and readable
+  // Text Colors
   static const Color primaryTextColor =
-      Color(0xFF2a2a2a); // Dark gray from palette
-  static const Color secondaryTextColor = Color(0xFF5A5A5A); // Medium gray
-  static const Color hintTextColor = Color(0xFF9E9E9E); // Light gray hints
+      Color(0xFFFFFFFF); // White primary text
+  static const Color secondaryTextColor =
+      Color(0xFFB0A090); // Muted warm gray
+  static const Color hintTextColor =
+      Color(0xFF7A6A5A); // Dim warm gray hints
 
   // Interactive Colors
   static const Color buttonColor =
-      Color(0xFF188762); // Primary green for buttons
-  static const Color selectedColor = Color(0xFFd8e1dd); // Light gray selection
-  static const Color borderColor = Color(0xFFE0E0E0); // Subtle borders
+      Color(0xFFE8A020); // Golden button color
+  static const Color selectedColor =
+      Color(0xFF3A2A15); // Slightly highlighted dark brown
+  static const Color borderColor =
+      Color(0xFF3D2E1A); // Subtle dark brown border
+
+  // Input Field Colors
+  static const Color inputFillColor =
+      Color(0xFF231809); // Very dark brown for inputs
+  static const Color inputBorderColor =
+      Color(0xFF4A3820); // Slightly visible border
 
   // Status Colors
-  static const Color successColor = Color(0xFF188762); // Green success
+  static const Color successColor = Color(0xFF4CAF50); // Green success
   static const Color errorColor = Color(0xFFD32F2F); // Red error
   static const Color warningColor = Color(0xFFFF9800); // Orange warning
-  static const Color infoColor = Color(0xFF289180); // Teal info
+  static const Color infoColor = Color(0xFFE8A020); // Golden info
 
   // Reading-focused Colors
   static const Color readingBackgroundColor =
-      Color(0xFFFFFDF7); // Warm white for reading
-  static const Color highlightColor = Color(0xFFFFEB3B); // Yellow highlight
-  static const Color bookmarkColor = Color(0xFF188762); // Green bookmark
+      Color(0xFF1A1008); // Dark background for reading
+  static const Color highlightColor =
+      Color(0xFFFFEB3B); // Yellow highlight
+  static const Color bookmarkColor =
+      Color(0xFFE8A020); // Golden bookmark
 
   // Social Colors
   static const Color googleColor = Color(0xFF4285F4);
-  static const Color facebookColor = Color(0xFF1877F2);
+  static const Color appleColor = Color(0xFFFFFFFF);
 
   // Transparent Colors
   static const Color overlayColor = Color(0x80000000);
-  static const Color shimmerColor = Color(0xFFd8e1dd);
+  static const Color shimmerColor = Color(0xFF3A2A15);
 
   // Theme Data
   static ThemeData get lightTheme {
     return ThemeData(
-      brightness: Brightness.light,
+      brightness: Brightness.dark,
       primaryColor: primaryColor,
       scaffoldBackgroundColor: backgroundColor,
       cardColor: cardColor,
-      colorScheme: const ColorScheme.light(
+      colorScheme: const ColorScheme.dark(
         primary: primaryColor,
         secondary: secondaryColor,
         surface: surfaceColor,
         error: errorColor,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
+        onPrimary: Colors.black,
+        onSecondary: Colors.black,
         onSurface: primaryTextColor,
         onError: Colors.white,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: backgroundColor,
+        foregroundColor: primaryTextColor,
         elevation: 0,
         titleTextStyle: GoogleFonts.raleway(
-          color: Colors.white,
+          color: primaryTextColor,
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
@@ -76,11 +92,26 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: buttonColor,
-          foregroundColor: Colors.white,
+          foregroundColor: Colors.black,
           elevation: 2,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
+          textStyle: GoogleFonts.raleway(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: primaryTextColor,
+          side: const BorderSide(color: inputBorderColor, width: 1.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: surfaceColor,
         ),
       ),
       textTheme: TextTheme(
@@ -144,12 +175,12 @@ class AppTheme {
           height: 1.4,
         ),
 
-        // Body styles - For reading content
+        // Body styles
         bodyLarge: GoogleFonts.montserrat(
           color: primaryTextColor,
           fontSize: 18,
           fontWeight: FontWeight.normal,
-          height: 1.6, // Better reading line height
+          height: 1.6,
         ),
         bodyMedium: GoogleFonts.montserrat(
           color: primaryTextColor,
@@ -186,139 +217,55 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: inputBorderColor),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: borderColor),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: inputBorderColor),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         filled: true,
-        fillColor: surfaceColor,
+        fillColor: inputFillColor,
+        hintStyle: GoogleFonts.montserrat(
+          color: hintTextColor,
+          fontSize: 14,
+        ),
+        labelStyle: GoogleFonts.raleway(
+          color: secondaryTextColor,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        prefixIconColor: hintTextColor,
+        suffixIconColor: hintTextColor,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
       cardTheme: CardThemeData(
         color: cardColor,
-        elevation: 2,
+        elevation: 4,
+        shadowColor: Colors.black54,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: inputBorderColor, width: 0.5),
         ),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: inputBorderColor,
+        thickness: 0.5,
+      ),
+      iconTheme: const IconThemeData(
+        color: secondaryTextColor,
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: primaryColor,
+        linearTrackColor: inputBorderColor,
       ),
     );
   }
-
-  // Dark theme variant for reading in low light
   static ThemeData get darkTheme {
-    return ThemeData(
-      brightness: Brightness.dark,
-      primaryColor: secondaryColor,
-      scaffoldBackgroundColor: accentColor,
-      cardColor: const Color(0xFF1E1E1E),
-      colorScheme: ColorScheme.dark(
-        primary: secondaryColor,
-        secondary: primaryColor,
-        surface: const Color(0xFF1E1E1E),
-        error: errorColor,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
-        onSurface: Colors.white,
-        onError: Colors.white,
-      ),
-      textTheme: TextTheme(
-        displayLarge: GoogleFonts.raleway(
-          color: Colors.white,
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          height: 1.2,
-        ),
-        displayMedium: GoogleFonts.raleway(
-          color: Colors.white,
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-          height: 1.2,
-        ),
-        displaySmall: GoogleFonts.raleway(
-          color: Colors.white,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          height: 1.3,
-        ),
-        headlineLarge: GoogleFonts.raleway(
-          color: Colors.white,
-          fontSize: 22,
-          fontWeight: FontWeight.w600,
-          height: 1.3,
-        ),
-        headlineMedium: GoogleFonts.raleway(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          height: 1.3,
-        ),
-        headlineSmall: GoogleFonts.raleway(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          height: 1.4,
-        ),
-        titleLarge: GoogleFonts.raleway(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          height: 1.4,
-        ),
-        titleMedium: GoogleFonts.raleway(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          height: 1.4,
-        ),
-        titleSmall: GoogleFonts.raleway(
-          color: const Color(0xFFB0B0B0),
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          height: 1.4,
-        ),
-        bodyLarge: GoogleFonts.montserrat(
-          color: const Color(0xFFE0E0E0),
-          fontSize: 18,
-          fontWeight: FontWeight.normal,
-          height: 1.6,
-        ),
-        bodyMedium: GoogleFonts.montserrat(
-          color: const Color(0xFFE0E0E0),
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-          height: 1.5,
-        ),
-        bodySmall: GoogleFonts.raleway(
-          color: const Color(0xFFB0B0B0),
-          fontSize: 14,
-          fontWeight: FontWeight.normal,
-          height: 1.4,
-        ),
-        labelLarge: GoogleFonts.raleway(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.1,
-        ),
-        labelMedium: GoogleFonts.raleway(
-          color: const Color(0xFFB0B0B0),
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.5,
-        ),
-        labelSmall: GoogleFonts.raleway(
-          color: const Color(0xFF666666),
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.5,
-        ),
-      ),
-    );
+    return lightTheme;
   }
 }
