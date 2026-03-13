@@ -12,11 +12,11 @@ export default function MainLayout({
   navData: NavData;
 }) {
   return (
-    <SidebarProvider>
+    <SidebarProvider className='h-svh overflow-hidden'>
       <AppSidebar navData={navData} />
-      <SidebarInset>
+      <SidebarInset className='h-svh overflow-hidden'>
         {navData.isAdmin ? <AdminHeader /> : <MultiHeader />}
-        <main className='flex-1 p-4'>{children}</main>
+        <main className='flex-1 overflow-y-auto p-4'>{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

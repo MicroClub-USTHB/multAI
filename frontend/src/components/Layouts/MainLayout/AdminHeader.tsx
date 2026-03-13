@@ -18,7 +18,7 @@ export function AdminHeader() {
   const adminSegments = useBreadcrumbs('/admin');
 
   return (
-    <header className='flex h-16 shrink-0 items-center gap-2 px-4'>
+    <header className='sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
       <div className='flex items-center gap-2'>
         <SidebarTrigger className='-ml-1' />
         <Separator
@@ -61,14 +61,15 @@ export function AdminHeader() {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className='relative flex-1 max-w-md ml-auto'>
-        <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-        <Input placeholder='Search...' className='pl-10 h-9' />
+
+      <div className='relative ml-auto max-w-md flex-1'>
+        <Search className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+        <Input placeholder='Search...' className='h-9 pl-10' />
       </div>
 
       <Button variant='ghost' size='icon' className='relative rounded-full'>
         <Bell className='h-5 w-5' />
-        <span className='absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full'></span>
+        <span className='absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive'></span>
       </Button>
     </header>
   );
