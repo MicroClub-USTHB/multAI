@@ -279,30 +279,4 @@ class AppTheme {
 
 
 
-// ── Responsive helpers ─────────────────────────────────────────────────────
-static double hPadding(BuildContext context) {
-  final w = MediaQuery.of(context).size.width;
-  return (w * 0.06).clamp(spacingLg, spacingXxl);
-}
-
-static double cardWidth(BuildContext context) {
-  final w = MediaQuery.of(context).size.width;
-  return min(w * 0.92, 480.0);
-}
-
-static double logoSize(BuildContext context) {
-  final w = MediaQuery.of(context).size.width;
-  return (w * 0.15).clamp(56.0, 88.0);
-}
-
-static double titleFontSize(BuildContext context) {
-  final w = MediaQuery.of(context).size.width;
-  return (w * 0.07).clamp(22.0, 32.0);
-}
-
-static double sectionSpacing(BuildContext context) {
-  final h = MediaQuery.of(context).size.height;
-  return h * 0.02;
-}
-
 }
