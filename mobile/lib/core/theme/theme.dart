@@ -2,7 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Primary Colors - Based on MultiAi color palette
+  // ── Radius ─────────────────────────────────────────────────────────────────
+  static const double radiusSm = 8.0;
+  static const double radiusMd = 12.0;
+  static const double radiusLg = 16.0;
+  static const double radiusXl = 18.0;
+
+  // ── Spacing ────────────────────────────────────────────────────────────────
+  static const double spacingXs = 4.0;
+  static const double spacingSm = 8.0;
+  static const double spacingMd = 16.0;
+  static const double spacingLg = 24.0;
+  static const double spacingXl = 32.0;
+  static const double spacingXxl = 40.0;
+
+  // ── Primary Colors ─────────────────────────────────────────────────────────
   static const Color primaryColor =
       Color(0xFFE8A020); // Golden/amber accent from palette
   static const Color secondaryColor =
@@ -10,7 +24,7 @@ class AppTheme {
   static const Color accentColor =
       Color(0xFFFFB830); // Bright golden highlight
 
-  // Background Colors
+  // ── Background Colors ──────────────────────────────────────────────────────
   static const Color backgroundColor =
       Color(0xFF1A1008); // Very dark brown/black background
   static const Color surfaceColor =
@@ -18,7 +32,7 @@ class AppTheme {
   static const Color cardColor =
       Color(0xFF2A1E0F); // Dark brown card background
 
-  // Text Colors
+  // ── Text Colors ────────────────────────────────────────────────────────────
   static const Color primaryTextColor =
       Color(0xFFFFFFFF); // White primary text
   static const Color secondaryTextColor =
@@ -26,7 +40,7 @@ class AppTheme {
   static const Color hintTextColor =
       Color(0xFF7A6A5A); // Dim warm gray hints
 
-  // Interactive Colors
+  // ── Interactive Colors ─────────────────────────────────────────────────────
   static const Color buttonColor =
       Color(0xFFE8A020); // Golden button color
   static const Color selectedColor =
@@ -34,35 +48,32 @@ class AppTheme {
   static const Color borderColor =
       Color(0xFF3D2E1A); // Subtle dark brown border
 
-  // Input Field Colors
+  // ── Input Field Colors ─────────────────────────────────────────────────────
   static const Color inputFillColor =
       Color(0xFF231809); // Very dark brown for inputs
   static const Color inputBorderColor =
       Color(0xFF4A3820); // Slightly visible border
 
-  // Status Colors
-  static const Color successColor = Color(0xFF4CAF50); // Green success
-  static const Color errorColor = Color(0xFFD32F2F); // Red error
-  static const Color warningColor = Color(0xFFFF9800); // Orange warning
-  static const Color infoColor = Color(0xFFE8A020); // Golden info
+  // ── Status Colors ──────────────────────────────────────────────────────────
+  static const Color successColor = Color(0xFF4CAF50);
+  static const Color errorColor = Color(0xFFD32F2F);
+  static const Color warningColor = Color(0xFFFF9800);
+  static const Color infoColor = Color(0xFFE8A020);
 
-  // Reading-focused Colors
-  static const Color readingBackgroundColor =
-      Color(0xFF1A1008); // Dark background for reading
-  static const Color highlightColor =
-      Color(0xFFFFEB3B); // Yellow highlight
-  static const Color bookmarkColor =
-      Color(0xFFE8A020); // Golden bookmark
+  // ── Reading Colors ─────────────────────────────────────────────────────────
+  static const Color readingBackgroundColor = Color(0xFF1A1008);
+  static const Color highlightColor = Color(0xFFFFEB3B);
+  static const Color bookmarkColor = Color(0xFFE8A020);
 
-  // Social Colors
+  // ── Social Colors ──────────────────────────────────────────────────────────
   static const Color googleColor = Color(0xFF4285F4);
   static const Color appleColor = Color(0xFFFFFFFF);
 
-  // Transparent Colors
+  // ── Transparent Colors ─────────────────────────────────────────────────────
   static const Color overlayColor = Color(0x80000000);
   static const Color shimmerColor = Color(0xFF3A2A15);
 
-  // Theme Data
+  // ── Theme Data ─────────────────────────────────────────────────────────────
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.dark,
@@ -95,7 +106,7 @@ class AppTheme {
           foregroundColor: Colors.black,
           elevation: 2,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(radiusMd),
           ),
           textStyle: GoogleFonts.raleway(
             fontSize: 16,
@@ -109,13 +120,12 @@ class AppTheme {
           foregroundColor: primaryTextColor,
           side: const BorderSide(color: inputBorderColor, width: 1.5),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(radiusMd),
           ),
           backgroundColor: surfaceColor,
         ),
       ),
       textTheme: TextTheme(
-        // Display styles - For major headings
         displayLarge: GoogleFonts.raleway(
           color: primaryTextColor,
           fontSize: 32,
@@ -134,8 +144,6 @@ class AppTheme {
           fontWeight: FontWeight.bold,
           height: 1.3,
         ),
-
-        // Headline styles - For section headings
         headlineLarge: GoogleFonts.raleway(
           color: primaryTextColor,
           fontSize: 22,
@@ -154,8 +162,6 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           height: 1.4,
         ),
-
-        // Title styles - For UI elements
         titleLarge: GoogleFonts.raleway(
           color: primaryTextColor,
           fontSize: 16,
@@ -174,8 +180,6 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           height: 1.4,
         ),
-
-        // Body styles
         bodyLarge: GoogleFonts.montserrat(
           color: primaryTextColor,
           fontSize: 18,
@@ -194,8 +198,6 @@ class AppTheme {
           fontWeight: FontWeight.normal,
           height: 1.4,
         ),
-
-        // Label styles - For buttons and small UI elements
         labelLarge: GoogleFonts.raleway(
           color: primaryTextColor,
           fontSize: 14,
@@ -217,15 +219,15 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(radiusMd),
           borderSide: const BorderSide(color: inputBorderColor),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(radiusMd),
           borderSide: const BorderSide(color: inputBorderColor),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(radiusMd),
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         filled: true,
@@ -241,14 +243,17 @@ class AppTheme {
         ),
         prefixIconColor: hintTextColor,
         suffixIconColor: hintTextColor,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: spacingMd,
+          vertical: spacingMd,
+        ),
       ),
       cardTheme: CardThemeData(
         color: cardColor,
         elevation: 4,
         shadowColor: Colors.black54,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(radiusLg),
           side: const BorderSide(color: inputBorderColor, width: 0.5),
         ),
       ),
@@ -265,7 +270,6 @@ class AppTheme {
       ),
     );
   }
-  static ThemeData get darkTheme {
-    return lightTheme;
-  }
+
+  static ThemeData get darkTheme => lightTheme;
 }
