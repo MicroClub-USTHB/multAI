@@ -61,12 +61,12 @@ class _LoginPageState extends State<LoginPage> {
             child: Center(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
-                  horizontal: AppTheme.hPadding(context),
+                  horizontal: context.hPadding(),
                   vertical: AppTheme.spacingXxl,
                 ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxWidth: AppTheme.cardWidth(context),
+                    maxWidth: context.cardWidth(),
                   ),
                   child: Form(
                     key: _formKey,
@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
  
                               const _LogoSection(),
                               SizedBox(
-                                height: AppTheme.sectionSpacing(context) * 2,
+                                height: context.sectionSpacing() * 2,
                               ),
  
                               Text(
@@ -167,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                                 validator: AppValidators.validatePassword,
                               ),
                               SizedBox(
-                                height: AppTheme.sectionSpacing(context) * 1.5,
+                                height: context.sectionSpacing() * 1.5,
                               ),
  
                               SizedBox(
@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               SizedBox(
-                                height: AppTheme.sectionSpacing(context) * 1.5,
+                                height: context.sectionSpacing() * 1.5,
                               ),
  
                               Row(
@@ -227,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ],
                               ),
                               SizedBox(
-                                height: AppTheme.sectionSpacing(context) * 1.5,
+                                height: context.sectionSpacing() * 1.5,
                               ),
  
                               SizedBox(
@@ -264,7 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               SizedBox(
-                                height: AppTheme.sectionSpacing(context) * 1.5,
+                                height: context.sectionSpacing() * 1.5,
                               ),
  
                               Wrap(
@@ -292,7 +292,7 @@ class _LoginPageState extends State<LoginPage> {
  
                         const SizedBox(height: AppTheme.spacingXl),
                         Text(
-                          'PROTECTED BY ADVANCED NEURAL ENCRYPTION © 2024\nMULTIAI CORP',
+                          'PROTECTED BY ADVANCED NEURAL ENCRYPTION © 2024 MULTIAI CORP',
                           style: tt.labelSmall?.copyWith(
                             letterSpacing: 0.8,
                             height: 1.8,
@@ -319,7 +319,7 @@ class _LogoSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
-    final logoSize = AppTheme.logoSize(context);
+    final logoSize = context.logoSize();
  
     return Column(
       children: [
@@ -348,7 +348,7 @@ class _LogoSection extends StatelessWidget {
         Text(
           'MultiAi',
           style: tt.displaySmall?.copyWith(
-            fontSize: AppTheme.titleFontSize(context),
+            fontSize: context.titleFontSize(),
             fontWeight: FontWeight.bold,
             color: AppTheme.primaryTextColor,
           ),
