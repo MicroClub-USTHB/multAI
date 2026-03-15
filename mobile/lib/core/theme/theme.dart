@@ -54,6 +54,9 @@ class AppTheme {
       Color(0xFF231809); // Very dark brown for inputs
   static const Color inputBorderColor =
       Color(0xFF4A3820); // Slightly visible border
+  // ── Form Card Color ────────────────────────────────────────────────────────
+  static const Color formCardColor =
+      Color(0x1AE8A830); // #E8A8301A amber with low opacity
 
   // ── Status Colors ──────────────────────────────────────────────────────────
   static const Color successColor = Color(0xFF4CAF50);
