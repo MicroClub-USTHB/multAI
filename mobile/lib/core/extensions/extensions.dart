@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/theme.dart';
+import 'dart:math';
 
 
 extension StringExtension on String {
@@ -155,3 +156,24 @@ extension SnackBarExtension on BuildContext{
   }
 }
 
+extension ResponsiveExtension on BuildContext {
+  double hPadding() {
+    return (width * 0.06).clamp(AppTheme.spacingLg, AppTheme.spacingXxl);
+  }
+
+  double cardWidth() {
+    return min(width * 0.92, 480.0);
+  }
+
+  double logoSize() {
+    return (width * 0.15).clamp(56.0, 88.0);
+  }
+
+  double titleFontSize() {
+    return (width * 0.07).clamp(22.0, 32.0);
+  }
+
+  double sectionSpacing() {
+    return height * 0.02;
+  }
+}
