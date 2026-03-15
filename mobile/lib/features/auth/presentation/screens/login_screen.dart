@@ -247,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Image.asset(
-                                        '${AppImages.imagesPath}/google.png',
+                                        '${AppImages.googleLogo}',
                                         height: 18,
                                         width: 18,
                                       ),
@@ -334,7 +334,7 @@ class _LogoSection extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             child: Image.asset(
-              '${AppImages.imagesPath}/MC_white.png',
+              '${AppImages.mcLogoWhite}',
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Icon(
                 Icons.auto_awesome,
