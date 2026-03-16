@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
- 
 import '../errors/failure.dart';
 import 'network_info.dart';
+import '../constants/end_points.dart';
 
 class ApiClient {
   final http.Client _client;
@@ -17,7 +16,7 @@ class ApiClient {
     required NetworkInfo networkInfo,
   })  : _client = client,
         _networkInfo = networkInfo,
-        baseUrl = dotenv.env['API_BASE_URL'] ?? '';
+        baseUrl = EndPoints.baseUrl;
  
   void setAccessToken(String token) => _accessToken = token;
  
@@ -66,7 +65,7 @@ class ApiClient {
     _handleVoidResponse(response);
   }
  
-  // ── DELETE ─────────────────────────────────────────────────────────────────
+  // ── DELETE ──────────────────────r───────────────────────────────────────────
   Future<void> delete(String endpoint) async {
     await _checkConnection();
     final response = await _client.delete(
