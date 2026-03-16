@@ -11,12 +11,9 @@ import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/refresh_token_usecase.dart';
 import '../../utils/device_utils.dart';
-
  
 part 'auth_event.dart';
 part 'auth_state.dart';
- 
-
  
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase _loginUseCase;
@@ -50,17 +47,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
  
     final result = await _loginUseCase(
       LoginParams(
-        email:       event.email,
-        password:    event.password,
-        deviceName:  device.deviceName,
-        deviceType:  device.deviceType,
-        deviceId:    device.deviceId,
-        fingerprint: device.fingerprint,
+        email:             event.email,
+        password:          event.password,
+        deviceName:        device.deviceName,
+        platform:          device.platform,
+        deviceId:          device.deviceId,
+        deviceFingerprint: device.deviceFingerprint,
       ),
     );
  
     result.fold(
-      (failure) => emit(AuthFailure(message: '')),
+      (failure) => emit(AuthFailure(message: failure.message)),
       (auth)    => emit(AuthSuccess(auth: auth)),
     );
   }
@@ -76,7 +73,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
  
     result.fold(
-      (failure) => emit(AuthFailure(message: '')),
+      (failure) => emit(AuthFailure(message: failure.message)),
       (auth)    => emit(AuthSuccess(auth: auth)),
     );
   }
@@ -90,7 +87,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await _logoutUseCase(NoParams());
  
     result.fold(
-      (failure) => emit(AuthFailure(message: '')),
+      (failure) => emit(AuthFailure(message: failure.message)),
       (_)       => emit(LogoutSuccess()),
     );
   }
@@ -104,7 +101,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await _getCurrentUserUseCase(NoParams());
  
     result.fold(
-      (failure) => emit(AuthFailure(message: '')),
+      (failure) => emit(AuthFailure(message: failure.message)),
       (user)    => emit(GetCurrentUserSuccess(user: user)),
     );
   }
