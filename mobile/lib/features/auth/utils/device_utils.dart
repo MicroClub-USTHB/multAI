@@ -5,15 +5,15 @@ import 'package:device_info_plus/device_info_plus.dart';
  
 class DeviceData {
   final String deviceName;
-  final String deviceType;
+  final String platform;
   final String deviceId;
-  final String fingerprint;
+  final String deviceFingerprint;
  
   const DeviceData({
     required this.deviceName,
-    required this.deviceType,
+    required this.platform,
     required this.deviceId,
-    required this.fingerprint,
+    required this.deviceFingerprint,
   });
 }
  
@@ -24,7 +24,7 @@ class DeviceUtils {
     if (Platform.isAndroid) {
       final info = await _plugin.androidInfo;
  
-      final fingerprint = _generateFingerprint([
+      final deviceFingerprint = _generateFingerprint([
         info.id,
         info.model,
         info.brand,
@@ -34,17 +34,17 @@ class DeviceUtils {
       ]);
  
       return DeviceData(
-        deviceName:  info.model,
-        deviceType:  'android',
-        deviceId:    info.id,
-        fingerprint: fingerprint,
+        deviceName:        info.model,
+        platform:          'android',
+        deviceId:          info.id,
+        deviceFingerprint: deviceFingerprint,
       );
     }
  
     if (Platform.isIOS) {
       final info = await _plugin.iosInfo;
  
-      final fingerprint = _generateFingerprint([
+      final deviceFingerprint = _generateFingerprint([
         info.identifierForVendor ?? '',
         info.model,
         info.name,
@@ -53,18 +53,18 @@ class DeviceUtils {
       ]);
  
       return DeviceData(
-        deviceName:  info.name,
-        deviceType:  'ios',
-        deviceId:    info.identifierForVendor ?? 'unknown',
-        fingerprint: fingerprint,
+        deviceName:        info.name,
+        platform:          'ios',
+        deviceId:          info.identifierForVendor ?? 'unknown',
+        deviceFingerprint: deviceFingerprint,
       );
     }
  
     return DeviceData(
-      deviceName:  'unknown',
-      deviceType:  'unknown',
-      deviceId:    'unknown',
-      fingerprint: _generateFingerprint(['unknown']),
+      deviceName:        'unknown',
+      platform:          'unknown',
+      deviceId:          'unknown',
+      deviceFingerprint: _generateFingerprint(['unknown']),
     );
   }
  
@@ -75,4 +75,3 @@ class DeviceUtils {
     return digest.toString();
   }
 }
- 
