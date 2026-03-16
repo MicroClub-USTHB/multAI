@@ -24,9 +24,9 @@ class AuthRepositoryImpl implements AuthRepository {
           email:       params.email,
           password:    params.password,
           deviceName:  params.deviceName,
-          deviceType:  params.deviceType,
+          platform:    params.platform,
           deviceId:    params.deviceId,
-          fingerprint: params.fingerprint,
+          deviceFingerprint: params.deviceFingerprint,
         ),
       );
       apiClient.setAccessToken(result.accessToken);
