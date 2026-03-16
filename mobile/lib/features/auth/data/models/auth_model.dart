@@ -4,31 +4,31 @@ class AuthRequestModel {
   final String email;
   final String password;
   final String deviceName;
-  final String deviceType;
+  final String platform;
   final String deviceId;
-  final String fingerprint;
+  final String deviceFingerprint;
  
   const AuthRequestModel({
     required this.email,
     required this.password,
     required this.deviceName,
-    required this.deviceType,
+    required this.platform,
     required this.deviceId,
-    required this.fingerprint,
+    required this.deviceFingerprint,
   });
  
   Map<String, dynamic> toJson() => {
-        'email':       email,
-        'password':    password,
-        'device_name': deviceName,
-        'device_type': deviceType,
-        'device_id':   deviceId,
-        'fingerprint': fingerprint,
+        'email':              email,
+        'password':           password,
+        'device_name':        deviceName,
+        'platform':           platform,
+        'device_id':          deviceId,
+        'device_fingerprint': deviceFingerprint,
       };
 }
  
 class AuthResponseModel extends AuthEntity {
-  AuthResponseModel({
+  const AuthResponseModel({
     required super.accessToken,
     required super.refreshToken,
   });
@@ -45,3 +45,4 @@ class AuthResponseModel extends AuthEntity {
         'refresh_token': refreshToken,
       };
 }
+ 
