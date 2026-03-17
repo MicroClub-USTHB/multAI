@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'dart:async';
 
@@ -27,7 +28,7 @@ class NetworkInfoImpl implements NetworkInfo {
           .timeout(const Duration(seconds: 10));
       return hasInternet;
     } catch (e) {
-      print('Network check error: $e');
+      debugPrint('Network check error: $e');
 
       return false;
     }
