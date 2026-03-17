@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../theme/theme.dart';
+import 'dart:math';
 
 
 extension StringExtension on String {
@@ -114,3 +116,64 @@ extension Calculator on BuildContext {
   }
 }
 
+extension SnackBarExtension on BuildContext{
+  void showErrorSnackBar(String message){
+    final tt = Theme.of(this).textTheme;
+    final cs = Theme.of(this).colorScheme;
+    ScaffoldMessenger.of(this)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(
+      message ,
+       style: tt.bodySmall?.copyWith(color: cs.onError),) ,
+       backgroundColor:  cs.error,
+       behavior: SnackBarBehavior.floating,
+       shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          ),
+        margin:  const EdgeInsets.all(AppTheme.spacingMd),
+    ));
+  }
+    void showSuccessSnackBar(String message) {
+    final tt = Theme.of(this).textTheme;
+    final cs = Theme.of(this).colorScheme;
+
+    ScaffoldMessenger.of(this)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: tt.bodySmall?.copyWith(color: cs.onPrimary),
+          ),
+          backgroundColor: cs.primary,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          ),
+          margin: const EdgeInsets.all(AppTheme.spacingMd),
+        ),
+      );
+  }
+}
+
+extension ResponsiveExtension on BuildContext {
+  double hPadding() {
+    return (width * 0.06).clamp(AppTheme.spacingLg, AppTheme.spacingXxl);
+  }
+
+  double cardWidth() {
+    return min(width * 0.92, 480.0);
+  }
+
+  double logoSize() {
+    return (width * 0.15).clamp(56.0, 88.0);
+  }
+
+  double titleFontSize() {
+    return (width * 0.07).clamp(22.0, 32.0);
+  }
+
+  double sectionSpacing() {
+    return height * 0.02;
+  }
+}
