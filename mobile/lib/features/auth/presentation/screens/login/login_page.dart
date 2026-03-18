@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import '../../../../../core/theme/theme.dart';
 import 'widgets/create_workspace.dart';
 import 'widgets/divider_with_text.dart';
 import 'widgets/email_field.dart';
-import 'widgets/forgot_password.dart';
 import 'widgets/google_button.dart';
 import 'widgets/logo_section.dart';
 import 'widgets/password_field.dart';
 import 'widgets/sign_in_button.dart';
 import '../../blocs/auth_bloc.dart';
+import '../../../../../core/extensions/extensions.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -22,7 +22,6 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
 
   void _onSignInPressed() {
     if (!_formKey.currentState!.validate()) return;
@@ -53,45 +52,30 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     const LogoSection(),
 
-                    const SizedBox(height: 16),
+                    SizedBox(height: context.sectionSpacing() * 2),
                     EmailField(controller: _emailController),
 
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Password",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        ForgotPassword(onTap: () {}),
-                      ],
-                    ),
-
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppTheme.spacingXl),
                     PasswordField(
                       controller: _passwordController,
-                      obscure: _obscurePassword,
-                      onToggle: () => setState(
-                        () => _obscurePassword = !_obscurePassword,
-                      ),
-                      onSubmit: _onSignInPressed,
+                      onSubmitted: _onSignInPressed,
                     ),
 
-                    const SizedBox(height: 16),
+                    SizedBox(height: context.sectionSpacing() * 1.5),
+
                     SignInButton(
                       isLoading: isLoading,
                       onPressed: _onSignInPressed,
                     ),
 
-                    const SizedBox(height: 16),
+                    SizedBox(height: context.sectionSpacing() * 1.5),
                     const DividerWithText(),
 
-                    const SizedBox(height: 16),
-                    GoogleButton(onPressed: () {}),
+                    SizedBox(height: context.sectionSpacing() * 1.5),
+                    GoogleButton(isLoading: isLoading),
 
-                    const SizedBox(height: 16),
-                    CreateWorkspace(onTap: () {}),
+                    SizedBox(height: context.sectionSpacing() * 1.5),
+                    const CreateWorkspaceLink(),
                   ],
                 ),
               ),
@@ -102,3 +86,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
+
+
+
