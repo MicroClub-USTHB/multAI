@@ -46,31 +46,26 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthSuccess) {
-          context.pushNamedAndRemoveUntil('/home');
-        }
-        if (state is AuthFailure) {
-          context.showErrorSnackBar(state.message);
-        }
+        if (state is AuthSuccess) context.pushNamedAndRemoveUntil('/home');
+        if (state is AuthFailure) context.showErrorSnackBar(state.message);
       },
       builder: (context, state) {
         final isLoading = state is AuthLoading;
-        final tt = context.textTheme;
 
         return Scaffold(
-          backgroundColor: const Color(0xFF0F0D07),
+          backgroundColor: AppTheme.backgroundColor,
           body: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.all(AppTheme.spacingLg),
               child: Column(
                 children: [
                   Expanded(
                     child: Center(
                       child: SingleChildScrollView(
                         child: Container(
-                          padding: const EdgeInsets.all(24),
+                          padding: const EdgeInsets.all(AppTheme.spacingLg),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1C1910),
+                            color: AppTheme.surfaceColor,
                             borderRadius: BorderRadius.circular(28),
                           ),
                           child: Form(
@@ -80,23 +75,23 @@ class _LoginPageState extends State<LoginPage> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 const LogoSection(),
-                                const SizedBox(height: 40),
+                                const SizedBox(height: AppTheme.spacingXxl),
                                 EmailField(controller: _emailController),
-                                const SizedBox(height: 24),
+                                const SizedBox(height: AppTheme.spacingLg),
                                 PasswordField(
                                   controller: _passwordController,
                                   onSubmitted: _onSignInPressed,
                                 ),
-                                const SizedBox(height: 32),
+                                const SizedBox(height: AppTheme.spacingXl),
                                 SignInButton(
                                   isLoading: isLoading, 
                                   onPressed: _onSignInPressed
                                 ),
-                                const SizedBox(height: 24),
+                                const SizedBox(height: AppTheme.spacingLg),
                                 const DividerWithText(),
-                                const SizedBox(height: 24),
+                                const SizedBox(height: AppTheme.spacingLg),
                                 GoogleButton(isLoading: isLoading),
-                                const SizedBox(height: 24),
+                                const SizedBox(height: AppTheme.spacingLg),
                                 const CreateWorkspaceLink(),
                               ],
                             ),
@@ -105,22 +100,22 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.spacingMd),
                   Column(
                     children: [
                       Text(
                         'PROTECTED BY ADVANCED NEURAL ENCRYPTION',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.3),
+                          color: AppTheme.hintTextColor,
                           fontSize: 10,
                           letterSpacing: 1,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppTheme.spacingXs),
                       Text(
                         '© 2024 MULTIAI CORP',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.3), 
+                          color: AppTheme.hintTextColor, 
                           fontSize: 10
                         ),
                       ),
