@@ -8,19 +8,19 @@ class DividerWithText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+        const Expanded(child: Divider()),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingMd),
           child: Text(
             'OR CONTINUE WITH',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.3),
+              color: AppTheme.hintTextColor,
               fontSize: 12,
               letterSpacing: 1.1,
             ),
           ),
         ),
-        Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+        const Expanded(child: Divider()),
       ],
     );
   }

@@ -9,7 +9,6 @@ class LogoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
-    final cs = context.theme.colorScheme;
 
     return Column(
       children: [
@@ -17,8 +16,8 @@ class LogoSection extends StatelessWidget {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: const Color(0xFFE8A33A), // The exact orange from your screenshot
-            borderRadius: BorderRadius.circular(16),
+            color: AppTheme.primaryColor,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           ),
           child: Center(
             child: Image.asset(
@@ -28,20 +27,19 @@ class LogoSection extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppTheme.spacingLg),
         Text(
           'MultiAi',
           style: tt.displaySmall?.copyWith(
             fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 32,
+            color: AppTheme.primaryTextColor,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.spacingSm),
         Text(
           'Elevate your intelligence workspace',
-          style: tt.bodyMedium?.copyWith(
-            color: Colors.white.withOpacity(0.5),
+          style: tt.bodySmall?.copyWith(
+            color: AppTheme.secondaryTextColor,
           ),
         ),
       ],

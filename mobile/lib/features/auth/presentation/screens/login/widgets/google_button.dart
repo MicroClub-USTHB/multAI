@@ -14,10 +14,10 @@ class GoogleButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : () {},
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: AppTheme.appleColor,
           foregroundColor: Colors.black,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           ),
           elevation: 0,
         ),
@@ -25,7 +25,7 @@ class GoogleButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(AppImages.googleLogo, height: 24),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppTheme.spacingMd),
             const Text(
               'Google',
               style: TextStyle(
