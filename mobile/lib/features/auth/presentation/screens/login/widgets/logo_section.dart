@@ -10,43 +10,39 @@ class LogoSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
-    final logoSize = context.logoSize();
 
     return Column(
       children: [
         Container(
-          width: logoSize,
-          height: logoSize,
+          width: 80,
+          height: 80,
           decoration: BoxDecoration(
-            color: cs.primary,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            color: const Color(0xFFE8A33A), // The exact orange from your screenshot
+            borderRadius: BorderRadius.circular(16),
           ),
-          // Removed extra padding to match original "MC" logo fit
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          child: Center(
             child: Image.asset(
               AppImages.mcLogoWhite,
+              width: 50,
               fit: BoxFit.contain,
             ),
           ),
         ),
-        const SizedBox(height: AppTheme.spacingMd),
+        const SizedBox(height: 24),
         Text(
           'MultiAi',
           style: tt.displaySmall?.copyWith(
-            fontSize: context.titleFontSize(),
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontSize: 32,
           ),
-          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: AppTheme.spacingXs),
+        const SizedBox(height: 8),
         Text(
           'Elevate your intelligence workspace',
-          style: tt.bodySmall?.copyWith(
+          style: tt.bodyMedium?.copyWith(
             color: Colors.white.withOpacity(0.5),
           ),
-          textAlign: TextAlign.center,
         ),
       ],
     );
