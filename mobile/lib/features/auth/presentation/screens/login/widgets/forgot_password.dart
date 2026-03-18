@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../../../../../core/extensions/extensions.dart';
 
-class ForgotPassword extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const ForgotPassword({super.key, required this.onTap});
+class ForgotPasswordButton extends StatelessWidget {
+  const ForgotPasswordButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {},
       child: Text(
         'Forgot?',
         style: tt.labelMedium?.copyWith(

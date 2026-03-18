@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
+import '../../../../../../core/extensions/extensions.dart';
 
-class CreateWorkspace extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const CreateWorkspace({super.key, required this.onTap});
+class CreateWorkspaceLink extends StatelessWidget {
+  const CreateWorkspaceLink({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
     return Wrap(
       alignment: WrapAlignment.center,
       children: [
         Text("Don't have an account? ", style: tt.labelMedium),
         GestureDetector(
-          onTap: onTap,
+          onTap: () {},
           child: Text(
             'Create workspace',
             style: tt.labelMedium?.copyWith(
