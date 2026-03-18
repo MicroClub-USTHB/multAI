@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _obscurePassword = true; // ✅ FIX
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -49,14 +49,13 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
+
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthSuccess) {
-          context.pushNamedAndRemoveUntil('/home');
-        }
-        if (state is AuthFailure) {
-          context.showErrorSnackBar(state.message);
-        }
+        if (state is AuthSuccess) context.pushNamedAndRemoveUntil('/home');
+        if (state is AuthFailure) context.showErrorSnackBar(state.message);
       },
       builder: (context, state) {
         final isLoading = state is AuthLoading;
@@ -64,120 +63,117 @@ class _LoginPageState extends State<LoginPage> {
         return Scaffold(
           backgroundColor: AppTheme.backgroundColor,
           body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppTheme.spacingLg),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: SingleChildScrollView(
-                        child: Container(
-                          padding:
-                              const EdgeInsets.all(AppTheme.spacingLg),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceColor,
-                            borderRadius: BorderRadius.circular(28),
-                          ),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.hPadding(),
+                      vertical: context.heightCalculated(24),
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(AppTheme.spacingLg),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceColor,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const LogoSection(),
+                            SizedBox(height: context.heightCalculated(24)),
+
+                            Text(
+                              'Email',
+                              style: tt.titleMedium?.copyWith(
+                                color: cs.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: context.heightCalculated(8)),
+                            EmailField(controller: _emailController),
+                            SizedBox(height: context.heightCalculated(16)),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const LogoSection(),
-
-                                const SizedBox(
-                                    height: AppTheme.spacingXxl),
-
-
-                                EmailField(
-                                    controller: _emailController),
-
-                                const SizedBox(
-                                    height: AppTheme.spacingLg),
-
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Password',
-                                      style: context.textTheme.titleMedium,
-                                    ),
-                                    ForgotPassword(onTap: () {}),
-                                  ],
+                                Text(
+                                  'Password',
+                                  style: tt.titleMedium?.copyWith(
+                                    color: cs.onSurface,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-
-                                const SizedBox(
-                                    height: AppTheme.spacingSm),
-
-                                PasswordField(
-                                  controller: _passwordController,
-                                  obscure: _obscurePassword,
-                                  onToggle: () {
-                                    setState(() {
-                                      _obscurePassword =
-                                          !_obscurePassword;
-                                    });
-                                  },
-                                  onSubmit: _onSignInPressed,
-                                ),
-
-                                const SizedBox(
-                                    height: AppTheme.spacingXl),
-
-
-                                SignInButton(
-                                  isLoading: isLoading,
-                                  onPressed: _onSignInPressed,
-                                ),
-
-                                const SizedBox(
-                                    height: AppTheme.spacingLg),
-
-                                const DividerWithText(),
-
-                                const SizedBox(
-                                    height: AppTheme.spacingLg),
-
-
-                                GoogleButton(
-                                  onPressed: () {},
-                                ),
-
-                                const SizedBox(
-                                    height: AppTheme.spacingLg),
-
-
-                                CreateWorkspace(
-                                  onTap: () {},
-                                ),
+                                ForgotPassword(onTap: () {}),
                               ],
                             ),
-                          ),
+                            SizedBox(height: context.heightCalculated(8)),
+
+                            PasswordField(
+                              controller: _passwordController,
+                              obscure: _obscurePassword,
+                              onToggle: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                              onSubmit: _onSignInPressed,
+                            ),
+                            SizedBox(height: context.heightCalculated(24)),
+
+                            SignInButton(
+                              isLoading: isLoading,
+                              // height: context.heightCalculated(52),
+                              onPressed: _onSignInPressed,
+                            ),
+                            SizedBox(height: context.heightCalculated(16)),
+
+                            const DividerWithText(),
+                            SizedBox(height: context.heightCalculated(16)),
+
+                            GoogleButton(
+                              // height: context.heightCalculated(52),
+                              onPressed: () {},
+                            ),
+                            SizedBox(height: context.heightCalculated(16)),
+
+                            CreateWorkspace(onTap: () {}),
+                            SizedBox(height: context.heightCalculated(24)),
+                          ],
                         ),
                       ),
                     ),
                   ),
+                ),
 
-                  const SizedBox(height: AppTheme.spacingMd),
-
-                  Column(
-                    children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: context.heightCalculated(8),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                       Text(
                         'PROTECTED BY ADVANCED NEURAL ENCRYPTION',
-                        style: TextStyle(fontSize: 10),
+                        style: tt.labelSmall?.copyWith(
+                          color: cs.onSurface.withValues(alpha: 0.7),
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: AppTheme.spacingXs),
+                      SizedBox(height: context.heightCalculated(2)),
                       Text(
                         '© 2024 MULTIAI CORP',
-                        style: TextStyle(fontSize: 10),
+                        style: tt.labelSmall?.copyWith(
+                          color: cs.onSurface.withValues(alpha: 0.7),
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
