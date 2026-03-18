@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../../../core/extensions/extensions.dart';
 import '../../../../../../core/theme/theme.dart';
 import '../../../../../../core/validators/validators.dart';
@@ -9,15 +10,15 @@ class EmailField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tt = context.textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
           'Email address',
-          style: tt.titleMedium?.copyWith(
+          style: GoogleFonts.raleway(
             fontWeight: FontWeight.bold,
-            color: AppTheme.primaryTextColor.withValues(alpha: 0.85),
+            fontSize: 14,
+            color: AppTheme.primaryTextColor.withOpacity(0.85),
           ),
         ),
         const SizedBox(height: AppTheme.spacingSm),
@@ -25,7 +26,10 @@ class EmailField extends StatelessWidget {
           controller: controller,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
-          style: tt.bodyMedium,
+          style: GoogleFonts.montserrat(
+            color: AppTheme.primaryTextColor,
+            fontSize: 16,
+          ),
           autofillHints: const [AutofillHints.email],
           decoration: const InputDecoration(
             hintText: 'name@example.com',
