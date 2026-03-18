@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../../../core/extensions/extensions.dart';
 import '../../../../../../core/theme/theme.dart';
 import '../../../../../../core/validators/validators.dart';
@@ -23,7 +24,6 @@ class _PasswordFieldState extends State<PasswordField> {
 
   @override
   Widget build(BuildContext context) {
-    final tt = context.textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -32,9 +32,10 @@ class _PasswordFieldState extends State<PasswordField> {
           children: [
             Text(
               'Password',
-              style: tt.titleMedium?.copyWith(
+              style: GoogleFonts.raleway(
                 fontWeight: FontWeight.bold,
-                color: AppTheme.primaryTextColor.withValues(alpha: 0.85),
+                fontSize: 14,
+                color: AppTheme.primaryTextColor.withOpacity(0.85),
               ),
             ),
             const ForgotPasswordButton(),
@@ -45,7 +46,10 @@ class _PasswordFieldState extends State<PasswordField> {
           controller: widget.controller,
           obscureText: _obscurePassword,
           textInputAction: TextInputAction.done,
-          style: tt.bodyMedium,
+          style: GoogleFonts.montserrat(
+            color: AppTheme.primaryTextColor,
+            fontSize: 16,
+          ),
           onFieldSubmitted: (_) => widget.onSubmitted(),
           decoration: InputDecoration(
             hintText: '••••••••',
