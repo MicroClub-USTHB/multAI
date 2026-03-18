@@ -17,7 +17,10 @@ class DividerWithText extends StatelessWidget {
           ),
           child: Text(
             'OR CONTINUE WITH',
-            style: tt.labelSmall?.copyWith(letterSpacing: 1.2),
+            style: tt.labelSmall?.copyWith(
+              fontSize: context.widthCalculated(12),
+              letterSpacing: 1.2,
+            ),
           ),
         ),
         const Expanded(child: Divider()),

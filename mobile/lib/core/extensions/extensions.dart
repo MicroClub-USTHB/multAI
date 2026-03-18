@@ -176,4 +176,22 @@ extension ResponsiveExtension on BuildContext {
   double sectionSpacing() {
     return height * 0.02;
   }
+  
+
+  double radius([double factor = 2]) {
+    // Adjust the factor for your design
+    return widthCalculated(factor);
+  }
+
+  double iconSize([double factor = 6]) {
+    // Adjust factor for your design
+    return widthCalculated(factor);
+  }
+
+  double subtitleFontSize([double factor = 3]) => widthCalculated(factor);
+
+  
 }
+
+
+

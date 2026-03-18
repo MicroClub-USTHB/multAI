@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/extensions.dart';
+import '../../../../../../core/theme/theme.dart';
 
 class SignInButton extends StatelessWidget {
   final bool isLoading;
@@ -16,9 +17,26 @@ class SignInButton extends StatelessWidget {
     final cs = context.theme.colorScheme;
     final tt = context.textTheme;
 
+    // Responsive sizing
+    final buttonHeight = context.heightCalculated(52);
+    final iconSize = context.widthCalculated(18);
+    final spacing = context.widthCalculated(6);
+    final textStyle = tt.titleLarge?.copyWith(
+      color: cs.onPrimary,
+      fontWeight: FontWeight.bold,
+      fontSize: context.widthCalculated(16), // responsive text
+    );
+
     return SizedBox(
-      height: context.heightCalculated(52),
+      height: buttonHeight,
       child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: cs.primary,
+          foregroundColor: cs.onPrimary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          ),
+        ),
         onPressed: isLoading ? null : onPressed,
         child: isLoading
             ? SizedBox(
@@ -32,17 +50,9 @@ class SignInButton extends StatelessWidget {
             : Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Sign In',
-                    style: tt.titleLarge?.copyWith(
-                      color: cs.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(width: context.widthCalculated(6)),
-                  Icon(Icons.arrow_forward,
-                      color: cs.onPrimary,
-                      size: context.widthCalculated(18)),
+                  Text('Sign In', style: textStyle),
+                  SizedBox(width: spacing),
+                  Icon(Icons.arrow_forward, color: cs.onPrimary, size: iconSize),
                 ],
               ),
       ),

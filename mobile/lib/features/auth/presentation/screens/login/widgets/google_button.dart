@@ -19,6 +19,9 @@ class GoogleButton extends StatelessWidget {
           backgroundColor: Colors.white,
           foregroundColor: Colors.black87,
           side: BorderSide.none,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.widthCalculated(8)),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -34,6 +37,7 @@ class GoogleButton extends StatelessWidget {
               style: tt.titleMedium?.copyWith(
                 color: Colors.black87,
                 fontWeight: FontWeight.w600,
+                fontSize: context.widthCalculated(14),
               ),
             ),
           ],

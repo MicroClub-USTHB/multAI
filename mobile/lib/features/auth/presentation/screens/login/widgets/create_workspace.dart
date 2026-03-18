@@ -13,8 +13,14 @@ class CreateWorkspace extends StatelessWidget {
 
     return Wrap(
       alignment: WrapAlignment.center,
+      spacing: context.widthCalculated(4),
       children: [
-        Text("Don't have an account? ", style: tt.labelMedium),
+        Text(
+          "Don't have an account?",
+          style: tt.labelMedium?.copyWith(
+            fontSize: context.widthCalculated(14),
+          ),
+        ),
         GestureDetector(
           onTap: onTap,
           child: Text(
@@ -22,6 +28,7 @@ class CreateWorkspace extends StatelessWidget {
             style: tt.labelMedium?.copyWith(
               color: cs.primary,
               fontWeight: FontWeight.w600,
+              fontSize: context.widthCalculated(14),
             ),
           ),
         ),

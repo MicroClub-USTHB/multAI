@@ -18,6 +18,7 @@ class ForgotPassword extends StatelessWidget {
         style: tt.labelMedium?.copyWith(
           color: cs.primary,
           fontWeight: FontWeight.w600,
+          fontSize: context.widthCalculated(14),
         ),
       ),
     );
