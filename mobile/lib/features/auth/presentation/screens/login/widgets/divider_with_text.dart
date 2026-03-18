@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../../../core/extensions/extensions.dart';
 import '../../../../../../core/theme/theme.dart';
 
 class DividerWithText extends StatelessWidget {
@@ -7,21 +6,21 @@ class DividerWithText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tt = context.textTheme;
     return Row(
       children: [
-        const Expanded(child: Divider(color: Colors.white10)),
+        Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'OR CONTINUE WITH',
-            style: tt.labelSmall?.copyWith(
-              letterSpacing: 1.2,
-              color: Colors.white.withOpacity(0.4),
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.3),
+              fontSize: 12,
+              letterSpacing: 1.1,
             ),
           ),
         ),
-        const Expanded(child: Divider(color: Colors.white10)),
+        Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
       ],
     );
   }
