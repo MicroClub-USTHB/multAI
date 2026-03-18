@@ -10,15 +10,18 @@ class DividerWithText extends StatelessWidget {
     final tt = context.textTheme;
     return Row(
       children: [
-        const Expanded(child: Divider()),
+        const Expanded(child: Divider(color: Colors.white10)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
           child: Text(
             'OR CONTINUE WITH',
-            style: tt.labelSmall?.copyWith(letterSpacing: 1.2),
+            style: tt.labelSmall?.copyWith(
+              letterSpacing: 1.2,
+              color: Colors.white.withOpacity(0.4),
+            ),
           ),
         ),
-        const Expanded(child: Divider()),
+        const Expanded(child: Divider(color: Colors.white10)),
       ],
     );
   }
