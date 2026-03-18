@@ -12,11 +12,11 @@ class GoogleButton extends StatelessWidget {
     final tt = context.textTheme;
     return SizedBox(
       height: 52,
-      width: double.infinity, // Ensure it fills the container width
+      width: double.infinity,
       child: OutlinedButton(
         onPressed: isLoading ? null : () {},
         style: OutlinedButton.styleFrom(
-          backgroundColor: AppTheme.primaryTextColor,
+          backgroundColor: Colors.white, // Pure white like original
           foregroundColor: Colors.black87,
           side: BorderSide.none,
           shape: RoundedRectangleBorder(
@@ -24,17 +24,13 @@ class GoogleButton extends StatelessWidget {
           ),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center, // Fixes horizontal positioning
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
               AppImages.googleLogo,
-              height: 18,
-              width: 18,
-              errorBuilder: (context, error, stackTrace) => const Icon(
-                Icons.g_mobiledata,
-                color: Colors.black87,
-                size: 24,
-              ),
+              height: 20,
+              width: 20,
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.g_mobiledata, size: 24),
             ),
             const SizedBox(width: AppTheme.spacingSm),
             Text(
