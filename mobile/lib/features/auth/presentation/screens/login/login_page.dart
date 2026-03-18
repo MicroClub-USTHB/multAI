@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/extensions/extensions.dart';
-import '../../../../core/theme/theme.dart';
-import '../blocs/auth_bloc.dart';
+import '../../../../../core/extensions/extensions.dart';
+import '../../../../../core/theme/theme.dart';
+import '../../blocs/auth_bloc.dart';
 import 'widgets/logo_section.dart';
 import 'widgets/email_field.dart';
 import 'widgets/password_field.dart';
