@@ -1,37 +1,39 @@
 import 'package:flutter/material.dart';
-import '../../../../../../core/theme/theme.dart';
+import '../../../../../../core/extensions/extensions.dart';
 import '../../../../../../core/constants/images.dart';
 
 class GoogleButton extends StatelessWidget {
-  final bool isLoading;
-  const GoogleButton({super.key, required this.isLoading});
+  final VoidCallback onPressed;
+
+  const GoogleButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
+    final tt = context.textTheme;
+
     return SizedBox(
-      height: 56,
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.appleColor,
-          foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-          ),
-          elevation: 0,
+      height: context.heightCalculated(52),
+      child: OutlinedButton(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black87,
+          side: BorderSide.none,
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(AppImages.googleLogo, height: 24),
-            const SizedBox(width: AppTheme.spacingMd),
-            const Text(
+            Image.asset(
+              '${AppImages.imagesPath}/google.png',
+              height: context.heightCalculated(20),
+              width: context.widthCalculated(20),
+            ),
+            SizedBox(width: context.widthCalculated(8)),
+            Text(
               'Google',
-              style: TextStyle(
-                fontSize: 18,
+              style: tt.titleMedium?.copyWith(
+                color: Colors.black87,
                 fontWeight: FontWeight.w600,
-                color: Colors.black,
               ),
             ),
           ],
