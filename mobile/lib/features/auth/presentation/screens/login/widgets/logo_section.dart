@@ -9,38 +9,39 @@ class LogoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
+    final logoSize = context.logoSize();
 
     return Column(
       children: [
         Container(
-          width: 80,
-          height: 80,
+          width: logoSize,
+          height: logoSize,
           decoration: BoxDecoration(
-            color: AppTheme.primaryColor,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+            color: cs.primary,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           ),
-          child: Center(
+          padding: EdgeInsets.all(context.widthCalculated(4)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             child: Image.asset(
-              AppImages.mcLogoWhite,
-              width: 50,
+              '${AppImages.imagesPath}/MC_white.png',
               fit: BoxFit.contain,
             ),
           ),
         ),
-        const SizedBox(height: AppTheme.spacingLg),
+        SizedBox(height: context.heightCalculated(16)),
         Text(
           'MultiAi',
           style: tt.displaySmall?.copyWith(
+            fontSize: context.titleFontSize(),
             fontWeight: FontWeight.bold,
-            color: AppTheme.primaryTextColor,
           ),
         ),
-        const SizedBox(height: AppTheme.spacingSm),
+        SizedBox(height: context.heightCalculated(4)),
         Text(
           'Elevate your intelligence workspace',
-          style: tt.bodySmall?.copyWith(
-            color: AppTheme.secondaryTextColor,
-          ),
+          style: tt.bodySmall,
         ),
       ],
     );
