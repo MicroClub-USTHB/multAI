@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/extensions.dart';
-import '../../../../../../core/theme/theme.dart';
 
 class SignInButton extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onPressed;
 
-  const SignInButton({super.key, required this.isLoading, required this.onPressed});
+  const SignInButton({
+    super.key,
+    required this.isLoading,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final tt = context.textTheme;
     final cs = context.theme.colorScheme;
+    final tt = context.textTheme;
+
     return SizedBox(
-      height: 52,
+      height: context.heightCalculated(52),
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         child: isLoading
             ? SizedBox(
-                height: 20,
-                width: 20,
+                height: context.heightCalculated(20),
+                width: context.heightCalculated(20),
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
                   color: cs.onPrimary,
@@ -35,8 +39,10 @@ class SignInButton extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: AppTheme.spacingXs),
-                  Icon(Icons.arrow_forward, color: cs.onPrimary, size: 18),
+                  SizedBox(width: context.widthCalculated(6)),
+                  Icon(Icons.arrow_forward,
+                      color: cs.onPrimary,
+                      size: context.widthCalculated(18)),
                 ],
               ),
       ),
