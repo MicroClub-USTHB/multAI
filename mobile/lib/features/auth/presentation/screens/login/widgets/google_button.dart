@@ -12,6 +12,7 @@ class GoogleButton extends StatelessWidget {
     final tt = context.textTheme;
     return SizedBox(
       height: 52,
+      width: double.infinity, // Ensure it fills the container width
       child: OutlinedButton(
         onPressed: isLoading ? null : () {},
         style: OutlinedButton.styleFrom(
@@ -23,10 +24,19 @@ class GoogleButton extends StatelessWidget {
           ),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center, // Fixes horizontal positioning
           children: [
-            Image.asset(AppImages.googleLogo, height: 18, width: 18),
-            const SizedBox(width: AppTheme.spacingXs),
+            Image.asset(
+              AppImages.googleLogo,
+              height: 18,
+              width: 18,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.g_mobiledata,
+                color: Colors.black87,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: AppTheme.spacingSm),
             Text(
               'Google',
               style: tt.titleMedium?.copyWith(
