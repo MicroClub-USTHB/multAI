@@ -41,12 +41,17 @@ class LogoSection extends StatelessWidget {
           style: tt.displaySmall?.copyWith(
             fontSize: context.titleFontSize(),
             fontWeight: FontWeight.bold,
+            color: AppTheme.primaryTextColor,
           ),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppTheme.spacingXs),
         Text(
           'Elevate your intelligence workspace',
-          style: tt.bodySmall,
+          style: tt.bodySmall?.copyWith(
+            color: AppTheme.secondaryTextColor.withValues(alpha: 0.7),
+          ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
