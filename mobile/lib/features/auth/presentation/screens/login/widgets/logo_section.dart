@@ -21,17 +21,12 @@ class LogoSection extends StatelessWidget {
             color: cs.primary,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           ),
-          padding: const EdgeInsets.all(AppTheme.spacingXs),
+          // Removed extra padding to match original "MC" logo fit
           child: ClipRRect(
             borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             child: Image.asset(
               AppImages.mcLogoWhite,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Icon(
-                Icons.auto_awesome,
-                color: cs.onPrimary,
-                size: logoSize * 0.55,
-              ),
             ),
           ),
         ),
@@ -41,7 +36,7 @@ class LogoSection extends StatelessWidget {
           style: tt.displaySmall?.copyWith(
             fontSize: context.titleFontSize(),
             fontWeight: FontWeight.bold,
-            color: AppTheme.primaryTextColor,
+            color: Colors.white,
           ),
           textAlign: TextAlign.center,
         ),
@@ -49,7 +44,7 @@ class LogoSection extends StatelessWidget {
         Text(
           'Elevate your intelligence workspace',
           style: tt.bodySmall?.copyWith(
-            color: AppTheme.secondaryTextColor.withValues(alpha: 0.7),
+            color: Colors.white.withOpacity(0.5),
           ),
           textAlign: TextAlign.center,
         ),
