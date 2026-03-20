@@ -86,20 +86,48 @@ class ApiClient {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return jsonDecode(response.body) as Map<String, dynamic>;
     }
-    if (response.statusCode == 401) {
-      throw const UnauthorizedFailure(
-          message: 'Session expired. Please log in again.');
+ 
+    switch (response.statusCode) {
+      case 400:
+        throw ServerFailure(message: _parseError(response));
+      case 401:
+        throw const UnauthorizedFailure(message: 'Session expired. Please log in again.');
+      case 403:
+        throw const ServerFailure(message: 'Access denied.');
+      case 404:
+        throw const ServerFailure(message: 'Resource not found.');
+      case 422:
+        throw ServerFailure(message: _parseError(response));
+      case 429:
+        throw const ServerFailure(message: 'Too many attempts. Try again later.');
+      case 500:
+        throw const ServerFailure(message: 'Server error. Try again later.');
+      default:
+        throw ServerFailure(message: _parseError(response));
     }
-    throw ServerFailure(message: _parseError(response));
   }
  
   void _handleVoidResponse(http.Response response) {
     if (response.statusCode == 200 || response.statusCode == 204) return;
-    if (response.statusCode == 401) {
-      throw const UnauthorizedFailure(
-          message: 'Session expired. Please log in again.');
+ 
+    switch (response.statusCode) {
+      case 400:
+        throw ServerFailure(message: _parseError(response));
+      case 401:
+        throw const UnauthorizedFailure(message: 'Session expired. Please log in again.');
+      case 403:
+        throw const ServerFailure(message: 'Access denied.');
+      case 404:
+        throw const ServerFailure(message: 'Resource not found.');
+      case 422:
+        throw ServerFailure(message: _parseError(response));
+      case 429:
+        throw const ServerFailure(message: 'Too many attempts. Try again later.');
+      case 500:
+        throw const ServerFailure(message: 'Server error. Try again later.');
+      default:
+        throw ServerFailure(message: _parseError(response));
     }
-    throw ServerFailure(message: _parseError(response));
   }
  
   String _parseError(http.Response response) {
@@ -113,4 +141,3 @@ class ApiClient {
     }
   }
 }
- 
