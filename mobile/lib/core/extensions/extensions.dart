@@ -157,41 +157,22 @@ extension SnackBarExtension on BuildContext{
 }
 
 extension ResponsiveExtension on BuildContext {
-  double hPadding() {
-    return (width * 0.06).clamp(AppTheme.spacingLg, AppTheme.spacingXxl);
-  }
-
-  double cardWidth() {
-    return min(width * 0.92, 480.0);
-  }
-
-  double logoSize() {
-    return (width * 0.15).clamp(56.0, 88.0);
-  }
-
-  double titleFontSize() {
-    return (width * 0.07).clamp(22.0, 32.0);
-  }
-
-  double sectionSpacing() {
-    return height * 0.02;
-  }
-  
-
-  double radius([double factor = 2]) {
-    // Adjust the factor for your design
-    return widthCalculated(factor);
-  }
-
-  double iconSize([double factor = 6]) {
-    // Adjust factor for your design
-    return widthCalculated(factor);
-  }
-
-  double subtitleFontSize([double factor = 3]) => widthCalculated(factor);
-
-  
+  double hPadding() =>
+      (width * 0.06).clamp(AppTheme.spacingLg, AppTheme.spacingXxl);
+ 
+  double cardMaxWidth() => min(width * 0.92, 480.0);
+ 
+  double logoSize() => (width * 0.15).clamp(56.0, 88.0);
+ 
+  double titleFontSize() => (width * 0.07).clamp(22.0, 32.0);
+ 
+  double sectionSpacing() => height * 0.02;
+ 
+  // ── icon size — scales with screen width ──────────────────────────────────
+  double iconSize() => (width * 0.055).clamp(20.0, 26.0);
+ 
+  // ── border radius — scales with screen width ──────────────────────────────
+  double radius() => (width * 0.03).clamp(AppTheme.radiusSm, AppTheme.radiusMd);
 }
-
-
+ 
 
