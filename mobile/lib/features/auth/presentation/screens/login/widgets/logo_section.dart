@@ -2,23 +2,18 @@ import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/extensions.dart';
 import '../../../../../../core/theme/theme.dart';
 import '../../../../../../core/constants/images.dart';
-
+ 
 class LogoSection extends StatelessWidget {
   const LogoSection({super.key});
-
+ 
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
-
-    // Use responsive sizing
     final logoSize = context.logoSize();
-    final verticalSpacing = context.heightCalculated(16);
-    final titleSpacing = context.heightCalculated(8);
-
+ 
     return Column(
       children: [
-        // Logo container
         Container(
           width: logoSize,
           height: logoSize,
@@ -35,11 +30,7 @@ class LogoSection extends StatelessWidget {
             ),
           ),
         ),
-
-        // Space below logo
-        SizedBox(height: verticalSpacing),
-
-        // App title
+        SizedBox(height: context.heightCalculated(16)),
         Text(
           'MultiAi',
           style: tt.displaySmall?.copyWith(
@@ -48,17 +39,11 @@ class LogoSection extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-
-        // Space below title
-        SizedBox(height: titleSpacing),
-
-        // Subtitle
+        SizedBox(height: context.heightCalculated(6)),
         Text(
           'Elevate your intelligence workspace',
-          style: tt.titleSmall?.copyWith(
+          style: tt.bodySmall?.copyWith(
             color: cs.onSurface.withValues(alpha: 0.7),
-            fontSize: context.widthCalculated(14), // scale subtitle
-            height: 1.4,
           ),
           textAlign: TextAlign.center,
         ),
@@ -66,3 +51,4 @@ class LogoSection extends StatelessWidget {
     );
   }
 }
+ 
