@@ -28,7 +28,7 @@ class GoogleButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
-              '${AppImages.imagesPath}/google.png',
+              AppImages.googleLogo,
               height: context.heightCalculated(20),
               width: context.widthCalculated(20),
             ),
