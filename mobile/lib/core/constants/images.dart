@@ -2,7 +2,5 @@ class AppImages {
   static const String assetsPath = 'assets';
   static const String imagesPath = '$assetsPath/images';
   static const String iconsPath = '$assetsPath/icons';
-  static const String mcLogoWhite = '$imagesPath/mclogo_white.png';
-  static const String mcLogoBlack = '$imagesPath/mclogo_black.png';
-  static const String googleLogo = '$iconsPath/google.png';
+  static const String mcLogoWhite = '$imagesPath/MC_white.png';
 }
