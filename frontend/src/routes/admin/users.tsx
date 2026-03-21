@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/shared/ui/alert'
+import { Button } from '@/shared/ui/button'
 import { Card, CardContent } from '@/shared/ui/card'
 import { Input } from '@/shared/ui/input'
 import {
@@ -11,17 +12,19 @@ import {
   SelectValue,
 } from '@/shared/ui/select'
 import { Skeleton } from '@/shared/ui/skeleton'
-import { UsersTable } from '@/features/admin/users/components/users-table'
+import {
+  CreateUserDialog,
+  DeleteUserConfirmDialog,
+  UsersTable,
+} from '@/features/admin/users/components'
 import { useAdminUsers } from '@/features/admin/users/hooks'
 import {
   ADMIN_USER_ROLES,
-  ADMIN_USER_STATUSES,
   type AdminUser,
   type AdminUserRole,
-  type AdminUserStatus,
 } from '@/features/admin/users/types'
-import { Search, Shield, UserCheck, UserPlus, Users } from 'lucide-react'
-import { AssignEventDialog } from '@/features/admin/users/components/assign-event-dialog'
+import { Plus, Search, Shield, UserCog, Users } from 'lucide-react'
+import { AdminUsersApiError } from '@/features/admin/users/api'
 
 export const Route = createFileRoute('/admin/users')({
   component: UsersPage,
@@ -34,17 +37,18 @@ function UsersPage() {
     isError,
     error,
     updateRole,
-    updateStatus,
-    resendInvite,
-    assignNewEvent,
+    createUser,
+    deleteUser,
     isMutating,
   } = useAdminUsers()
 
   const [searchValue, setSearchValue] = useState('')
   const [roleFilter, setRoleFilter] = useState<'all' | AdminUserRole>('all')
-  const [statusFilter, setStatusFilter] = useState<'all' | AdminUserStatus>('all')
-  const [selectedMultiUser, setSelectedMultiUser] = useState<AdminUser | null>(null)
-  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [selectedUserToDelete, setSelectedUserToDelete] =
+    useState<AdminUser | null>(null)
+
   const filteredUsers = useMemo(() => {
     const query = searchValue.trim().toLowerCase()
 
@@ -55,20 +59,26 @@ function UsersPage() {
         user.email.toLowerCase().includes(query)
 
       const matchesRole = roleFilter === 'all' || user.role === roleFilter
-      const matchesStatus = statusFilter === 'all' || user.status === statusFilter
 
-      return matchesSearch && matchesRole && matchesStatus
+      return matchesSearch && matchesRole
     })
-  }, [users, searchValue, roleFilter, statusFilter])
+  }, [users, searchValue, roleFilter])
 
   const stats = useMemo(() => {
     const total = users.length
-    const members = users.filter(user => user.status === 'member').length
-    const invited = users.filter(user => user.status === 'invited').length
     const admins = users.filter(user => user.role === 'admin').length
+    const teamLeads = users.filter(user => user.role === 'multi_team_lead').length
+    const multis = users.filter(user => user.role === 'multi').length
 
-    return { total, members, invited, admins }
+    return { total, admins, teamLeads, multis }
   }, [users])
+
+  const errorMessage =
+    error instanceof AdminUsersApiError && error.status === 401
+      ? 'Session admin absente. Connecte-toi et assure-toi que le token est bien present (cookie access_token ou localStorage admin_access_token).'
+      : error instanceof Error
+        ? error.message
+        : 'Unknown error'
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-6">
@@ -76,21 +86,25 @@ function UsersPage() {
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Users</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage roles and statuses with mock data until backend integration.
+            Manage staff users with the backend admin/staff-users endpoints.
           </p>
         </div>
+        <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <Plus />
+          Create user
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Total users" value={stats.total.toString()} icon={Users} />
-        <StatCard label="Members" value={stats.members.toString()} icon={UserCheck} />
-        <StatCard label="Invited" value={stats.invited.toString()} icon={UserPlus} />
         <StatCard label="Admins" value={stats.admins.toString()} icon={Shield} />
+        <StatCard label="Team leads" value={stats.teamLeads.toString()} icon={UserCog} />
+        <StatCard label="Multi" value={stats.multis.toString()} icon={Users} />
       </div>
 
       <Card className="gap-4 py-4">
         <CardContent className="space-y-4 px-4">
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_180px_180px]">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_220px]">
             <div className="relative">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -117,31 +131,12 @@ function UsersPage() {
                 ))}
               </SelectContent>
             </Select>
-
-            <Select
-              value={statusFilter}
-              onValueChange={value => setStatusFilter(value as 'all' | AdminUserStatus)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
-                {ADMIN_USER_STATUSES.map(status => (
-                  <SelectItem key={status} value={status}>
-                    {status}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           {isError && (
             <Alert variant="destructive">
               <AlertTitle>Failed to load users</AlertTitle>
-              <AlertDescription>
-                {error instanceof Error ? error.message : 'Unknown error'}
-              </AlertDescription>
+              <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
           )}
 
@@ -154,30 +149,36 @@ function UsersPage() {
           ) : (
             <UsersTable
               users={filteredUsers}
-              onRoleChange={(userId, role) => updateRole({ userId, role })}
-              onStatusChange={(userId, status) => updateStatus({ userId, status })}
-              onResendInvite={userId => resendInvite(userId)}
-              onAssignNewEvent={user => {
-                setSelectedMultiUser(user)
-                setIsAssignDialogOpen(true)
+              onRoleChange={(user, role) =>
+                updateRole({ userId: user.id, role, email: user.email })
+              }
+              onDeleteUser={user => {
+                setSelectedUserToDelete(user)
+                setIsDeleteDialogOpen(true)
               }}
-              onDeactivateAccount={userId => updateStatus({ userId, status: 'suspended' })}
               isMutating={isMutating}
             />
           )}
         </CardContent>
       </Card>
 
-      <AssignEventDialog
-        user={selectedMultiUser}
-        open={isAssignDialogOpen}
+      <CreateUserDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onSubmit={createUser}
+        isSubmitting={isMutating}
+      />
+
+      <DeleteUserConfirmDialog
+        open={isDeleteDialogOpen}
+        user={selectedUserToDelete}
         onOpenChange={open => {
-          setIsAssignDialogOpen(open)
+          setIsDeleteDialogOpen(open)
           if (!open) {
-            setSelectedMultiUser(null)
+            setSelectedUserToDelete(null)
           }
         }}
-        onSubmit={assignNewEvent}
+        onConfirm={deleteUser}
         isSubmitting={isMutating}
       />
     </div>
