@@ -1,169 +1,197 @@
 import type {
 	AdminUser,
-	AssignAdminUserToEventInput,
+	CreateAdminUserInput,
+	EditableAdminUserRole,
 	UpdateAdminUserRoleInput,
-	UpdateAdminUserStatusInput,
 } from './types'
 
-const MOCK_LATENCY_MS = 350
+type StaffRole = 'admin' | 'multi_team_lead' | 'multi'
 
-let mockUsers: AdminUser[] = [
-	{
-		id: 'usr-001',
-		fullName: 'Aya Bensalem',
-		email: 'aya@multai.app',
-		role: 'admin',
-		status: 'member',
-		assignedEventsCount: 0,
-		avatarUrl: null,
-		lastActiveAt: '2026-03-19T08:45:00.000Z',
-		createdAt: '2025-11-04T10:25:00.000Z',
-	},
-	{
-		id: 'usr-002',
-		fullName: 'Yacine Kaci',
-		email: 'yacine@multai.app',
-		role: 'multi',
-		status: 'member',
-		assignedEventsCount: 5,
-		avatarUrl: null,
-		lastActiveAt: '2026-03-18T19:18:00.000Z',
-		createdAt: '2025-10-10T09:00:00.000Z',
-	},
-	{
-		id: 'usr-003',
-		fullName: 'Lina Boudiaf',
-		email: 'lina@multai.app',
-		role: 'user',
-		status: 'invited',
-		assignedEventsCount: 0,
-		avatarUrl: null,
-		lastActiveAt: null,
-		createdAt: '2026-03-12T13:20:00.000Z',
-	},
-	{
-		id: 'usr-004',
-		fullName: 'Anis Merabet',
-		email: 'anis@multai.app',
-		role: 'user',
-		status: 'suspended',
-		assignedEventsCount: 0,
-		avatarUrl: null,
-		lastActiveAt: '2026-02-28T11:00:00.000Z',
-		createdAt: '2025-12-01T08:45:00.000Z',
-	},
-	{
-		id: 'usr-005',
-		fullName: 'Sofia Messaoudi',
-		email: 'sofia@multai.app',
-		role: 'multi',
-		status: 'member',
-		assignedEventsCount: 3,
-		avatarUrl: null,
-		lastActiveAt: '2026-03-19T06:10:00.000Z',
-		createdAt: '2025-11-20T15:30:00.000Z',
-	},
-]
+type StaffUserSchema = {
+	id: string
+	email: string | null
+	role: StaffRole
+	created_at: string
+	updated_at: string
+}
 
-const sleep = (ms: number) =>
-	new Promise(resolve => {
-		setTimeout(resolve, ms)
-	})
+const API_BASE_URL =
+	(import.meta.env.VITE_API_BASE_URL as string | undefined) ??
+	'http://localhost:8000'
 
-const cloneUser = (user: AdminUser): AdminUser => ({ ...user })
+export class AdminUsersApiError extends Error {
+	status: number
 
-const cloneUsers = (): AdminUser[] => mockUsers.map(cloneUser)
+	constructor(message: string, status: number) {
+		super(message)
+		this.name = 'AdminUsersApiError'
+		this.status = status
+	}
+}
 
-const findUserIndex = (userId: string) =>
-	mockUsers.findIndex(user => user.id === userId)
-
-const getUserOrThrow = (userId: string) => {
-	const index = findUserIndex(userId)
-
-	if (index === -1) {
-		throw new Error('User not found')
+function getAuthToken() {
+	if (typeof window === 'undefined') {
+		return null
 	}
 
-	return { index, user: mockUsers[index] }
+	return (
+		window.localStorage.getItem('admin_access_token') ??
+		window.localStorage.getItem('adminToken') ??
+		window.localStorage.getItem('access_token') ??
+		window.localStorage.getItem('token') ??
+		window.sessionStorage.getItem('admin_access_token') ??
+		window.sessionStorage.getItem('access_token')
+	)
+}
+
+function ensureAccessTokenCookie(token: string | null) {
+	if (typeof document === 'undefined' || !token) {
+		return
+	}
+
+	const encoded = encodeURIComponent(token)
+	if (document.cookie.includes(`access_token=${encoded}`)) {
+		return
+	}
+
+	document.cookie = `access_token=${encoded}; path=/; SameSite=Lax`
+}
+
+function buildHeaders(extra?: Record<string, string>) {
+	const token = getAuthToken()
+
+	return {
+		...(token ? { Authorization: `Bearer ${token}` } : {}),
+		...(extra ?? {}),
+	}
+}
+
+async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
+	const token = getAuthToken()
+	ensureAccessTokenCookie(token)
+
+	const response = await fetch(`${API_BASE_URL}${path}`, {
+		...init,
+		credentials: 'include',
+		headers: {
+			...buildHeaders(),
+			...(init?.headers ?? {}),
+		},
+	})
+
+	if (!response.ok) {
+		const fallback = `Request failed (${response.status})`
+		let message = fallback
+		try {
+			const data = (await response.json()) as { detail?: unknown }
+			if (typeof data.detail === 'string') {
+				message = data.detail
+			}
+		} catch {
+			// Ignore parse errors and keep a generic message.
+		}
+		if (response.status === 401) {
+			throw new AdminUsersApiError(
+				'Session admin invalide ou absente. Connecte-toi puis reessaie.',
+				401,
+			)
+		}
+
+		throw new AdminUsersApiError(message, response.status)
+	}
+
+	if (response.status === 204) {
+		return undefined as T
+	}
+
+	return (await response.json()) as T
+}
+
+function roleFromApi(role: StaffRole): AdminUser['role'] {
+	return role
+}
+
+function roleToApi(role: EditableAdminUserRole): Exclude<StaffRole, 'admin'> {
+	return role
+}
+
+function emailToFullName(email: string | null): string {
+	if (!email) {
+		return 'Unknown user'
+	}
+
+	const username = email.split('@')[0] ?? 'user'
+	return username
+		.split(/[._-]/g)
+		.filter(Boolean)
+		.map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+		.join(' ')
+}
+
+function mapStaffUserToAdminUser(user: StaffUserSchema): AdminUser {
+	return {
+		id: user.id,
+		fullName: emailToFullName(user.email),
+		email: user.email ?? '',
+		role: roleFromApi(user.role),
+		avatarUrl: null,
+		createdAt: user.created_at,
+		updatedAt: user.updated_at,
+	}
 }
 
 export async function getAdminUsers(): Promise<AdminUser[]> {
-	await sleep(MOCK_LATENCY_MS)
+	const users = await requestJson<StaffUserSchema[]>('/admin/staff-users/')
 
-	return cloneUsers().sort((a, b) => a.fullName.localeCompare(b.fullName))
+	return users
+		.map(mapStaffUserToAdminUser)
+		.sort((a, b) => a.fullName.localeCompare(b.fullName))
 }
 
 export async function updateAdminUserRole(
 	input: UpdateAdminUserRoleInput,
 ): Promise<AdminUser> {
-	await sleep(MOCK_LATENCY_MS)
+	const current = await requestJson<StaffUserSchema>(
+		`/admin/staff-users/${input.userId}`,
+		{
+			method: 'PATCH',
+			headers: buildHeaders({
+				'Content-Type': 'application/json',
+			}),
+			body: JSON.stringify({
+				email: input.email ?? null,
+				role: roleToApi(input.role),
+			}),
+		},
+	)
 
-	const { index, user } = getUserOrThrow(input.userId)
-	const updatedUser: AdminUser = {
-		...user,
-		role: input.role,
-	}
-
-	mockUsers[index] = updatedUser
-	return cloneUser(updatedUser)
+	return mapStaffUserToAdminUser(current)
 }
 
-export async function updateAdminUserStatus(
-	input: UpdateAdminUserStatusInput,
+export async function createAdminUser(
+	input: CreateAdminUserInput,
 ): Promise<AdminUser> {
-	await sleep(MOCK_LATENCY_MS)
+	const created = await requestJson<StaffUserSchema>('/admin/staff-users/', {
+		method: 'POST',
+		headers: buildHeaders({
+			'Content-Type': 'application/json',
+		}),
+		body: JSON.stringify({
+			email: input.email,
+			password: input.password,
+			role: roleToApi(input.role),
+		}),
+	})
 
-	const { index, user } = getUserOrThrow(input.userId)
-	const updatedUser: AdminUser = {
-		...user,
-		status: input.status,
-		lastActiveAt:
-			input.status === 'member'
-				? user.lastActiveAt ?? new Date().toISOString()
-				: user.lastActiveAt,
-	}
-
-	mockUsers[index] = updatedUser
-	return cloneUser(updatedUser)
+	return mapStaffUserToAdminUser(created)
 }
 
-export async function resendAdminUserInvite(userId: string): Promise<AdminUser> {
-	await sleep(MOCK_LATENCY_MS)
+export async function deleteAdminUser(userId: string): Promise<{ id: string }> {
+	await requestJson<StaffUserSchema>(`/admin/staff-users/${userId}`, {
+		method: 'DELETE',
+		headers: buildHeaders(),
+	})
 
-	const { index, user } = getUserOrThrow(userId)
-	const updatedUser: AdminUser = {
-		...user,
-		status: 'invited',
-	}
-
-	mockUsers[index] = updatedUser
-	return cloneUser(updatedUser)
-}
-
-export async function assignAdminUserToNewEvent(
-	input: AssignAdminUserToEventInput,
-): Promise<AdminUser> {
-	await sleep(MOCK_LATENCY_MS)
-	const eventName = input.eventName.trim()
-
-	if (eventName.length < 3) {
-		throw new Error('Event name must contain at least 3 characters')
-	}
-
-	const { index, user } = getUserOrThrow(input.userId)
-
-	if (user.role !== 'multi') {
-		throw new Error('Only multi users can be assigned to new events')
-	}
-
-	const updatedUser: AdminUser = {
-		...user,
-		status: 'member',
-		assignedEventsCount: user.assignedEventsCount + 1,
-		lastActiveAt: new Date().toISOString(),
-	}
-
-	mockUsers[index] = updatedUser
-	return cloneUser(updatedUser)
+	return { id: userId }
 }
 

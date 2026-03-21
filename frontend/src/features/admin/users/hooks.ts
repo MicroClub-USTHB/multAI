@@ -1,16 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-	assignAdminUserToNewEvent,
+	createAdminUser,
+	deleteAdminUser,
 	getAdminUsers,
-	resendAdminUserInvite,
 	updateAdminUserRole,
-	updateAdminUserStatus,
 } from './api'
 import type {
 	AdminUser,
-	AssignAdminUserToEventInput,
+	CreateAdminUserInput,
 	UpdateAdminUserRoleInput,
-	UpdateAdminUserStatusInput,
 } from './types'
 
 export const ADMIN_USERS_QUERY_KEY = ['admin', 'users'] as const
@@ -26,6 +24,14 @@ const upsertUserInCache = (users: AdminUser[] | undefined, updated: AdminUser) =
 	}
 
 	return users.map(user => (user.id === updated.id ? updated : user))
+}
+
+const removeUserFromCache = (users: AdminUser[] | undefined, removedId: string) => {
+	if (!users) {
+		return []
+	}
+
+	return users.filter(user => user.id !== removedId)
 }
 
 export function useAdminUsersQuery() {
@@ -48,11 +54,11 @@ export function useUpdateAdminUserRoleMutation() {
 	})
 }
 
-export function useUpdateAdminUserStatusMutation() {
+export function useCreateAdminUserMutation() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: (input: UpdateAdminUserStatusInput) => updateAdminUserStatus(input),
+		mutationFn: (input: CreateAdminUserInput) => createAdminUser(input),
 		onSuccess: updatedUser => {
 			queryClient.setQueryData<AdminUser[]>(ADMIN_USERS_QUERY_KEY, users =>
 				upsertUserInCache(users, updatedUser),
@@ -61,28 +67,14 @@ export function useUpdateAdminUserStatusMutation() {
 	})
 }
 
-export function useResendAdminUserInviteMutation() {
+export function useDeleteAdminUserMutation() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: (userId: string) => resendAdminUserInvite(userId),
-		onSuccess: updatedUser => {
+		mutationFn: (userId: string) => deleteAdminUser(userId),
+		onSuccess: ({ id }) => {
 			queryClient.setQueryData<AdminUser[]>(ADMIN_USERS_QUERY_KEY, users =>
-				upsertUserInCache(users, updatedUser),
-			)
-		},
-	})
-}
-
-export function useAssignAdminUserToNewEventMutation() {
-	const queryClient = useQueryClient()
-
-	return useMutation({
-		mutationFn: (input: AssignAdminUserToEventInput) =>
-			assignAdminUserToNewEvent(input),
-		onSuccess: updatedUser => {
-			queryClient.setQueryData<AdminUser[]>(ADMIN_USERS_QUERY_KEY, users =>
-				upsertUserInCache(users, updatedUser),
+				removeUserFromCache(users, id),
 			)
 		},
 	})
@@ -91,9 +83,8 @@ export function useAssignAdminUserToNewEventMutation() {
 export function useAdminUsers() {
 	const usersQuery = useAdminUsersQuery()
 	const roleMutation = useUpdateAdminUserRoleMutation()
-	const statusMutation = useUpdateAdminUserStatusMutation()
-	const inviteMutation = useResendAdminUserInviteMutation()
-	const assignEventMutation = useAssignAdminUserToNewEventMutation()
+	const createMutation = useCreateAdminUserMutation()
+	const deleteUserMutation = useDeleteAdminUserMutation()
 
 	return {
 		users: usersQuery.data ?? [],
@@ -102,14 +93,11 @@ export function useAdminUsers() {
 		error: usersQuery.error,
 		refetch: usersQuery.refetch,
 		updateRole: roleMutation.mutateAsync,
-		updateStatus: statusMutation.mutateAsync,
-		resendInvite: inviteMutation.mutateAsync,
-		assignNewEvent: assignEventMutation.mutateAsync,
+		createUser: createMutation.mutateAsync,
+		deleteUser: deleteUserMutation.mutateAsync,
 		isMutating:
 			roleMutation.isPending ||
-			statusMutation.isPending ||
-			inviteMutation.isPending ||
-			assignEventMutation.isPending,
+			createMutation.isPending ||
+			deleteUserMutation.isPending,
 	}
 }
-
