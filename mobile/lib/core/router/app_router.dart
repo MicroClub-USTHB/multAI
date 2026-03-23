@@ -1,6 +1,10 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
  
+import '../../di/injection_container.dart' as di;
 import '../../features/auth/presentation/screens/login/login_page.dart';
+import '../../features/face_enrollment/presentation/screens/face_enrollment_screen.dart';
+import '../../features/face_enrollment/presentation/bloc/face_enrollment_bloc.dart';
 import '../../features/home/presentation/screens/home_shell.dart';
 import '../../features/events/presentation/screens/events_screen.dart';
 import '../../features/gallery/presentation/screens/gallery_screen.dart';
@@ -17,7 +21,16 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const LoginPage(),
     ),
  
-    // ── Home shell with bottom nav ─────────────────────────────────────────
+    // ── Face Enrollment ────────────────────────────────────────────────────────
+    GoRoute(
+      path: AppRoutes.faceEnrollment,
+      builder: (context, state) => BlocProvider(
+        create: (_) => di.sl<FaceEnrollmentBloc>(),
+        child: const FaceEnrollmentScreen(),
+      ),
+    ),
+ 
+    // ── Home shell with bottom nav ─────────────────────────────────────────────
     ShellRoute(
       builder: (context, state, child) => HomeShell(child: child),
       routes: [
@@ -37,3 +50,4 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
+
