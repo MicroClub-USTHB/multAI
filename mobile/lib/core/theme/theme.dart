@@ -17,45 +17,54 @@ class AppTheme {
   static const double spacingXxl = 40.0;
 
   // ── Primary Colors ─────────────────────────────────────────────────────────
-  static const Color primaryColor =
-      Color(0xFFE8A020); // Golden/amber accent from palette
-  static const Color secondaryColor =
-      Color(0xFFD4901A); // Darker golden for secondary
-  static const Color accentColor =
-      Color(0xFFFFB830); // Bright golden highlight
+  static const Color primaryColor = Color(
+    0xFFE8A020,
+  ); // Golden/amber accent from palette
+  static const Color secondaryColor = Color(
+    0xFFD4901A,
+  ); // Darker golden for secondary
+  static const Color accentColor = Color(0xFFFFB830); // Bright golden highlight
 
   // ── Background Colors ──────────────────────────────────────────────────────
-  static const Color backgroundColor =
-      Color(0xFF1A1008); // Very dark brown/black background
-  static const Color surfaceColor =
-      Color(0xFF2A1E0F); // Slightly lighter dark brown surface
-  static const Color cardColor =
-      Color(0xFF2A1E0F); // Dark brown card background
+  static const Color backgroundColor = Color(
+    0xFF1A1008,
+  ); // Very dark brown/black background
+  static const Color surfaceColor = Color(
+    0xFF2A1E0F,
+  ); // Slightly lighter dark brown surface
+  static const Color cardColor = Color(
+    0xFF2A1E0F,
+  ); // Dark brown card background
 
   // ── Text Colors ────────────────────────────────────────────────────────────
-  static const Color primaryTextColor =
-      Color(0xFFFFFFFF); // White primary text
-  static const Color secondaryTextColor =
-      Color(0xFFB0A090); // Muted warm gray
-  static const Color hintTextColor =
-      Color(0xFF7A6A5A); // Dim warm gray hints
+  static const Color primaryTextColor = Color(0xFFFFFFFF); // White primary text
+  static const Color secondaryTextColor = Color(0xFFB0A090); // Muted warm gray
+  static const Color hintTextColor = Color(0xFF7A6A5A); // Dim warm gray hints
+
+  // ── Splash Colors ─────────────────────────────────────────────────────
+  static const Color gold = Color(0xFFE8A830); // The "Ai" color
+  static const Color slateGray = Color(0xFF94A3B8); // The subtitle color
 
   // ── Interactive Colors ─────────────────────────────────────────────────────
-  static const Color buttonColor =
-      Color(0xFFE8A020); // Golden button color
-  static const Color selectedColor =
-      Color(0xFF3A2A15); // Slightly highlighted dark brown
-  static const Color borderColor =
-      Color(0xFF3D2E1A); // Subtle dark brown border
+  static const Color buttonColor = Color(0xFFE8A020); // Golden button color
+  static const Color selectedColor = Color(
+    0xFF3A2A15,
+  ); // Slightly highlighted dark brown
+  static const Color borderColor = Color(
+    0xFF3D2E1A,
+  ); // Subtle dark brown border
 
   // ── Input Field Colors ─────────────────────────────────────────────────────
-  static const Color inputFillColor =
-      Color(0xFF231809); // Very dark brown for inputs
-  static const Color inputBorderColor =
-      Color(0xFF4A3820); // Slightly visible border
+  static const Color inputFillColor = Color(
+    0xFF231809,
+  ); // Very dark brown for inputs
+  static const Color inputBorderColor = Color(
+    0xFF4A3820,
+  ); // Slightly visible border
   // ── Form Card Color ────────────────────────────────────────────────────────
-  static const Color formCardColor =
-      Color(0x1AE8A830); // #E8A8301A amber with low opacity
+  static const Color formCardColor = Color(
+    0x1AE8A830,
+  ); // #E8A8301A amber with low opacity
 
   // ── Status Colors ──────────────────────────────────────────────────────────
   static const Color successColor = Color(0xFF4CAF50);
@@ -239,10 +248,7 @@ class AppTheme {
         ),
         filled: true,
         fillColor: inputFillColor,
-        hintStyle: GoogleFonts.montserrat(
-          color: hintTextColor,
-          fontSize: 14,
-        ),
+        hintStyle: GoogleFonts.montserrat(color: hintTextColor, fontSize: 14),
         labelStyle: GoogleFonts.raleway(
           color: secondaryTextColor,
           fontSize: 14,
@@ -268,9 +274,7 @@ class AppTheme {
         color: inputBorderColor,
         thickness: 0.5,
       ),
-      iconTheme: const IconThemeData(
-        color: secondaryTextColor,
-      ),
+      iconTheme: const IconThemeData(color: secondaryTextColor),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: primaryColor,
         linearTrackColor: inputBorderColor,
@@ -278,8 +282,20 @@ class AppTheme {
     );
   }
 
+  // ── spalsh style ─────────────────────────────────────────────────────────────
+  static TextStyle splashLargeText = GoogleFonts.playfairDisplay(
+    color: primaryTextColor,
+    fontSize: 48,
+    height: 1.0,
+    fontWeight: FontWeight.normal,
+    fontStyle: FontStyle.italic,
+  );
+  static TextStyle splashMediumText = GoogleFonts.playfairDisplay(
+    color: slateGray,
+    fontSize: 18,
+    height: 1.55,
+    fontStyle: FontStyle.italic,
+  );
+
   static ThemeData get darkTheme => lightTheme;
-
-
-
 }
