@@ -23,10 +23,10 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from '@/shared/ui/command';
+} from '@/shared/ui/command/command';
 
-import { cn } from '../utils/helpers';
-import { useSidebar } from './sidebar';
+import { cn } from '../../utils/helpers';
+import { useSidebar } from '../layout/sidebar';
 
 export function GlobalSearch({
   open,

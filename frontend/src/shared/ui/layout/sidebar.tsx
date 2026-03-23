@@ -5,18 +5,18 @@ import { PanelLeftIcon } from 'lucide-react';
 import * as React from 'react';
 
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { Separator } from '@/shared/ui/separator';
+import { Button } from '@/shared/ui/forms/button';
+import { Input } from '@/shared/ui/forms/input';
+import { Separator } from '@/shared/ui/layout/separator';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@/shared/ui/sheet';
-import { Skeleton } from '@/shared/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
+} from '@/shared/ui/overlays/sheet';
+import { Skeleton } from '@/shared/ui/feedback/skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/overlays/tooltip';
 import { cn } from '@/shared/utils/helpers';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';

@@ -10,8 +10,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/shared/ui/dialog';
-import { InputGroup, InputGroupAddon } from '@/shared/ui/input-group';
+} from '@/shared/ui/overlays/dialog';
+import { InputGroup, InputGroupAddon } from '@/shared/ui/forms/input-group';
 import { cn } from '@/shared/utils/helpers';
 
 function Command({
