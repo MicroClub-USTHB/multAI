@@ -1,13 +1,13 @@
 import type { FaceMatchingLog, SyncError } from '@/features/admin/logs/types';
 
-import { Badge } from '@/shared/ui/badge';
+import { Badge } from '@/shared/ui';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/shared/ui/dialog';
+} from '@/shared/ui';
 import { cn } from '@/shared/utils/helpers';
 
 const sourceVariants = {

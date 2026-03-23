@@ -1,7 +1,7 @@
 import { Folder } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/ui';
 import {
   Card,
   CardContent,
@@ -9,8 +9,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/card';
-import { Input } from '@/shared/ui/input';
+} from '@/shared/ui';
+import { Input } from '@/shared/ui';
 
 interface Props {
   value: string;

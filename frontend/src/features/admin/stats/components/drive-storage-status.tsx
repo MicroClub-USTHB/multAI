@@ -1,6 +1,6 @@
-import { Badge } from '@/shared/ui/badge';
-import { Card, CardHeader, CardContent, CardTitle } from '@/shared/ui/card';
-import { Progress } from '@/shared/ui/progress';
+import { Badge } from '@/shared/ui';
+import { Card, CardHeader, CardContent, CardTitle } from '@/shared/ui';
+import { Progress } from '@/shared/ui';
 
 import type { DriveUsage } from '../types';
 

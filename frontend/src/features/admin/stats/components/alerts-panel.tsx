@@ -2,8 +2,8 @@ import { Bell, BellRing, Eye } from 'lucide-react';
 import { useState } from 'react';
 
 import { Alert } from '@/features/common/components/alert';
-import { Badge } from '@/shared/ui/badge';
-import { Button } from '@/shared/ui/button';
+import { Badge } from '@/shared/ui';
+import { Button } from '@/shared/ui';
 import { cn } from '@/shared/utils/helpers';
 
 import type { AlertData } from '../types';

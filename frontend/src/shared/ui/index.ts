@@ -133,7 +133,7 @@ export {
 	CommandSeparator,
 	CommandShortcut,
 } from './command/command'
-export { GlobalSearch, SearchTrigger } from './command/global-search'
+export { GlobalSearch, SearchTrigger } from '../../features/navigation/components/global-search'
 
 export {
 	Breadcrumb,

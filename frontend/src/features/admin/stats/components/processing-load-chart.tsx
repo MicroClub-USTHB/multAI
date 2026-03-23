@@ -1,12 +1,12 @@
 import { Cell, Pie, PieChart } from 'recharts';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui';
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from '@/shared/ui/chart';
+} from '@/shared/ui';
 
 import type { ProcessingLoad } from '../types';
 

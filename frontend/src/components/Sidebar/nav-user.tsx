@@ -1,6 +1,6 @@
 import { ChevronsUpDownIcon, LogOutIcon, MessageSquare } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,13 +9,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
+} from '@/shared/ui';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/shared/ui/sidebar';
+} from '@/shared/ui';
 import { getInitials } from '@/shared/utils/helpers';
 
 import { ThemeToggle } from '../theme-toggle';

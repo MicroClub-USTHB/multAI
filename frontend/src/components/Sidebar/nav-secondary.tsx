@@ -9,7 +9,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/shared/ui/sidebar';
+} from '@/shared/ui';
 import { isItemActive } from '@/shared/utils/helpers';
 
 export function NavSecondary({

@@ -7,7 +7,7 @@ import {
   type LogDetailsState,
 } from '@/features/admin/logs/components/log-details-dialog';
 import { SyncErrorsTable } from '@/features/admin/logs/components/sync-errors-table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui';
 
 export const Route = createFileRoute('/admin/logs')({
   component: LogsView,

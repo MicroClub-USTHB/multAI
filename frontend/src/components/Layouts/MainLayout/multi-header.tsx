@@ -9,11 +9,11 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/shared/ui/breadcrumb';
-import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { Separator } from '@/shared/ui/separator';
-import { SidebarTrigger } from '@/shared/ui/sidebar';
+} from '@/shared/ui';
+import { Button } from '@/shared/ui';
+import { Input } from '@/shared/ui';
+import { Separator } from '@/shared/ui';
+import { SidebarTrigger } from '@/shared/ui';
 
 export function MultiHeader() {
   const multiSegments = useBreadcrumbs('/multi');

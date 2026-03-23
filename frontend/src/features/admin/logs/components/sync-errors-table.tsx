@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-table';
 import { Clock3 } from 'lucide-react';
 
-import { Badge } from '@/shared/ui/badge';
+import { Badge } from '@/shared/ui';
 import {
   Table,
   TableBody,
@@ -15,7 +15,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/shared/ui/table';
+} from '@/shared/ui';
 import { cn } from '@/shared/utils/helpers';
 
 import { syncErrorsMock, type SyncError } from '../types';

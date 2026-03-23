@@ -7,7 +7,7 @@ import { OutputFolderCard } from '@/features/admin/drive/components/output-folde
 import { SyncFrequencyCard } from '@/features/admin/drive/components/sync-frequency-card';
 import { useDriveSettings } from '@/features/admin/drive/hooks';
 import { type SyncInterval } from '@/features/admin/drive/types';
-import { Button } from '@/shared/ui/button';
+import { Button } from '@/shared/ui';
 
 export const Route = createFileRoute('/admin/drive-settings')({
   component: RouteComponent,

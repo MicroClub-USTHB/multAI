@@ -10,8 +10,8 @@ import {
 import type { Alert as AlertType } from '@/features/admin/stats/types';
 
 import { formatTimeAgo } from '@/features/admin/stats/types';
-import { Badge } from '@/shared/ui/badge';
-import { Button } from '@/shared/ui/button';
+import { Badge } from '@/shared/ui';
+import { Button } from '@/shared/ui';
 import { cn } from '@/shared/utils/helpers';
 
 const alertConfig = {
