@@ -1,7 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/entities/face_photo_entity.dart'; 
-import '../../domain/usecases/save_enrollment_done_usecase.dart';
-import '../../domain/usecases/upload_face_photos_usecase.dart';
+ 
+import './../../domain/entities/face_photo_entity.dart';
+import './../../domain/usecases/upload_face_photos_usecase.dart';
+import './../../domain/usecases/save_enrollment_done_usecase.dart';
+import './../../data/utils/photo_validator.dart';
  
 part 'face_enrollment_event.dart';
 part 'face_enrollment_state.dart';
@@ -11,7 +13,6 @@ class FaceEnrollmentBloc
   final UploadFacePhotosUseCase _uploadFacePhotos;
   final SaveEnrollmentDoneUseCase _saveEnrollmentDone;
  
-  // local map of selected photos
   final Map<FacePhotoType, String> _photos = {};
  
   FaceEnrollmentBloc({
@@ -26,12 +27,20 @@ class FaceEnrollmentBloc
   }
  
   // ── Photo selected ─────────────────────────────────────────────────────────
-  void _onPhotoSelected(
+  Future<void> _onPhotoSelected(
     PhotoSelected event,
     Emitter<FaceEnrollmentState> emit,
-  ) {
-    _photos[event.type] = event.filePath;
-    emit(FaceEnrollmentUpdated(photos: Map.from(_photos)));
+  ) async {
+    //  validate file before adding to state
+    final validation = await PhotoValidator.validate(event.filePath);
+ 
+    validation.fold(
+      (failure) => emit(FaceEnrollmentFailure(message: failure.message)),
+      (_) {
+        _photos[event.type] = event.filePath;
+        emit(FaceEnrollmentUpdated(photos: Map.from(_photos)));
+      },
+    );
   }
  
   // ── Photo removed ──────────────────────────────────────────────────────────
@@ -50,6 +59,16 @@ class FaceEnrollmentBloc
   ) async {
     emit(FaceEnrollmentLoading());
  
+    //  validate all files again before upload
+    for (final entry in _photos.entries) {
+      final validation = await PhotoValidator.validate(entry.value);
+      final failure = validation.fold((f) => f, (_) => null);
+      if (failure != null) {
+        emit(FaceEnrollmentFailure(message: failure.message));
+        return;
+      }
+    }
+ 
     final photos = _photos.entries
         .map((e) => FacePhotoEntity(type: e.key, filePath: e.value))
         .toList();
@@ -67,4 +86,3 @@ class FaceEnrollmentBloc
     );
   }
 }
- 
