@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/theme.dart';
+import '../../features/face_enrollment/domain/entities/face_photo_entity.dart';
 import 'dart:math';
-
 
 extension StringExtension on String {
   String get capitalize {
@@ -10,43 +10,6 @@ extension StringExtension on String {
 
   String get capitalizeFirstofEach {
     return split(" ").map((str) => str.capitalize).join(" ");
-  }
-}
-
-extension PushNamed on BuildContext {
-  void pushNamed(
-    String route, {
-    Object? arguments,
-  }) {
-    Navigator.pushNamed(
-      this,
-      route,
-      arguments: {
-        "data": arguments,
-      },
-    );
-  }
-}
-
-extension Pop on BuildContext {
-  void pop() {
-    Navigator.pop(this);
-  }
-}
-
-extension PushReplacement on BuildContext {
-  void pushReplacementNamed(String route) {
-    Navigator.pushReplacementNamed(this, route);
-  }
-}
-
-extension PushAndRemoveUntil on BuildContext {
-  void pushNamedAndRemoveUntil(String route) {
-    Navigator.pushNamedAndRemoveUntil(
-      this,
-      route,
-      (route) => false,
-    );
   }
 }
 
@@ -116,24 +79,29 @@ extension Calculator on BuildContext {
   }
 }
 
-extension SnackBarExtension on BuildContext{
-  void showErrorSnackBar(String message){
+extension SnackBarExtension on BuildContext {
+  void showErrorSnackBar(String message) {
     final tt = Theme.of(this).textTheme;
     final cs = Theme.of(this).colorScheme;
     ScaffoldMessenger.of(this)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(
-      message ,
-       style: tt.bodySmall?.copyWith(color: cs.onError),) ,
-       backgroundColor:  cs.error,
-       behavior: SnackBarBehavior.floating,
-       shape: RoundedRectangleBorder(
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: tt.bodySmall?.copyWith(color: cs.onError),
+          ),
+          backgroundColor: cs.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           ),
-        margin:  const EdgeInsets.all(AppTheme.spacingMd),
-    ));
+          margin: const EdgeInsets.all(AppTheme.spacingMd),
+        ),
+      );
   }
-    void showSuccessSnackBar(String message) {
+
+  void showSuccessSnackBar(String message) {
     final tt = Theme.of(this).textTheme;
     final cs = Theme.of(this).colorScheme;
 
@@ -159,20 +127,35 @@ extension SnackBarExtension on BuildContext{
 extension ResponsiveExtension on BuildContext {
   double hPadding() =>
       (width * 0.06).clamp(AppTheme.spacingLg, AppTheme.spacingXxl);
- 
+
   double cardMaxWidth() => min(width * 0.92, 480.0);
- 
+
   double logoSize() => (width * 0.15).clamp(56.0, 88.0);
- 
+
   double titleFontSize() => (width * 0.07).clamp(22.0, 32.0);
- 
+
   double sectionSpacing() => height * 0.02;
- 
+
   // ── icon size — scales with screen width ──────────────────────────────────
   double iconSize() => (width * 0.055).clamp(20.0, 26.0);
- 
+
   // ── border radius — scales with screen width ──────────────────────────────
   double radius() => (width * 0.03).clamp(AppTheme.radiusSm, AppTheme.radiusMd);
 }
- 
 
+
+ 
+extension FacePhotoTypeX on FacePhotoType {
+  String get label {
+    switch (this) {
+      case FacePhotoType.frontal:
+        return 'Frontal View';
+      case FacePhotoType.leftProfile:
+        return 'Left Profile';
+      case FacePhotoType.rightProfile:
+        return 'Right Profile';
+    }
+  }
+ 
+  bool get isPrimary => this == FacePhotoType.frontal;
+}
