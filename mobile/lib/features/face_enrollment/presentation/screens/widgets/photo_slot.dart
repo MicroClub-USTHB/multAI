@@ -9,6 +9,8 @@ class PhotoSlot extends StatelessWidget {
   final String? filePath;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
+  final double? height;
+  final bool isOptional;
  
   const PhotoSlot({
     super.key,
@@ -16,6 +18,8 @@ class PhotoSlot extends StatelessWidget {
     required this.onTap,
     this.filePath,
     this.onDelete,
+    this.height,
+    this.isOptional = false,
   });
  
   bool get _hasPhoto => filePath != null;
@@ -24,15 +28,17 @@ class PhotoSlot extends StatelessWidget {
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
+    final slotHeight = height ?? context.heightCalculated(200);
  
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Photo container ────────────────────────────────────────────────
+ 
+        // ── Photo container ──────────────────────────────────────────────
         GestureDetector(
           onTap: _hasPhoto ? null : onTap,
           child: Container(
-            height: context.heightCalculated(200),
+            height: slotHeight,
             width: double.infinity,
             decoration: BoxDecoration(
               color: AppTheme.surfaceColor,
@@ -48,46 +54,51 @@ class PhotoSlot extends StatelessWidget {
                     isPrimary: type.isPrimary,
                     onDelete: onDelete,
                   )
-                : _EmptySlot(),
+                : _EmptySlot(isOptional: isOptional),
           ),
         ),
-        SizedBox(height: context.heightCalculated(8)),
+        SizedBox(height: context.heightCalculated(6)),
  
-        // ── Label row ──────────────────────────────────────────────────────
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              type.label,
-              style: tt.titleSmall?.copyWith(
-                color: _hasPhoto ? cs.primary : cs.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            if (!_hasPhoto)
+        // ── Label row ────────────────────────────────────────────────────
+        if (!isOptional)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
               Text(
-                'Required',
-                style: tt.labelSmall?.copyWith(
-                  color: cs.onSurface.withValues(alpha: 0.5),
+                type.label,
+                style: tt.labelMedium?.copyWith(
+                  color: _hasPhoto ? cs.primary : cs.onSurface,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            if (type.isPrimary && _hasPhoto)
-              Text(
-                'PRIMARY',
-                style: tt.labelSmall?.copyWith(
-                  color: cs.primary,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
+              if (!_hasPhoto)
+                Text(
+                  'Required',
+                  style: tt.labelSmall?.copyWith(
+                    color: cs.onSurface.withValues(alpha: 0.5),
+                  ),
                 ),
-              ),
-          ],
-        ),
+              if (type.isPrimary && _hasPhoto)
+                Text(
+                  'PRIMARY',
+                  style: tt.labelSmall?.copyWith(
+                    color: cs.primary,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+            ],
+          ),
       ],
     );
   }
 }
  
 class _EmptySlot extends StatelessWidget {
+  final bool isOptional;
+ 
+  const _EmptySlot({this.isOptional = false});
+ 
   @override
   Widget build(BuildContext context) {
     final cs = context.theme.colorScheme;
@@ -97,16 +108,18 @@ class _EmptySlot extends StatelessWidget {
       children: [
         Icon(
           Icons.camera_alt_outlined,
-          size: context.iconSize() * 1.8,
-          color: cs.onSurface.withValues(alpha: 0.4),
+          size: context.iconSize() * (isOptional ? 1.2 : 1.8),
+          color: cs.onSurface.withValues(alpha: 0.3),
         ),
-        SizedBox(height: context.heightCalculated(8)),
-        Text(
-          'Tap to upload',
-          style: context.textTheme.labelMedium?.copyWith(
-            color: cs.onSurface.withValues(alpha: 0.4),
+        if (!isOptional) ...[
+          SizedBox(height: context.heightCalculated(8)),
+          Text(
+            'Tap to upload',
+            style: context.textTheme.labelSmall?.copyWith(
+              color: cs.onSurface.withValues(alpha: 0.3),
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -128,7 +141,6 @@ class _FilledSlot extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // photo preview
         ClipRRect(
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           child: Image.file(
@@ -186,4 +198,3 @@ class _FilledSlot extends StatelessWidget {
     );
   }
 }
- 
