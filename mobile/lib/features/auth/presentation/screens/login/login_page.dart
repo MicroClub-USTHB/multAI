@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:multai_mobile/core/router/app_routes.dart';
 
-import '../../../../../core/extensions/extensions.dart';
+import '../../../../../core/extensions/extensions.dart' as di ;
 import '../../../../../core/theme/theme.dart';
 import '../../blocs/auth_bloc.dart';
-
+import 'package:multai_mobile/features/face_enrollment/domain/usecases/check_enrollment_done_usecase.dart';
 import 'widgets/logo_section.dart';
 import 'widgets/email_field.dart';
 import 'widgets/password_field.dart';
@@ -13,6 +15,7 @@ import 'widgets/divider_with_text.dart';
 import 'widgets/google_button.dart';
 import 'widgets/create_workspace.dart';
 import 'widgets/forgot_password.dart';
+import 'package:multai_mobile/di/injection_container.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -40,11 +43,11 @@ class _LoginPageState extends State<LoginPage> {
     context.unfocus();
 
     context.read<AuthBloc>().add(
-          LoginRequested(
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-          ),
-        );
+      LoginRequested(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      ),
+    );
   }
 
   @override
@@ -53,8 +56,17 @@ class _LoginPageState extends State<LoginPage> {
     final cs = context.theme.colorScheme;
 
     return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is AuthSuccess) context.pushNamedAndRemoveUntil('/home');
+      listener: (context, state) async {
+        final useCase = sl<CheckEnrollmentDoneUseCase>();
+        final bool isDone = await useCase.call();
+        if (state is AuthSuccess) {
+        if (context.mounted) {
+            isDone
+                ? context.go(AppRoutes.events)
+                : context.go(AppRoutes.faceEnrollment);
+          }
+        }
+        // ignore: use_build_context_synchronously
         if (state is AuthFailure) context.showErrorSnackBar(state.message);
       },
       builder: (context, state) {
