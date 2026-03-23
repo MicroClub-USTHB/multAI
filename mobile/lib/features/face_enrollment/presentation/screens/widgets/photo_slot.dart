@@ -47,7 +47,7 @@ class PhotoSlot extends StatelessWidget {
               // ✅ correct upload area color #334155
               color: _hasPhoto
                   ? Colors.transparent
-                  : const Color(0xFF334155),
+                  : AppTheme.photoSlotColor,
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
               border: Border.all(
                 color: _hasPhoto

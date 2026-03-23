@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/extensions.dart';
 import '../../../../../../core/theme/theme.dart';
- 
+
 class TipsRow extends StatelessWidget {
   const TipsRow({super.key});
- 
+
   @override
   Widget build(BuildContext context) {
     return Wrap(
@@ -12,33 +12,33 @@ class TipsRow extends StatelessWidget {
       spacing: context.widthCalculated(8),
       runSpacing: context.heightCalculated(8),
       children: const [
-        _TipChip(label: 'No Blur',         isDone: false),
+        _TipChip(label: 'No Blur', isDone: false),
         _TipChip(label: 'Single Face Only', isDone: false),
-        _TipChip(label: 'Good Lighting',    isDone: false),
+        _TipChip(label: 'Good Lighting', isDone: false),
       ],
     );
   }
 }
- 
+
 class _TipChip extends StatelessWidget {
   final String label;
   final bool isDone;
- 
+
   const _TipChip({required this.label, required this.isDone});
- 
+
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
- 
+
     // ── colors ──────────────────────────────────────────────────────────────
     // background: #64748B1A when not done, green with opacity when done
     final bgColor = isDone
         ? Colors.green.withValues(alpha: 0.15)
-        : const Color(0x1A64748B);
- 
+        : AppTheme.tipsBgColor;
+
     final iconColor = isDone ? Colors.green : AppTheme.secondaryTextColor;
     final textColor = isDone ? Colors.green : AppTheme.primaryTextColor;
- 
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.widthCalculated(12),
@@ -69,4 +69,3 @@ class _TipChip extends StatelessWidget {
     );
   }
 }
- 

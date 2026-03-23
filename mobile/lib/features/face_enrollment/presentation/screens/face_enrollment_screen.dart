@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
- 
 import '../../../../../core/extensions/extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/theme.dart';
@@ -225,7 +224,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
                               // ✅ cannot submit → #EC5B1333 red with opacity
                               backgroundColor: canSubmit
                                   ? AppTheme.primaryColor
-                                  : const Color(0x33EC5B13),
+                                  : AppTheme.enrollDisabledColor,
                               foregroundColor: canSubmit
                                   ? Colors.black
                                   : Colors.white,
