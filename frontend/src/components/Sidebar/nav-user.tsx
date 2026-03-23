@@ -18,7 +18,7 @@ import {
 } from '@/shared/ui/sidebar';
 import { getInitials } from '@/shared/utils/helpers';
 
-import { ThemeToggle } from '../ThemeToggle';
+import { ThemeToggle } from '../theme-toggle';
 
 export function NavUser({
   user,

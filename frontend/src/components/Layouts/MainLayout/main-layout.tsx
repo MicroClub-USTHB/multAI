@@ -3,8 +3,8 @@ import type { NavData } from '@/shared/utils/types';
 import { AppSidebar } from '@/components/Sidebar';
 import { SidebarInset, SidebarProvider } from '@/shared/ui/sidebar';
 
-import { AdminHeader } from './AdminHeader';
-import { MultiHeader } from './MultiHeader';
+import { AdminHeader } from './admin-header';
+import { MultiHeader } from './multi-header';
 
 export default function MainLayout({
   children,

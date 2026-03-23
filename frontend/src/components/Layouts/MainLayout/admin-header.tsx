@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Bell, Search } from 'lucide-react';
 
-import { useBreadcrumbs } from '@/hooks/useBreadcrumbs';
+import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
 import {
   Breadcrumb,
   BreadcrumbItem,
