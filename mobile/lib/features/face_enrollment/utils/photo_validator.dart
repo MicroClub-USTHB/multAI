@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failure.dart';
+import '../../../core/errors/failure.dart';
  
 /// Validates a photo file before upload.
 /// Checks: existence, size, format.

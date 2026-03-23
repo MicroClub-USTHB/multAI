@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import './../../domain/entities/face_photo_entity.dart';
 import './../../domain/usecases/upload_face_photos_usecase.dart';
 import './../../domain/usecases/save_enrollment_done_usecase.dart';
-import './../../data/utils/photo_validator.dart';
+import '../../utils/photo_validator.dart';
  
 part 'face_enrollment_event.dart';
 part 'face_enrollment_state.dart';

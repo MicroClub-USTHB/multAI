@@ -5,7 +5,20 @@ enum FacePhotoType {
   rightProfile,
 }
 
-
+extension FacePhotoTypeX on FacePhotoType {
+  String get label {
+    switch (this) {
+      case FacePhotoType.frontal:
+        return 'Frontal View';
+      case FacePhotoType.leftProfile:
+        return 'Left Profile';
+      case FacePhotoType.rightProfile:
+        return 'Right Profile';
+    }
+  }
+ 
+  bool get isPrimary => this == FacePhotoType.frontal;
+}
 
 // entity
 class FacePhotoEntity {

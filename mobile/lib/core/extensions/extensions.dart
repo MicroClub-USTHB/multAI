@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/theme.dart';
-import '../../features/face_enrollment/domain/entities/face_photo_entity.dart';
 import 'dart:math';
 
 extension StringExtension on String {
@@ -145,17 +144,3 @@ extension ResponsiveExtension on BuildContext {
 
 
  
-extension FacePhotoTypeX on FacePhotoType {
-  String get label {
-    switch (this) {
-      case FacePhotoType.frontal:
-        return 'Frontal View';
-      case FacePhotoType.leftProfile:
-        return 'Left Profile';
-      case FacePhotoType.rightProfile:
-        return 'Right Profile';
-    }
-  }
- 
-  bool get isPrimary => this == FacePhotoType.frontal;
-}

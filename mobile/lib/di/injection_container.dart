@@ -117,6 +117,7 @@
 
 
 
+
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -147,7 +148,7 @@ import '../features/auth/presentation/blocs/auth_bloc.dart';
 // Face Enrollment
 import '../features/face_enrollment/data/datasources/face_enrollment_local_datasource.dart';
 import '../features/face_enrollment/data/datasources/face_enrollment_remote_datasource.dart';
-import '../features/face_enrollment/data/repositories/face_enrollment_repository_impl.dart';
+import '../features/face_enrollment/repositories/face_enrollment_repository_impl.dart';
 import '../features/face_enrollment/domain/repositories/face_enrollment_repository.dart';
 import '../features/face_enrollment/domain/usecases/check_enrollment_done_usecase.dart';
 import '../features/face_enrollment/domain/usecases/save_enrollment_done_usecase.dart';
@@ -226,6 +227,7 @@ FutureOr<void> init() async {
       logoutUseCase:         sl<LogoutUseCase>(),
       refreshTokenUseCase:   sl<RefreshTokenUseCase>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
+      checkEnrollmentDone:   sl<CheckEnrollmentDoneUseCase>(), 
     ),
   );
  
