@@ -1,41 +1,42 @@
-import { Badge } from '@/shared/ui/badge'
+import type { FaceMatchingLog, SyncError } from '@/features/admin/logs/types';
+
+import { Badge } from '@/shared/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/shared/ui/dialog'
-import type { FaceMatchingLog, SyncError } from '@/features/admin/logs/types'
-import { cn } from '@/lib/utils'
+} from '@/shared/ui/dialog';
+import { cn } from '@/shared/utils/helpers';
 
 const sourceVariants = {
   Drive: 'border-blue-500/80 text-blue-400',
   Storage: 'border-violet-500/80 text-violet-400',
   Worker: 'border-amber-500/80 text-amber-400',
-}
+};
 
 const statusVariants = {
   Resolved: 'border-emerald-500/90 text-emerald-400',
   Investigating: 'border-yellow-500/90 text-yellow-300',
   Unresolved: 'border-red-500/90 text-red-400',
-}
+};
 
 const resultVariants = {
   Success: 'border-emerald-500/90 text-emerald-400',
   Partial: 'border-yellow-500/90 text-yellow-300',
   Failed: 'border-red-500/90 text-red-400',
-}
+};
 
 type LogDetailsState =
   | { type: 'sync'; data: SyncError }
   | { type: 'face'; data: FaceMatchingLog }
-  | null
+  | null;
 
 type LogDetailsDialogProps = {
-  details: LogDetailsState
-  onOpenChange: (open: boolean) => void
-}
+  details: LogDetailsState;
+  onOpenChange: (open: boolean) => void;
+};
 
 function RowField({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -43,12 +44,18 @@ function RowField({ label, value }: { label: string; value: React.ReactNode }) {
       <span className="text-muted-foreground">{label}</span>
       <div className="min-w-0">{value}</div>
     </div>
-  )
+  );
 }
 
-export function LogDetailsDialog({ details, onOpenChange }: LogDetailsDialogProps) {
-  const detailsTitle =
-    !details ? '' : details.type === 'sync' ? 'Sync Error Details' : 'Face Matching Details'
+export function LogDetailsDialog({
+  details,
+  onOpenChange,
+}: LogDetailsDialogProps) {
+  const detailsTitle = !details
+    ? ''
+    : details.type === 'sync'
+      ? 'Sync Error Details'
+      : 'Face Matching Details';
 
   return (
     <Dialog open={Boolean(details)} onOpenChange={onOpenChange}>
@@ -68,7 +75,10 @@ export function LogDetailsDialog({ details, onOpenChange }: LogDetailsDialogProp
               value={
                 <Badge
                   variant="outline"
-                  className={cn('h-6 rounded-sm bg-transparent px-3 text-xs', sourceVariants[details.data.source])}
+                  className={cn(
+                    'h-6 rounded-sm bg-transparent px-3 text-xs',
+                    sourceVariants[details.data.source],
+                  )}
                 >
                   {details.data.source}
                 </Badge>
@@ -79,7 +89,10 @@ export function LogDetailsDialog({ details, onOpenChange }: LogDetailsDialogProp
               value={
                 <Badge
                   variant="outline"
-                  className={cn('h-6 rounded-sm bg-transparent px-3 text-xs', statusVariants[details.data.status])}
+                  className={cn(
+                    'h-6 rounded-sm bg-transparent px-3 text-xs',
+                    statusVariants[details.data.status],
+                  )}
                 >
                   {details.data.status}
                 </Badge>
@@ -87,7 +100,11 @@ export function LogDetailsDialog({ details, onOpenChange }: LogDetailsDialogProp
             />
             <RowField
               label="Message"
-              value={<p className="leading-relaxed text-foreground/90">{details.data.errorMessage}</p>}
+              value={
+                <p className="text-foreground/90 leading-relaxed">
+                  {details.data.errorMessage}
+                </p>
+              }
             />
           </div>
         )}
@@ -96,7 +113,10 @@ export function LogDetailsDialog({ details, onOpenChange }: LogDetailsDialogProp
           <div className="space-y-3">
             <RowField label="Timestamp" value={details.data.timestamp} />
             <RowField label="Photo ID" value={details.data.photoId} />
-            <RowField label="Faces" value={details.data.facesDetected.toString()} />
+            <RowField
+              label="Faces"
+              value={details.data.facesDetected.toString()}
+            />
             <RowField
               label="Matched Users"
               value={
@@ -106,7 +126,7 @@ export function LogDetailsDialog({ details, onOpenChange }: LogDetailsDialogProp
                       <Badge
                         key={user}
                         variant="outline"
-                        className="h-6 rounded-sm border-border/70 bg-transparent px-2.5 text-xs text-muted-foreground"
+                        className="border-border/70 text-muted-foreground h-6 rounded-sm bg-transparent px-2.5 text-xs"
                       >
                         {user}
                       </Badge>
@@ -122,7 +142,10 @@ export function LogDetailsDialog({ details, onOpenChange }: LogDetailsDialogProp
               value={
                 <Badge
                   variant="outline"
-                  className={cn('h-6 rounded-sm bg-transparent px-3 text-xs', resultVariants[details.data.result])}
+                  className={cn(
+                    'h-6 rounded-sm bg-transparent px-3 text-xs',
+                    resultVariants[details.data.result],
+                  )}
                 >
                   {details.data.result}
                 </Badge>
@@ -132,7 +155,7 @@ export function LogDetailsDialog({ details, onOpenChange }: LogDetailsDialogProp
         )}
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-export type { LogDetailsState }
+export type { LogDetailsState };
