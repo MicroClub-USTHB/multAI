@@ -11,6 +11,7 @@ class PhotoSlot extends StatelessWidget {
   final VoidCallback? onDelete;
   final double? height;
   final bool isOptional;
+  final String? label;
  
   const PhotoSlot({
     super.key,
@@ -20,6 +21,7 @@ class PhotoSlot extends StatelessWidget {
     this.onDelete,
     this.height,
     this.isOptional = false,
+    this.label,
   });
  
   bool get _hasPhoto => filePath != null;
@@ -29,6 +31,7 @@ class PhotoSlot extends StatelessWidget {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
     final slotHeight = height ?? context.heightCalculated(200);
+    final slotLabel = label ?? type.label;
  
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,10 +44,15 @@ class PhotoSlot extends StatelessWidget {
             height: slotHeight,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppTheme.surfaceColor,
+              // ✅ correct upload area color #334155
+              color: _hasPhoto
+                  ? Colors.transparent
+                  : const Color(0xFF334155),
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
               border: Border.all(
-                color: _hasPhoto ? cs.primary : AppTheme.inputBorderColor,
+                color: _hasPhoto
+                    ? cs.primary
+                    : AppTheme.inputBorderColor,
                 width: _hasPhoto ? 1.5 : 0.5,
               ),
             ),
@@ -57,18 +65,18 @@ class PhotoSlot extends StatelessWidget {
                 : _EmptySlot(isOptional: isOptional),
           ),
         ),
-        SizedBox(height: context.heightCalculated(6)),
  
-        // ── Label row ────────────────────────────────────────────────────
-        if (!isOptional)
+        // ── Label row ─────────────────────────────────────────────────────
+        if (!isOptional) ...[
+          SizedBox(height: context.heightCalculated(6)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                type.label,
-                style: tt.labelMedium?.copyWith(
-                  color: _hasPhoto ? cs.primary : cs.onSurface,
-                  fontWeight: FontWeight.w600,
+                slotLabel,
+                style: tt.labelLarge?.copyWith(
+                  color: _hasPhoto ? cs.primary : AppTheme.primaryTextColor,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               if (!_hasPhoto)
@@ -89,6 +97,15 @@ class PhotoSlot extends StatelessWidget {
                 ),
             ],
           ),
+        ] else ...[
+          SizedBox(height: context.heightCalculated(6)),
+          Text(
+            slotLabel,
+            style: tt.labelMedium?.copyWith(
+              color: cs.onSurface.withValues(alpha: 0.5),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -96,27 +113,24 @@ class PhotoSlot extends StatelessWidget {
  
 class _EmptySlot extends StatelessWidget {
   final bool isOptional;
- 
   const _EmptySlot({this.isOptional = false});
  
   @override
   Widget build(BuildContext context) {
-    final cs = context.theme.colorScheme;
- 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
           Icons.camera_alt_outlined,
           size: context.iconSize() * (isOptional ? 1.2 : 1.8),
-          color: cs.onSurface.withValues(alpha: 0.3),
+          color: AppTheme.secondaryTextColor.withValues(alpha: 0.6),
         ),
         if (!isOptional) ...[
           SizedBox(height: context.heightCalculated(8)),
           Text(
             'Tap to upload',
             style: context.textTheme.labelSmall?.copyWith(
-              color: cs.onSurface.withValues(alpha: 0.3),
+              color: AppTheme.secondaryTextColor.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -198,3 +212,4 @@ class _FilledSlot extends StatelessWidget {
     );
   }
 }
+ 

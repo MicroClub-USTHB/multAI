@@ -28,8 +28,9 @@ class _StepProgressBarState extends State<StepProgressBar>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 800),
     );
+    // ✅ starts from 0 always
     _animation = Tween<double>(begin: 0.0, end: _targetProgress).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
@@ -40,7 +41,6 @@ class _StepProgressBarState extends State<StepProgressBar>
   void didUpdateWidget(StepProgressBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentStep != widget.currentStep) {
-      // animate from current value to new target
       _animation = Tween<double>(
         begin: _animation.value,
         end: _targetProgress,
@@ -62,7 +62,6 @@ class _StepProgressBarState extends State<StepProgressBar>
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
-    final cs = context.theme.colorScheme;
  
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,20 +69,30 @@ class _StepProgressBarState extends State<StepProgressBar>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // ✅ bold
             Text(
               'Step ${widget.currentStep} of ${widget.totalSteps}',
-              style: tt.labelMedium?.copyWith(color: cs.onSurface),
+              style: tt.labelLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppTheme.primaryTextColor,
+              ),
             ),
+            // ✅ gold color + bold
             AnimatedBuilder(
               animation: _animation,
               builder: (context, _) => Text(
                 '${(_animation.value * 100).toInt()}%',
-                style: tt.labelMedium?.copyWith(color: cs.primary),
+                style: tt.labelLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryColor,
+                ),
               ),
             ),
           ],
         ),
         SizedBox(height: context.heightCalculated(8)),
+ 
+        // ✅ thicker progress bar
         ClipRRect(
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
           child: AnimatedBuilder(
@@ -91,8 +100,8 @@ class _StepProgressBarState extends State<StepProgressBar>
             builder: (context, _) => LinearProgressIndicator(
               value: _animation.value,
               backgroundColor: AppTheme.inputBorderColor,
-              color: cs.primary,
-              minHeight: context.heightCalculated(4),
+              color: AppTheme.primaryColor,
+              minHeight: context.heightCalculated(6),
             ),
           ),
         ),
@@ -100,4 +109,3 @@ class _StepProgressBarState extends State<StepProgressBar>
     );
   }
 }
- 

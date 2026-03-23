@@ -12,45 +12,61 @@ class TipsRow extends StatelessWidget {
       spacing: context.widthCalculated(8),
       runSpacing: context.heightCalculated(8),
       children: const [
-        _TipChip(icon: Icons.blur_off_outlined, label: 'No Blur'),
-        _TipChip(icon: Icons.face_outlined, label: 'Single Face Only'),
-        _TipChip(icon: Icons.light_mode_outlined, label: 'Good Lighting'),
+        _TipChip(label: 'No Blur',         isDone: false),
+        _TipChip(label: 'Single Face Only', isDone: false),
+        _TipChip(label: 'Good Lighting',    isDone: false),
       ],
     );
   }
 }
  
 class _TipChip extends StatelessWidget {
-  final IconData icon;
   final String label;
+  final bool isDone;
  
-  const _TipChip({required this.icon, required this.label});
+  const _TipChip({required this.label, required this.isDone});
  
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
-    final cs = context.theme.colorScheme;
+ 
+    // ── colors ──────────────────────────────────────────────────────────────
+    // background: #64748B1A when not done, green with opacity when done
+    final bgColor = isDone
+        ? Colors.green.withValues(alpha: 0.15)
+        : const Color(0x1A64748B);
+ 
+    final iconColor = isDone ? Colors.green : AppTheme.secondaryTextColor;
+    final textColor = isDone ? Colors.green : AppTheme.primaryTextColor;
  
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.widthCalculated(12),
-        vertical: context.heightCalculated(6),
+        vertical: context.heightCalculated(8),
       ),
       decoration: BoxDecoration(
-        border: Border.all(color: AppTheme.inputBorderColor),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: context.iconSize(), color: cs.onSurface),
-          SizedBox(width: context.widthCalculated(4)),
+          Icon(
+            isDone ? Icons.check_circle_outline : Icons.warning_amber_rounded,
+            size: context.iconSize() * 0.85,
+            color: iconColor,
+          ),
+          SizedBox(width: context.widthCalculated(6)),
           Text(
             label,
-            style: tt.labelSmall?.copyWith(color: cs.onSurface),
+            style: tt.labelMedium?.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
     );
   }
 }
+ 
