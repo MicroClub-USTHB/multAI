@@ -15,7 +15,11 @@ import {
   SidebarMenuItem,
 } from '@/shared/ui';
 
-import { NavMain, NavSecondary, NavUser } from '../../../components/Sidebar/index';
+import {
+  NavMain,
+  NavSecondary,
+  NavUser,
+} from '../../../components/Sidebar/index';
 
 export function AppSidebar({
   navData,

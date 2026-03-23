@@ -4,6 +4,7 @@ import { Command as CommandPrimitive } from 'cmdk';
 import { SearchIcon, CheckIcon } from 'lucide-react';
 import * as React from 'react';
 
+import { InputGroup, InputGroupAddon } from '@/shared/ui/forms/input-group';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/overlays/dialog';
-import { InputGroup, InputGroupAddon } from '@/shared/ui/forms/input-group';
 import { cn } from '@/shared/utils/helpers';
 
 function Command({

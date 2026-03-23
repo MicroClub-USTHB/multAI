@@ -5,6 +5,7 @@ import { PanelLeftIcon } from 'lucide-react';
 import * as React from 'react';
 
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Skeleton } from '@/shared/ui/feedback/skeleton';
 import { Button } from '@/shared/ui/forms/button';
 import { Input } from '@/shared/ui/forms/input';
 import { Separator } from '@/shared/ui/layout/separator';
@@ -15,8 +16,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/shared/ui/overlays/sheet';
-import { Skeleton } from '@/shared/ui/feedback/skeleton';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/overlays/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/ui/overlays/tooltip';
 import { cn } from '@/shared/utils/helpers';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
