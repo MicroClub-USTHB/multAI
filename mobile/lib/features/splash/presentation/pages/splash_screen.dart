@@ -30,7 +30,12 @@ class SplashScreen extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       children: [
-        const Icon(Icons.auto_awesome, size: 80, color: Colors.white),
+        Image.asset(
+          'assets/images/MC_white.png',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        ),
         const SizedBox(height: AppTheme.spacingMd),
 
         RichText(
@@ -48,7 +53,7 @@ class SplashScreen extends StatelessWidget {
         const SizedBox(height: AppTheme.spacingSm),
         Text(
           'Your moments, found automatically',
-         style: AppTheme.splashMediumText,
+          style: AppTheme.splashMediumText,
         ),
       ],
     );
