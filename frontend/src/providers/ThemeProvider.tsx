@@ -1,5 +1,6 @@
-import { ThemeProviderContext, type ThemeMode } from '@/hooks/useTheme';
 import { useEffect, useState } from 'react';
+
+import { ThemeProviderContext, type ThemeMode } from '@/hooks/useTheme';
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -24,7 +25,7 @@ function applyThemeMode(mode: ThemeMode) {
   if (typeof window === 'undefined') {
     return;
   }
-  
+
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const resolved = mode === 'system' ? (prefersDark ? 'dark' : 'light') : mode;
 
@@ -50,7 +51,7 @@ export function ThemeProvider({
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const initialMode = getInitialMode();
     setTheme(initialMode);
     applyThemeMode(initialMode);
@@ -58,7 +59,7 @@ export function ThemeProvider({
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     if (theme !== 'system') {
       return;
     }
@@ -74,7 +75,7 @@ export function ThemeProvider({
 
   function toggleTheme() {
     if (typeof window === 'undefined') return;
-    
+
     const nextMode: ThemeMode = theme === 'light' ? 'dark' : 'light';
     setTheme(nextMode);
     applyThemeMode(nextMode);

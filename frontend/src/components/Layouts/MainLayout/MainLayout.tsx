@@ -1,6 +1,8 @@
 import type { NavData } from '@/shared/utils/types';
+
 import { AppSidebar } from '@/components/Sidebar';
 import { SidebarInset, SidebarProvider } from '@/shared/ui/sidebar';
+
 import { AdminHeader } from './AdminHeader';
 import { MultiHeader } from './MultiHeader';
 
@@ -12,11 +14,11 @@ export default function MainLayout({
   navData: NavData;
 }) {
   return (
-    <SidebarProvider className='h-svh overflow-hidden'>
+    <SidebarProvider className="h-svh overflow-hidden">
       <AppSidebar navData={navData} />
-      <SidebarInset className='h-svh overflow-hidden'>
+      <SidebarInset className="h-svh overflow-hidden">
         {navData.isAdmin ? <AdminHeader /> : <MultiHeader />}
-        <main className='flex-1 overflow-y-auto p-4'>{children}</main>
+        <main className="flex-1 overflow-y-auto p-4">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

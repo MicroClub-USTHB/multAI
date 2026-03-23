@@ -1,15 +1,4 @@
 import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from '@/shared/ui/command';
-import {
   ClipboardPasteIcon,
   CommandIcon,
   CopyIcon,
@@ -23,8 +12,21 @@ import {
   TrashIcon,
   UsersRound,
 } from 'lucide-react';
-import { useSidebar } from './sidebar';
+
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from '@/shared/ui/command';
+
 import { cn } from '../utils/helpers';
+import { useSidebar } from './sidebar';
 
 export function GlobalSearch({
   open,
@@ -34,13 +36,13 @@ export function GlobalSearch({
   onOpenChange: (open: boolean) => void;
 }) {
   return (
-    <div className='flex flex-col gap-4'>
+    <div className="flex flex-col gap-4">
       <CommandDialog open={open} onOpenChange={onOpenChange}>
         <Command>
-          <CommandInput placeholder='Type a command or search...' />
+          <CommandInput placeholder="Type a command or search..." />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
-            <CommandGroup heading='Navigation'>
+            <CommandGroup heading="Navigation">
               <CommandItem>
                 <HomeIcon />
                 <span>Home</span>
@@ -63,7 +65,7 @@ export function GlobalSearch({
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
-            <CommandGroup heading='Actions'>
+            <CommandGroup heading="Actions">
               <CommandItem>
                 <PlusIcon />
                 <span>New Event</span>
@@ -115,24 +117,24 @@ export function SearchTrigger({ onClick, className }: SearchTriggerProps) {
     <button
       onClick={onClick}
       className={cn(
-        'flex items-center gap-2 text-sm text-muted-foreground overflow-hidden',
+        'text-muted-foreground flex items-center gap-2 overflow-hidden text-sm',
         'bg-sidebar-accent/50 hover:bg-sidebar-accent rounded-md transition-all duration-200 ease-in-out',
-        'border border-border/50 group cursor-pointer',
+        'border-border/50 group cursor-pointer border',
         // Conditional sizing with smooth transitions
-        isCollapsed ? 'w-8 h-8 px-2' : 'w-full px-3 py-2 justify-start',
+        isCollapsed ? 'h-8 w-8 px-2' : 'w-full justify-start px-3 py-2',
         className,
       )}
-      title='Search (⌘K)'
+      title="Search (⌘K)"
     >
-      <Search className='h-4 w-4 flex-shrink-0 -ml-0.5' />
+      <Search className="-ml-0.5 h-4 w-4 flex-shrink-0" />
 
       {/* Text content with smooth fade and slide animation */}
       <span
         className={cn(
           'flex-1 text-left whitespace-nowrap transition-all duration-200 ease-in-out',
           isCollapsed
-            ? 'opacity-0 w-0 -translate-x-2'
-            : 'opacity-100 w-auto translate-x-0',
+            ? 'w-0 -translate-x-2 opacity-0'
+            : 'w-auto translate-x-0 opacity-100',
         )}
       >
         Search...
@@ -143,12 +145,12 @@ export function SearchTrigger({ onClick, className }: SearchTriggerProps) {
         className={cn(
           'flex items-center gap-1 transition-all duration-200 ease-in-out',
           isCollapsed
-            ? 'opacity-0 w-0 -translate-x-2'
-            : 'opacity-100 w-auto translate-x-0',
+            ? 'w-0 -translate-x-2 opacity-0'
+            : 'w-auto translate-x-0 opacity-100',
         )}
       >
-        <kbd className='inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-60 group-hover:opacity-100 transition-opacity'>
-          <CommandIcon className='h-2.5 w-2.5' />K
+        <kbd className="bg-muted text-muted-foreground inline-flex h-5 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-60 transition-opacity select-none group-hover:opacity-100">
+          <CommandIcon className="h-2.5 w-2.5" />K
         </kbd>
       </div>
     </button>

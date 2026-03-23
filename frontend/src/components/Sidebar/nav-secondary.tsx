@@ -1,4 +1,7 @@
+import { Link, useLocation } from '@tanstack/react-router';
 import * as React from 'react';
+
+import type { NavLink } from '@/shared/utils/types';
 
 import {
   SidebarGroup,
@@ -7,8 +10,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/shared/ui/sidebar';
-import type { NavLink } from '@/shared/utils/types';
-import { Link, useLocation } from '@tanstack/react-router';
 import { isItemActive } from '@/shared/utils/helpers';
 
 export function NavSecondary({

@@ -8,6 +8,7 @@ import {
   Settings,
   UsersRound,
 } from 'lucide-react';
+
 import type { NavData } from './types';
 
 export const ADMIN_NAV_DATA: NavData = {

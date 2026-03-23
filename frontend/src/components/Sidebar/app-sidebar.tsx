@@ -1,6 +1,10 @@
+import { Link } from '@tanstack/react-router';
 import * as React from 'react';
 
-import { NavMain, NavSecondary, NavUser } from './index';
+import type { NavData } from '@/shared/utils/types';
+
+import { Badge } from '@/shared/ui/badge';
+import { GlobalSearch } from '@/shared/ui/global-search';
 import {
   Sidebar,
   SidebarContent,
@@ -10,10 +14,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/shared/ui/sidebar';
-import type { NavData } from '@/shared/utils/types';
-import { Badge } from '@/shared/ui/badge';
-import { Link } from '@tanstack/react-router';
-import { GlobalSearch } from '@/shared/ui/global-search';
+
+import { NavMain, NavSecondary, NavUser } from './index';
 
 export function AppSidebar({
   navData,
@@ -23,15 +25,15 @@ export function AppSidebar({
 
   return (
     <>
-      <Sidebar variant='inset' {...props}>
+      <Sidebar variant="inset" {...props}>
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size='lg' render={<Link to='/' />}>
-                <div className='flex items-center justify-center space-x-4 flex-1 text-sm leading-tight'>
-                  <span className='truncate font-medium text-xl'>MultAI</span>
+              <SidebarMenuButton size="lg" render={<Link to="/" />}>
+                <div className="flex flex-1 items-center justify-center space-x-4 text-sm leading-tight">
+                  <span className="truncate text-xl font-medium">MultAI</span>
                   {navData.isAdmin && (
-                    <Badge variant='secondary' className='truncate text-xs'>
+                    <Badge variant="secondary" className="truncate text-xs">
                       Admin
                     </Badge>
                   )}
@@ -42,7 +44,7 @@ export function AppSidebar({
         </SidebarHeader>
         <SidebarContent>
           <NavMain items={navData.main} />
-          <NavSecondary items={navData.secondary} className='mt-auto' />
+          <NavSecondary items={navData.secondary} className="mt-auto" />
         </SidebarContent>
         <SidebarFooter>
           <NavUser user={navData.user} />

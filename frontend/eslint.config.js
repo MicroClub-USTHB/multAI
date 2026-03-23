@@ -1,10 +1,10 @@
-import pluginRouter from '@tanstack/eslint-plugin-router'
 import pluginQuery from '@tanstack/eslint-plugin-query'
-import tsParser from '@typescript-eslint/parser'
+import pluginRouter from '@tanstack/eslint-plugin-router'
 import tsPlugin from '@typescript-eslint/eslint-plugin'
+import tsParser from '@typescript-eslint/parser'
+import perfectionistPlugin from 'eslint-plugin-perfectionist'
 import reactPlugin from 'eslint-plugin-react'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
-import perfectionistPlugin from 'eslint-plugin-perfectionist'
 
 export default [
   {

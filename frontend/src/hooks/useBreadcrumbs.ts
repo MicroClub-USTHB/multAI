@@ -35,6 +35,5 @@ export function useBreadcrumbs(pathPrefix?: string): BreadcrumbSegment[] {
       seg.path.startsWith(pathPrefix),
     );
   }
-  const [first, ...rest] = finalSegments;
-  return rest;
+  return finalSegments.slice(1);
 }

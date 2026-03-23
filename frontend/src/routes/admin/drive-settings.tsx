@@ -1,16 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { GoogleDriveAuthCard } from '@/features/admin/drive/components/google-auth-card'
-import { OutputFolderCard } from '@/features/admin/drive/components/output-folder-card'
-import { SyncFrequencyCard } from '@/features/admin/drive/components/sync-frequency-card'
-import { useDriveSettings } from '@/features/admin/drive/hooks'
-import { type SyncInterval } from '@/features/admin/drive/types'
-import { Button } from '@/shared/ui/button'
-import { AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { createFileRoute } from '@tanstack/react-router';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+
+import { GoogleDriveAuthCard } from '@/features/admin/drive/components/google-auth-card';
+import { OutputFolderCard } from '@/features/admin/drive/components/output-folder-card';
+import { SyncFrequencyCard } from '@/features/admin/drive/components/sync-frequency-card';
+import { useDriveSettings } from '@/features/admin/drive/hooks';
+import { type SyncInterval } from '@/features/admin/drive/types';
+import { Button } from '@/shared/ui/button';
 
 export const Route = createFileRoute('/admin/drive-settings')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   const {
@@ -22,69 +23,75 @@ function RouteComponent() {
     connect,
     updateSyncFrequency,
     updateOutputFolder,
-  } = useDriveSettings()
+  } = useDriveSettings();
 
-  const [actionError, setActionError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const clearMessages = () => {
-    setActionError(null)
-    setSuccessMessage(null)
-  }
+    setActionError(null);
+    setSuccessMessage(null);
+  };
 
   const handleConnect = async (apiKey: string) => {
-    clearMessages()
+    clearMessages();
 
     try {
-      await connect({ apiKey })
-      setSuccessMessage('Google Drive connected successfully.')
+      await connect({ apiKey });
+      setSuccessMessage('Google Drive connected successfully.');
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Unable to connect Google Drive.')
+      setActionError(
+        err instanceof Error ? err.message : 'Unable to connect Google Drive.',
+      );
     }
-  }
+  };
 
   const handleSyncChange = async (minutes: SyncInterval) => {
-    clearMessages()
+    clearMessages();
 
     try {
-      await updateSyncFrequency({ syncInterval: minutes })
-      setSuccessMessage(`Sync frequency updated to every ${minutes} minutes.`)
+      await updateSyncFrequency({ syncInterval: minutes });
+      setSuccessMessage(`Sync frequency updated to every ${minutes} minutes.`);
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Unable to update sync frequency.')
+      setActionError(
+        err instanceof Error ? err.message : 'Unable to update sync frequency.',
+      );
     }
-  }
+  };
 
   const handleOutputPathSave = async (path: string) => {
-    clearMessages()
+    clearMessages();
 
     try {
-      await updateOutputFolder({ outputFolder: path })
-      setSuccessMessage('Output folder updated successfully.')
+      await updateOutputFolder({ outputFolder: path });
+      setSuccessMessage('Output folder updated successfully.');
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Unable to update output folder.')
+      setActionError(
+        err instanceof Error ? err.message : 'Unable to update output folder.',
+      );
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="bg-sidebar text-sidebar-foreground">
         <div className="space-y-6 p-6">
           <div>
-            <div className="h-10 w-56 animate-pulse rounded-md bg-sidebar-accent/40" />
-            <div className="mt-2 h-5 w-96 animate-pulse rounded-md bg-sidebar-accent/30" />
+            <div className="bg-sidebar-accent/40 h-10 w-56 animate-pulse rounded-md" />
+            <div className="bg-sidebar-accent/30 mt-2 h-5 w-96 animate-pulse rounded-md" />
           </div>
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
               <div
                 key={index}
-                className="h-[320px] animate-pulse rounded-lg border border-border/40 bg-card/40"
+                className="border-border/40 bg-card/40 h-[320px] animate-pulse rounded-lg border"
               />
             ))}
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (isError || !settings) {
@@ -93,19 +100,23 @@ function RouteComponent() {
         <div className="space-y-6 p-6">
           <h1 className="text-3xl font-bold">Drive Settings</h1>
 
-          <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          <div className="border-destructive/40 bg-destructive/10 text-destructive rounded-lg border p-4 text-sm">
             <div className="mb-3 flex items-center gap-2 font-medium">
               <AlertTriangle className="h-4 w-4" />
               Failed to load Drive settings
             </div>
             <p>{error instanceof Error ? error.message : 'Unknown error.'}</p>
-            <Button className="mt-4" variant="outline" onClick={() => refetch()}>
+            <Button
+              className="mt-4"
+              variant="outline"
+              onClick={() => refetch()}
+            >
               Retry
             </Button>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -113,13 +124,13 @@ function RouteComponent() {
       <div className="space-y-6 p-6">
         <div>
           <h1 className="text-3xl font-bold">Drive Settings</h1>
-          <p className="mt-1 text-muted-foreground">
+          <p className="text-muted-foreground mt-1">
             Configure Google Drive integration and synchronization.
           </p>
         </div>
 
         {actionError ? (
-          <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          <div className="border-destructive/40 bg-destructive/10 text-destructive rounded-lg border p-4 text-sm">
             {actionError}
           </div>
         ) : null}
@@ -149,5 +160,5 @@ function RouteComponent() {
         </div>
       </div>
     </div>
-  )
+  );
 }
