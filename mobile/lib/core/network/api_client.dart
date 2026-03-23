@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../errors/failure.dart';
 import 'network_info.dart';
 import '../constants/end_points.dart';
-
+ 
 class ApiClient {
   final http.Client _client;
   final NetworkInfo _networkInfo;
@@ -22,14 +22,24 @@ class ApiClient {
  
   void clearAccessToken() => _accessToken = null;
  
+  // ── exposed for multipart requests in datasources ──────────────────────────
+  String? get currentAccessToken => _accessToken;
+ 
   Map<String, String> get _headers => {
         'Content-Type': 'application/json',
         if (_accessToken != null) 'Authorization': 'Bearer $_accessToken',
       };
  
+  // ── exposed for datasources that build their own requests ─────────────────
+  Future<void> checkConnection() async {
+    if (!await _networkInfo.isConnected) {
+      throw const NetworkFailure(message: 'No internet connection');
+    }
+  }
+ 
   // ── GET ────────────────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> get(String endpoint) async {
-    await _checkConnection();
+    await checkConnection();
     final response = await _client.get(
       Uri.parse('$baseUrl$endpoint'),
       headers: _headers,
@@ -43,7 +53,7 @@ class ApiClient {
     Map<String, dynamic>? body,
     bool requiresAuth = false,
   }) async {
-    await _checkConnection();
+    await checkConnection();
     final response = await _client.post(
       Uri.parse('$baseUrl$endpoint'),
       headers: requiresAuth ? _headers : {'Content-Type': 'application/json'},
@@ -52,12 +62,12 @@ class ApiClient {
     return _handleResponse(response);
   }
  
-  // ── POST void (no response body needed) ───────────────────────────────────
+  // ── POST void ──────────────────────────────────────────────────────────────
   Future<void> postVoid(
     String endpoint, {
     bool requiresAuth = false,
   }) async {
-    await _checkConnection();
+    await checkConnection();
     final response = await _client.post(
       Uri.parse('$baseUrl$endpoint'),
       headers: requiresAuth ? _headers : {'Content-Type': 'application/json'},
@@ -65,9 +75,9 @@ class ApiClient {
     _handleVoidResponse(response);
   }
  
-  // ── DELETE ──────────────────────r───────────────────────────────────────────
+  // ── DELETE ─────────────────────────────────────────────────────────────────
   Future<void> delete(String endpoint) async {
-    await _checkConnection();
+    await checkConnection();
     final response = await _client.delete(
       Uri.parse('$baseUrl$endpoint'),
       headers: _headers,
@@ -75,18 +85,11 @@ class ApiClient {
     _handleVoidResponse(response);
   }
  
-  // ── Helpers ────────────────────────────────────────────────────────────────
-  Future<void> _checkConnection() async {
-    if (!await _networkInfo.isConnected) {
-      throw const NetworkFailure(message: 'No internet connection');
-    }
-  }
- 
+  // ── Response handlers ──────────────────────────────────────────────────────
   Map<String, dynamic> _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return jsonDecode(response.body) as Map<String, dynamic>;
     }
- 
     switch (response.statusCode) {
       case 400:
         throw ServerFailure(message: _parseError(response));
@@ -109,7 +112,6 @@ class ApiClient {
  
   void _handleVoidResponse(http.Response response) {
     if (response.statusCode == 200 || response.statusCode == 204) return;
- 
     switch (response.statusCode) {
       case 400:
         throw ServerFailure(message: _parseError(response));
@@ -141,3 +143,4 @@ class ApiClient {
     }
   }
 }
+ 
