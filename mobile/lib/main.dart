@@ -17,6 +17,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
 
+
   // Load .env with error handling - use defaults if file missing/corrupted
   try {
     await dotenv.load(fileName: ".env");
