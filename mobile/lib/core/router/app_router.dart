@@ -12,7 +12,7 @@ import '../../features/account/presentation/screens/account_screen.dart';
 import 'app_routes.dart';
  
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppRoutes.login,
+  initialLocation: AppRoutes.faceEnrollment,
   routes: [
  
     // ── Auth ──────────────────────────────────────────────────────────────────

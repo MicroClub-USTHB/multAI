@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'package:dartz/dartz.dart';
-import 'package:path/path.dart' as p;
-import '../../../core/errors/failure.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path/path.dart' as p;
 
-/// Validates a photo file before upload.
+import '../../../../core/errors/failure.dart';
+
 class PhotoValidator {
   static const int _maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
   static const List<String> _allowedExtensions = [
@@ -13,81 +14,104 @@ class PhotoValidator {
     'jpeg',
     'png',
     'heic',
-    'webp'
+    'webp',
   ];
 
-  /// Validates a file path or content URI.
   static Future<Either<Failure, File>> validate(String filePath) async {
     File file;
-
     try {
       file = await _resolveFile(filePath);
-    } catch (e) {
+    } catch (_) {
       return const Left(
-        FileNotFoundFailure(
-            message: 'Photo file not found. Please try again.'),
+        FileNotFoundFailure(message: 'Photo file not found. Please try again.'),
       );
     }
 
-    // ── 1. file exists ───────────────────────────────────────────────
     if (!await file.exists()) {
       return const Left(
-        FileNotFoundFailure(
-            message: 'Photo file not found. Please try again.'),
+        FileNotFoundFailure(message: 'Photo file not found. Please try again.'),
       );
     }
 
-    // ── 2. file size ───────────────────────────────────────────────
+    // compress returns File 
+    file = await _compressFile(file);
+
     final size = await file.length();
     if (size > _maxFileSizeBytes) {
       return const Left(
-        FileTooLargeFailure(message: 'Photo is too large. Maximum size is 5MB.'),
+        FileTooLargeFailure(
+          message: 'Photo is too large. Maximum size is 5MB.',
+        ),
       );
     }
 
-    // ── 3. file format ─────────────────────────────────────────────
     final ext = p.extension(file.path).replaceFirst('.', '').toLowerCase();
     if (!_allowedExtensions.contains(ext)) {
       return const Left(
         InvalidFileFormatFailure(
-            message: 'Invalid format. Use JPG, PNG, HEIC, or WEBP photos.'),
+          message: 'Invalid format. Use JPG, PNG, HEIC, or WEBP.',
+        ),
       );
     }
 
     return Right(file);
   }
 
-  /// Resolves content URIs or direct file paths into File objects
   static Future<File> _resolveFile(String path) async {
     if (path.startsWith('content://') && !kIsWeb) {
-      // Android content URI → copy to temp file
       final tempDir = Directory.systemTemp;
       final fileName = path.split('/').last;
       final tempFile = File('${tempDir.path}/$fileName');
-      final byteData = await MethodChannel('flutter/photo')
-          .invokeMethod<ByteData>('readFileBytes', {'uri': path});
-      await tempFile.writeAsBytes(byteData!.buffer.asUint8List());
+
+      final byteData = await const MethodChannel(
+        'flutter/photo',
+      ).invokeMethod<ByteData>('readFileBytes', {'uri': path});
+
+      if (byteData == null) {
+        throw Exception('Failed to read bytes from content URI');
+      }
+
+      await tempFile.writeAsBytes(byteData.buffer.asUint8List());
       return tempFile;
     }
-    // iOS PH:// or normal path → direct
+
     return File(path);
   }
 
-  /// Returns content type based on file extension.
+  static Future<File> _compressFile(File file) async {
+    final dir = Directory.systemTemp;
+    final targetPath =
+        '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+    final XFile? compressedXFile =
+        await FlutterImageCompress.compressAndGetFile(
+          file.absolute.path,
+          targetPath,
+          quality: 70,
+          minWidth: 1080,
+          minHeight: 1080,
+        );
+
+    final File compressedFile = compressedXFile != null
+        ? File(compressedXFile.path)
+        : file;
+
+    return compressedFile;
+  }
+
   static String getContentType(String filePath) {
     final ext = p.extension(filePath).replaceFirst('.', '').toLowerCase();
     switch (ext) {
       case 'png':
         return 'image/png';
-      case 'jpg':
-      case 'jpeg':
-        return 'image/jpeg';
       case 'heic':
         return 'image/heic';
       case 'webp':
         return 'image/webp';
+      case 'jpg':
+      case 'jpeg':
       default:
-        return 'application/octet-stream';
+        return 'image/jpeg';
     }
   }
 }

@@ -12,6 +12,7 @@ class PhotoSlot extends StatelessWidget {
   final double? height;
   final bool isOptional;
   final String? label;
+  final bool isLoading;
  
   const PhotoSlot({
     super.key,
@@ -22,6 +23,7 @@ class PhotoSlot extends StatelessWidget {
     this.height,
     this.isOptional = false,
     this.label,
+    this.isLoading = false,
   });
  
   bool get _hasPhoto => filePath != null;
@@ -39,12 +41,12 @@ class PhotoSlot extends StatelessWidget {
  
         // ── Photo container ──────────────────────────────────────────────
         GestureDetector(
-          onTap: _hasPhoto ? null : onTap,
+          onTap: (_hasPhoto || isLoading) ?  null : onTap,
           child: Container(
             height: slotHeight,
             width: double.infinity,
             decoration: BoxDecoration(
-              // ✅ correct upload area color #334155
+              //  correct upload area color #334155
               color: _hasPhoto
                   ? Colors.transparent
                   : AppTheme.photoSlotColor,

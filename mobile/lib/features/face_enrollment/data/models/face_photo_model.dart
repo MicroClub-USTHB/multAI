@@ -14,6 +14,10 @@ class FacePhotoModel extends FacePhotoEntity {
         return 'left_profile_photo';
       case FacePhotoType.rightProfile:
         return 'right_profile_photo';
+      case FacePhotoType.extra1:
+        return 'extra1_photo';
+      case FacePhotoType.extra2:
+        return 'extra2_photo';
     }
   }
 }

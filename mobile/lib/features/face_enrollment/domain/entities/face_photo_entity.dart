@@ -1,8 +1,10 @@
 // photo type
 enum FacePhotoType {
-  frontal,    // PRIMARY
+  frontal, //
   leftProfile,
   rightProfile,
+  extra1, // Optional
+  extra2, // Optional
 }
 
 extension FacePhotoTypeX on FacePhotoType {
@@ -14,9 +16,13 @@ extension FacePhotoTypeX on FacePhotoType {
         return 'Left Profile';
       case FacePhotoType.rightProfile:
         return 'Right Profile';
+      case FacePhotoType.extra1:
+        return 'Optional1';
+      case FacePhotoType.extra2:
+        return 'Optional2';
     }
   }
- 
+
   bool get isPrimary => this == FacePhotoType.frontal;
 }
 
@@ -25,10 +31,5 @@ class FacePhotoEntity {
   final FacePhotoType type;
   final String filePath;
 
-  const FacePhotoEntity({
-    required this.type,
-    required this.filePath,
-  });
+  const FacePhotoEntity({required this.type, required this.filePath});
 }
-
-

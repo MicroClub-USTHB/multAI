@@ -31,7 +31,6 @@ class _TipChip extends StatelessWidget {
     final tt = context.textTheme;
 
     // ── colors ──────────────────────────────────────────────────────────────
-    // background: #64748B1A when not done, green with opacity when done
     final bgColor = isDone
         ? Colors.green.withValues(alpha: 0.15)
         : AppTheme.tipsBgColor;
