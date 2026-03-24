@@ -41,6 +41,8 @@ class PhotoSlot extends StatelessWidget {
             PhotoView(
               imageProvider: FileImage(File(filePath!)),
               backgroundDecoration: const BoxDecoration(color: Colors.black),
+              minScale: PhotoViewComputedScale.contained,
+              maxScale: PhotoViewComputedScale.covered * 3,
             ),
             Positioned(
               top: 40,
@@ -66,7 +68,6 @@ class PhotoSlot extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Photo container
         GestureDetector(
           onTap: _hasPhoto ? () => _openPhoto(context) : onTap,
           child: Container(
@@ -90,8 +91,6 @@ class PhotoSlot extends StatelessWidget {
                 : _EmptySlot(isOptional: isOptional),
           ),
         ),
-
-        // Label
         SizedBox(height: context.heightCalculated(6)),
         isOptional
             ? Text(
@@ -106,8 +105,7 @@ class PhotoSlot extends StatelessWidget {
                   Text(
                     slotLabel,
                     style: tt.labelLarge?.copyWith(
-                      color:
-                          _hasPhoto ? cs.primary : AppTheme.primaryTextColor,
+                      color: _hasPhoto ? cs.primary : AppTheme.primaryTextColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -184,11 +182,10 @@ class _FilledSlot extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           child: Image.file(
             File(filePath),
-            fit: BoxFit.cover, // Keeps slot size fixed but scales image
+            fit: BoxFit.cover,
+            alignment: Alignment.center, // always center image
           ),
         ),
-
-        // PRIMARY badge
         if (isPrimary)
           Positioned(
             top: context.heightCalculated(8),
@@ -212,8 +209,6 @@ class _FilledSlot extends StatelessWidget {
               ),
             ),
           ),
-
-        // Delete button
         if (onDelete != null)
           Positioned(
             top: context.heightCalculated(8),

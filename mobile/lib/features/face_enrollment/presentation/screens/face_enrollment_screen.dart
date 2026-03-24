@@ -127,7 +127,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
                         PhotoSlot(
                           type: FacePhotoType.frontal,
                           filePath: photos[FacePhotoType.frontal],
-                          height: context.heightCalculated(240),
+                          height: context.heightCalculated(340),
                           isLoading: loadingType == FacePhotoType.frontal,
                           onTap: () => _pickPhoto(context, FacePhotoType.frontal),
                           onDelete: photos[FacePhotoType.frontal] != null
@@ -143,7 +143,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
                               child: PhotoSlot(
                                 type: FacePhotoType.leftProfile,
                                 filePath: photos[FacePhotoType.leftProfile],
-                                height: context.heightCalculated(160),
+                                height: context.heightCalculated(260),
                                 isLoading: loadingType == FacePhotoType.leftProfile,
                                 onTap: () =>
                                     _pickPhoto(context, FacePhotoType.leftProfile),
@@ -160,7 +160,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
                               child: PhotoSlot(
                                 type: FacePhotoType.rightProfile,
                                 filePath: photos[FacePhotoType.rightProfile],
-                                height: context.heightCalculated(160),
+                                height: context.heightCalculated(260),
                                 isLoading:
                                     loadingType == FacePhotoType.rightProfile,
                                 onTap: () =>
@@ -181,7 +181,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
                         PhotoSlot(
                           type: FacePhotoType.extra1,
                           filePath: photos[FacePhotoType.extra1],
-                          height: context.heightCalculated(160),
+                          height: context.heightCalculated(260),
                           isOptional: true,
                           label: 'Extra View 1',
                           isLoading: loadingType == FacePhotoType.extra1,
@@ -196,7 +196,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
                         PhotoSlot(
                           type: FacePhotoType.extra2,
                           filePath: photos[FacePhotoType.extra2],
-                          height: context.heightCalculated(160),
+                          height: context.heightCalculated(260),
                           isOptional: true,
                           label: 'Extra View 2',
                           isLoading: loadingType == FacePhotoType.extra2,
