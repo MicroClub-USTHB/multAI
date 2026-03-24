@@ -17,19 +17,22 @@ class FaceEnrollmentScreen extends StatelessWidget {
 
   Future<void> _pickPhoto(BuildContext context, FacePhotoType type) async {
     final picker = ImagePicker();
+
     final picked = await picker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 90,
     );
 
     if (picked == null || !context.mounted) return;
+
     final file = File(picked.path);
 
-    context.read<FaceEnrollmentBloc>().add(
-          PhotoSelected(type: type, filePath: file.path),
-        );
+    // Optimistically update UI
+    context.read<FaceEnrollmentBloc>().add(PhotoSelected(
+          type: type,
+          filePath: file.path,
+        ));
   }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<FaceEnrollmentBloc, FaceEnrollmentState>(

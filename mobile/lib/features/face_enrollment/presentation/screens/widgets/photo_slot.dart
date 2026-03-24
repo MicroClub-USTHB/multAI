@@ -5,7 +5,7 @@ import '../../../../../../core/extensions/extensions.dart';
 import '../../../../../../core/theme/theme.dart';
 import '../../../domain/entities/face_photo_entity.dart';
 
-class PhotoSlot extends StatelessWidget {
+class PhotoSlot extends StatefulWidget {
   final FacePhotoType type;
   final String? filePath;
   final VoidCallback onTap;
@@ -27,7 +27,41 @@ class PhotoSlot extends StatelessWidget {
     this.isLoading = false,
   });
 
-  bool get _hasPhoto => filePath != null;
+  @override
+  State<PhotoSlot> createState() => _PhotoSlotState();
+}
+
+class _PhotoSlotState extends State<PhotoSlot> {
+  late String? _currentFilePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentFilePath = widget.filePath;
+  }
+
+  @override
+  void didUpdateWidget(PhotoSlot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _currentFilePath = widget.filePath; // update if bloc state changes
+  }
+
+  void _handleDelete() {
+    setState(() {
+      _currentFilePath = null;
+    });
+    if (widget.onDelete != null) widget.onDelete!();
+  }
+
+  void _handleTap() {
+    if (_currentFilePath != null) {
+      _openPhoto(context);
+    } else {
+      widget.onTap();
+    }
+  }
+
+  bool get _hasPhoto => _currentFilePath != null;
 
   void _openPhoto(BuildContext context) {
     if (!_hasPhoto) return;
@@ -36,23 +70,9 @@ class PhotoSlot extends StatelessWidget {
       builder: (_) => Dialog(
         backgroundColor: Colors.black,
         insetPadding: EdgeInsets.zero,
-        child: Stack(
-          children: [
-            PhotoView(
-              imageProvider: FileImage(File(filePath!)),
-              backgroundDecoration: const BoxDecoration(color: Colors.black),
-              minScale: PhotoViewComputedScale.contained,
-              maxScale: PhotoViewComputedScale.covered * 3,
-            ),
-            Positioned(
-              top: 40,
-              right: 20,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ],
+        child: PhotoView(
+          imageProvider: FileImage(File(_currentFilePath!)),
+          backgroundDecoration: const BoxDecoration(color: Colors.black),
         ),
       ),
     );
@@ -62,14 +82,14 @@ class PhotoSlot extends StatelessWidget {
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
-    final slotHeight = height ?? context.heightCalculated(200);
-    final slotLabel = label ?? type.label;
+    final slotHeight = widget.height ?? context.heightCalculated(200);
+    final slotLabel = widget.label ?? widget.type.label;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: _hasPhoto ? () => _openPhoto(context) : onTap,
+          onTap: _handleTap,
           child: Container(
             height: slotHeight,
             width: double.infinity,
@@ -84,15 +104,15 @@ class PhotoSlot extends StatelessWidget {
             clipBehavior: Clip.hardEdge,
             child: _hasPhoto
                 ? _FilledSlot(
-                    filePath: filePath!,
-                    isPrimary: type.isPrimary,
-                    onDelete: onDelete,
+                    filePath: _currentFilePath!,
+                    isPrimary: widget.type.isPrimary,
+                    onDelete: _handleDelete,
                   )
-                : _EmptySlot(isOptional: isOptional),
+                : _EmptySlot(isOptional: widget.isOptional),
           ),
         ),
         SizedBox(height: context.heightCalculated(6)),
-        isOptional
+        widget.isOptional
             ? Text(
                 slotLabel,
                 style: tt.labelMedium?.copyWith(
@@ -116,7 +136,7 @@ class PhotoSlot extends StatelessWidget {
                         color: cs.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
-                  if (type.isPrimary && _hasPhoto)
+                  if (widget.type.isPrimary && _hasPhoto)
                     Text(
                       'PRIMARY',
                       style: tt.labelSmall?.copyWith(
@@ -131,7 +151,6 @@ class PhotoSlot extends StatelessWidget {
     );
   }
 }
-
 class _EmptySlot extends StatelessWidget {
   final bool isOptional;
 
@@ -182,10 +201,12 @@ class _FilledSlot extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           child: Image.file(
             File(filePath),
-            fit: BoxFit.cover,
-            alignment: Alignment.center, // always center image
+            fit: BoxFit.contain, // keeps image fully visible inside the slot
+            alignment: Alignment.center,
           ),
         ),
+
+        // PRIMARY badge
         if (isPrimary)
           Positioned(
             top: context.heightCalculated(8),
@@ -209,6 +230,8 @@ class _FilledSlot extends StatelessWidget {
               ),
             ),
           ),
+
+        // Delete button
         if (onDelete != null)
           Positioned(
             top: context.heightCalculated(8),
