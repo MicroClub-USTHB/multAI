@@ -14,6 +14,7 @@ class FaceEnrollmentBloc
     extends Bloc<FaceEnrollmentEvent, FaceEnrollmentState> {
   final UploadFacePhotosUseCase _uploadFacePhotos;
   final SaveEnrollmentDoneUseCase _saveEnrollmentDone;
+  
 
   /// Stores compressed photo file paths
   final Map<FacePhotoType, String> _photos = {};
@@ -38,14 +39,16 @@ class FaceEnrollmentBloc
       type: event.type,
       photos: Map.from(_photos),
     ));
-
-    final validation = await PhotoValidator.validate(event.filePath);
-
+    final validation = await PhotoProcessor.processAndValidate(event.filePath);
     validation.fold(
       (failure) {
-        // Restore previous photos on failure
+        // Restore previous photos
         emit(FaceEnrollmentUpdated(photos: Map.from(_photos)));
-        emit(FaceEnrollmentFailure(message: failure.message));
+
+        // Delay failure emit slightly to avoid sync emit issues
+        Future.microtask(() {
+          emit(FaceEnrollmentFailure(message: failure.message));
+        });
       },
       (compressedFile) {
         _photos[event.type] = compressedFile.path;
@@ -74,22 +77,26 @@ class FaceEnrollmentBloc
         .map((e) => FacePhotoEntity(type: e.key, filePath: e.value))
         .toList();
 
-    final result = await _uploadFacePhotos(
-      UploadFacePhotosParams(photos: photos),
-    );
+    try {
+      final result = await _uploadFacePhotos(
+        UploadFacePhotosParams(photos: photos),
+      );
 
-    result.fold(
-      (failure) => emit(FaceEnrollmentFailure(message: failure.message)),
-      (_) async {
-        await _saveEnrollmentDone();
-        emit(FaceEnrollmentSuccess());
-      },
-    );
+      await result.fold(
+        (failure) async => emit(FaceEnrollmentFailure(message: failure.message)),
+        (_) async {
+          await _saveEnrollmentDone();
+          emit(FaceEnrollmentSuccess());
+        },
+      );
+    } catch (e) {
+      emit(FaceEnrollmentFailure(message: e.toString()));
+    }
   }
 
-  /// Returns a copy of current photos (read-only)
+  /// Returns a read-only copy of current photos
   Map<FacePhotoType, String> get photos => Map.unmodifiable(_photos);
 
-  /// Determines if submission is allowed (e.g., at least 3 photos)
-  bool get canSubmit => _photos.length >= 3; // adjust as needed
+  /// Determines if submission is allowed
+  bool get canSubmit => _photos.length >= 3; // adjust minimum as needed
 }
