@@ -17,55 +17,52 @@ class PhotoValidator {
     'webp',
   ];
 
+  /// Validates a photo file by checking existence, compressing, size, and format.
   static Future<Either<Failure, File>> validate(String filePath) async {
-    File file;
     try {
-      file = await _resolveFile(filePath);
-    } catch (_) {
-      return const Left(
-        FileNotFoundFailure(message: 'Photo file not found. Please try again.'),
-      );
-    }
+      var file = await _resolveFile(filePath);
 
-    if (!await file.exists()) {
-      return const Left(
-        FileNotFoundFailure(message: 'Photo file not found. Please try again.'),
-      );
-    }
+      if (!await file.exists()) {
+        return const Left(FileNotFoundFailure(
+          message: 'Photo file not found. Please try again.',
+        ));
+      }
 
-    // compress returns File 
-    file = await _compressFile(file);
+      // Compress the file
+      file = await _compressFile(file);
 
-    final size = await file.length();
-    if (size > _maxFileSizeBytes) {
-      return const Left(
-        FileTooLargeFailure(
+      // Check file size
+      if (await file.length() > _maxFileSizeBytes) {
+        return const Left(FileTooLargeFailure(
           message: 'Photo is too large. Maximum size is 5MB.',
-        ),
-      );
-    }
+        ));
+      }
 
-    final ext = p.extension(file.path).replaceFirst('.', '').toLowerCase();
-    if (!_allowedExtensions.contains(ext)) {
-      return const Left(
-        InvalidFileFormatFailure(
+      // Check file extension
+      final ext = p.extension(file.path).replaceFirst('.', '').toLowerCase();
+      if (!_allowedExtensions.contains(ext)) {
+        return const Left(InvalidFileFormatFailure(
           message: 'Invalid format. Use JPG, PNG, HEIC, or WEBP.',
-        ),
-      );
-    }
+        ));
+      }
 
-    return Right(file);
+      return Right(file);
+    } catch (e) {
+      return const Left(FileNotFoundFailure(
+        message: 'Photo file not found. Please try again.',
+      ));
+    }
   }
 
+  /// Resolves the file from a path or content URI (Android only)
   static Future<File> _resolveFile(String path) async {
     if (path.startsWith('content://') && !kIsWeb) {
       final tempDir = Directory.systemTemp;
-      final fileName = path.split('/').last;
+      final fileName = p.basename(path);
       final tempFile = File('${tempDir.path}/$fileName');
 
-      final byteData = await const MethodChannel(
-        'flutter/photo',
-      ).invokeMethod<ByteData>('readFileBytes', {'uri': path});
+      final byteData = await const MethodChannel('flutter/photo')
+          .invokeMethod<ByteData>('readFileBytes', {'uri': path});
 
       if (byteData == null) {
         throw Exception('Failed to read bytes from content URI');
@@ -78,27 +75,23 @@ class PhotoValidator {
     return File(path);
   }
 
+  /// Compresses the file to reduce size while keeping quality
   static Future<File> _compressFile(File file) async {
-    final dir = Directory.systemTemp;
     final targetPath =
-        '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+        '${Directory.systemTemp.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-    final XFile? compressedXFile =
-        await FlutterImageCompress.compressAndGetFile(
-          file.absolute.path,
-          targetPath,
-          quality: 70,
-          minWidth: 1080,
-          minHeight: 1080,
-        );
+    final compressedXFile = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
+      quality: 70,
+      minWidth: 1080,
+      minHeight: 1080,
+    );
 
-    final File compressedFile = compressedXFile != null
-        ? File(compressedXFile.path)
-        : file;
-
-    return compressedFile;
+    return compressedXFile != null ? File(compressedXFile.path) : file;
   }
 
+  /// Returns the MIME type based on the file extension
   static String getContentType(String filePath) {
     final ext = p.extension(filePath).replaceFirst('.', '').toLowerCase();
     switch (ext) {
