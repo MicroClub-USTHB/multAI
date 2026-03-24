@@ -12,6 +12,7 @@ class LogoSection extends StatelessWidget {
     final cs = context.theme.colorScheme;
     final logoSize = context.logoSize();
  
+ 
     return Column(
       children: [
         Container(

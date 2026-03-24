@@ -75,6 +75,10 @@ class AppTheme {
   // ── Transparent Colors ─────────────────────────────────────────────────────
   static const Color overlayColor = Color(0x80000000);
   static const Color shimmerColor = Color(0xFF3A2A15);
+  // colors ____________________________________________________________________
+  static const Color photoSlotColor      = Color(0xFF334155);
+  static const Color tipsBgColor         = Color(0x1A64748B);
+  static const Color enrollDisabledColor = Color(0x33EC5B13);
 
   // ── Theme Data ─────────────────────────────────────────────────────────────
   static ThemeData get lightTheme {
