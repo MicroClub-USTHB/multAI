@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 import '../../../../../../core/extensions/extensions.dart';
 import '../../../../../../core/theme/theme.dart';
 import '../../../domain/entities/face_photo_entity.dart';
- 
+
 class PhotoSlot extends StatelessWidget {
   final FacePhotoType type;
   final String? filePath;
@@ -13,7 +14,7 @@ class PhotoSlot extends StatelessWidget {
   final bool isOptional;
   final String? label;
   final bool isLoading;
- 
+
   const PhotoSlot({
     super.key,
     required this.type,
@@ -25,39 +26,61 @@ class PhotoSlot extends StatelessWidget {
     this.label,
     this.isLoading = false,
   });
- 
+
   bool get _hasPhoto => filePath != null;
- 
+
+  void _openPhoto(BuildContext context) {
+    if (!_hasPhoto) return;
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.black,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          children: [
+            PhotoView(
+              imageProvider: FileImage(File(filePath!)),
+              backgroundDecoration: const BoxDecoration(color: Colors.black),
+            ),
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
     final slotHeight = height ?? context.heightCalculated(200);
     final slotLabel = label ?? type.label;
- 
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
- 
-        // ── Photo container ──────────────────────────────────────────────
+        // Photo container
         GestureDetector(
-          onTap: (_hasPhoto || isLoading) ?  null : onTap,
+          onTap: _hasPhoto ? () => _openPhoto(context) : onTap,
           child: Container(
             height: slotHeight,
             width: double.infinity,
             decoration: BoxDecoration(
-              //  correct upload area color #334155
-              color: _hasPhoto
-                  ? Colors.transparent
-                  : AppTheme.photoSlotColor,
+              color: _hasPhoto ? Colors.transparent : AppTheme.photoSlotColor,
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
               border: Border.all(
-                color: _hasPhoto
-                    ? cs.primary
-                    : AppTheme.inputBorderColor,
+                color: _hasPhoto ? cs.primary : AppTheme.inputBorderColor,
                 width: _hasPhoto ? 1.5 : 0.5,
               ),
             ),
+            clipBehavior: Clip.hardEdge,
             child: _hasPhoto
                 ? _FilledSlot(
                     filePath: filePath!,
@@ -67,91 +90,91 @@ class PhotoSlot extends StatelessWidget {
                 : _EmptySlot(isOptional: isOptional),
           ),
         ),
- 
-        // ── Label row ─────────────────────────────────────────────────────
-        if (!isOptional) ...[
-          SizedBox(height: context.heightCalculated(6)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
+
+        // Label
+        SizedBox(height: context.heightCalculated(6)),
+        isOptional
+            ? Text(
                 slotLabel,
-                style: tt.labelLarge?.copyWith(
-                  color: _hasPhoto ? cs.primary : AppTheme.primaryTextColor,
-                  fontWeight: FontWeight.bold,
+                style: tt.labelMedium?.copyWith(
+                  color: cs.onSurface.withValues(alpha: 0.5),
                 ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    slotLabel,
+                    style: tt.labelLarge?.copyWith(
+                      color:
+                          _hasPhoto ? cs.primary : AppTheme.primaryTextColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (!_hasPhoto)
+                    Text(
+                      'Required',
+                      style: tt.labelSmall?.copyWith(
+                        color: cs.onSurface.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  if (type.isPrimary && _hasPhoto)
+                    Text(
+                      'PRIMARY',
+                      style: tt.labelSmall?.copyWith(
+                        color: cs.primary,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                ],
               ),
-              if (!_hasPhoto)
-                Text(
-                  'Required',
-                  style: tt.labelSmall?.copyWith(
-                    color: cs.onSurface.withValues(alpha: 0.5),
-                  ),
-                ),
-              if (type.isPrimary && _hasPhoto)
-                Text(
-                  'PRIMARY',
-                  style: tt.labelSmall?.copyWith(
-                    color: cs.primary,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-            ],
-          ),
-        ] else ...[
-          SizedBox(height: context.heightCalculated(6)),
-          Text(
-            slotLabel,
-            style: tt.labelMedium?.copyWith(
-              color: cs.onSurface.withValues(alpha: 0.5),
-            ),
-          ),
-        ],
       ],
     );
   }
 }
- 
+
 class _EmptySlot extends StatelessWidget {
   final bool isOptional;
+
   const _EmptySlot({this.isOptional = false});
- 
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.camera_alt_outlined,
-          size: context.iconSize() * (isOptional ? 1.2 : 1.8),
-          color: AppTheme.secondaryTextColor.withValues(alpha: 0.6),
-        ),
-        if (!isOptional) ...[
-          SizedBox(height: context.heightCalculated(8)),
-          Text(
-            'Tap to upload',
-            style: context.textTheme.labelSmall?.copyWith(
-              color: AppTheme.secondaryTextColor.withValues(alpha: 0.6),
-            ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.camera_alt_outlined,
+            size: context.iconSize() * (isOptional ? 1.2 : 1.8),
+            color: AppTheme.secondaryTextColor.withValues(alpha: 0.6),
           ),
+          if (!isOptional) SizedBox(height: context.heightCalculated(8)),
+          if (!isOptional)
+            Text(
+              'Tap to upload',
+              style: context.textTheme.labelSmall?.copyWith(
+                color: AppTheme.secondaryTextColor.withValues(alpha: 0.6),
+              ),
+            ),
         ],
-      ],
+      ),
     );
   }
 }
- 
+
 class _FilledSlot extends StatelessWidget {
   final String filePath;
   final bool isPrimary;
   final VoidCallback? onDelete;
- 
+
   const _FilledSlot({
     required this.filePath,
     required this.isPrimary,
     this.onDelete,
   });
- 
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -161,10 +184,10 @@ class _FilledSlot extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           child: Image.file(
             File(filePath),
-            fit: BoxFit.cover,
+            fit: BoxFit.cover, // Keeps slot size fixed but scales image
           ),
         ),
- 
+
         // PRIMARY badge
         if (isPrimary)
           Positioned(
@@ -189,29 +212,29 @@ class _FilledSlot extends StatelessWidget {
               ),
             ),
           ),
- 
-        // delete button
-        Positioned(
-          top: context.heightCalculated(8),
-          right: context.widthCalculated(8),
-          child: GestureDetector(
-            onTap: onDelete,
-            child: Container(
-              padding: EdgeInsets.all(context.widthCalculated(6)),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-              ),
-              child: Icon(
-                Icons.delete_outline,
-                size: context.iconSize(),
-                color: Colors.white,
+
+        // Delete button
+        if (onDelete != null)
+          Positioned(
+            top: context.heightCalculated(8),
+            right: context.widthCalculated(8),
+            child: GestureDetector(
+              onTap: onDelete,
+              child: Container(
+                padding: EdgeInsets.all(context.widthCalculated(6)),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                ),
+                child: Icon(
+                  Icons.delete_outline,
+                  size: context.iconSize(),
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
 }
- 
