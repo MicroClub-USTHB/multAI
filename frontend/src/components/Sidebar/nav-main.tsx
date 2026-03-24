@@ -1,8 +1,13 @@
+import { Link, useLocation } from '@tanstack/react-router';
+import { ChevronRightIcon } from 'lucide-react';
+
+import type { NavLink } from '@/shared/utils/types';
+
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/shared/ui/collapsible';
+} from '@/shared/ui';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -13,12 +18,8 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  useSidebar,
-} from '@/shared/ui/sidebar';
+} from '@/shared/ui';
 import { isItemActive } from '@/shared/utils/helpers';
-import type { NavLink } from '@/shared/utils/types';
-import { Link, useLocation } from '@tanstack/react-router';
-import { ChevronRightIcon } from 'lucide-react';
 
 export function NavMain({ items }: { items: NavLink[] }) {
   const { pathname } = useLocation();
@@ -44,11 +45,11 @@ export function NavMain({ items }: { items: NavLink[] }) {
               <>
                 <CollapsibleTrigger
                   render={
-                    <SidebarMenuAction className='aria-expanded:rotate-90' />
+                    <SidebarMenuAction className="aria-expanded:rotate-90" />
                   }
                 >
                   <ChevronRightIcon />
-                  <span className='sr-only'>Toggle</span>
+                  <span className="sr-only">Toggle</span>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>

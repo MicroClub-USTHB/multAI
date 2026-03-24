@@ -1,11 +1,13 @@
+import type { ColumnDef } from '@tanstack/react-table';
+
 import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from '@tanstack/react-table'
-import type { ColumnDef } from '@tanstack/react-table'
-import { Badge } from '@/shared/ui/badge'
-import { Clock3 } from 'lucide-react'
+} from '@tanstack/react-table';
+import { Clock3 } from 'lucide-react';
+
+import { Badge } from '@/shared/ui';
 import {
   Table,
   TableBody,
@@ -13,20 +15,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/shared/ui/table'
-import { faceLogsMock, type FaceMatchingLog } from '../types'
-import { splitTimestamp } from '../utils'
-import { cn } from '@/lib/utils'
+} from '@/shared/ui';
+import { cn } from '@/shared/utils/helpers';
+
+import { faceLogsMock, type FaceMatchingLog } from '../types';
+import { splitTimestamp } from '../utils';
 
 type FaceMatchingLogsTableProps = {
-  onRowClick?: (log: FaceMatchingLog) => void
-}
+  onRowClick?: (log: FaceMatchingLog) => void;
+};
 
 const resultVariants = {
   Success: 'border-emerald-500/90 text-emerald-400',
   Partial: 'border-yellow-500/90 text-yellow-300',
   Failed: 'border-red-500/90 text-red-400',
-}
+};
 
 const columns: ColumnDef<FaceMatchingLog>[] = [
   {
@@ -34,7 +37,10 @@ const columns: ColumnDef<FaceMatchingLog>[] = [
     header: () => <span className="sr-only">Row marker</span>,
     cell: () => (
       <div className="flex items-center">
-        <Clock3 aria-hidden="true" className="h-3.5 w-3.5 text-muted-foreground/80" />
+        <Clock3
+          aria-hidden="true"
+          className="text-muted-foreground/80 h-3.5 w-3.5"
+        />
       </div>
     ),
     size: 28,
@@ -43,39 +49,45 @@ const columns: ColumnDef<FaceMatchingLog>[] = [
     accessorKey: 'timestamp',
     header: 'Timestamp',
     cell: ({ row }) => {
-      const raw = row.getValue('timestamp') as string
-      const [date, time] = splitTimestamp(raw)
+      const raw = row.getValue('timestamp') as string;
+      const [date, time] = splitTimestamp(raw);
 
       return (
-        <div className="font-mono text-sm text-foreground/90 whitespace-nowrap leading-tight">
+        <div className="text-foreground/90 font-mono text-sm leading-tight whitespace-nowrap">
           <div>{date}</div>
           <div>{time}</div>
         </div>
-      )
+      );
     },
   },
   {
     accessorKey: 'photoId',
     header: 'Photo ID',
     cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">{row.getValue('photoId')}</div>
+      <div className="text-muted-foreground text-sm">
+        {row.getValue('photoId')}
+      </div>
     ),
   },
   {
     accessorKey: 'facesDetected',
     header: 'Faces Detected',
     cell: ({ row }) => (
-      <div className="text-sm text-foreground/90">{String(row.getValue('facesDetected'))}</div>
+      <div className="text-foreground/90 text-sm">
+        {String(row.getValue('facesDetected'))}
+      </div>
     ),
   },
   {
     accessorKey: 'matchedUsers',
     header: 'Matched Users',
     cell: ({ row }) => {
-      const users = row.getValue('matchedUsers') as string[]
+      const users = row.getValue('matchedUsers') as string[];
 
       if (!users.length) {
-        return <span className="text-sm text-muted-foreground">No matches</span>
+        return (
+          <span className="text-muted-foreground text-sm">No matches</span>
+        );
       }
 
       return (
@@ -84,53 +96,61 @@ const columns: ColumnDef<FaceMatchingLog>[] = [
             <Badge
               key={user}
               variant="outline"
-              className="h-6 rounded-sm border-border/70 bg-transparent px-2.5 text-xs text-muted-foreground"
+              className="border-border/70 text-muted-foreground h-6 rounded-sm bg-transparent px-2.5 text-xs"
             >
               {user}
             </Badge>
           ))}
         </div>
-      )
+      );
     },
   },
   {
     accessorKey: 'result',
     header: 'Result',
     cell: ({ row }) => {
-      const value = row.getValue('result') as keyof typeof resultVariants
+      const value = row.getValue('result') as keyof typeof resultVariants;
 
       return (
         <Badge
           variant="outline"
-          className={cn('h-6 rounded-sm bg-transparent px-3 text-xs', resultVariants[value])}
+          className={cn(
+            'h-6 rounded-sm bg-transparent px-3 text-xs',
+            resultVariants[value],
+          )}
         >
           {value}
         </Badge>
-      )
+      );
     },
   },
-]
+];
 
-export function FaceMatchingLogsTable({ onRowClick }: FaceMatchingLogsTableProps) {
+export function FaceMatchingLogsTable({
+  onRowClick,
+}: FaceMatchingLogsTableProps) {
   const table = useReactTable({
     data: faceLogsMock,
     columns,
     getCoreRowModel: getCoreRowModel(),
-  })
+  });
 
   return (
-    <div className="rounded-md border border-border/40">
+    <div className="border-border/40 rounded-md border">
       <Table>
         <TableHeader className="bg-transparent">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="h-9 px-2 text-xs font-medium text-muted-foreground">
+                <TableHead
+                  key={header.id}
+                  className="text-muted-foreground h-9 px-2 text-xs font-medium"
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
                         header.column.columnDef.header,
-                        header.getContext()
+                        header.getContext(),
                       )}
                 </TableHead>
               ))}
@@ -145,17 +165,20 @@ export function FaceMatchingLogsTable({ onRowClick }: FaceMatchingLogsTableProps
                 key={row.id}
                 className={cn(
                   'border-border/40 hover:bg-muted/10',
-                  onRowClick && 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60'
+                  onRowClick &&
+                    'focus-visible:ring-ring/60 cursor-pointer focus-visible:ring-2 focus-visible:outline-none',
                 )}
                 tabIndex={onRowClick ? 0 : undefined}
                 role={onRowClick ? 'button' : undefined}
-                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                onClick={
+                  onRowClick ? () => onRowClick(row.original) : undefined
+                }
                 onKeyDown={
                   onRowClick
                     ? (event) => {
                         if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault()
-                          onRowClick(row.original)
+                          event.preventDefault();
+                          onRowClick(row.original);
                         }
                       }
                     : undefined
@@ -170,7 +193,10 @@ export function FaceMatchingLogsTable({ onRowClick }: FaceMatchingLogsTableProps
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center text-sm text-muted-foreground">
+              <TableCell
+                colSpan={columns.length}
+                className="text-muted-foreground h-24 text-center text-sm"
+              >
                 No results.
               </TableCell>
             </TableRow>
@@ -178,5 +204,5 @@ export function FaceMatchingLogsTable({ onRowClick }: FaceMatchingLogsTableProps
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

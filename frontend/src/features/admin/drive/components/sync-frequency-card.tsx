@@ -1,18 +1,24 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/ui/select'
-import { type SyncInterval, SYNC_INTERVALS } from '../types'
+} from '@/shared/ui';
+
+import { type SyncInterval, SYNC_INTERVALS } from '../types';
 
 interface Props {
-  value: SyncInterval
-  onChange: (minutes: SyncInterval) => void
+  value: SyncInterval;
+  onChange: (minutes: SyncInterval) => void;
 }
-
 
 export function SyncFrequencyCard({ value, onChange }: Props) {
   return (
@@ -23,16 +29,16 @@ export function SyncFrequencyCard({ value, onChange }: Props) {
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="space-y-5">
-          <label className="text-sm mb-3 font-medium">Sync every</label>
+          <label className="mb-3 text-sm font-medium">Sync every</label>
           <Select
-              value={value.toString()}
-              onValueChange={(v) => onChange(Number(v) as SyncInterval)}
-            >
+            value={value.toString()}
+            onValueChange={(v) => onChange(Number(v) as SyncInterval)}
+          >
             <SelectTrigger className="w-full max-w-xs">
               <SelectValue placeholder="Select interval" />
             </SelectTrigger>
             <SelectContent>
-              {SYNC_INTERVALS.map(min => (
+              {SYNC_INTERVALS.map((min) => (
                 <SelectItem key={min} value={min.toString()}>
                   {min} minutes
                 </SelectItem>
@@ -41,10 +47,11 @@ export function SyncFrequencyCard({ value, onChange }: Props) {
           </Select>
         </div>
 
-        <p className="text-sm text-muted-foreground italic">
-          Files will automatically sync with Google Drive every {value} minutes. This keeps your media library up to date.
+        <p className="text-muted-foreground text-sm italic">
+          Files will automatically sync with Google Drive every {value} minutes.
+          This keeps your media library up to date.
         </p>
       </CardContent>
     </Card>
-  )
+  );
 }

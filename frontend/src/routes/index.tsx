@@ -1,15 +1,16 @@
-import { Button } from '@/shared/ui/button';
 import { createFileRoute, Link } from '@tanstack/react-router';
+
+import { Button } from '@/shared/ui';
 
 export const Route = createFileRoute('/')({ component: App });
 
 function App() {
   return (
-    <div className='p-8 space-x-4'>
-      <Link to='/admin'>
-        <Button variant='secondary'>Admin Dashboard</Button>
+    <div className="space-x-4 p-8">
+      <Link to="/admin">
+        <Button variant="secondary">Admin Dashboard</Button>
       </Link>
-      <Link to='/multi'>
+      <Link to="/multi">
         <Button>Multi Dashboard</Button>
       </Link>
     </div>

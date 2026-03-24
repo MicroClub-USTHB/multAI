@@ -1,28 +1,36 @@
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card'
-import { Input } from '@/shared/ui/input'
-import { Button } from '@/shared/ui/button'
+import { useState } from 'react';
+
+import { Button } from '@/shared/ui';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui';
+import { Input } from '@/shared/ui';
 
 interface Props {
-  isConnected: boolean
-  onConnect: (key: string) => Promise<void>
+  isConnected: boolean;
+  onConnect: (key: string) => Promise<void>;
 }
 
 export function GoogleDriveAuthCard({ isConnected, onConnect }: Props) {
-  const [apiKey, setApiKey] = useState('')
-  const [saving, setSaving] = useState(false)
+  const [apiKey, setApiKey] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const handleConnect = async () => {
-    if (!apiKey.trim()) return
-    setSaving(true)
+    if (!apiKey.trim()) return;
+    setSaving(true);
 
     try {
-      await onConnect(apiKey)
-      setApiKey('')
+      await onConnect(apiKey);
+      setApiKey('');
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   return (
     <Card className="border-border/40 bg-card/60 backdrop-blur-sm">
@@ -41,15 +49,15 @@ export function GoogleDriveAuthCard({ isConnected, onConnect }: Props) {
             </div>
           </div>
         ) : (
-          <div className="space-y-4 mt-5">
+          <div className="mt-5 space-y-4">
             <Input
               type="password"
               placeholder="Enter your Google Drive API key"
               value={apiKey}
-              onChange={e => setApiKey(e.target.value)}
+              onChange={(e) => setApiKey(e.target.value)}
               className="bg-background/70"
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               This key will only be used for authentication.
             </p>
           </div>
@@ -61,12 +69,12 @@ export function GoogleDriveAuthCard({ isConnected, onConnect }: Props) {
           <Button
             onClick={handleConnect}
             disabled={saving || !apiKey.trim()}
-            className="w-full bg-primary hover:bg-primary/90 mt-5"
+            className="bg-primary hover:bg-primary/90 mt-5 w-full"
           >
             {saving ? 'Connecting...' : 'Connect'}
           </Button>
         </CardFooter>
       )}
     </Card>
-  )
+  );
 }

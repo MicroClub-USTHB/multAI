@@ -5,7 +5,7 @@
 @import '@fontsource-variable/inter';
 
 @custom-variant dark (&:is(.dark *));
-@plugin "@tailwindcss/typography";
+@plugin '@tailwindcss/typography';
 
 @theme {
   --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;

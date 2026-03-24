@@ -1,4 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { ChevronsUpDownIcon, LogOutIcon, MessageSquare } from 'lucide-react';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,16 +9,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
+} from '@/shared/ui';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/shared/ui/sidebar';
-import { ChevronsUpDownIcon, LogOutIcon, MessageSquare } from 'lucide-react';
-import { ThemeToggle } from '../ThemeToggle';
+} from '@/shared/ui';
 import { getInitials } from '@/shared/utils/helpers';
+
+import { ThemeToggle } from '../theme-toggle';
 
 export function NavUser({
   user,
@@ -33,37 +35,37 @@ export function NavUser({
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <SidebarMenuButton size='lg' className='aria-expanded:bg-muted' />
+              <SidebarMenuButton size="lg" className="aria-expanded:bg-muted" />
             }
           >
             <Avatar>
               <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback className='text-xs'>
+              <AvatarFallback className="text-xs">
                 {getInitials(user.name)}
               </AvatarFallback>
             </Avatar>
-            <div className='grid flex-1 text-left text-sm leading-tight'>
-              <span className='truncate font-medium'>{user.name}</span>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">{user.name}</span>
             </div>
-            <ChevronsUpDownIcon className='ml-auto size-4' />
+            <ChevronsUpDownIcon className="ml-auto size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className='min-w-56 rounded-lg!'
+            className="min-w-56 rounded-lg!"
             side={isMobile ? 'bottom' : 'right'}
-            align='end'
+            align="end"
             sideOffset={4}
           >
             <DropdownMenuGroup>
-              <DropdownMenuLabel className='p-0 font-normal'>
-                <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar>
                     <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className='text-xs'>
+                    <AvatarFallback className="text-xs">
                       {getInitials(user.name)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className='grid flex-1 text-left text-sm leading-tight'>
-                    <span className='truncate font-medium'>{user.name}</span>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{user.name}</span>
                   </div>
                   <ThemeToggle />
                 </div>
