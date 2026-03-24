@@ -15,6 +15,7 @@ Map<String, String>? _pendingAuthTokens;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
 
   // Load .env with error handling - use defaults if file missing/corrupted
   try {
@@ -79,6 +80,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-
-
