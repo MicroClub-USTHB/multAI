@@ -1,110 +1,80 @@
 import 'dart:io';
 import 'package:dartz/dartz.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/errors/failure.dart';
 
-class PhotoValidator {
+class PhotoProcessor {
   static const int _maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
-  static const List<String> _allowedExtensions = [
-    'jpg',
-    'jpeg',
-    'png',
-    'heic',
-    'webp',
-  ];
+  static const Set<String> _allowedExtensions = {
+    'jpg', 'jpeg', 'png', 'heic', 'webp',
+  };
 
-  /// Validates a photo file by checking existence, compressing, size, and format.
-  static Future<Either<Failure, File>> validate(String filePath) async {
+  /// Processes a photo: Validates type -> Validates size -> Compresses
+  static Future<Either<Failure, File>> processAndValidate(String filePath) async {
     try {
-      var file = await _resolveFile(filePath);
+      final file = File(filePath);
 
+      // 1. Quick Check: Existence
       if (!await file.exists()) {
-        return const Left(FileNotFoundFailure(
-          message: 'Photo file not found. Please try again.',
-        ));
+        return const Left(FileNotFoundFailure(message: 'File does not exist.'));
       }
 
-      // Compress the file
-      file = await _compressFile(file);
-
-      // Check file size
-      if (await file.length() > _maxFileSizeBytes) {
-        return const Left(FileTooLargeFailure(
-          message: 'Photo is too large. Maximum size is 5MB.',
-        ));
-      }
-
-      // Check file extension
-      final ext = p.extension(file.path).replaceFirst('.', '').toLowerCase();
+      // 2. Quick Check: Extension (Use Set.contains for O(1) lookup)
+      final ext = p.extension(filePath).replaceFirst('.', '').toLowerCase();
       if (!_allowedExtensions.contains(ext)) {
         return const Left(InvalidFileFormatFailure(
           message: 'Invalid format. Use JPG, PNG, HEIC, or WEBP.',
         ));
       }
 
-      return Right(file);
-    } catch (e) {
-      return const Left(FileNotFoundFailure(
-        message: 'Photo file not found. Please try again.',
-      ));
-    }
-  }
-
-  /// Resolves the file from a path or content URI (Android only)
-  static Future<File> _resolveFile(String path) async {
-    if (path.startsWith('content://') && !kIsWeb) {
-      final tempDir = Directory.systemTemp;
-      final fileName = p.basename(path);
-      final tempFile = File('${tempDir.path}/$fileName');
-
-      final byteData = await const MethodChannel('flutter/photo')
-          .invokeMethod<ByteData>('readFileBytes', {'uri': path});
-
-      if (byteData == null) {
-        throw Exception('Failed to read bytes from content URI');
+      // 3. Heavy Check: Initial Size (Fail if even the raw file is astronomically large)
+      // Note: We check size before compression to avoid processing 100MB+ files.
+      final int initialSize = await file.length();
+      if (initialSize > _maxFileSizeBytes * 2) { // Allow some headroom before compression
+        return const Left(FileTooLargeFailure(message: 'Original image is too large.'));
       }
 
-      await tempFile.writeAsBytes(byteData.buffer.asUint8List());
-      return tempFile;
-    }
+      // 4. Transform: Compression
+      final compressedFile = await _compressImage(file);
+      
+      // 5. Final Size Validation
+      if (await compressedFile.length() > _maxFileSizeBytes) {
+        return const Left(FileTooLargeFailure(message: 'Photo exceeds 5MB limit after compression.'));
+      }
 
-    return File(path);
+      return Right(compressedFile);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
   }
 
-  /// Compresses the file to reduce size while keeping quality
-  static Future<File> _compressFile(File file) async {
-    final targetPath =
-        '${Directory.systemTemp.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+  static Future<File> _compressImage(File file) async {
+    final tempDir = await getTemporaryDirectory();
+    final targetPath = p.join(tempDir.path, '${DateTime.now().microsecondsSinceEpoch}.jpg');
 
-    final compressedXFile = await FlutterImageCompress.compressAndGetFile(
+    final result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       targetPath,
       quality: 70,
       minWidth: 1080,
       minHeight: 1080,
+      format: CompressFormat.jpeg,
     );
 
-    return compressedXFile != null ? File(compressedXFile.path) : file;
+    // If compression fails, return original; otherwise return new File
+    return result != null ? File(result.path) : file;
   }
 
-  /// Returns the MIME type based on the file extension
   static String getContentType(String filePath) {
     final ext = p.extension(filePath).replaceFirst('.', '').toLowerCase();
-    switch (ext) {
-      case 'png':
-        return 'image/png';
-      case 'heic':
-        return 'image/heic';
-      case 'webp':
-        return 'image/webp';
-      case 'jpg':
-      case 'jpeg':
-      default:
-        return 'image/jpeg';
-    }
+    final mimeTypes = {
+      'png': 'image/png',
+      'heic': 'image/heic',
+      'webp': 'image/webp',
+    };
+    return mimeTypes[ext] ?? 'image/jpeg';
   }
 }
