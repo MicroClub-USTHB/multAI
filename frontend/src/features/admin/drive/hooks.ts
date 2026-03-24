@@ -40,7 +40,7 @@ export function useUpdateSyncFrequencyMutation() {
     mutationFn: (input: UpdateSyncFrequencyInput) => updateSyncFrequency(input),
     onSuccess: (settings) => {
       queryClient.setQueryData(DRIVE_SETTINGS_QUERY_KEY, settings);
-      queryClient.invalidateQueries({queryKey: DRIVE_SETTINGS_QUERY_KEY});
+      queryClient.invalidateQueries({ queryKey: DRIVE_SETTINGS_QUERY_KEY });
     },
   });
 }
@@ -52,7 +52,7 @@ export function useUpdateOutputFolderMutation() {
     mutationFn: (input: UpdateOutputFolderInput) => updateOutputFolder(input),
     onSuccess: (settings) => {
       queryClient.setQueryData(DRIVE_SETTINGS_QUERY_KEY, settings);
-      queryClient.invalidateQueries({queryKey: DRIVE_SETTINGS_QUERY_KEY});
+      queryClient.invalidateQueries({ queryKey: DRIVE_SETTINGS_QUERY_KEY });
     },
   });
 }
