@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart' show Widget, BuildContext;
-import 'package:http/retry.dart';
 import 'package:multai_mobile/core/theme/theme.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -18,7 +16,7 @@ class SplashScreen extends StatelessWidget {
                   center: Alignment.topLeft,
                   radius: 0.5,
                   colors: [
-                    AppTheme.gold.withValues(alpha: 0.1),
+                    AppTheme.gold.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -33,7 +31,7 @@ class SplashScreen extends StatelessWidget {
                   center: Alignment.bottomRight,
                   radius: 0.5,
                   colors: [
-                    AppTheme.gold.withValues(alpha: 0.1),
+                    AppTheme.gold.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
