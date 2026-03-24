@@ -15,12 +15,14 @@ class SplashScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Spacer(flex: 2),
-              _buildLogo(context),
               const Spacer(flex: 3),
+              _buildLogo(context),
+              const Spacer(flex: 1),
               _buildProgressSection(context),
+              const Spacer(flex: 3),
+              // const SizedBox(height: AppTheme.spacingLg),
+              _buildFooter(context),
               const SizedBox(height: AppTheme.spacingLg),
-              // _buildFooter(context),
             ],
           ),
         ),
@@ -30,15 +32,17 @@ class SplashScreen extends StatelessWidget {
 
   Widget _buildLogo(BuildContext context) {
     final theme = Theme.of(context);
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Column(
       children: [
         Image.asset(
           'assets/images/MC_white.png',
-          width: 80,
+          width: 145,
           height: 80,
           fit: BoxFit.contain,
         ),
-        const SizedBox(height: AppTheme.spacingMd),
+        SizedBox(height: screenHeight * 0.04),
 
         RichText(
           text: TextSpan(
@@ -52,7 +56,7 @@ class SplashScreen extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: AppTheme.spacingSm),
+        SizedBox(height: screenHeight * 0.02),
         Text(
           'Your moments, found automatically',
           style: AppTheme.splashMediumText,
@@ -97,9 +101,11 @@ class SplashScreen extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildCard(Icons.photo_outlined),
-            _buildCard(Icons.videocam_outlined),
-            _buildCard(Icons.face_outlined),
+            Expanded(child: _buildCard(Icons.photo_outlined)),
+            const SizedBox(width: 8),
+            Expanded(child: _buildCard(Icons.videocam_outlined)),
+            const SizedBox(width: 8),
+            Expanded(child: _buildCard(Icons.face_outlined)),
           ],
         ),
       ],
@@ -108,14 +114,46 @@ class SplashScreen extends StatelessWidget {
 
   Widget _buildCard(IconData icon) {
     return Container(
-      width: 80,
       height: 80,
       decoration: BoxDecoration(
         color: AppTheme.surfaceColor,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(color: AppTheme.borderColor),
       ),
-      child: Icon(icon, color: AppTheme.primaryTextColor, size: 32),
+      child: Icon(icon, color: AppTheme.gold.withOpacity(0.4), size: 24),
+    );
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    return Row(
+      children: [
+        const Expanded(
+          child: Divider(
+            color: AppTheme.appleColor,
+            thickness: 1,
+            indent: 24,
+            endIndent: 16,
+          ),
+        ),
+
+        Text(
+          'SECURE NEURAL PROCESSING',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            letterSpacing: 2.4,
+            fontSize: 12,
+            color: AppTheme.slateGray,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const Expanded(
+          child: Divider(
+            color: AppTheme.borderColor,
+            thickness: 1,
+            indent: 16,
+            endIndent: 24,
+          ),
+        ),
+      ],
     );
   }
 }
