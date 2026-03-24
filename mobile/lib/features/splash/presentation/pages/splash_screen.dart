@@ -8,24 +8,60 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppTheme.spacingLg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Spacer(flex: 3),
-              _buildLogo(context),
-              const Spacer(flex: 1),
-              _buildProgressSection(context),
-              const Spacer(flex: 3),
-              // const SizedBox(height: AppTheme.spacingLg),
-              _buildFooter(context),
-              const SizedBox(height: AppTheme.spacingLg),
-            ],
+      backgroundColor: AppTheme.splashBackgroundColor,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.topLeft,
+                  radius: 0.5,
+                  colors: [
+                    AppTheme.gold.withValues(alpha: 0.1),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.bottomRight,
+                  radius: 0.5,
+                  colors: [
+                    AppTheme.gold.withValues(alpha: 0.1),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppTheme.spacingLg),
+              child: SizedBox(
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Spacer(flex: 3),
+                    _buildLogo(context),
+                    const Spacer(flex: 1),
+                    _buildProgressSection(context),
+                    const Spacer(flex: 3),
+                    _buildFooter(context),
+                    const SizedBox(height: AppTheme.spacingLg),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -129,28 +165,28 @@ class SplashScreen extends StatelessWidget {
       children: [
         const Expanded(
           child: Divider(
-            color: AppTheme.appleColor,
+            color: AppTheme.devider,
             thickness: 1,
-            indent: 24,
-            endIndent: 16,
+            indent: 28,
+            endIndent: 8,
           ),
         ),
 
         Text(
           'SECURE NEURAL PROCESSING',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            letterSpacing: 2.4,
-            fontSize: 12,
-            color: AppTheme.slateGray,
-            fontWeight: FontWeight.bold,
+            letterSpacing: 3,
+            fontSize: 10,
+            color: AppTheme.textDevider,
+            fontWeight: FontWeight.normal,
           ),
         ),
         const Expanded(
           child: Divider(
-            color: AppTheme.borderColor,
+            color: AppTheme.devider,
             thickness: 1,
-            indent: 16,
-            endIndent: 24,
+            indent: 8,
+            endIndent: 28,
           ),
         ),
       ],

@@ -42,8 +42,12 @@ class AppTheme {
   static const Color hintTextColor = Color(0xFF7A6A5A); // Dim warm gray hints
 
   // ── Splash Colors ─────────────────────────────────────────────────────
+  static const Color splashBackgroundColor = Color(0xFF0F0E0D);
   static const Color gold = Color(0xFFE8A830); // The "Ai" color
   static const Color slateGray = Color(0xFF94A3B8); // The subtitle color
+  static const Color textDevider = Color(0xFF64748B);
+  static const Color devider = Color(0xFF1E293B);
+  static const Color gradient = Color(0x33E8A830);
 
   // ── Interactive Colors ─────────────────────────────────────────────────────
   static const Color buttonColor = Color(0xFFE8A020); // Golden button color
