@@ -1,7 +1,6 @@
 import { Folder } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@/shared/ui';
 import {
   Card,
   CardContent,
@@ -11,6 +10,7 @@ import {
   CardTitle,
 } from '@/shared/ui';
 import { Input } from '@/shared/ui';
+import { LoadingButton } from '@/shared/ui/forms/loading-button';
 
 interface Props {
   value: string;
@@ -34,7 +34,7 @@ export function OutputFolderCard({ value, onSave }: Props) {
   };
 
   return (
-    <Card variant='glass'>
+    <Card variant="glass">
       <CardHeader>
         <CardTitle className="text-xl">Output Folders</CardTitle>
         <CardDescription>Storage configuration</CardDescription>
@@ -64,13 +64,16 @@ export function OutputFolderCard({ value, onSave }: Props) {
       </CardContent>
 
       <CardFooter>
-        <Button
+        <LoadingButton
           onClick={handleSave}
-          disabled={saving || !hasChanged || !path.trim()}
+          disabled={!hasChanged || !path.trim()}
           className="w-full"
+          isLoading={saving}
+          loadingText="Saving..."
+          showLoader={false}
         >
-          {saving ? 'Saving...' : 'Save Path'}
-        </Button>
+          Save Path
+        </LoadingButton>
       </CardFooter>
     </Card>
   );

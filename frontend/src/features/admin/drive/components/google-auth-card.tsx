@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { Button } from '@/shared/ui';
 import {
   Card,
   CardContent,
@@ -10,6 +9,7 @@ import {
   CardTitle,
 } from '@/shared/ui';
 import { Input } from '@/shared/ui';
+import { LoadingButton } from '@/shared/ui/forms/loading-button';
 
 interface Props {
   isConnected: boolean;
@@ -33,7 +33,7 @@ export function GoogleDriveAuthCard({ isConnected, onConnect }: Props) {
   };
 
   return (
-    <Card variant='glass'>
+    <Card variant="glass">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl">
           Google Drive Auth
@@ -66,13 +66,16 @@ export function GoogleDriveAuthCard({ isConnected, onConnect }: Props) {
 
       {!isConnected && (
         <CardFooter>
-          <Button
+          <LoadingButton
             onClick={handleConnect}
-            disabled={saving || !apiKey.trim()}
+            disabled={!apiKey.trim()}
             className="bg-primary hover:bg-primary/90 mt-5 w-full"
+            isLoading={saving}
+            loadingText="Connecting..."
+            showLoader={false}
           >
-            {saving ? 'Connecting...' : 'Connect'}
-          </Button>
+            Connect
+          </LoadingButton>
         </CardFooter>
       )}
     </Card>
