@@ -1,5 +1,6 @@
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { Loader2Icon } from 'lucide-react';
 
 import { cn } from '@/shared/utils/helpers';
 
@@ -41,20 +42,40 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends ButtonPrimitive.Props, VariantProps<typeof buttonVariants> {}
+  extends ButtonPrimitive.Props, VariantProps<typeof buttonVariants> {
+  isLoading?: boolean;
+  loadingText?: string;
+  showLoader?: React.ReactNode;
+  customLoader?: React.ReactNode;
+}
 
 function Button({
   className,
   variant = 'default',
   size = 'default',
+  isLoading,
+  loadingText,
+  showLoader = true,
+  customLoader,
+  children,
   ...props
 }: ButtonProps) {
   return (
     <ButtonPrimitive
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        isLoading && 'cursor-not-allowed opacity-70',
+      )}
+      disabled={isLoading || props.disabled}
+      data-disabled={isLoading || props.disabled}
       {...props}
-    />
+    >
+      {isLoading &&
+        showLoader &&
+        (customLoader || <Loader2Icon className="animate-spin" />)}
+      {isLoading ? loadingText || 'Loading...' : children}
+    </ButtonPrimitive>
   );
 }
 

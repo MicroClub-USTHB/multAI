@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
@@ -9,7 +10,6 @@ import {
   CardTitle,
 } from '@/shared/ui';
 import { Input } from '@/shared/ui';
-import { LoadingButton } from '@/shared/ui/forms/loading-button';
 
 interface Props {
   isConnected: boolean;
@@ -66,7 +66,7 @@ export function GoogleDriveAuthCard({ isConnected, onConnect }: Props) {
 
       {!isConnected && (
         <CardFooter>
-          <LoadingButton
+          <Button
             onClick={handleConnect}
             disabled={!apiKey.trim()}
             className="bg-primary hover:bg-primary/90 mt-5 w-full"
@@ -75,7 +75,7 @@ export function GoogleDriveAuthCard({ isConnected, onConnect }: Props) {
             showLoader={false}
           >
             Connect
-          </LoadingButton>
+          </Button>
         </CardFooter>
       )}
     </Card>

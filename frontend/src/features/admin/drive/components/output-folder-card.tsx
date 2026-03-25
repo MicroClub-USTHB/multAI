@@ -2,6 +2,7 @@ import { Folder } from 'lucide-react';
 import { useState } from 'react';
 
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
@@ -10,7 +11,6 @@ import {
   CardTitle,
 } from '@/shared/ui';
 import { Input } from '@/shared/ui';
-import { LoadingButton } from '@/shared/ui/forms/loading-button';
 
 interface Props {
   value: string;
@@ -64,7 +64,7 @@ export function OutputFolderCard({ value, onSave }: Props) {
       </CardContent>
 
       <CardFooter>
-        <LoadingButton
+        <Button
           onClick={handleSave}
           disabled={!hasChanged || !path.trim()}
           className="w-full"
@@ -73,7 +73,7 @@ export function OutputFolderCard({ value, onSave }: Props) {
           showLoader={false}
         >
           Save Path
-        </LoadingButton>
+        </Button>
       </CardFooter>
     </Card>
   );
