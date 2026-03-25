@@ -34,7 +34,7 @@ export function OutputFolderCard({ value, onSave }: Props) {
   };
 
   return (
-    <Card className="border-border/40 bg-card/60 backdrop-blur-sm">
+    <Card variant='glass'>
       <CardHeader>
         <CardTitle className="text-xl">Output Folders</CardTitle>
         <CardDescription>Storage configuration</CardDescription>
