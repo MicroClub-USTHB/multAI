@@ -8,12 +8,12 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 
+import ThemeScript from '@/components/theme/theme-script';
 import { ThemeProvider } from '@/providers/theme-provider';
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import TanStackQueryProvider from '../integrations/tanstack-query/root-provider';
 import appCss from '../styles.css?url';
-import ThemeScript from '@/components/theme/theme-script';
 
 interface MyRouterContext {
   queryClient: QueryClient;

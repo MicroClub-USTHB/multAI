@@ -22,7 +22,7 @@ interface Props {
 
 export function SyncFrequencyCard({ value, onChange }: Props) {
   return (
-    <Card variant='glass'>
+    <Card variant="glass">
       <CardHeader>
         <CardTitle className="text-xl">Sync Frequency</CardTitle>
         <CardDescription>Auto-sync configuration</CardDescription>
