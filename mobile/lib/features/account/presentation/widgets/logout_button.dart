@@ -4,7 +4,9 @@ import '../../../../core/extensions/responsive_extensions.dart';
 import '../../../../core/theme/theme.dart';
 
 class LogoutButton extends StatelessWidget {
-  const LogoutButton({super.key});
+  final VoidCallback onPressed;
+
+  const LogoutButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -14,13 +16,11 @@ class LogoutButton extends StatelessWidget {
       width: double.infinity,
       height: context.heightCalculated(52),
       child: OutlinedButton(
-        onPressed: () {
-        },
+        onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           backgroundColor: AppTheme.errorColor.withValues(alpha: 0.1),
           side: BorderSide(
             color: AppTheme.errorColor.withValues(alpha: 0.4),
-            width: 1,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),

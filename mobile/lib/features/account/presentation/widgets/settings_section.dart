@@ -21,20 +21,21 @@ class SettingsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-        // ── section title — uppercase + muted ────────────────────────────
-        Text(
-          title,
-          style: tt.labelMedium?.copyWith(
-            color: AppTheme.secondaryTextColor,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
+        // ── Section Title ───────────────────────────────────────────────
+        Padding(
+          padding: EdgeInsets.only(bottom: context.heightCalculated(8)),
+          child: Text(
+            title.toUpperCase(),
+            style: tt.labelMedium?.copyWith(
+              color: AppTheme.secondaryTextColor,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
           ),
         ),
-        SizedBox(height: context.heightCalculated(12)),
 
-        // ── tiles ─────────────────────────────────────────────────────────
-        ...items.map((e) => SettingsTile(data: e)),
+        // ── Tiles ───────────────────────────────────────────────────────
+        ...items.map((item) => SettingsTile(data: item)),
       ],
     );
   }

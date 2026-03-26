@@ -9,7 +9,7 @@ class SettingItemData {
   final String? subtitle;
   final VoidCallback? onTap;
 
-  SettingItemData({
+  const SettingItemData({
     required this.icon,
     required this.title,
     this.subtitle,
@@ -42,17 +42,17 @@ class SettingsTile extends StatelessWidget {
         child: Row(
           children: [
 
-            // ── icon container ───────────────────────────────────────────
+            // ── icon with amber tinted background ────────────────────────
             Container(
               padding: EdgeInsets.all(context.widthCalculated(8)),
               decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withValues(alpha: 0.15),
+                color: cs.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
               child: Icon(
                 data.icon,
                 size: context.iconSize(),
-                color: AppTheme.primaryColor,
+                color: cs.primary,
               ),
             ),
             SizedBox(width: context.widthCalculated(12)),
