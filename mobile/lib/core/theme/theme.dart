@@ -96,6 +96,10 @@ class AppTheme {
   static const Color tipsBgColor = Color(0x1A64748B);
   static const Color enrollDisabledColor = Color(0x33EC5B13);
 
+  // ── Tab Colors ───────────────────────────────────────────────────────────────
+  static const Color tabUnselectedTextColor = Color(0xFF94A3B8);
+  static const Color tabDividerColor = Color.fromRGBO(255, 255, 255, 0.1);
+
   // ── Theme Data ─────────────────────────────────────────────────────────────
   static ThemeData get lightTheme {
     return ThemeData(
