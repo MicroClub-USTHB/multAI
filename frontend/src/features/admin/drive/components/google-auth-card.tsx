@@ -67,21 +67,13 @@ export function GoogleDriveAuthCard({
         <CardFooter>
           <Button
             onClick={handleConnect}
-<<<<<<< refactor/ui-components-&-styles
             disabled={!apiKey.trim()}
-=======
-            disabled={isLoading || !apiKey.trim()}
->>>>>>> main
             className="bg-primary hover:bg-primary/90 mt-5 w-full"
-            isLoading={saving}
+            isLoading={isLoading}
             loadingText="Connecting..."
             showLoader={false}
           >
-<<<<<<< refactor/ui-components-&-styles
             Connect
-=======
-            {isLoading ? 'Connecting...' : 'Connect'}
->>>>>>> main
           </Button>
         </CardFooter>
       )}

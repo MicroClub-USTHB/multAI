@@ -61,21 +61,13 @@ export function OutputFolderCard({ value, isLoading = false, onSave }: Props) {
       <CardFooter>
         <Button
           onClick={handleSave}
-<<<<<<< refactor/ui-components-&-styles
           disabled={!hasChanged || !path.trim()}
-=======
-          disabled={isLoading || !hasChanged || !path.trim()}
->>>>>>> main
           className="w-full"
-          isLoading={saving}
+          isLoading={isLoading}
           loadingText="Saving..."
           showLoader={false}
         >
-<<<<<<< refactor/ui-components-&-styles
           Save Path
-=======
-          {isLoading ? 'Saving...' : 'Save Path'}
->>>>>>> main
         </Button>
       </CardFooter>
     </Card>
