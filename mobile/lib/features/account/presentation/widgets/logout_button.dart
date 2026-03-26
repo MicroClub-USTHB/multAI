@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
+import '../../../../core/theme/theme.dart';
 
 class LogoutButton extends StatelessWidget {
   const LogoutButton({super.key});
@@ -9,19 +10,39 @@ class LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final tt = context.textTheme;
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      height: context.heightCalculated(50),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(context.radius()),
-        border: Border.all(color: Colors.red),
-      ),
-      child: TextButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.logout, color: Colors.red),
-        label: Text(
-          "Logout",
-          style: tt.titleMedium?.copyWith(color: Colors.red),
+      height: context.heightCalculated(52),
+      child: OutlinedButton(
+        onPressed: () {
+        },
+        style: OutlinedButton.styleFrom(
+          backgroundColor: AppTheme.errorColor.withValues(alpha: 0.1),
+          side: BorderSide(
+            color: AppTheme.errorColor.withValues(alpha: 0.4),
+            width: 1,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.logout,
+              color: AppTheme.errorColor,
+              size: context.iconSize(),
+            ),
+            SizedBox(width: context.widthCalculated(8)),
+            Text(
+              'Sign Out',
+              style: tt.titleMedium?.copyWith(
+                color: AppTheme.errorColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );
