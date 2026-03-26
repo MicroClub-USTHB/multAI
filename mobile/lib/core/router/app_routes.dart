@@ -9,4 +9,6 @@ abstract class AppRoutes {
   static const String account = '/home/account';
   // ── Face enrollment ────────────────────────────────────────────────────────
   static const String faceEnrollment = '/face-enrollment';
+  // ── Notifications ──────────────────────────────────────────────────────────
+  static const String photoApproval = '/photo-approval';
 }

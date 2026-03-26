@@ -11,10 +11,11 @@ import '../../features/home/presentation/screens/home_shell.dart';
 import '../../features/events/presentation/screens/events_screen.dart';
 import '../../features/gallery/presentation/screens/gallery_screen.dart';
 import '../../features/account/presentation/screens/account_screen.dart';
+import '../../features/notifications/presentation/screens/photo_approval_screen.dart';
 import 'app_routes.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: AppRoutes.photoApproval,
   routes: [
     // ── Splash Screen (initial route) ───────────────────────────────────────
     GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
@@ -36,6 +37,12 @@ final GoRouter appRouter = GoRouter(
       ),
     ),
 
+    // ── Notifications ──────────────────────────────────────────────────────────
+    GoRoute(
+      path: AppRoutes.photoApproval,
+      builder: (context, state) => const PhotoApprovalPage(),
+    ),
+ 
     // ── Home shell with bottom nav ─────────────────────────────────────────────
     ShellRoute(
       builder: (context, state, child) => HomeShell(child: child),
