@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
+import '../../../../../core/theme/theme.dart';
 import 'decision_tile.dart';
 
 class RecentDecisionsSection extends StatelessWidget {
@@ -8,33 +9,42 @@ class RecentDecisionsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tt = context.textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ── Section title ────────────────────────────────────────────────
         Row(
           children: [
-            const Icon(Icons.history, size: 18),
-            const SizedBox(width: 6),
+            Icon(
+              Icons.history,
+              size: context.iconSize() * 0.85,
+              color: AppTheme.secondaryTextColor,
+            ),
+            SizedBox(width: context.widthCalculated(6)),
             Text(
-              "RECENT DECISIONS",
-              style: context.textTheme.labelMedium,
+              'RECENT DECISIONS',
+              style: tt.labelMedium?.copyWith(
+                color: AppTheme.secondaryTextColor,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
             ),
           ],
         ),
+        SizedBox(height: context.heightCalculated(12)),
 
-        SizedBox(height: context.hPadding()),
-
+        // ── Tiles ────────────────────────────────────────────────────────
         const DecisionTile(
-          title: "Sunset Dinner Group",
-          subtitle: "2 hours ago",
+          title: 'Sunset Dinner Group',
+          subtitle: '2 hours ago',
           status: DecisionStatus.approved,
         ),
 
-        const SizedBox(height: 12),
-
         const DecisionTile(
-          title: "Beach Trip",
-          subtitle: "Yesterday",
+          title: 'Birthday Bash 2024',
+          subtitle: 'Yesterday',
           status: DecisionStatus.rejected,
         ),
       ],
