@@ -14,23 +14,18 @@ import { Input } from '@/shared/ui';
 
 interface Props {
   value: string;
+  isLoading?: boolean;
   onSave: (path: string) => Promise<void>;
 }
 
-export function OutputFolderCard({ value, onSave }: Props) {
+export function OutputFolderCard({ value, isLoading = false, onSave }: Props) {
   const [path, setPath] = useState(value);
-  const [saving, setSaving] = useState(false);
   const hasChanged = path !== value;
 
   const handleSave = async () => {
     if (!path.trim() || !hasChanged) return;
-    setSaving(true);
 
-    try {
-      await onSave(path.trim());
-    } finally {
-      setSaving(false);
-    }
+    await onSave(path.trim());
   };
 
   return (
@@ -66,13 +61,21 @@ export function OutputFolderCard({ value, onSave }: Props) {
       <CardFooter>
         <Button
           onClick={handleSave}
+<<<<<<< refactor/ui-components-&-styles
           disabled={!hasChanged || !path.trim()}
+=======
+          disabled={isLoading || !hasChanged || !path.trim()}
+>>>>>>> main
           className="w-full"
           isLoading={saving}
           loadingText="Saving..."
           showLoader={false}
         >
+<<<<<<< refactor/ui-components-&-styles
           Save Path
+=======
+          {isLoading ? 'Saving...' : 'Save Path'}
+>>>>>>> main
         </Button>
       </CardFooter>
     </Card>
