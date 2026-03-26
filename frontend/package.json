@@ -45,7 +45,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
-    "@content-collections/core": "^0.13.1",
+    "@content-collections/core": "^0.14.3",
     "@content-collections/markdown": "^0.1.4",
     "@content-collections/mdx": "^0.2.2",
     "@content-collections/vite": "^0.2.8",
