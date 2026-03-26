@@ -1,8 +1,8 @@
 import { Folder } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@/shared/ui';
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
@@ -29,7 +29,7 @@ export function OutputFolderCard({ value, isLoading = false, onSave }: Props) {
   };
 
   return (
-    <Card className="border-border/40 bg-card/60 backdrop-blur-sm">
+    <Card variant="glass">
       <CardHeader>
         <CardTitle className="text-xl">Output Folders</CardTitle>
         <CardDescription>Storage configuration</CardDescription>
@@ -61,10 +61,13 @@ export function OutputFolderCard({ value, isLoading = false, onSave }: Props) {
       <CardFooter>
         <Button
           onClick={handleSave}
-          disabled={isLoading || !hasChanged || !path.trim()}
+          disabled={!hasChanged || !path.trim()}
           className="w-full"
+          isLoading={isLoading}
+          loadingText="Saving..."
+          showLoader={false}
         >
-          {isLoading ? 'Saving...' : 'Save Path'}
+          Save Path
         </Button>
       </CardFooter>
     </Card>

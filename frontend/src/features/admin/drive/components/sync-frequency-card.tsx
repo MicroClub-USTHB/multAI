@@ -27,7 +27,7 @@ export function SyncFrequencyCard({
   onChange,
 }: Props) {
   return (
-    <Card className="border-border/40 bg-card/60 backdrop-blur-sm">
+    <Card variant="glass">
       <CardHeader>
         <CardTitle className="text-xl">Sync Frequency</CardTitle>
         <CardDescription>Auto-sync configuration</CardDescription>

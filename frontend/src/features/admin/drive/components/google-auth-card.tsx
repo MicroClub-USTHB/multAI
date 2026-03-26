@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { Button } from '@/shared/ui';
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
@@ -32,7 +32,7 @@ export function GoogleDriveAuthCard({
   };
 
   return (
-    <Card className="border-border/40 bg-card/60 backdrop-blur-sm">
+    <Card variant="glass">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl">
           Google Drive Auth
@@ -67,10 +67,13 @@ export function GoogleDriveAuthCard({
         <CardFooter>
           <Button
             onClick={handleConnect}
-            disabled={isLoading || !apiKey.trim()}
+            disabled={!apiKey.trim()}
             className="bg-primary hover:bg-primary/90 mt-5 w-full"
+            isLoading={isLoading}
+            loadingText="Connecting..."
+            showLoader={false}
           >
-            {isLoading ? 'Connecting...' : 'Connect'}
+            Connect
           </Button>
         </CardFooter>
       )}
