@@ -13,23 +13,22 @@ import { Input } from '@/shared/ui';
 
 interface Props {
   isConnected: boolean;
+  isLoading?: boolean;
   onConnect: (key: string) => Promise<void>;
 }
 
-export function GoogleDriveAuthCard({ isConnected, onConnect }: Props) {
+export function GoogleDriveAuthCard({
+  isConnected,
+  isLoading = false,
+  onConnect,
+}: Props) {
   const [apiKey, setApiKey] = useState('');
-  const [saving, setSaving] = useState(false);
 
   const handleConnect = async () => {
     if (!apiKey.trim()) return;
-    setSaving(true);
 
-    try {
-      await onConnect(apiKey);
-      setApiKey('');
-    } finally {
-      setSaving(false);
-    }
+    await onConnect(apiKey);
+    setApiKey('');
   };
 
   return (
@@ -68,10 +67,10 @@ export function GoogleDriveAuthCard({ isConnected, onConnect }: Props) {
         <CardFooter>
           <Button
             onClick={handleConnect}
-            disabled={saving || !apiKey.trim()}
+            disabled={isLoading || !apiKey.trim()}
             className="bg-primary hover:bg-primary/90 mt-5 w-full"
           >
-            {saving ? 'Connecting...' : 'Connect'}
+            {isLoading ? 'Connecting...' : 'Connect'}
           </Button>
         </CardFooter>
       )}

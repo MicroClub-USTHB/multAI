@@ -17,10 +17,15 @@ import { type SyncInterval, SYNC_INTERVALS } from '../types';
 
 interface Props {
   value: SyncInterval;
+  isLoading?: boolean;
   onChange: (minutes: SyncInterval) => void;
 }
 
-export function SyncFrequencyCard({ value, onChange }: Props) {
+export function SyncFrequencyCard({
+  value,
+  isLoading = false,
+  onChange,
+}: Props) {
   return (
     <Card className="border-border/40 bg-card/60 backdrop-blur-sm">
       <CardHeader>
@@ -33,6 +38,7 @@ export function SyncFrequencyCard({ value, onChange }: Props) {
           <Select
             value={value.toString()}
             onValueChange={(v) => onChange(Number(v) as SyncInterval)}
+            disabled={isLoading}
           >
             <SelectTrigger className="w-full max-w-xs">
               <SelectValue placeholder="Select interval" />

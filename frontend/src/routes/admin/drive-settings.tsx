@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { useState } from 'react';
 
 import { GoogleDriveAuthCard } from '@/features/admin/drive/components/google-auth-card';
 import { OutputFolderCard } from '@/features/admin/drive/components/output-folder-card';
@@ -23,53 +22,22 @@ function RouteComponent() {
     connect,
     updateSyncFrequency,
     updateOutputFolder,
+    connectIsLoading,
+    syncIsLoading,
+    outputIsLoading,
+    actionFeedback,
   } = useDriveSettings();
 
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  const clearMessages = () => {
-    setActionError(null);
-    setSuccessMessage(null);
-  };
-
   const handleConnect = async (apiKey: string) => {
-    clearMessages();
-
-    try {
-      await connect({ apiKey });
-      setSuccessMessage('Google Drive connected successfully.');
-    } catch (err) {
-      setActionError(
-        err instanceof Error ? err.message : 'Unable to connect Google Drive.',
-      );
-    }
+    await connect({ apiKey });
   };
 
   const handleSyncChange = async (minutes: SyncInterval) => {
-    clearMessages();
-
-    try {
-      await updateSyncFrequency({ syncInterval: minutes });
-      setSuccessMessage(`Sync frequency updated to every ${minutes} minutes.`);
-    } catch (err) {
-      setActionError(
-        err instanceof Error ? err.message : 'Unable to update sync frequency.',
-      );
-    }
+    await updateSyncFrequency({ syncInterval: minutes });
   };
 
   const handleOutputPathSave = async (path: string) => {
-    clearMessages();
-
-    try {
-      await updateOutputFolder({ outputFolder: path });
-      setSuccessMessage('Output folder updated successfully.');
-    } catch (err) {
-      setActionError(
-        err instanceof Error ? err.message : 'Unable to update output folder.',
-      );
-    }
+    await updateOutputFolder({ outputFolder: path });
   };
 
   if (isLoading) {
@@ -129,32 +97,35 @@ function RouteComponent() {
           </p>
         </div>
 
-        {actionError ? (
+        {actionFeedback?.tone === 'error' ? (
           <div className="border-destructive/40 bg-destructive/10 text-destructive rounded-lg border p-4 text-sm">
-            {actionError}
+            {actionFeedback.message}
           </div>
         ) : null}
 
-        {successMessage ? (
+        {actionFeedback?.tone === 'success' ? (
           <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-300">
             <CheckCircle2 className="h-4 w-4" />
-            {successMessage}
+            {actionFeedback.message}
           </div>
         ) : null}
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <GoogleDriveAuthCard
             isConnected={settings.isConnected}
+            isLoading={connectIsLoading}
             onConnect={handleConnect}
           />
 
           <SyncFrequencyCard
             value={settings.syncInterval}
+            isLoading={syncIsLoading}
             onChange={handleSyncChange}
           />
 
           <OutputFolderCard
             value={settings.outputFolder}
+            isLoading={outputIsLoading}
             onSave={handleOutputPathSave}
           />
         </div>
