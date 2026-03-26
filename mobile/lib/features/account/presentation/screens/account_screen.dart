@@ -6,6 +6,7 @@ import '../widgets/profile_section.dart';
 import '../widgets/settings_section.dart';
 import '../widgets/logout_button.dart';
 import '../widgets/settings_tile.dart';
+
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
@@ -14,67 +15,58 @@ class AccountScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: const AccountAppBar(),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: context.hPadding()),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: context.sectionSpacing()),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.hPadding(),
+          vertical: context.heightCalculated(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
 
-              /// PROFILE
-              const ProfileSection(),
+            // ── Profile ─────────────────────────────────────────────────
+            Center(child: const ProfileSection(),),
+            SizedBox(height: context.heightCalculated(32)),
 
-              SizedBox(height: context.sectionSpacing()),
+            // ── Account Settings ─────────────────────────────────────────
+            SettingsSection(
+              title: 'ACCOUNT SETTINGS',
+              items: [
+                SettingItemData(
+                  icon: Icons.notifications_outlined,
+                  title: 'Notifications',
+                  subtitle: 'Manage alerts and activity',
+                ),
+                SettingItemData(
+                  icon: Icons.lock_outline,
+                  title: 'Privacy & Security',
+                  subtitle: 'Password, 2FA, and data sharing',
+                ),
+                SettingItemData(
+                  icon: Icons.storage_outlined,
+                  title: 'Account Data',
+                  subtitle: 'Export or manage your personal data',
+                ),
+              ],
+            ),
+            SizedBox(height: context.heightCalculated(24)),
 
-              /// SETTINGS
-              SettingsSection(
-                title: "Account Settings",
-                items: [
-                  SettingItemData(
-                    icon: Icons.notifications_outlined,
-                    title: "Notifications",
-                  ),
-                  SettingItemData(
-                    icon: Icons.lock_outline,
-                    title: "Privacy",
-                  ),
-                  SettingItemData(
-                    icon: Icons.security,
-                    title: "Security",
-                  ),
-                  SettingItemData(
-                    icon: Icons.person_outline,
-                    title: "Account",
-                  ),
-                  SettingItemData(
-                    icon: Icons.storage,
-                    title: "Data",
-                  ),
-                ],
-              ),
+            // ── Support ──────────────────────────────────────────────────
+            SettingsSection(
+              title: 'SUPPORT',
+              items: [
+                SettingItemData(
+                  icon: Icons.help_outline,
+                  title: 'Help Center',
+                ),
+              ],
+            ),
+            SizedBox(height: context.heightCalculated(32)),
 
-              SizedBox(height: context.sectionSpacing()),
-
-              /// HELP
-              SettingsSection(
-                title: "Support",
-                items: [
-                  SettingItemData(
-                    icon: Icons.help_outline,
-                    title: "Help Center",
-                  ),
-                ],
-              ),
-
-              SizedBox(height: context.sectionSpacing()),
-
-              /// LOGOUT
-              const LogoutButton(),
-
-              SizedBox(height: context.sectionSpacing()),
-            ],
-          ),
+            // ── Logout ───────────────────────────────────────────────────
+            const LogoutButton(),
+            SizedBox(height: context.heightCalculated(24)),
+          ],
         ),
       ),
     );
