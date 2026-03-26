@@ -12,6 +12,7 @@ import 'features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'di/injection_container.dart' as di;
 =======
 import 'package:multai_mobile/core/theme/theme.dart';
+import 'package:multai_mobile/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:multai_mobile/features/splash/presentation/pages/splash_screen.dart';
 >>>>>>> 583b67e (implement the firsts components of the splashscreen and add the style and the colors of the screen that we need them create the .env file for now i only worked on the ui and we have some improvment we respecte the responsive ofc after i finish it we go through the lofic of the screen)
 
@@ -89,7 +90,7 @@ class _MyAppState extends State<MyApp> {
       navigatorKey: _navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const SplashScreen(),
+      home: const OnboardingScreen(),
     );
     // return MaterialApp(
     //   navigatorKey: _navigatorKey,

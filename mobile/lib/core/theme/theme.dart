@@ -49,6 +49,9 @@ class AppTheme {
   static const Color devider = Color(0xFF1E293B);
   static const Color gradient = Color(0x33E8A830);
 
+  // ── Onboarding Colors ─────────────────────────────────────────────────────
+  static const Color onboardingBackgroundColor = Color(0xFF221610);
+
   // ── Interactive Colors ─────────────────────────────────────────────────────
   static const Color buttonColor = Color(0xFFE8A020); // Golden button color
   static const Color selectedColor = Color(
@@ -299,6 +302,17 @@ class AppTheme {
     fontSize: 18,
     height: 1.55,
     fontStyle: FontStyle.italic,
+  );
+  // ── spalsh style ─────────────────────────────────────────────────────────────
+  static TextStyle onbaordingLargeText = GoogleFonts.publicSans(
+    color: primaryTextColor,
+    fontSize: 36,
+    fontStyle: FontStyle.normal,
+  );
+  static TextStyle onbaordingMediumText = GoogleFonts.publicSans(
+    color: slateGray,
+    fontSize: 18,
+    fontStyle: FontStyle.normal,
   );
 
   static ThemeData get darkTheme => lightTheme;
