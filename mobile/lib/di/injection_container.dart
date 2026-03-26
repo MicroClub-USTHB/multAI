@@ -37,6 +37,19 @@ import '../features/face_enrollment/domain/usecases/save_enrollment_done_usecase
 import '../features/face_enrollment/domain/usecases/upload_face_photos_usecase.dart';
 import '../features/face_enrollment/presentation/bloc/face_enrollment_bloc.dart';
 
+
+
+// ── Account ────────────────────────────────────────────────────────────────
+import '../features/account/data/datasources/account_local_datasource.dart';
+import '../features/account/data/datasources/account_remote_datasource.dart';
+import '../features/account/data/repositories/account_repository_impl.dart';
+import '../features/account/domain/repositories/account_repository.dart';
+import '../features/account/domain/usecases/get_account_data_usecase.dart';
+import '../features/account/presentation/bloc/account_bloc.dart';
+
+
+
+ 
 final sl = GetIt.instance;
 
 FutureOr<void> init() async {
@@ -151,6 +164,38 @@ FutureOr<void> init() async {
     () => FaceEnrollmentBloc(
       uploadFacePhotos: sl<UploadFacePhotosUseCase>(),
       saveEnrollmentDone: sl<SaveEnrollmentDoneUseCase>(),
+    ),
+  );
+
+
+  // ── Account DI ───────────────────────────────────────────────────────────
+  sl.registerLazySingleton<AccountLocalDataSource>(
+    () => AccountLocalDataSourceImpl(
+      sharedPreferences: sl<SharedPreferences>(),
+    ),
+  );
+
+  sl.registerLazySingleton<AccountRemoteDataSource>(
+    () => AccountRemoteDataSourceImpl(
+      apiClient: sl<ApiClient>(),
+    ),
+  );
+  sl.registerLazySingleton<AccountRepository>(
+    () => AccountRepositoryImpl(
+      remoteDataSource: sl<AccountRemoteDataSource>(), // required
+      localDataSource: sl<AccountLocalDataSource>(),
+      networkInfo: sl<NetworkInfo>(),
+    ),
+  );
+
+  // ── Account Use Cases ─────────────────────────────────────────────────────
+    sl.registerLazySingleton(() => GetAccountDataUseCase(sl<AccountRepository>()));
+
+  // ── Account BLoC ─────────────────────────────────────────────────────────
+  sl.registerFactory<AccountBloc>(
+    () => AccountBloc(
+      getAccountData: sl<GetAccountDataUseCase>(),
+      logoutUseCase: sl<LogoutUseCase>(),
     ),
   );
 }
