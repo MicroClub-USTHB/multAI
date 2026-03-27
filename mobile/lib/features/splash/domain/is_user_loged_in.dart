@@ -1,21 +1,21 @@
-// import 'package:dartz/dartz.dart';
-// import 'dart:async';
+import 'package:dartz/dartz.dart';
+import 'dart:async';
 
-// import '../../../core/errors/failure.dart';
-// import '../../../core/usecase/usecase.dart';
-// import '../../auth/domain/repositories/auth_repository.dart';
+import '../../../core/errors/failure.dart';
+import '../../../core/usecase/usecase.dart';
+import '../../auth/domain/repositories/auth_repository.dart';
 
-// class IsUserLoggedIn implements UseCase<bool, NoParams> {
-//   final AuthRepository repository;
+class IsUserLoggedIn implements UseCase<bool, NoParams> {
+  final AuthRepository repository;
 
-//   IsUserLoggedIn(this.repository);
+  IsUserLoggedIn(this.repository);
 
-//   @override
-//   FutureOr<Either<Failure, bool>> call(NoParams params) async {
-//     final result = await repository.getToken();
-//     return result.fold(
-//       (failure) => const Right(false),
-//       (token) => Right(token != null && token.isNotEmpty),
-//     );
-//   }
-// }
+  @override
+  FutureOr<Either<Failure, bool>> call(NoParams params) async {
+    final result = await repository.getToken();
+    return result.fold(
+      (failure) => const Right(false),
+      (token) => Right(token != null && token.isNotEmpty),
+    );
+  }
+}

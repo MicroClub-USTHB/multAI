@@ -2,14 +2,16 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failure.dart';
 import '../entities/auth_entity.dart';
 import '../entities/user_entity.dart';
- 
+
 abstract class AuthRepository {
+  //
+  Future<Either<Failure, String?>> getToken();
   Future<Either<Failure, AuthEntity>> login(LoginParams params);
   Future<Either<Failure, AuthEntity>> refreshToken(String refreshToken);
   Future<Either<Failure, void>> logout();
   Future<Either<Failure, MeEntity>> getMe();
 }
- 
+
 class LoginParams {
   final String email;
   final String password;
@@ -17,7 +19,7 @@ class LoginParams {
   final String platform;
   final String deviceId;
   final String deviceFingerprint;
- 
+
   const LoginParams({
     required this.email,
     required this.password,
