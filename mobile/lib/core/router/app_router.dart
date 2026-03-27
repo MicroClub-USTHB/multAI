@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
- 
+import 'package:multai_mobile/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:multai_mobile/features/splash/presentation/pages/splash_screen.dart';
+
 import '../../di/injection_container.dart' as di;
 import '../../features/auth/presentation/screens/login/login_page.dart';
 import '../../features/face_enrollment/presentation/screens/face_enrollment_screen.dart';
@@ -10,17 +12,21 @@ import '../../features/events/presentation/screens/events_screen.dart';
 import '../../features/gallery/presentation/screens/gallery_screen.dart';
 import '../../features/account/presentation/screens/account_screen.dart';
 import 'app_routes.dart';
- 
+
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppRoutes.login,
+  initialLocation: '/',
   routes: [
- 
-    // ── Auth ──────────────────────────────────────────────────────────────────
+    // ── Splash Screen (initial route) ───────────────────────────────────────
+    GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+    // ── Onboarding ───────────────────────────────────────────────────────────
     GoRoute(
-      path: AppRoutes.login,
-      builder: (context, state) => const LoginPage(),
+      path: '/onboarding',
+      builder: (context, state) => const OnboardingScreen(),
     ),
- 
+
+    // ── Auth ──────────────────────────────────────────────────────────────────
+    GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+
     // ── Face Enrollment ────────────────────────────────────────────────────────
     GoRoute(
       path: AppRoutes.faceEnrollment,
@@ -29,7 +35,7 @@ final GoRouter appRouter = GoRouter(
         child: const FaceEnrollmentScreen(),
       ),
     ),
- 
+
     // ── Home shell with bottom nav ─────────────────────────────────────────────
     ShellRoute(
       builder: (context, state, child) => HomeShell(child: child),
@@ -50,4 +56,3 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
-
