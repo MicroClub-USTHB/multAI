@@ -1,32 +1,35 @@
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card'
-import { Input } from '@/shared/ui/input'
-import { Button } from '@/shared/ui/button'
-import { Folder } from 'lucide-react'
+import { Folder } from 'lucide-react';
+import { useState } from 'react';
+
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui';
+import { Input } from '@/shared/ui';
 
 interface Props {
-  value: string
-  onSave: (path: string) => Promise<void>
+  value: string;
+  isLoading?: boolean;
+  onSave: (path: string) => Promise<void>;
 }
 
-export function OutputFolderCard({ value, onSave }: Props) {
-  const [path, setPath] = useState(value)
-  const [saving, setSaving] = useState(false)
-  const hasChanged = path !== value
+export function OutputFolderCard({ value, isLoading = false, onSave }: Props) {
+  const [path, setPath] = useState(value);
+  const hasChanged = path !== value;
 
   const handleSave = async () => {
-    if (!path.trim() || !hasChanged) return
-    setSaving(true)
+    if (!path.trim() || !hasChanged) return;
 
-    try {
-      await onSave(path.trim())
-    } finally {
-      setSaving(false)
-    }
-  }
+    await onSave(path.trim());
+  };
 
   return (
-    <Card className="border-border/40 bg-card/60 backdrop-blur-sm">
+    <Card variant="glass">
       <CardHeader>
         <CardTitle className="text-xl">Output Folders</CardTitle>
         <CardDescription>Storage configuration</CardDescription>
@@ -35,7 +38,7 @@ export function OutputFolderCard({ value, onSave }: Props) {
       <CardContent className="space-y-5">
         <div className="space-y-2">
           <label className="text-sm font-medium">Current path</label>
-          <div className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 font-mono text-sm text-gray-400/90">
+          <div className="bg-muted/40 flex items-center gap-2 rounded-md border px-3 py-2 font-mono text-sm text-gray-400/90">
             <Folder className="h-4 w-4" />
             {value || '/media/processed'}
           </div>
@@ -45,11 +48,11 @@ export function OutputFolderCard({ value, onSave }: Props) {
           <label className="text-sm font-medium">New output path</label>
           <Input
             value={path}
-            onChange={e => setPath(e.target.value)}
+            onChange={(e) => setPath(e.target.value)}
             placeholder="/media/Processed"
             className="font-mono"
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Processed photos will be automatically saved to this location
           </p>
         </div>
@@ -58,12 +61,15 @@ export function OutputFolderCard({ value, onSave }: Props) {
       <CardFooter>
         <Button
           onClick={handleSave}
-          disabled={saving || !hasChanged || !path.trim()}
+          disabled={!hasChanged || !path.trim()}
           className="w-full"
+          isLoading={isLoading}
+          loadingText="Saving..."
+          showLoader={false}
         >
-          {saving ? 'Saving...' : 'Save Path'}
+          Save Path
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

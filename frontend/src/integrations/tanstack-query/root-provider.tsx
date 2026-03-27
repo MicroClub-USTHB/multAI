@@ -1,34 +1,36 @@
-import type { ReactNode } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import type { ReactNode } from 'react';
 
-let context:
-  | {
-      queryClient: QueryClient
-    }
-  | undefined
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-export function getContext() {
-  if (context) {
-    return context
+let queryClient: QueryClient | undefined;
+
+export function getQueryClient() {
+  if (!queryClient) {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: 1000 * 60 * 5,
+          gcTime: 1000 * 60 * 10,
+          refetchOnWindowFocus: import.meta.env.PROD,
+          retry: 2,
+        },
+        mutations: {
+          retry: 1,
+        },
+      },
+    });
   }
-
-  const queryClient = new QueryClient()
-
-  context = {
-    queryClient,
-  }
-
-  return context
+  return queryClient;
 }
 
 export default function TanStackQueryProvider({
   children,
 }: {
-  children: ReactNode
+  children: ReactNode;
 }) {
-  const { queryClient } = getContext()
-
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  )
+    <QueryClientProvider client={getQueryClient()}>
+      {children}
+    </QueryClientProvider>
+  );
 }
