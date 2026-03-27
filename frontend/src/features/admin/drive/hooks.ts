@@ -18,6 +18,23 @@ import {
 import { DRIVE_SETTINGS_QUERY_KEY } from './constants';
 import { driveSettingsQueryOptions } from './query-options';
 
+function parseErrorMessage(error: unknown, fallbackMessage: string): string {
+  if (!(error instanceof Error)) return fallbackMessage;
+
+  try {
+    // Attempt to parse the stringified Zod error array
+    const parsedErrors = JSON.parse(error.message);
+    if (Array.isArray(parsedErrors) && parsedErrors.length > 0) {
+      // Just grab the first validation error message to keep the UI clean
+      return parsedErrors[0].message;
+    }
+  } catch {
+    console.warn('Failed to parse error message:', error.message);
+  }
+
+  return error.message || fallbackMessage;
+}
+
 export function useDriveSettingsQuery() {
   return useSuspenseQuery(driveSettingsQueryOptions());
 }
@@ -98,14 +115,14 @@ export function useDriveSettings() {
       : latestMutation.isError
         ? {
             tone: 'error' as const,
-            message:
-              latestMutation.error instanceof Error
-                ? latestMutation.error.message
-                : latestMutation.type === 'connect'
-                  ? 'Unable to connect Google Drive.'
-                  : latestMutation.type === 'sync'
-                    ? 'Unable to update sync frequency.'
-                    : 'Unable to update output folder.',
+            message: parseErrorMessage(
+              latestMutation.error,
+              latestMutation.type === 'connect'
+                ? 'Unable to connect Google Drive.'
+                : latestMutation.type === 'sync'
+                  ? 'Unable to update sync frequency.'
+                  : 'Unable to update output folder.',
+            ),
           }
         : latestMutation.isSuccess
           ? {
