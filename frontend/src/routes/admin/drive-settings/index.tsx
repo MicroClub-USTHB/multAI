@@ -9,8 +9,8 @@ import { SyncFrequencyCard } from '@/features/admin/drive/components/sync-freque
 import { useDriveSettings } from '@/features/admin/drive/hooks';
 import { driveSettingsQueryOptions } from '@/features/admin/drive/query-options';
 
-import DriveSettingsError from './error';
-import DriveSettingsPending from './pending';
+import DriveSettingsError from './-error';
+import DriveSettingsPending from './-pending';
 
 export const Route = createFileRoute('/admin/drive-settings/')({
   loader: async ({ context }) => {

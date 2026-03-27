@@ -18,8 +18,8 @@ import {
 } from '@/features/admin/stats/query-options';
 import { StatsCard } from '@/features/common/components/stats-card';
 
-import { AdminIndexError } from './admin-index-error';
-import { AdminIndexPending } from './admin-index-pending';
+import { AdminIndexError } from './-admin-index-error';
+import { AdminIndexPending } from './-admin-index-pending';
 
 export const Route = createFileRoute('/admin/')({
   loader: async ({ context }) => {
