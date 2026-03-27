@@ -6,43 +6,40 @@ import { DriveStorageStatus } from '@/features/admin/stats/components/drive-stor
 import { ProcessingLoadChart } from '@/features/admin/stats/components/processing-load-chart';
 import {
   useAdminStats,
-  useDriveUsage,
   useAlerts,
+  useDriveUsage,
   useProcessingLoad,
 } from '@/features/admin/stats/hooks';
+import {
+  adminStatsQueryOptions,
+  alertsQueryOptions,
+  driveUsageQueryOptions,
+  processingLoadQueryOptions,
+} from '@/features/admin/stats/query-options';
 import { StatsCard } from '@/features/common/components/stats-card';
 
 import { AdminIndexError } from './admin-index-error';
 import { AdminIndexPending } from './admin-index-pending';
 
 export const Route = createFileRoute('/admin/')({
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(adminStatsQueryOptions()),
+      context.queryClient.ensureQueryData(driveUsageQueryOptions()),
+      context.queryClient.ensureQueryData(alertsQueryOptions()),
+      context.queryClient.ensureQueryData(processingLoadQueryOptions()),
+    ]);
+  },
+  pendingComponent: AdminIndexPending,
+  errorComponent: AdminIndexError,
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const {
-    data: adminStatsData,
-    isLoading: statsLoading,
-    error: statsError,
-  } = useAdminStats();
-  const {
-    data: driveData,
-    isLoading: driveLoading,
-    error: driveError,
-  } = useDriveUsage();
-  const {
-    data: alertsData,
-    isLoading: alertsLoading,
-    error: alertsError,
-  } = useAlerts();
-  const {
-    data: processingLoadData,
-    isLoading: processingLoading,
-    error: processingLoadError,
-  } = useProcessingLoad();
-
-  const firstError =
-    statsError ?? driveError ?? alertsError ?? processingLoadError;
+  const { data: adminStatsData } = useAdminStats();
+  const { data: driveData } = useDriveUsage();
+  const { data: alertsData } = useAlerts();
+  const { data: processingLoadData } = useProcessingLoad();
 
   const statsCards = adminStatsData
     ? [
@@ -79,26 +76,19 @@ function RouteComponent() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {statsLoading ? (
-            <AdminIndexPending />
-          ) : (
-            statsCards.map((stat, index) => <StatsCard key={index} {...stat} />)
-          )}
+          {statsCards.map((stat, index) => (
+            <StatsCard key={index} {...stat} />
+          ))}
         </div>
-
-        {firstError ? <AdminIndexError error={firstError} /> : null}
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
-            <DriveStorageStatus data={driveData} isLoading={driveLoading} />
-            <ProcessingLoadChart
-              data={processingLoadData}
-              isLoading={processingLoading}
-            />
+            <DriveStorageStatus data={driveData} />
+            <ProcessingLoadChart data={processingLoadData} />
           </div>
 
           <div className="lg:sticky lg:top-6 lg:self-start">
-            <AlertsPanel data={alertsData} isLoading={alertsLoading} />
+            <AlertsPanel data={alertsData} />
           </div>
         </div>
       </div>
