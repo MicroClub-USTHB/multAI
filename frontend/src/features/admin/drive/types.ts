@@ -1,12 +1,12 @@
 import type z from 'zod';
 
+import type { SYNC_INTERVALS } from './constants';
+
 import {
   connectGoogleDriveInput,
   updateSyncFrequencyInput,
   updateOutputFolderInput,
 } from './schemas';
-
-export const SYNC_INTERVALS = [5, 10, 15, 30, 60] as const;
 
 export type SyncInterval = (typeof SYNC_INTERVALS)[number];
 

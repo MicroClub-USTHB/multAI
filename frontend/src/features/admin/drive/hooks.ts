@@ -1,4 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 
 import type {
   ConnectGoogleDriveInput,
@@ -8,25 +12,22 @@ import type {
 
 import {
   connectGoogleDrive,
-  getDriveSettings,
   updateOutputFolder,
   updateSyncFrequency,
 } from './api';
-
-export const DRIVE_SETTINGS_QUERY_KEY = ['admin', 'drive', 'settings'] as const;
+import { DRIVE_SETTINGS_QUERY_KEY } from './constants';
+import { driveSettingsQueryOptions } from './query-options';
 
 export function useDriveSettingsQuery() {
-  return useQuery({
-    queryKey: DRIVE_SETTINGS_QUERY_KEY,
-    queryFn: getDriveSettings,
-  });
+  return useSuspenseQuery(driveSettingsQueryOptions());
 }
 
 export function useConnectGoogleDriveMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: ConnectGoogleDriveInput) => connectGoogleDrive(input),
+    mutationFn: (input: ConnectGoogleDriveInput) =>
+      connectGoogleDrive({ data: input }),
     onSuccess: (settings) => {
       queryClient.setQueryData(DRIVE_SETTINGS_QUERY_KEY, settings);
     },
@@ -37,7 +38,8 @@ export function useUpdateSyncFrequencyMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateSyncFrequencyInput) => updateSyncFrequency(input),
+    mutationFn: (input: UpdateSyncFrequencyInput) =>
+      updateSyncFrequency({ data: input }),
     onSuccess: (settings) => {
       queryClient.setQueryData(DRIVE_SETTINGS_QUERY_KEY, settings);
       queryClient.invalidateQueries({ queryKey: DRIVE_SETTINGS_QUERY_KEY });
@@ -49,7 +51,8 @@ export function useUpdateOutputFolderMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateOutputFolderInput) => updateOutputFolder(input),
+    mutationFn: (input: UpdateOutputFolderInput) =>
+      updateOutputFolder({ data: input }),
     onSuccess: (settings) => {
       queryClient.setQueryData(DRIVE_SETTINGS_QUERY_KEY, settings);
       queryClient.invalidateQueries({ queryKey: DRIVE_SETTINGS_QUERY_KEY });

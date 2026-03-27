@@ -1,11 +1,13 @@
 import { createServerFn } from '@tanstack/react-start';
 
+import type { DriveSettings, SyncInterval } from './types';
+
+import { SYNC_INTERVALS } from './constants';
 import {
   connectGoogleDriveInput,
   updateOutputFolderInput,
   updateSyncFrequencyInput,
 } from './schemas';
-import { type DriveSettings, SYNC_INTERVALS, type SyncInterval } from './types';
 
 const MOCK_LATENCY_MS = 400;
 
@@ -25,7 +27,7 @@ const sleep = (ms: number) =>
 const cloneSettings = (): DriveSettings => ({ ...mockDriveSettings });
 
 const assertSyncInterval = (interval: number) => {
-  if (!SYNC_INTERVALS.includes(interval as (typeof SYNC_INTERVALS)[number])) {
+  if (!SYNC_INTERVALS.includes(interval as SyncInterval)) {
     throw new Error('Invalid sync interval');
   }
 };

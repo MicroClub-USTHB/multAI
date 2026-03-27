@@ -1,6 +1,7 @@
 import z from 'zod';
 
-import { SYNC_INTERVALS, type SyncInterval } from './types';
+import { SYNC_INTERVALS } from './constants';
+import { type SyncInterval } from './types';
 
 export const connectGoogleDriveInput = z.object({
   apiKey: z.string().min(10, 'API key must be at least 10 characters'),

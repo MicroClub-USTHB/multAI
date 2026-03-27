@@ -12,16 +12,37 @@ import {
 } from '@/features/admin/stats/hooks';
 import { StatsCard } from '@/features/common/components/stats-card';
 
+import { AdminIndexError } from './admin-index-error';
+import { AdminIndexPending } from './admin-index-pending';
+
 export const Route = createFileRoute('/admin/')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { data: adminStatsData, isLoading: statsLoading } = useAdminStats();
-  const { data: driveData, isLoading: driveLoading } = useDriveUsage();
-  const { data: alertsData, isLoading: alertsLoading } = useAlerts();
-  const { data: processingLoadData, isLoading: processingLoading } =
-    useProcessingLoad();
+  const {
+    data: adminStatsData,
+    isLoading: statsLoading,
+    error: statsError,
+  } = useAdminStats();
+  const {
+    data: driveData,
+    isLoading: driveLoading,
+    error: driveError,
+  } = useDriveUsage();
+  const {
+    data: alertsData,
+    isLoading: alertsLoading,
+    error: alertsError,
+  } = useAlerts();
+  const {
+    data: processingLoadData,
+    isLoading: processingLoading,
+    error: processingLoadError,
+  } = useProcessingLoad();
+
+  const firstError =
+    statsError ?? driveError ?? alertsError ?? processingLoadError;
 
   const statsCards = adminStatsData
     ? [
@@ -58,23 +79,14 @@ function RouteComponent() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {statsLoading
-            ? Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="border-sidebar-border animate-pulse rounded-lg border p-6"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-sidebar-accent h-6 w-6 rounded"></div>
-                    <div className="bg-sidebar-accent h-8 w-16 rounded"></div>
-                  </div>
-                  <div className="bg-sidebar-accent mt-2 h-4 w-20 rounded"></div>
-                </div>
-              ))
-            : statsCards.map((stat, index) => (
-                <StatsCard key={index} {...stat} />
-              ))}
+          {statsLoading ? (
+            <AdminIndexPending />
+          ) : (
+            statsCards.map((stat, index) => <StatsCard key={index} {...stat} />)
+          )}
         </div>
+
+        {firstError ? <AdminIndexError error={firstError} /> : null}
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">

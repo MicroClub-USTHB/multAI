@@ -25,7 +25,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
 import { Route as AdminLogsRouteImport } from './routes/admin/logs'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
-import { Route as AdminDriveSettingsRouteImport } from './routes/admin/drive-settings'
+import { Route as AdminDriveSettingsIndexRouteImport } from './routes/admin/drive-settings/index'
 
 const RssDotxmlRoute = RssDotxmlRouteImport.update({
   id: '/rss.xml',
@@ -107,9 +107,9 @@ const AdminEventsRoute = AdminEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminDriveSettingsRoute = AdminDriveSettingsRouteImport.update({
-  id: '/drive-settings',
-  path: '/drive-settings',
+const AdminDriveSettingsIndexRoute = AdminDriveSettingsIndexRouteImport.update({
+  id: '/drive-settings/',
+  path: '/drive-settings/',
   getParentRoute: () => AdminRoute,
 } as any)
 
@@ -118,7 +118,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/multi': typeof MultiRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
-  '/admin/drive-settings': typeof AdminDriveSettingsRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -131,11 +130,11 @@ export interface FileRoutesByFullPath {
   '/multi/upload': typeof MultiUploadRoute
   '/admin/': typeof AdminIndexRoute
   '/multi/': typeof MultiIndexRoute
+  '/admin/drive-settings/': typeof AdminDriveSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/rss.xml': typeof RssDotxmlRoute
-  '/admin/drive-settings': typeof AdminDriveSettingsRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -148,6 +147,7 @@ export interface FileRoutesByTo {
   '/multi/upload': typeof MultiUploadRoute
   '/admin': typeof AdminIndexRoute
   '/multi': typeof MultiIndexRoute
+  '/admin/drive-settings': typeof AdminDriveSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -155,7 +155,6 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/multi': typeof MultiRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
-  '/admin/drive-settings': typeof AdminDriveSettingsRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -168,6 +167,7 @@ export interface FileRoutesById {
   '/multi/upload': typeof MultiUploadRoute
   '/admin/': typeof AdminIndexRoute
   '/multi/': typeof MultiIndexRoute
+  '/admin/drive-settings/': typeof AdminDriveSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -176,7 +176,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/multi'
     | '/rss.xml'
-    | '/admin/drive-settings'
     | '/admin/events'
     | '/admin/logs'
     | '/admin/notifications'
@@ -189,11 +188,11 @@ export interface FileRouteTypes {
     | '/multi/upload'
     | '/admin/'
     | '/multi/'
+    | '/admin/drive-settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/rss.xml'
-    | '/admin/drive-settings'
     | '/admin/events'
     | '/admin/logs'
     | '/admin/notifications'
@@ -206,13 +205,13 @@ export interface FileRouteTypes {
     | '/multi/upload'
     | '/admin'
     | '/multi'
+    | '/admin/drive-settings'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/multi'
     | '/rss.xml'
-    | '/admin/drive-settings'
     | '/admin/events'
     | '/admin/logs'
     | '/admin/notifications'
@@ -225,6 +224,7 @@ export interface FileRouteTypes {
     | '/multi/upload'
     | '/admin/'
     | '/multi/'
+    | '/admin/drive-settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -349,32 +349,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEventsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/drive-settings': {
-      id: '/admin/drive-settings'
+    '/admin/drive-settings/': {
+      id: '/admin/drive-settings/'
       path: '/drive-settings'
-      fullPath: '/admin/drive-settings'
-      preLoaderRoute: typeof AdminDriveSettingsRouteImport
+      fullPath: '/admin/drive-settings/'
+      preLoaderRoute: typeof AdminDriveSettingsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
   }
 }
 
 interface AdminRouteChildren {
-  AdminDriveSettingsRoute: typeof AdminDriveSettingsRoute
   AdminEventsRoute: typeof AdminEventsRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminDriveSettingsIndexRoute: typeof AdminDriveSettingsIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminDriveSettingsRoute: AdminDriveSettingsRoute,
   AdminEventsRoute: AdminEventsRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminDriveSettingsIndexRoute: AdminDriveSettingsIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
