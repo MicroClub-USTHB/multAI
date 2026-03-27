@@ -1,4 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 
 import type {
   ConnectGoogleDriveInput,
@@ -8,25 +12,39 @@ import type {
 
 import {
   connectGoogleDrive,
-  getDriveSettings,
   updateOutputFolder,
   updateSyncFrequency,
 } from './api';
+import { DRIVE_SETTINGS_QUERY_KEY } from './constants';
+import { driveSettingsQueryOptions } from './query-options';
 
-export const DRIVE_SETTINGS_QUERY_KEY = ['admin', 'drive', 'settings'] as const;
+function parseErrorMessage(error: unknown, fallbackMessage: string): string {
+  if (!(error instanceof Error)) return fallbackMessage;
+
+  try {
+    // Attempt to parse the stringified Zod error array
+    const parsedErrors = JSON.parse(error.message);
+    if (Array.isArray(parsedErrors) && parsedErrors.length > 0) {
+      // Just grab the first validation error message to keep the UI clean
+      return parsedErrors[0].message;
+    }
+  } catch {
+    console.warn('Failed to parse error message:', error.message);
+  }
+
+  return error.message || fallbackMessage;
+}
 
 export function useDriveSettingsQuery() {
-  return useQuery({
-    queryKey: DRIVE_SETTINGS_QUERY_KEY,
-    queryFn: getDriveSettings,
-  });
+  return useSuspenseQuery(driveSettingsQueryOptions());
 }
 
 export function useConnectGoogleDriveMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: ConnectGoogleDriveInput) => connectGoogleDrive(input),
+    mutationFn: (input: ConnectGoogleDriveInput) =>
+      connectGoogleDrive({ data: input }),
     onSuccess: (settings) => {
       queryClient.setQueryData(DRIVE_SETTINGS_QUERY_KEY, settings);
     },
@@ -37,7 +55,8 @@ export function useUpdateSyncFrequencyMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateSyncFrequencyInput) => updateSyncFrequency(input),
+    mutationFn: (input: UpdateSyncFrequencyInput) =>
+      updateSyncFrequency({ data: input }),
     onSuccess: (settings) => {
       queryClient.setQueryData(DRIVE_SETTINGS_QUERY_KEY, settings);
       queryClient.invalidateQueries({ queryKey: DRIVE_SETTINGS_QUERY_KEY });
@@ -49,7 +68,8 @@ export function useUpdateOutputFolderMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateOutputFolderInput) => updateOutputFolder(input),
+    mutationFn: (input: UpdateOutputFolderInput) =>
+      updateOutputFolder({ data: input }),
     onSuccess: (settings) => {
       queryClient.setQueryData(DRIVE_SETTINGS_QUERY_KEY, settings);
       queryClient.invalidateQueries({ queryKey: DRIVE_SETTINGS_QUERY_KEY });
@@ -95,14 +115,14 @@ export function useDriveSettings() {
       : latestMutation.isError
         ? {
             tone: 'error' as const,
-            message:
-              latestMutation.error instanceof Error
-                ? latestMutation.error.message
-                : latestMutation.type === 'connect'
-                  ? 'Unable to connect Google Drive.'
-                  : latestMutation.type === 'sync'
-                    ? 'Unable to update sync frequency.'
-                    : 'Unable to update output folder.',
+            message: parseErrorMessage(
+              latestMutation.error,
+              latestMutation.type === 'connect'
+                ? 'Unable to connect Google Drive.'
+                : latestMutation.type === 'sync'
+                  ? 'Unable to update sync frequency.'
+                  : 'Unable to update output folder.',
+            ),
           }
         : latestMutation.isSuccess
           ? {

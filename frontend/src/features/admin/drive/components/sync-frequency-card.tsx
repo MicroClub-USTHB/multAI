@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from '@/shared/ui';
 
-import { type SyncInterval, SYNC_INTERVALS } from '../types';
+import { SYNC_INTERVALS } from '../constants';
+import { type SyncInterval } from '../types';
 
 interface Props {
   value: SyncInterval;

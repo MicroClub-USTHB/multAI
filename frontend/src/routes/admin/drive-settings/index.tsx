@@ -1,24 +1,29 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
+
+import type { SyncInterval } from '@/features/admin/drive/types';
 
 import { GoogleDriveAuthCard } from '@/features/admin/drive/components/google-auth-card';
 import { OutputFolderCard } from '@/features/admin/drive/components/output-folder-card';
 import { SyncFrequencyCard } from '@/features/admin/drive/components/sync-frequency-card';
 import { useDriveSettings } from '@/features/admin/drive/hooks';
-import { type SyncInterval } from '@/features/admin/drive/types';
-import { Button } from '@/shared/ui';
+import { driveSettingsQueryOptions } from '@/features/admin/drive/query-options';
 
-export const Route = createFileRoute('/admin/drive-settings')({
+import DriveSettingsError from './-error';
+import DriveSettingsPending from './-pending';
+
+export const Route = createFileRoute('/admin/drive-settings/')({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(driveSettingsQueryOptions());
+  },
+  pendingComponent: DriveSettingsPending,
+  errorComponent: DriveSettingsError,
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const {
     settings,
-    isLoading,
-    isError,
-    error,
-    refetch,
     connect,
     updateSyncFrequency,
     updateOutputFolder,
@@ -39,53 +44,6 @@ function RouteComponent() {
   const handleOutputPathSave = async (path: string) => {
     await updateOutputFolder({ outputFolder: path });
   };
-
-  if (isLoading) {
-    return (
-      <div className="bg-sidebar text-sidebar-foreground">
-        <div className="space-y-6 p-6">
-          <div>
-            <div className="bg-sidebar-accent/40 h-10 w-56 animate-pulse rounded-md" />
-            <div className="bg-sidebar-accent/30 mt-2 h-5 w-96 animate-pulse rounded-md" />
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={index}
-                className="border-border/40 bg-card/40 h-[320px] animate-pulse rounded-lg border"
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (isError || !settings) {
-    return (
-      <div className="bg-sidebar text-sidebar-foreground">
-        <div className="space-y-6 p-6">
-          <h1 className="text-3xl font-bold">Drive Settings</h1>
-
-          <div className="border-destructive/40 bg-destructive/10 text-destructive rounded-lg border p-4 text-sm">
-            <div className="mb-3 flex items-center gap-2 font-medium">
-              <AlertTriangle className="h-4 w-4" />
-              Failed to load Drive settings
-            </div>
-            <p>{error instanceof Error ? error.message : 'Unknown error.'}</p>
-            <Button
-              className="mt-4"
-              variant="outline"
-              onClick={() => refetch()}
-            >
-              Retry
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-sidebar text-sidebar-foreground">

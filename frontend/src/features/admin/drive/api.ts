@@ -1,10 +1,12 @@
+import { createServerFn } from '@tanstack/react-start';
+
+import type { DriveSettings, SyncInterval } from './types';
+
 import {
-  type ConnectGoogleDriveInput,
-  type DriveSettings,
-  SYNC_INTERVALS,
-  type UpdateOutputFolderInput,
-  type UpdateSyncFrequencyInput,
-} from './types';
+  connectGoogleDriveInput,
+  updateOutputFolderInput,
+  updateSyncFrequencyInput,
+} from './schemas';
 
 const MOCK_LATENCY_MS = 400;
 
@@ -23,71 +25,55 @@ const sleep = (ms: number) =>
 
 const cloneSettings = (): DriveSettings => ({ ...mockDriveSettings });
 
-const assertSyncInterval = (interval: number) => {
-  if (!SYNC_INTERVALS.includes(interval as (typeof SYNC_INTERVALS)[number])) {
-    throw new Error('Invalid sync interval');
-  }
-};
+export const getDriveSettings = createServerFn({ method: 'GET' }).handler(
+  async (): Promise<DriveSettings> => {
+    await sleep(MOCK_LATENCY_MS);
+    return cloneSettings();
+  },
+);
 
-export async function getDriveSettings(): Promise<DriveSettings> {
-  await sleep(MOCK_LATENCY_MS);
-  return cloneSettings();
-}
+export const connectGoogleDrive = createServerFn({ method: 'POST' })
+  .inputValidator(connectGoogleDriveInput)
+  .handler(async (): Promise<DriveSettings> => {
+    await sleep(MOCK_LATENCY_MS);
 
-export async function connectGoogleDrive(
-  input: ConnectGoogleDriveInput,
-): Promise<DriveSettings> {
-  const apiKey = input.apiKey.trim();
+    const now = new Date().toISOString();
+    mockDriveSettings = {
+      ...mockDriveSettings,
+      isConnected: true,
+      connectedAt: now,
+      updatedAt: now,
+    };
 
-  if (apiKey.length < 10) {
-    throw new Error('API key is too short');
-  }
+    return cloneSettings();
+  });
 
-  await sleep(MOCK_LATENCY_MS);
+export const updateSyncFrequency = createServerFn({ method: 'POST' })
+  .inputValidator(updateSyncFrequencyInput)
+  .handler(async ({ data: input }): Promise<DriveSettings> => {
+    await sleep(MOCK_LATENCY_MS);
 
-  const now = new Date().toISOString();
-  mockDriveSettings = {
-    ...mockDriveSettings,
-    isConnected: true,
-    connectedAt: now,
-    updatedAt: now,
-  };
+    mockDriveSettings = {
+      ...mockDriveSettings,
+      syncInterval: input.syncInterval as SyncInterval,
+      updatedAt: new Date().toISOString(),
+    };
 
-  return cloneSettings();
-}
+    return cloneSettings();
+  });
 
-export async function updateSyncFrequency(
-  input: UpdateSyncFrequencyInput,
-): Promise<DriveSettings> {
-  assertSyncInterval(input.syncInterval);
+export const updateOutputFolder = createServerFn({ method: 'POST' })
+  .inputValidator(updateOutputFolderInput)
+  .handler(async ({ data: input }): Promise<DriveSettings> => {
+    const normalizedPath = input.outputFolder.trim();
 
-  await sleep(MOCK_LATENCY_MS);
+    await sleep(MOCK_LATENCY_MS);
 
-  mockDriveSettings = {
-    ...mockDriveSettings,
-    syncInterval: input.syncInterval,
-    updatedAt: new Date().toISOString(),
-  };
+    mockDriveSettings = {
+      ...mockDriveSettings,
+      outputFolder: normalizedPath,
+      updatedAt: new Date().toISOString(),
+    };
 
-  return cloneSettings();
-}
-
-export async function updateOutputFolder(
-  input: UpdateOutputFolderInput,
-): Promise<DriveSettings> {
-  const normalizedPath = input.outputFolder.trim();
-
-  if (!normalizedPath.startsWith('/')) {
-    throw new Error('Output folder must be an absolute path');
-  }
-
-  await sleep(MOCK_LATENCY_MS);
-
-  mockDriveSettings = {
-    ...mockDriveSettings,
-    outputFolder: normalizedPath,
-    updatedAt: new Date().toISOString(),
-  };
-
-  return cloneSettings();
-}
+    return cloneSettings();
+  });

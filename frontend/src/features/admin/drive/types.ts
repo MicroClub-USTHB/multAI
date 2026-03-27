@@ -1,4 +1,12 @@
-export const SYNC_INTERVALS = [5, 10, 15, 30, 60] as const;
+import type z from 'zod';
+
+import type { SYNC_INTERVALS } from './constants';
+
+import {
+  connectGoogleDriveInput,
+  updateSyncFrequencyInput,
+  updateOutputFolderInput,
+} from './schemas';
 
 export type SyncInterval = (typeof SYNC_INTERVALS)[number];
 
@@ -10,14 +18,8 @@ export interface DriveSettings {
   updatedAt: string;
 }
 
-export interface ConnectGoogleDriveInput {
-  apiKey: string;
-}
+export type ConnectGoogleDriveInput = z.infer<typeof connectGoogleDriveInput>;
 
-export interface UpdateSyncFrequencyInput {
-  syncInterval: SyncInterval;
-}
+export type UpdateSyncFrequencyInput = z.infer<typeof updateSyncFrequencyInput>;
 
-export interface UpdateOutputFolderInput {
-  outputFolder: string;
-}
+export type UpdateOutputFolderInput = z.infer<typeof updateOutputFolderInput>;
