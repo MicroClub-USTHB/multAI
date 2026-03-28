@@ -6,4 +6,5 @@ abstract class OnboardingEvent extends Equatable {
 }
 
 class CheckOnboarding extends OnboardingEvent {}
+
 class CompleteOnboarding extends OnboardingEvent {}

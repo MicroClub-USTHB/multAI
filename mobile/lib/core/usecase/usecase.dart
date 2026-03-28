@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'dart:async';
 import '../errors/failure.dart';
 
-
 abstract class UseCase<T, Params> {
   FutureOr<Either<Failure, T>> call(Params params);
 }

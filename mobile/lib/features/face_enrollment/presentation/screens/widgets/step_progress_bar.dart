@@ -19,14 +19,18 @@ class StepProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     // Calculate uploaded photos
     final uploadedRequired = photos.entries
-        .where((e) =>
-            e.key == FacePhotoType.frontal ||
-            e.key == FacePhotoType.leftProfile ||
-            e.key == FacePhotoType.rightProfile)
+        .where(
+          (e) =>
+              e.key == FacePhotoType.frontal ||
+              e.key == FacePhotoType.leftProfile ||
+              e.key == FacePhotoType.rightProfile,
+        )
         .length;
 
     final uploadedOptional = photos.entries
-        .where((e) => e.key == FacePhotoType.extra1 || e.key == FacePhotoType.extra2)
+        .where(
+          (e) => e.key == FacePhotoType.extra1 || e.key == FacePhotoType.extra2,
+        )
         .length;
 
     final totalSteps = requiredPhotos + optionalPhotos;

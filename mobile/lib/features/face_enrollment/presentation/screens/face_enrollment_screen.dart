@@ -28,11 +28,11 @@ class FaceEnrollmentScreen extends StatelessWidget {
     final file = File(picked.path);
 
     // Optimistically update UI
-    context.read<FaceEnrollmentBloc>().add(PhotoSelected(
-          type: type,
-          filePath: file.path,
-        ));
+    context.read<FaceEnrollmentBloc>().add(
+      PhotoSelected(type: type, filePath: file.path),
+    );
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<FaceEnrollmentBloc, FaceEnrollmentState>(
@@ -92,9 +92,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
                     horizontal: context.hPadding(),
                     vertical: context.heightCalculated(8),
                   ),
-                  child: StepProgressBar(
-                    photos: photos,
-                  ),
+                  child: StepProgressBar(photos: photos),
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -132,10 +130,12 @@ class FaceEnrollmentScreen extends StatelessWidget {
                           filePath: photos[FacePhotoType.frontal],
                           height: context.heightCalculated(340),
                           isLoading: loadingType == FacePhotoType.frontal,
-                          onTap: () => _pickPhoto(context, FacePhotoType.frontal),
+                          onTap: () =>
+                              _pickPhoto(context, FacePhotoType.frontal),
                           onDelete: photos[FacePhotoType.frontal] != null
                               ? () => context.read<FaceEnrollmentBloc>().add(
-                                  PhotoRemoved(type: FacePhotoType.frontal))
+                                  PhotoRemoved(type: FacePhotoType.frontal),
+                                )
                               : null,
                         ),
                         SizedBox(height: context.heightCalculated(12)),
@@ -147,14 +147,21 @@ class FaceEnrollmentScreen extends StatelessWidget {
                                 type: FacePhotoType.leftProfile,
                                 filePath: photos[FacePhotoType.leftProfile],
                                 height: context.heightCalculated(260),
-                                isLoading: loadingType == FacePhotoType.leftProfile,
-                                onTap: () =>
-                                    _pickPhoto(context, FacePhotoType.leftProfile),
-                                onDelete: photos[FacePhotoType.leftProfile] != null
+                                isLoading:
+                                    loadingType == FacePhotoType.leftProfile,
+                                onTap: () => _pickPhoto(
+                                  context,
+                                  FacePhotoType.leftProfile,
+                                ),
+                                onDelete:
+                                    photos[FacePhotoType.leftProfile] != null
                                     ? () => context
-                                        .read<FaceEnrollmentBloc>()
-                                        .add(PhotoRemoved(
-                                            type: FacePhotoType.leftProfile))
+                                          .read<FaceEnrollmentBloc>()
+                                          .add(
+                                            PhotoRemoved(
+                                              type: FacePhotoType.leftProfile,
+                                            ),
+                                          )
                                     : null,
                               ),
                             ),
@@ -166,13 +173,19 @@ class FaceEnrollmentScreen extends StatelessWidget {
                                 height: context.heightCalculated(260),
                                 isLoading:
                                     loadingType == FacePhotoType.rightProfile,
-                                onTap: () =>
-                                    _pickPhoto(context, FacePhotoType.rightProfile),
-                                onDelete: photos[FacePhotoType.rightProfile] != null
+                                onTap: () => _pickPhoto(
+                                  context,
+                                  FacePhotoType.rightProfile,
+                                ),
+                                onDelete:
+                                    photos[FacePhotoType.rightProfile] != null
                                     ? () => context
-                                        .read<FaceEnrollmentBloc>()
-                                        .add(PhotoRemoved(
-                                            type: FacePhotoType.rightProfile))
+                                          .read<FaceEnrollmentBloc>()
+                                          .add(
+                                            PhotoRemoved(
+                                              type: FacePhotoType.rightProfile,
+                                            ),
+                                          )
                                     : null,
                               ),
                             ),
@@ -188,11 +201,12 @@ class FaceEnrollmentScreen extends StatelessWidget {
                           isOptional: true,
                           label: 'Extra View 1',
                           isLoading: loadingType == FacePhotoType.extra1,
-                          onTap: () => _pickPhoto(context, FacePhotoType.extra1),
+                          onTap: () =>
+                              _pickPhoto(context, FacePhotoType.extra1),
                           onDelete: photos[FacePhotoType.extra1] != null
-                              ? () => context
-                                  .read<FaceEnrollmentBloc>()
-                                  .add(PhotoRemoved(type: FacePhotoType.extra1))
+                              ? () => context.read<FaceEnrollmentBloc>().add(
+                                  PhotoRemoved(type: FacePhotoType.extra1),
+                                )
                               : null,
                         ),
                         SizedBox(height: context.heightCalculated(12)),
@@ -203,11 +217,12 @@ class FaceEnrollmentScreen extends StatelessWidget {
                           isOptional: true,
                           label: 'Extra View 2',
                           isLoading: loadingType == FacePhotoType.extra2,
-                          onTap: () => _pickPhoto(context, FacePhotoType.extra2),
+                          onTap: () =>
+                              _pickPhoto(context, FacePhotoType.extra2),
                           onDelete: photos[FacePhotoType.extra2] != null
-                              ? () => context
-                                  .read<FaceEnrollmentBloc>()
-                                  .add(PhotoRemoved(type: FacePhotoType.extra2))
+                              ? () => context.read<FaceEnrollmentBloc>().add(
+                                  PhotoRemoved(type: FacePhotoType.extra2),
+                                )
                               : null,
                         ),
                         SizedBox(height: context.heightCalculated(16)),
@@ -240,12 +255,11 @@ class FaceEnrollmentScreen extends StatelessWidget {
                         SizedBox(
                           height: context.heightCalculated(52),
                           child: ElevatedButton(
-                            onPressed:
-                                canSubmit && !isLoading
-                                    ? () => context
-                                        .read<FaceEnrollmentBloc>()
-                                        .add(EnrollmentSubmitted())
-                                    : null,
+                            onPressed: canSubmit && !isLoading
+                                ? () => context.read<FaceEnrollmentBloc>().add(
+                                    EnrollmentSubmitted(),
+                                  )
+                                : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: canSubmit
                                   ? AppTheme.primaryColor
@@ -254,7 +268,9 @@ class FaceEnrollmentScreen extends StatelessWidget {
                                   ? Colors.black
                                   : Colors.white,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusMd,
+                                ),
                               ),
                             ),
                             child: isLoading
@@ -272,14 +288,20 @@ class FaceEnrollmentScreen extends StatelessWidget {
                                       Text(
                                         'Start Enrollment',
                                         style: tt.titleLarge?.copyWith(
-                                          color: canSubmit ? Colors.black : Colors.white,
+                                          color: canSubmit
+                                              ? Colors.black
+                                              : Colors.white,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(width: context.widthCalculated(6)),
+                                      SizedBox(
+                                        width: context.widthCalculated(6),
+                                      ),
                                       Icon(
                                         Icons.arrow_forward,
-                                        color: canSubmit ? Colors.black : Colors.white,
+                                        color: canSubmit
+                                            ? Colors.black
+                                            : Colors.white,
                                         size: context.iconSize(),
                                       ),
                                     ],

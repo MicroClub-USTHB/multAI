@@ -21,6 +21,7 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   //
+
   @override
   Future<Either<Failure, String?>> getToken() async {
     try {
@@ -52,7 +53,6 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       apiClient.setAccessToken(result.accessToken);
       await sharedPreferences.setString('access_token', result.accessToken);
-
       return Right(result);
     } on Failure catch (f) {
       return Left(f);

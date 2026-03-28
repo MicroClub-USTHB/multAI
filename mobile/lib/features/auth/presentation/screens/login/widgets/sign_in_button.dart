@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/extensions.dart';
- 
+
 class SignInButton extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onPressed;
- 
+
   const SignInButton({
     super.key,
     required this.isLoading,
     required this.onPressed,
   });
- 
+
   @override
   Widget build(BuildContext context) {
     final cs = context.theme.colorScheme;
     final tt = context.textTheme;
- 
+
     return SizedBox(
       height: context.heightCalculated(52),
       width: double.infinity,
@@ -53,4 +53,3 @@ class SignInButton extends StatelessWidget {
     );
   }
 }
- 

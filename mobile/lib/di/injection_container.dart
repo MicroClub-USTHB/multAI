@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:multai_mobile/features/auth/data/datasource/fake.dart';
 import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -78,8 +79,12 @@ FutureOr<void> init() async {
   );
 
   // ── Auth Data Source ────────────────────────────────────────────────────────
+  // sl.registerLazySingleton<AuthRemoteDataSource>(
+  //   () => AuthRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  // );
+  //test
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+    () => FakeAuthRemoteDataSource(),
   );
 
   // ── Auth Repository ─────────────────────────────────────────────────────────

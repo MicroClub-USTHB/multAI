@@ -3,7 +3,7 @@ class SessionEntity {
   final String deviceId;
   final DateTime lastActive;
   final DateTime expiresAt;
- 
+
   const SessionEntity({
     required this.sessionId,
     required this.deviceId,
@@ -11,4 +11,3 @@ class SessionEntity {
     required this.expiresAt,
   });
 }
- 

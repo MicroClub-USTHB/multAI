@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:multai_mobile/core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/theme.dart';
 import 'package:multai_mobile/core/usecase/usecase.dart';
 import 'package:multai_mobile/di/injection_container.dart';
+import 'package:multai_mobile/features/onboarding/domain/usecases/get_onboarding_seen.dart';
 import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
 import 'package:multai_mobile/features/splash/presentation/widget/splash_footer.dart';
 import 'package:multai_mobile/features/splash/presentation/widget/splash_logo.dart';
@@ -26,17 +28,22 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkAuthAndNavigate() async {
     await Future.delayed(const Duration(seconds: 3));
 
-    final isUserLoggedIn = await sl<IsUserLoggedIn>();
+    final getOnboardingSeen = sl<GetOnboardingSeen>();
+    final hasSeenOnboarding = await getOnboardingSeen();
+    if (!mounted) return;
+    if (!hasSeenOnboarding) {
+      context.go('/onboarding');
+      return;
+    }
 
+    final isUserLoggedIn = sl<IsUserLoggedIn>();
     final result = await isUserLoggedIn(NoParams());
 
-    if (!mounted) return;
-
-    result.fold((failure) => context.go('/onboarding'), (isLoggedIn) {
+    result.fold((failure) => context.go(AppRoutes.login), (isLoggedIn) {
       if (isLoggedIn) {
-        context.go('/home');
+        context.go('/home/events');
       } else {
-        context.go('/onboarding');
+        context.go(AppRoutes.login);
       }
     });
   }

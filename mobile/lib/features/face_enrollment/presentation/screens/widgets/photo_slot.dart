@@ -137,7 +137,9 @@ class _PhotoSlotState extends State<PhotoSlot> {
     if (widget.isOptional) {
       return Text(
         slotLabel,
-        style: tt.labelMedium?.copyWith(color: cs.onSurface.withValues(alpha: 0.5)),
+        style: tt.labelMedium?.copyWith(
+          color: cs.onSurface.withValues(alpha: 0.5),
+        ),
       );
     }
 
@@ -154,7 +156,9 @@ class _PhotoSlotState extends State<PhotoSlot> {
         if (!_hasPhoto)
           Text(
             'Required',
-            style: tt.labelSmall?.copyWith(color: cs.onSurface.withValues(alpha: 0.5)),
+            style: tt.labelSmall?.copyWith(
+              color: cs.onSurface.withValues(alpha: 0.5),
+            ),
           ),
         if (widget.type.isPrimary && _hasPhoto)
           Text(
@@ -228,7 +232,12 @@ class _FilledSlot extends StatelessWidget {
           Positioned(
             top: context.heightCalculated(8),
             left: context.widthCalculated(8),
-            child: _badge(context, 'PRIMARY', AppTheme.primaryColor, Colors.black),
+            child: _badge(
+              context,
+              'PRIMARY',
+              AppTheme.primaryColor,
+              Colors.black,
+            ),
           ),
         if (onDelete != null)
           Positioned(
@@ -242,7 +251,11 @@ class _FilledSlot extends StatelessWidget {
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 ),
-                child: Icon(Icons.delete_outline, size: context.iconSize(), color: Colors.white),
+                child: Icon(
+                  Icons.delete_outline,
+                  size: context.iconSize(),
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
@@ -262,7 +275,11 @@ class _FilledSlot extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: context.textTheme.labelSmall?.copyWith(color: fg, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+        style: context.textTheme.labelSmall?.copyWith(
+          color: fg,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }

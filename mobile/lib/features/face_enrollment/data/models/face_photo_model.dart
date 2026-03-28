@@ -1,11 +1,8 @@
 import '../../domain/entities/face_photo_entity.dart';
- 
+
 class FacePhotoModel extends FacePhotoEntity {
-  const FacePhotoModel({
-    required super.type,
-    required super.filePath,
-  });
- 
+  const FacePhotoModel({required super.type, required super.filePath});
+
   String get fieldName {
     switch (type) {
       case FacePhotoType.frontal:
@@ -21,4 +18,3 @@ class FacePhotoModel extends FacePhotoEntity {
     }
   }
 }
- 

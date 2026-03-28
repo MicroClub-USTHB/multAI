@@ -3,7 +3,7 @@
 // @immutable
 // abstract class SplashState extends Equatable {
 //   const SplashState();
-  
+
 //   @override
 //   List<Object> get props => [];
 // }
@@ -18,18 +18,18 @@
 
 // class SplashLoaded extends SplashState {
 //   final String route;
-  
+
 //   const SplashLoaded({required this.route});
-  
+
 //   @override
 //   List<Object> get props => [route];
 // }
 
 // class SplashError extends SplashState {
 //   final String message;
-  
+
 //   const SplashError({required this.message});
-  
+
 //   @override
 //   List<Object> get props => [message];
 // }
