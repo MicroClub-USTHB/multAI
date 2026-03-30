@@ -1,17 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-	createAdminUser,
-	deleteAdminUser,
-	getAdminUsers,
-	updateAdminUserRole,
-} from './api'
+
 import type {
 	AdminUser,
 	CreateAdminUserInput,
 	UpdateAdminUserRoleInput,
 } from './types'
 
-export const ADMIN_USERS_QUERY_KEY = ['admin', 'users'] as const
+import {
+	createAdminUser,
+	deleteAdminUser,
+	updateAdminUserRole,
+} from './api'
+import { ADMIN_USERS_QUERY_KEY } from './constants'
+import { adminUsersQueryOptions } from './query-options'
 
 const upsertUserInCache = (users: AdminUser[] | undefined, updated: AdminUser) => {
 	if (!users) {
@@ -35,10 +36,7 @@ const removeUserFromCache = (users: AdminUser[] | undefined, removedId: string) 
 }
 
 export function useAdminUsersQuery() {
-	return useQuery({
-		queryKey: ADMIN_USERS_QUERY_KEY,
-		queryFn: getAdminUsers,
-	})
+	return useQuery(adminUsersQueryOptions())
 }
 
 export function useUpdateAdminUserRoleMutation() {
@@ -88,10 +86,6 @@ export function useAdminUsers() {
 
 	return {
 		users: usersQuery.data ?? [],
-		isLoading: usersQuery.isLoading,
-		isError: usersQuery.isError,
-		error: usersQuery.error,
-		refetch: usersQuery.refetch,
 		updateRole: roleMutation.mutateAsync,
 		createUser: createMutation.mutateAsync,
 		deleteUser: deleteUserMutation.mutateAsync,
