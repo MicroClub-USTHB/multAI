@@ -2,22 +2,19 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Plus, Search, Shield, UserCog, Users } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { AdminUsersApiError } from '@/features/admin/users/api'
 import {
   CreateUserDialog,
   DeleteUserConfirmDialog,
   UsersTable,
 } from '@/features/admin/users/components'
 import { useAdminUsers } from '@/features/admin/users/hooks'
+import { adminUsersQueryOptions } from '@/features/admin/users/query-options'
 import {
   ADMIN_USER_ROLES,
   type AdminUser,
   type AdminUserRole,
 } from '@/features/admin/users/types'
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
   Button,
   Card,
   CardContent,
@@ -27,24 +24,22 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Skeleton,
 } from '@/shared/ui'
 
+import { AdminUsersError } from './-admin-users-error'
+import { AdminUsersPending } from './-admin-users-pending'
+
 export const Route = createFileRoute('/admin/users')({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(adminUsersQueryOptions())
+  },
+  pendingComponent: AdminUsersPending,
+  errorComponent: AdminUsersError,
   component: UsersPage,
 })
 
 function UsersPage() {
-  const {
-    users,
-    isLoading,
-    isError,
-    error,
-    updateRole,
-    createUser,
-    deleteUser,
-    isMutating,
-  } = useAdminUsers()
+  const { users, updateRole, createUser, deleteUser, isMutating } = useAdminUsers()
 
   const [searchValue, setSearchValue] = useState('')
   const [roleFilter, setRoleFilter] = useState<'all' | AdminUserRole>('all')
@@ -76,13 +71,6 @@ function UsersPage() {
 
     return { total, admins, teamLeads, multis }
   }, [users])
-
-  const errorMessage =
-    error instanceof AdminUsersApiError && error.status === 401
-      ? 'Your admin session is missing or has expired. Please log in again to restore it.'
-      : error instanceof Error
-        ? error.message
-        : 'Unknown error'
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-6">
@@ -137,32 +125,17 @@ function UsersPage() {
             </Select>
           </div>
 
-          {isError && (
-            <Alert variant="destructive">
-              <AlertTitle>Failed to load users</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
-          )}
-
-          {isLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : (
-            <UsersTable
-              users={filteredUsers}
-              onRoleChange={(user, role) =>
-                updateRole({ userId: user.id, role, email: user.email })
-              }
-              onDeleteUser={user => {
-                setSelectedUserToDelete(user)
-                setIsDeleteDialogOpen(true)
-              }}
-              isMutating={isMutating}
-            />
-          )}
+          <UsersTable
+            users={filteredUsers}
+            onRoleChange={(user, role) =>
+              updateRole({ userId: user.id, role, email: user.email })
+            }
+            onDeleteUser={user => {
+              setSelectedUserToDelete(user)
+              setIsDeleteDialogOpen(true)
+            }}
+            isMutating={isMutating}
+          />
         </CardContent>
       </Card>
 
