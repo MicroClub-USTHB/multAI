@@ -29,54 +29,11 @@ export class AdminUsersApiError extends Error {
 	}
 }
 
-function getAuthToken() {
-	if (typeof window === 'undefined') {
-		return null
-	}
-
-	return (
-		window.localStorage.getItem('admin_access_token') ??
-		window.localStorage.getItem('adminToken') ??
-		window.localStorage.getItem('access_token') ??
-		window.localStorage.getItem('token') ??
-		window.sessionStorage.getItem('admin_access_token') ??
-		window.sessionStorage.getItem('access_token')
-	)
-}
-
-function ensureAccessTokenCookie(token: string | null) {
-	if (typeof document === 'undefined' || !token) {
-		return
-	}
-
-	const encoded = encodeURIComponent(token)
-	if (document.cookie.includes(`access_token=${encoded}`)) {
-		return
-	}
-
-	document.cookie = `access_token=${encoded}; path=/; SameSite=Lax`
-}
-
-function buildHeaders(extra?: Record<string, string>) {
-	const token = getAuthToken()
-
-	return {
-		...(token ? { Authorization: `Bearer ${token}` } : {}),
-		...(extra ?? {}),
-	}
-}
-
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
-	const token = getAuthToken()
-	ensureAccessTokenCookie(token)
-
 	const response = await fetch(`${API_BASE_URL}${path}`, {
 		...init,
 		credentials: 'include',
-		headers: {
-			...buildHeaders(),
-			...(init?.headers ?? {}),
-		},
+		headers: init?.headers,
 	})
 
 	if (!response.ok) {
@@ -155,9 +112,9 @@ export async function updateAdminUserRole(
 		`/admin/staff-users/${input.userId}`,
 		{
 			method: 'PATCH',
-			headers: buildHeaders({
+			headers: {
 				'Content-Type': 'application/json',
-			}),
+			},
 			body: JSON.stringify({
 				email: input.email ?? null,
 				role: roleToApi(input.role),
@@ -173,9 +130,9 @@ export async function createAdminUser(
 ): Promise<AdminUser> {
 	const created = await requestJson<StaffUserSchema>('/admin/staff-users/', {
 		method: 'POST',
-		headers: buildHeaders({
+		headers: {
 			'Content-Type': 'application/json',
-		}),
+		},
 		body: JSON.stringify({
 			email: input.email,
 			password: input.password,
@@ -189,7 +146,6 @@ export async function createAdminUser(
 export async function deleteAdminUser(userId: string): Promise<{ id: string }> {
 	await requestJson<StaffUserSchema>(`/admin/staff-users/${userId}`, {
 		method: 'DELETE',
-		headers: buildHeaders(),
 	})
 
 	return { id: userId }

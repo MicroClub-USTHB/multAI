@@ -1,17 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Plus, Search, Shield, UserCog, Users } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Alert, AlertDescription, AlertTitle } from '@/shared/ui/alert'
-import { Button } from '@/shared/ui/button'
-import { Card, CardContent } from '@/shared/ui/card'
-import { Input } from '@/shared/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui/select'
-import { Skeleton } from '@/shared/ui/skeleton'
+
+import { AdminUsersApiError } from '@/features/admin/users/api'
 import {
   CreateUserDialog,
   DeleteUserConfirmDialog,
@@ -23,8 +14,21 @@ import {
   type AdminUser,
   type AdminUserRole,
 } from '@/features/admin/users/types'
-import { Plus, Search, Shield, UserCog, Users } from 'lucide-react'
-import { AdminUsersApiError } from '@/features/admin/users/api'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Card,
+  CardContent,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Skeleton,
+} from '@/shared/ui'
 
 export const Route = createFileRoute('/admin/users')({
   component: UsersPage,
@@ -75,7 +79,7 @@ function UsersPage() {
 
   const errorMessage =
     error instanceof AdminUsersApiError && error.status === 401
-      ? 'Session admin absente. Connecte-toi et assure-toi que le token est bien present (cookie access_token ou localStorage admin_access_token).'
+      ? 'Your admin session is missing or has expired. Please log in again to restore it.'
       : error instanceof Error
         ? error.message
         : 'Unknown error'
