@@ -1,7 +1,10 @@
-import { Avatar, AvatarFallback } from '@/shared/ui/avatar'
-import { Badge } from '@/shared/ui/badge'
-import { Button } from '@/shared/ui/button'
+import { MoreHorizontal, UserX } from 'lucide-react'
+
 import {
+	Avatar,
+	AvatarFallback,
+	Badge,
+	Button,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuGroup,
@@ -9,17 +12,15 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu'
-import {
 	Table,
 	TableBody,
 	TableCell,
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '@/shared/ui/table'
+} from '@/shared/ui'
 import { cn, getInitials } from '@/shared/utils/helpers'
-import { MoreHorizontal, UserX } from 'lucide-react'
+
 import {
 	ADMIN_USER_EDITABLE_ROLES,
 	type AdminUser,

@@ -1,14 +1,18 @@
 import { useState } from 'react'
-import { Alert, AlertDescription, AlertTitle } from '@/shared/ui/alert'
-import { Button } from '@/shared/ui/button'
+
 import {
+	Alert,
+	AlertDescription,
+	AlertTitle,
+	Button,
 	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from '@/shared/ui/dialog'
+} from '@/shared/ui'
+
 import type { AdminUser } from '../types'
 
 type DeleteUserConfirmDialogProps = {

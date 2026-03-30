@@ -1,22 +1,24 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, AlertDescription, AlertTitle } from '@/shared/ui/alert'
-import { Button } from '@/shared/ui/button'
+
 import {
+	Alert,
+	AlertDescription,
+	AlertTitle,
+	Button,
 	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from '@/shared/ui/dialog'
-import { Input } from '@/shared/ui/input'
-import {
+	Input,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/shared/ui/select'
+} from '@/shared/ui'
+
 import {
 	ADMIN_USER_EDITABLE_ROLES,
 	type CreateAdminUserInput,
