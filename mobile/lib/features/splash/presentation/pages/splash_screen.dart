@@ -1,56 +1,31 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:multai_mobile/core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/theme.dart';
-import 'package:multai_mobile/core/usecase/usecase.dart';
 import 'package:multai_mobile/di/injection_container.dart';
-import 'package:multai_mobile/features/onboarding/domain/usecases/get_onboarding_seen.dart';
-import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
+import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:multai_mobile/features/splash/presentation/widget/splash_footer.dart';
 import 'package:multai_mobile/features/splash/presentation/widget/splash_logo.dart';
 import 'package:multai_mobile/features/splash/presentation/widget/splash_progress_section.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _checkAuthAndNavigate();
-  }
-
-  Future<void> _checkAuthAndNavigate() async {
-    await Future.delayed(const Duration(seconds: 3));
-
-    final getOnboardingSeen = sl<GetOnboardingSeen>();
-    final hasSeenOnboarding = await getOnboardingSeen();
-    if (!mounted) return;
-    if (!hasSeenOnboarding) {
-      context.go('/onboarding');
-      return;
-    }
-
-    final isUserLoggedIn = sl<IsUserLoggedIn>();
-    final result = await isUserLoggedIn(NoParams());
-
-    result.fold((failure) => context.go(AppRoutes.login), (isLoggedIn) {
-      if (isLoggedIn) {
-        context.go('/home/events');
-      } else {
-        context.go(AppRoutes.login);
-      }
-    });
-  }
-
-  @override
+   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocProvider(
+      create : (context) => sl<SplashBloc>()..add(const InitializeApp()),
+      child: BlocListener<SplashBloc, SplashState>(
+        listener:(context, state) {
+          if (state is SplashError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          } else if (state is SplashLoaded) {
+            context.go(state.route);
+          }
+        },  
+        child: Scaffold(
       backgroundColor: AppTheme.splashBackgroundColor,
       body: Stack(
         children: [
@@ -74,6 +49,9 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ],
       ),
+    ),
+      ),
+   
     );
   }
 
@@ -90,4 +68,33 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
+
 }
+
+
+
+  // Future<void> _checkAuthAndNavigate() async {
+  //   await Future.delayed(const Duration(seconds: 3));
+
+  //   final getOnboardingSeen = sl<GetOnboardingSeen>();
+  //   final hasSeenOnboarding = await getOnboardingSeen();
+  //   if (!mounted) return;
+  //   if (!hasSeenOnboarding) {
+  //     context.go('/onboarding');
+  //     return;
+  //   }
+
+  //   final isUserLoggedIn = sl<IsUserLoggedIn>();
+  //   final result = await isUserLoggedIn(NoParams());
+
+  //   result.fold((failure) => context.go(AppRoutes.login), (isLoggedIn) {
+  //     if (isLoggedIn) {
+  //       context.go('/home/events');
+  //     } else {
+  //       context.go(AppRoutes.login);
+  //     }
+  //   });
+  // }
+
+ 
+

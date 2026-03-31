@@ -1,13 +1,13 @@
-// part of 'splash_bloc.dart';
+part of 'splash_bloc.dart';
 
-// @immutable
-// sealed class SplashEvent extends Equatable {
-//   const SplashEvent();
+@immutable
+sealed class SplashEvent extends Equatable {
+  const SplashEvent();
 
-//   @override
-//   List<Object?> get props => [];
-// }
+  @override
+  List<Object?> get props => [];
+}
 
-// class InitializeApp extends SplashEvent {
-//   const InitializeApp();
-// }
+class InitializeApp extends SplashEvent {
+  const InitializeApp();
+}

@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:multai_mobile/features/auth/data/datasource/fake.dart';
 import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
+import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -60,6 +61,13 @@ FutureOr<void> init() async {
   sl.registerLazySingleton(
     () => ApiClient(client: sl<http.Client>(), networkInfo: sl<NetworkInfo>()),
   );
+  // ── Onboarding ─────────────────────────────────────────────────────────────
+  sl.registerFactory<SplashBloc>(
+    () => SplashBloc(
+      getOnboardingSeen: sl<GetOnboardingSeen>(),
+      isUserLoggedIn: sl<IsUserLoggedIn>(),
+    )
+  );
 
   // ── Onboarding ─────────────────────────────────────────────────────────────
   sl.registerLazySingleton<OnboardingRepository>(
@@ -82,6 +90,7 @@ FutureOr<void> init() async {
   // sl.registerLazySingleton<AuthRemoteDataSource>(
   //   () => AuthRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   // );
+
   //test
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => FakeAuthRemoteDataSource(),
