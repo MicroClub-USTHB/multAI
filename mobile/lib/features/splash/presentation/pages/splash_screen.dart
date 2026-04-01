@@ -11,47 +11,46 @@ import 'package:multai_mobile/features/splash/presentation/widget/splash_progres
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create : (context) => sl<SplashBloc>()..add(const InitializeApp()),
+      create: (context) => sl<SplashBloc>()..add(const InitializeApp()),
       child: BlocListener<SplashBloc, SplashState>(
-        listener:(context, state) {
+        listener: (context, state) {
           if (state is SplashError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           } else if (state is SplashLoaded) {
             context.go(state.route);
           }
-        },  
+        },
         child: Scaffold(
-      backgroundColor: AppTheme.splashBackgroundColor,
-      body: Stack(
-        children: [
-          _buildGlow(Alignment.topLeft),
-          _buildGlow(Alignment.bottomRight),
-          const SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(AppTheme.spacingLg),
-              child: Column(
-                children: [
-                  Spacer(flex: 3),
-                  SplashLogo(),
-                  Spacer(flex: 1),
-                  SplashProgressSection(),
-                  Spacer(flex: 3),
-                  SplashFooter(),
-                  SizedBox(height: AppTheme.spacingLg),
-                ],
+          backgroundColor: AppTheme.splashBackgroundColor,
+          body: Stack(
+            children: [
+              _buildGlow(Alignment.topLeft),
+              _buildGlow(Alignment.bottomRight),
+              const SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.all(AppTheme.spacingLg),
+                  child: Column(
+                    children: [
+                      Spacer(flex: 3),
+                      SplashLogo(),
+                      Spacer(flex: 1),
+                      SplashProgressSection(),
+                      Spacer(flex: 3),
+                      SplashFooter(),
+                      SizedBox(height: AppTheme.spacingLg),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
-    ),
-      ),
-   
     );
   }
 
@@ -68,33 +67,27 @@ class SplashScreen extends StatelessWidget {
       ),
     );
   }
-
 }
 
+// Future<void> _checkAuthAndNavigate() async {
+//   await Future.delayed(const Duration(seconds: 3));
 
+//   final getOnboardingSeen = sl<GetOnboardingSeen>();
+//   final hasSeenOnboarding = await getOnboardingSeen();
+//   if (!mounted) return;
+//   if (!hasSeenOnboarding) {
+//     context.go('/onboarding');
+//     return;
+//   }
 
-  // Future<void> _checkAuthAndNavigate() async {
-  //   await Future.delayed(const Duration(seconds: 3));
+//   final isUserLoggedIn = sl<IsUserLoggedIn>();
+//   final result = await isUserLoggedIn(NoParams());
 
-  //   final getOnboardingSeen = sl<GetOnboardingSeen>();
-  //   final hasSeenOnboarding = await getOnboardingSeen();
-  //   if (!mounted) return;
-  //   if (!hasSeenOnboarding) {
-  //     context.go('/onboarding');
-  //     return;
-  //   }
-
-  //   final isUserLoggedIn = sl<IsUserLoggedIn>();
-  //   final result = await isUserLoggedIn(NoParams());
-
-  //   result.fold((failure) => context.go(AppRoutes.login), (isLoggedIn) {
-  //     if (isLoggedIn) {
-  //       context.go('/home/events');
-  //     } else {
-  //       context.go(AppRoutes.login);
-  //     }
-  //   });
-  // }
-
- 
-
+//   result.fold((failure) => context.go(AppRoutes.login), (isLoggedIn) {
+//     if (isLoggedIn) {
+//       context.go('/home/events');
+//     } else {
+//       context.go(AppRoutes.login);
+//     }
+//   });
+// }

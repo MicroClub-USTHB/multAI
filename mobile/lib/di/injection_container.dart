@@ -66,7 +66,7 @@ FutureOr<void> init() async {
     () => SplashBloc(
       getOnboardingSeen: sl<GetOnboardingSeen>(),
       isUserLoggedIn: sl<IsUserLoggedIn>(),
-    )
+    ),
   );
 
   // ── Onboarding ─────────────────────────────────────────────────────────────
@@ -87,13 +87,8 @@ FutureOr<void> init() async {
   );
 
   // ── Auth Data Source ────────────────────────────────────────────────────────
-  // sl.registerLazySingleton<AuthRemoteDataSource>(
-  //   () => AuthRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
-  // );
-
-  //test
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => FakeAuthRemoteDataSource(),
+    () => AuthRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
 
   // ── Auth Repository ─────────────────────────────────────────────────────────

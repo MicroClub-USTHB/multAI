@@ -29,5 +29,4 @@ class OnboardingError extends OnboardingState {
 
   @override
   List<Object> get props => [message];
-
 }
