@@ -13,4 +13,7 @@ class EndPoints {
   static const String faceEnrollment = '/face-enrollment/upload';
   //── account ─────────────────────────────────────────────────────────────────
   static const String account = '/account';
+  // events
+  static const String userEvents = '/user/event/me';
+  static const String joinEvent  = '/user/event/join';
 }
