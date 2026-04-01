@@ -14,7 +14,7 @@ class RevokePushTokenUsecase extends UseCase<void, RevokePushTokenParams> {
   final NotificationsRepository repository;
   RevokePushTokenUsecase(this.repository);
   @override
-  FutureOr<Either<Failure, void>> call(RevokePushTokenParams params) {
+  Future<Either<Failure, void>> call(RevokePushTokenParams params) {
     return repository.revokePushToken(params.token);
   }
 }

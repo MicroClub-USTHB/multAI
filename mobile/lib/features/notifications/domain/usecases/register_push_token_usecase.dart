@@ -15,7 +15,7 @@ class RegisterPushTokenUseCase extends UseCase<void, RegisterPushTokenParams> {
   final NotificationsRepository repository;
   RegisterPushTokenUseCase(this.repository);
   @override
-  FutureOr<Either<Failure, void>> call(RegisterPushTokenParams params) {
+  Future<Either<Failure, void>> call(RegisterPushTokenParams params) {
     return repository.registerPushToken(token: params.token, platform: params.platform);
   }
 }

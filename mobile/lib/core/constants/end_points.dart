@@ -13,4 +13,11 @@ class EndPoints {
   static const String faceEnrollment = '/face-enrollment/upload';
   //── account ─────────────────────────────────────────────────────────────────
   static const String account = '/account';
+  static const String revokeDevice = '/auth/devices';
+
+  // ── Notifications ──────────────────────────────────────────────────────────
+  static const String notifications = '/notifications';
+  static const String notificationsReads = '/notifications/read';
+  static const String registerPushToken = '/notifications/push-token/register';
+  static const String revokePushToken = '/notifications/push-token/revoke';
 }

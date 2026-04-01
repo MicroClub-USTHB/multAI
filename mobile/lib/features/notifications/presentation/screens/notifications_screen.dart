@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../core/extensions/extensions.dart';
+import '../../../../core/extensions/snackbar_extensions.dart';
+import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../core/theme/theme.dart';
 import '../bloc/notifications_bloc.dart';
 import '../widgets/notification_tile.dart';

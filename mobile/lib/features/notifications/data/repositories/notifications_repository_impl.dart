@@ -5,7 +5,7 @@ import '../../domain/repositories/notifications_repository.dart';
 import '../datasources/notifications_remote_datasource.dart';
 
 class NotificationRepositoryImpl implements NotificationsRepository {
-  final NotificationRemoteDataSourceImpl remoteDataSource;
+  final NotificationRemoteDataSource remoteDataSource;
   NotificationRepositoryImpl({required this.remoteDataSource});
   @override
   Future<Either<Failure, List<NotificationEntity>>> getNotifications() async {

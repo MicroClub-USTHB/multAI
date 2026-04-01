@@ -44,6 +44,18 @@ import '../features/account/data/repositories/account_repository_impl.dart';
 import '../features/account/domain/repositories/account_repository.dart';
 import '../features/account/domain/usecases/get_account_data_usecase.dart';
 import '../features/account/presentation/bloc/account_bloc.dart';
+// notifi
+import '../features/notifications/data/datasources/notifications_remote_datasource.dart';
+import '../features/notifications/data/repositories/notifications_repository_impl.dart';
+import '../features/notifications/domain/repositories/notifications_repository.dart';
+import '../features/notifications/domain/usecases/get_notifications_usecase.dart';
+import '../features/notifications/domain/usecases/mark_all_as_read_usecase.dart';
+import '../features/notifications/domain/usecases/mark_as_read_usecase.dart';
+import '../features/notifications/domain/usecases/register_push_token_usecase.dart';
+import '../features/notifications/domain/usecases/revoke_push_token_usecase.dart';
+import '../features/notifications/presentation/bloc/notifications_bloc.dart';
+import '../features/notifications/services/push_notification_service.dart';
+
 
 final sl = GetIt.instance;
 
@@ -188,6 +200,51 @@ FutureOr<void> init() async {
     () => AccountBloc(
       getAccountData: sl<GetAccountDataUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
+  // Notification Remote DataSource
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  // Notification Repository
+  sl.registerLazySingleton< NotificationsRepository>(
+    () => NotificationRepositoryImpl(
+      remoteDataSource: sl<NotificationRemoteDataSource>(),
+      
+    ),
+  );
+
+  // Notification Use Cases
+  sl.registerLazySingleton(
+    () => GetNotificationsUsecase(sl< NotificationsRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => MarkAsReadUsecase(sl< NotificationsRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => MarkAllAsReadUsecase(sl< NotificationsRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => RegisterPushTokenUseCase(sl< NotificationsRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => RevokePushTokenUsecase(sl< NotificationsRepository>()),
+  );
+
+  // Push Notification Service
+  sl.registerLazySingleton(
+    () => PushNotificationService(
+      registerToken: sl<RegisterPushTokenUseCase>(),
+      revokeToken: sl<RevokePushTokenUsecase>(),
+    ),
+  );
+
+  // Notification BLoC
+  sl.registerFactory<NotificationBloc>(
+    () => NotificationBloc(
+      getNotifications: sl<GetNotificationsUsecase>(),
+      markAsRead: sl<MarkAsReadUsecase>(),
+      markAllAsRead: sl<MarkAllAsReadUsecase>(),
+      registerPushToken: sl<RegisterPushTokenUseCase>(),
     ),
   );
 }

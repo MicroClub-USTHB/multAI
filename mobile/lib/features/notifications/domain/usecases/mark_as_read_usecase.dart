@@ -13,6 +13,6 @@ class MarkAsReadUsecase extends UseCase<void, MarkAsReadParams> {
   MarkAsReadUsecase(this.repository);
   @override
   Future<Either<Failure, void>> call(MarkAsReadParams params) {
-    return repository.markAsRead();
+    return repository.markAsRead(params.notificationId);
   }
 }

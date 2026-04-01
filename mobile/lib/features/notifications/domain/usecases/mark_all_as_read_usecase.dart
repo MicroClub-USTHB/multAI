@@ -9,7 +9,7 @@ class MarkAllAsReadUsecase extends UseCase<void, NoParams> {
   final NotificationsRepository repository;
   MarkAllAsReadUsecase(this.repository);
   @override
-  FutureOr<Either<Failure, void>> call(NoParams params) {
+  Future<Either<Failure, void>> call(NoParams params) {
     return repository.markAllAsRead();
   }
 }
