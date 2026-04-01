@@ -13,12 +13,10 @@ class ApiClient {
 
   String? _accessToken;
 
-  ApiClient({
-    required http.Client client,
-    required NetworkInfo networkInfo,
-  })  : _client = client,
-        _networkInfo = networkInfo,
-        baseUrl = EndPoints.baseUrl;
+  ApiClient({required http.Client client, required NetworkInfo networkInfo})
+    : _client = client,
+      _networkInfo = networkInfo,
+      baseUrl = EndPoints.baseUrl;
 
   void setAccessToken(String token) => _accessToken = token;
   void clearAccessToken() => _accessToken = null;
@@ -26,9 +24,9 @@ class ApiClient {
   String? get currentAccessToken => _accessToken;
 
   Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        if (_accessToken != null) 'Authorization': 'Bearer $_accessToken',
-      };
+    'Content-Type': 'application/json',
+    if (_accessToken != null) 'Authorization': 'Bearer $_accessToken',
+  };
 
   Future<void> checkConnection() async {
     if (!await _networkInfo.isConnected) {
@@ -60,10 +58,7 @@ class ApiClient {
     return _handleResponse(response);
   }
 
-  Future<void> postVoid(
-    String endpoint, {
-    bool requiresAuth = false,
-  }) async {
+  Future<void> postVoid(String endpoint, {bool requiresAuth = false}) async {
     await checkConnection();
     final response = await _client.post(
       Uri.parse('$baseUrl$endpoint'),
@@ -89,13 +84,16 @@ class ApiClient {
         throw ServerFailure(message: _parseError(response));
       case 401:
         throw const UnauthorizedFailure(
-            message: 'Session expired. Please log in again.');
+          message: 'Session expired. Please log in again.',
+        );
       case 403:
         throw const ServerFailure(message: 'Access denied.');
       case 404:
         throw const ServerFailure(message: 'Resource not found.');
       case 429:
-        throw const ServerFailure(message: 'Too many attempts. Try again later.');
+        throw const ServerFailure(
+          message: 'Too many attempts. Try again later.',
+        );
       case 500:
         throw const ServerFailure(message: 'Server error. Try again later.');
       default:
@@ -129,7 +127,7 @@ class ApiClient {
           stream,
           length,
           filename: file.path.split('/').last,
-          contentType: MediaType('image', 'jpeg'), 
+          contentType: MediaType('image', 'jpeg'),
         ),
       );
     }
@@ -139,7 +137,8 @@ class ApiClient {
 
     if (response.statusCode == 401) {
       throw const UnauthorizedFailure(
-          message: 'Session expired. Please log in again.');
+        message: 'Session expired. Please log in again.',
+      );
     }
 
     if (response.statusCode != 200 && response.statusCode != 201) {
@@ -159,13 +158,16 @@ class ApiClient {
         throw ServerFailure(message: _parseError(response));
       case 401:
         throw const UnauthorizedFailure(
-            message: 'Session expired. Please log in again.');
+          message: 'Session expired. Please log in again.',
+        );
       case 403:
         throw const ServerFailure(message: 'Access denied.');
       case 404:
         throw const ServerFailure(message: 'Resource not found.');
       case 429:
-        throw const ServerFailure(message: 'Too many attempts. Try again later.');
+        throw const ServerFailure(
+          message: 'Too many attempts. Try again later.',
+        );
       case 500:
         throw const ServerFailure(message: 'Server error. Try again later.');
       default:

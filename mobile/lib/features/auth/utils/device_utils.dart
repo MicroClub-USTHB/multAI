@@ -23,9 +23,7 @@ class DeviceUtils {
   static const _storage = FlutterSecureStorage();
   static const String _fingerprintKey = 'secure_device_fingerprint';
 
-
   static Future<DeviceData> getDeviceData() async {
-  
     String? storedFingerprint = await _storage.read(key: _fingerprintKey);
 
     DeviceData currentData;
@@ -43,7 +41,7 @@ class DeviceUtils {
     } catch (_) {
       currentData = _buildFallbackData();
     }
-    
+
     if (storedFingerprint != null) {
       return DeviceData(
         deviceName: currentData.deviceName,
@@ -95,7 +93,9 @@ class DeviceUtils {
   static DeviceData _buildFallbackData() {
     return DeviceData(
       deviceName: 'unknown',
-      platform: Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'unknown'),
+      platform: Platform.isAndroid
+          ? 'android'
+          : (Platform.isIOS ? 'ios' : 'unknown'),
       deviceId: 'unknown',
       deviceFingerprint: _generateFingerprint(['unknown']),
     );

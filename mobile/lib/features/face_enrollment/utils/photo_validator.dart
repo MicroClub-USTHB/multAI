@@ -9,11 +9,17 @@ import '../../../../core/errors/failure.dart';
 class PhotoProcessor {
   static const int _maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
   static const Set<String> _allowedExtensions = {
-    'jpg', 'jpeg', 'png', 'heic', 'webp',
+    'jpg',
+    'jpeg',
+    'png',
+    'heic',
+    'webp',
   };
 
   /// Processes a photo: Validates type -> Validates size -> Compresses
-  static Future<Either<Failure, File>> processAndValidate(String filePath) async {
+  static Future<Either<Failure, File>> processAndValidate(
+    String filePath,
+  ) async {
     try {
       final file = File(filePath);
 
@@ -25,24 +31,33 @@ class PhotoProcessor {
       // 2. Quick Check: Extension (Use Set.contains for O(1) lookup)
       final ext = p.extension(filePath).replaceFirst('.', '').toLowerCase();
       if (!_allowedExtensions.contains(ext)) {
-        return const Left(InvalidFileFormatFailure(
-          message: 'Invalid format. Use JPG, PNG, HEIC, or WEBP.',
-        ));
+        return const Left(
+          InvalidFileFormatFailure(
+            message: 'Invalid format. Use JPG, PNG, HEIC, or WEBP.',
+          ),
+        );
       }
 
       // 3. Heavy Check: Initial Size (Fail if even the raw file is astronomically large)
       // Note: We check size before compression to avoid processing 100MB+ files.
       final int initialSize = await file.length();
-      if (initialSize > _maxFileSizeBytes * 2) { // Allow some headroom before compression
-        return const Left(FileTooLargeFailure(message: 'Original image is too large.'));
+      if (initialSize > _maxFileSizeBytes * 2) {
+        // Allow some headroom before compression
+        return const Left(
+          FileTooLargeFailure(message: 'Original image is too large.'),
+        );
       }
 
       // 4. Transform: Compression
       final compressedFile = await _compressImage(file);
-      
+
       // 5. Final Size Validation
       if (await compressedFile.length() > _maxFileSizeBytes) {
-        return const Left(FileTooLargeFailure(message: 'Photo exceeds 5MB limit after compression.'));
+        return const Left(
+          FileTooLargeFailure(
+            message: 'Photo exceeds 5MB limit after compression.',
+          ),
+        );
       }
 
       return Right(compressedFile);
@@ -53,7 +68,10 @@ class PhotoProcessor {
 
   static Future<File> _compressImage(File file) async {
     final tempDir = await getTemporaryDirectory();
-    final targetPath = p.join(tempDir.path, '${DateTime.now().microsecondsSinceEpoch}.jpg');
+    final targetPath = p.join(
+      tempDir.path,
+      '${DateTime.now().microsecondsSinceEpoch}.jpg',
+    );
 
     final result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,

@@ -1,5 +1,3 @@
-// ignore_for_file: unused_element
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +14,6 @@ Map<String, String>? _pendingAuthTokens;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
-
 
   // Load .env with error handling - use defaults if file missing/corrupted
   try {
@@ -79,5 +76,18 @@ class _MyAppState extends State<MyApp> {
         routerConfig: appRouter,
       ),
     );
+    // return MaterialApp(
+    //   navigatorKey: _navigatorKey,
+    //   debugShowCheckedModeBanner: false,
+    //   theme: AppTheme.darkTheme,
+    //   home: const SplashScreen(),
+    // );
+    // return MaterialApp(
+    //   navigatorKey: _navigatorKey,
+    //   debugShowCheckedModeBanner: false,
+    //   theme: AppTheme.darkTheme,
+    //   // home: Scaffold(),
+    //   home: const SplashScreen(),
+    // );
   }
 }

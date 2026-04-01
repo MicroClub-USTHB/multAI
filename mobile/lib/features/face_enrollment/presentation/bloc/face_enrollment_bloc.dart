@@ -14,7 +14,6 @@ class FaceEnrollmentBloc
     extends Bloc<FaceEnrollmentEvent, FaceEnrollmentState> {
   final UploadFacePhotosUseCase _uploadFacePhotos;
   final SaveEnrollmentDoneUseCase _saveEnrollmentDone;
-  
 
   /// Stores compressed photo file paths
   final Map<FacePhotoType, String> _photos = {};
@@ -22,9 +21,9 @@ class FaceEnrollmentBloc
   FaceEnrollmentBloc({
     required UploadFacePhotosUseCase uploadFacePhotos,
     required SaveEnrollmentDoneUseCase saveEnrollmentDone,
-  })  : _uploadFacePhotos = uploadFacePhotos,
-        _saveEnrollmentDone = saveEnrollmentDone,
-        super(FaceEnrollmentInitial()) {
+  }) : _uploadFacePhotos = uploadFacePhotos,
+       _saveEnrollmentDone = saveEnrollmentDone,
+       super(FaceEnrollmentInitial()) {
     on<PhotoSelected>(_onPhotoSelected);
     on<PhotoRemoved>(_onPhotoRemoved);
     on<EnrollmentSubmitted>(_onEnrollmentSubmitted);
@@ -35,10 +34,9 @@ class FaceEnrollmentBloc
     PhotoSelected event,
     Emitter<FaceEnrollmentState> emit,
   ) async {
-    emit(FaceEnrollmentPhotoLoading(
-      type: event.type,
-      photos: Map.from(_photos),
-    ));
+    emit(
+      FaceEnrollmentPhotoLoading(type: event.type, photos: Map.from(_photos)),
+    );
     final validation = await PhotoProcessor.processAndValidate(event.filePath);
     validation.fold(
       (failure) {
@@ -58,10 +56,7 @@ class FaceEnrollmentBloc
   }
 
   /// Handles photo removal
-  void _onPhotoRemoved(
-    PhotoRemoved event,
-    Emitter<FaceEnrollmentState> emit,
-  ) {
+  void _onPhotoRemoved(PhotoRemoved event, Emitter<FaceEnrollmentState> emit) {
     _photos.remove(event.type);
     emit(FaceEnrollmentUpdated(photos: Map.from(_photos)));
   }
@@ -83,7 +78,8 @@ class FaceEnrollmentBloc
       );
 
       await result.fold(
-        (failure) async => emit(FaceEnrollmentFailure(message: failure.message)),
+        (failure) async =>
+            emit(FaceEnrollmentFailure(message: failure.message)),
         (_) async {
           await _saveEnrollmentDone();
           emit(FaceEnrollmentSuccess());

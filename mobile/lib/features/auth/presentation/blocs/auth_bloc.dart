@@ -27,12 +27,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required LogoutUseCase logoutUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
     required CheckEnrollmentDoneUseCase checkEnrollmentDone,
-  })  : _loginUseCase = loginUseCase,
-        _refreshTokenUseCase = refreshTokenUseCase,
-        _logoutUseCase = logoutUseCase,
-        _getCurrentUserUseCase = getCurrentUserUseCase,
-        _checkEnrollmentDone = checkEnrollmentDone,
-        super(AuthInitial()) {
+  }) : _loginUseCase = loginUseCase,
+       _refreshTokenUseCase = refreshTokenUseCase,
+       _logoutUseCase = logoutUseCase,
+       _getCurrentUserUseCase = getCurrentUserUseCase,
+       _checkEnrollmentDone = checkEnrollmentDone,
+       super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
     on<RefreshTokenRequested>(_onRefreshTokenRequested);
     on<LogoutRequested>(_onLogoutRequested);
@@ -91,7 +91,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       result.fold(
         (failure) => emit(AuthFailure(message: failure.message)),
-        (auth) => emit(AuthAuthenticated(auth: auth)), // assume enrollment done if token refreshed
+        (auth) => emit(
+          AuthAuthenticated(auth: auth),
+        ), // assume enrollment done if token refreshed
       );
     } catch (e) {
       emit(AuthFailure(message: e.toString()));

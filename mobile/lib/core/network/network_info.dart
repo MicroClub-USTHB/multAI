@@ -26,8 +26,9 @@ class NetworkInfoImpl implements NetworkInfo {
         return false;
       }
 
-      final hasInternet = await connectionChecker.hasInternetAccess
-        .timeout(const Duration(seconds: 10));
+      final hasInternet = await connectionChecker.hasInternetAccess.timeout(
+        const Duration(seconds: 10),
+      );
 
       return hasInternet;
     } catch (e) {

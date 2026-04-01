@@ -1,5 +1,5 @@
 import 'package:uuid/uuid.dart';
- 
+
 class DeviceEntity {
   final UuidValue id;
   final UuidValue userId;
@@ -9,7 +9,7 @@ class DeviceEntity {
   final bool revoked;
   final DateTime? lastSeen;
   final DateTime createdAt;
- 
+
   const DeviceEntity({
     required this.id,
     required this.userId,
@@ -21,4 +21,3 @@ class DeviceEntity {
     required this.createdAt,
   });
 }
- 

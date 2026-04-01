@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/extensions.dart';
 import '../../../../../../core/constants/images.dart';
- 
+
 class GoogleButton extends StatelessWidget {
   final VoidCallback onPressed;
- 
+
   const GoogleButton({super.key, required this.onPressed});
- 
+
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
- 
+
     return SizedBox(
       height: context.heightCalculated(52),
       width: double.infinity,

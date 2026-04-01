@@ -141,6 +141,3 @@ extension ResponsiveExtension on BuildContext {
   // ── border radius — scales with screen width ──────────────────────────────
   double radius() => (width * 0.03).clamp(AppTheme.radiusSm, AppTheme.radiusMd);
 }
-
-
- 
