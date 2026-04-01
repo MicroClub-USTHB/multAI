@@ -42,11 +42,6 @@ export const ADMIN_NAV_DATA: NavData = {
   ],
   secondary: [
     {
-      title: 'Notifications',
-      url: '/admin/notifications',
-      icon: Bell,
-    },
-    {
       title: 'Settings',
       url: '/admin/settings',
       icon: Settings,
