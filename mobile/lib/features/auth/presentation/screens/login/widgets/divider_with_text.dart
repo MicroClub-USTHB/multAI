@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../../../../core/extensions/extensions.dart';
-
+import '../../../../../../core/extensions/context_extensions.dart';
+import '../../../../../../core/extensions/responsive_extensions.dart';
+ 
+ 
 class DividerWithText extends StatelessWidget {
   const DividerWithText({super.key});
 

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../../../../core/extensions/extensions.dart';
-import '../../../../../../core/validators/validators.dart';
-
+import '../../../../../../core/extensions/context_extensions.dart';
+import '../../../../../../core/extensions/responsive_extensions.dart';
+ import '../../../../../../core/validators/validators.dart';
+ 
 class PasswordField extends StatelessWidget {
   final TextEditingController controller;
   final bool obscure;

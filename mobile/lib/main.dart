@@ -9,7 +9,7 @@ import 'features/auth/presentation/blocs/auth_bloc.dart';
 import 'features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'di/injection_container.dart' as di;
 
-Map<String, String>? _pendingAuthTokens;
+// Map<String, String>? _pendingAuthTokens;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,9 +59,9 @@ class _MyAppState extends State<MyApp> {
     //to be implemented
   }
 
-  void _processPendingTokens() {
-    // to be implemented
-  }
+  // void _processPendingTokens() {
+  //   // to be implemented
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -76,18 +76,6 @@ class _MyAppState extends State<MyApp> {
         routerConfig: appRouter,
       ),
     );
-    // return MaterialApp(
-    //   navigatorKey: _navigatorKey,
-    //   debugShowCheckedModeBanner: false,
-    //   theme: AppTheme.darkTheme,
-    //   home: const SplashScreen(),
-    // );
-    // return MaterialApp(
-    //   navigatorKey: _navigatorKey,
-    //   debugShowCheckedModeBanner: false,
-    //   theme: AppTheme.darkTheme,
-    //   // home: Scaffold(),
-    //   home: const SplashScreen(),
-    // );
+
   }
 }

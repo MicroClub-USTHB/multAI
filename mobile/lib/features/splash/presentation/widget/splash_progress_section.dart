@@ -50,7 +50,7 @@ class SplashProgressSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(color: AppTheme.borderColor),
       ),
-      child: Icon(icon, color: AppTheme.gold.withOpacity(0.4), size: 24),
+      child: Icon(icon, color: AppTheme.gold.withValues(alpha: 0.4), size: 24),
     );
   }
 }

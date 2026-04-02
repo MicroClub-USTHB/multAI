@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import '../../../../../../core/extensions/extensions.dart';
+import '../../../../../../core/extensions/context_extensions.dart';
+import '../../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../../core/theme/theme.dart';
 import '../../../domain/entities/face_photo_entity.dart';
 

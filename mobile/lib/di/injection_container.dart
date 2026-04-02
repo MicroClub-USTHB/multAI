@@ -1,5 +1,4 @@
 import 'package:get_it/get_it.dart';
-import 'package:multai_mobile/features/auth/data/datasource/fake.dart';
 import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
 import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
