@@ -4,7 +4,6 @@ class AccountModel extends AccountEntity {
   const AccountModel({
     required super.name,
     required super.email,
-    required super.membershipType,
     super.avatarUrl,
   });
 
@@ -12,7 +11,6 @@ class AccountModel extends AccountEntity {
     return AccountModel(
       name: json['name'] as String,
       email: json['email'] as String,
-      membershipType: json['membership_type'] as String,
       avatarUrl: json['avatar_url'] as String?,
     );
   }
@@ -20,7 +18,6 @@ class AccountModel extends AccountEntity {
   Map<String, dynamic> toJson() => {
         'name': name,
         'email': email,
-        'membership_type': membershipType,
         'avatar_url': avatarUrl,
       };
 }

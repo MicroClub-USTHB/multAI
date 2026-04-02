@@ -4,6 +4,7 @@ import '../../domain/repositories/account_repository.dart';
 import '../datasources/account_remote_datasource.dart';
 import '../datasources/account_local_datasource.dart';
 import '../../../../core/errors/failure.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/network/network_info.dart';
 
 class AccountRepositoryImpl implements AccountRepository {
@@ -42,6 +43,8 @@ class AccountRepositoryImpl implements AccountRepository {
   Future<Either<Failure, void>> logout() async {
     // Here you can implement actual logout logic (API call + clearing token)
     try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));

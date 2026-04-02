@@ -35,7 +35,6 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       (account) => emit(AccountLoaded(
         name:           account.name,
         email:          account.email,
-        membershipType: account.membershipType,
         avatarUrl:      account.avatarUrl,
       )),
     );

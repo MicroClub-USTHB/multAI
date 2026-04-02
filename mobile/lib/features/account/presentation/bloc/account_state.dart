@@ -10,13 +10,11 @@ class AccountLoading extends AccountState {}
 class AccountLoaded extends AccountState {
   final String name;
   final String email;
-  final String membershipType;
   final String? avatarUrl;
 
   AccountLoaded({
     required this.name,
     required this.email,
-    required this.membershipType,
     this.avatarUrl,
   });
 }

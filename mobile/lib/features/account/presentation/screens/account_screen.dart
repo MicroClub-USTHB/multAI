@@ -77,7 +77,7 @@ class AccountScreen extends StatelessWidget {
           ProfileSection(
             name:           state.name,
             email:          state.email,
-            membershipType: state.membershipType,
+            membershipType: 'mc-member',
             avatarUrl:      state.avatarUrl,
           ),
           SizedBox(height: context.heightCalculated(32)),
