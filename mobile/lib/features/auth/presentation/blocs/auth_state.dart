@@ -16,7 +16,7 @@ class AuthNeedsFaceEnrollment extends AuthState {
   AuthNeedsFaceEnrollment({required this.auth});
 }
 
-class LogoutSuccess extends AuthState {}
+class Unauthenticated  extends AuthState {}
 
 class GetCurrentUserSuccess extends AuthState {
   final MeEntity user;

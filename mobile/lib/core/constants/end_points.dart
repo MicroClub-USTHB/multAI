@@ -11,4 +11,6 @@ class EndPoints {
 
   // ── Face Enrollment ────────────────────────────────────────────────────────
   static const String faceEnrollment = '/face-enrollment/upload';
+  //── account ─────────────────────────────────────────────────────────────────
+  static const String account = '/account';
 }

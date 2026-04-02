@@ -112,7 +112,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       result.fold(
         (failure) => emit(AuthFailure(message: failure.message)),
-        (_) => emit(LogoutSuccess()),
+        (_) => emit(Unauthenticated()),
       );
     } catch (e) {
       emit(AuthFailure(message: e.toString()));
