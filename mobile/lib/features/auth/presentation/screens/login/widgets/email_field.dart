@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../../core/validators/validators.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
 import '../../../../../../core/extensions/responsive_extensions.dart';
- 
- 
+
 class EmailField extends StatelessWidget {
   final TextEditingController controller;
 

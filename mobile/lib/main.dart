@@ -70,7 +70,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         BlocProvider<AuthBloc>(create: (_) => di.sl<AuthBloc>()),
         BlocProvider<OnboardingBloc>(create: (_) => di.sl<OnboardingBloc>()),
-        BlocProvider<AccountBloc>(create: (_) => di.sl<AccountBloc>(),)
+        BlocProvider<AccountBloc>(create: (_) => di.sl<AccountBloc>()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
@@ -78,6 +78,5 @@ class _MyAppState extends State<MyApp> {
         routerConfig: appRouter,
       ),
     );
-
   }
 }

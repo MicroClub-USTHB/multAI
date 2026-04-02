@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../../core/constants/images.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
 import '../../../../../../core/extensions/responsive_extensions.dart';
- 
- 
+
 class GoogleButton extends StatelessWidget {
   final VoidCallback onPressed;
 

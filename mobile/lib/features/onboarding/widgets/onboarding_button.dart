@@ -19,7 +19,7 @@ class OnboardingButton extends StatelessWidget {
             color: AppTheme.gold,
             borderRadius: BorderRadius.circular(12),
           ),
-          
+
           child: SizedBox(
             width: double.infinity,
             height: 56,

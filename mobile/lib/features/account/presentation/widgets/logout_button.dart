@@ -19,9 +19,7 @@ class LogoutButton extends StatelessWidget {
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           backgroundColor: AppTheme.errorColor.withValues(alpha: 0.1),
-          side: BorderSide(
-            color: AppTheme.errorColor.withValues(alpha: 0.4),
-          ),
+          side: BorderSide(color: AppTheme.errorColor.withValues(alpha: 0.4)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
           ),

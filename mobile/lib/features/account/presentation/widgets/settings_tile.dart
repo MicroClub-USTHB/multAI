@@ -41,7 +41,6 @@ class SettingsTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-
             // ── icon with amber tinted background ────────────────────────
             Container(
               padding: EdgeInsets.all(context.widthCalculated(8)),

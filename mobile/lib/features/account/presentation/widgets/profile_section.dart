@@ -26,7 +26,6 @@ class ProfileSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-
           // ── Avatar with amber border ───────────────────────────────────
           Container(
             decoration: BoxDecoration(
@@ -39,8 +38,9 @@ class ProfileSection extends StatelessWidget {
             child: CircleAvatar(
               radius: context.widthCalculated(52),
               backgroundColor: AppTheme.surfaceColor,
-              backgroundImage:
-                  avatarUrl != null ? NetworkImage(avatarUrl!) : null,
+              backgroundImage: avatarUrl != null
+                  ? NetworkImage(avatarUrl!)
+                  : null,
               child: avatarUrl == null
                   ? Icon(
                       Icons.person,

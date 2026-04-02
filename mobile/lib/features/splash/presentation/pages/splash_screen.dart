@@ -68,26 +68,3 @@ class SplashScreen extends StatelessWidget {
     );
   }
 }
-
-// Future<void> _checkAuthAndNavigate() async {
-//   await Future.delayed(const Duration(seconds: 3));
-
-//   final getOnboardingSeen = sl<GetOnboardingSeen>();
-//   final hasSeenOnboarding = await getOnboardingSeen();
-//   if (!mounted) return;
-//   if (!hasSeenOnboarding) {
-//     context.go('/onboarding');
-//     return;
-//   }
-
-//   final isUserLoggedIn = sl<IsUserLoggedIn>();
-//   final result = await isUserLoggedIn(NoParams());
-
-//   result.fold((failure) => context.go(AppRoutes.login), (isLoggedIn) {
-//     if (isLoggedIn) {
-//       context.go('/home/events');
-//     } else {
-//       context.go(AppRoutes.login);
-//     }
-//   });
-// }

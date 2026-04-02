@@ -3,8 +3,7 @@ import '../../../../../../core/theme/theme.dart';
 import '../../../../../../core/constants/images.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
 import '../../../../../../core/extensions/responsive_extensions.dart';
- 
- 
+
 class LogoSection extends StatelessWidget {
   const LogoSection({super.key});
 

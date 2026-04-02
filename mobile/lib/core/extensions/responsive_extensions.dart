@@ -25,6 +25,5 @@ extension ResponsiveX on BuildContext {
 
   double iconSize() => (width * 0.055).clamp(20.0, 26.0);
 
-  double radius() =>
-      (width * 0.03).clamp(AppTheme.radiusSm, AppTheme.radiusMd);
+  double radius() => (width * 0.03).clamp(AppTheme.radiusSm, AppTheme.radiusMd);
 }

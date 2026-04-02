@@ -15,7 +15,10 @@ class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: AppTheme.backgroundColor,
       elevation: 0,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: context.theme.colorScheme.onSurface),
+        icon: Icon(
+          Icons.arrow_back,
+          color: context.theme.colorScheme.onSurface,
+        ),
         onPressed: () => context.pop(),
       ),
       centerTitle: true,

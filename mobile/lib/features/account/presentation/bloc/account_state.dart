@@ -1,4 +1,3 @@
-
 part of 'account_bloc.dart';
 
 abstract class AccountState {}
@@ -12,11 +11,7 @@ class AccountLoaded extends AccountState {
   final String email;
   final String? avatarUrl;
 
-  AccountLoaded({
-    required this.name,
-    required this.email,
-    this.avatarUrl,
-  });
+  AccountLoaded({required this.name, required this.email, this.avatarUrl});
 }
 
 class AccountError extends AccountState {

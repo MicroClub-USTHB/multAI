@@ -72,13 +72,12 @@ class AccountScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-
           // ── Profile ────────────────────────────────────────────────────
           ProfileSection(
-            name:           state.name,
-            email:          state.email,
+            name: state.name,
+            email: state.email,
             membershipType: 'mc-member',
-            avatarUrl:      state.avatarUrl,
+            avatarUrl: state.avatarUrl,
           ),
           SizedBox(height: context.heightCalculated(32)),
 
@@ -87,22 +86,22 @@ class AccountScreen extends StatelessWidget {
             title: 'ACCOUNT SETTINGS',
             items: [
               SettingItemData(
-                icon:     Icons.notifications_outlined,
-                title:    'Notifications',
+                icon: Icons.notifications_outlined,
+                title: 'Notifications',
                 subtitle: 'Manage alerts and activity',
-                onTap:    () {},
+                onTap: () {},
               ),
               SettingItemData(
-                icon:     Icons.lock_outline,
-                title:    'Privacy & Security',
+                icon: Icons.lock_outline,
+                title: 'Privacy & Security',
                 subtitle: 'Password, 2FA, and data sharing',
-                onTap:    () {},
+                onTap: () {},
               ),
               SettingItemData(
-                icon:     Icons.storage_outlined,
-                title:    'Account Data',
+                icon: Icons.storage_outlined,
+                title: 'Account Data',
                 subtitle: 'Export or manage your personal data',
-                onTap:    () {},
+                onTap: () {},
               ),
             ],
           ),
@@ -113,7 +112,7 @@ class AccountScreen extends StatelessWidget {
             title: 'SUPPORT',
             items: [
               SettingItemData(
-                icon:  Icons.help_outline,
+                icon: Icons.help_outline,
                 title: 'Help Center',
                 onTap: () {},
               ),
@@ -123,9 +122,7 @@ class AccountScreen extends StatelessWidget {
 
           // ── Logout ─────────────────────────────────────────────────────
           LogoutButton(
-            onPressed: () => context
-                .read<AccountBloc>()
-                .add(LogoutRequested()),
+            onPressed: () => context.read<AccountBloc>().add(LogoutRequested()),
           ),
           SizedBox(height: context.heightCalculated(24)),
         ],

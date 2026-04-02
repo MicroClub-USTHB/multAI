@@ -16,8 +16,8 @@ class AccountModel extends AccountEntity {
   }
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'email': email,
-        'avatar_url': avatarUrl,
-      };
+    'name': name,
+    'email': email,
+    'avatar_url': avatarUrl,
+  };
 }

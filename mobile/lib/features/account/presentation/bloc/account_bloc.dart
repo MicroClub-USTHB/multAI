@@ -1,4 +1,3 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/usecases/get_account_data_usecase.dart';
@@ -15,9 +14,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   AccountBloc({
     required GetAccountDataUseCase getAccountData,
     required LogoutUseCase logoutUseCase,
-  })  : _getAccountData = getAccountData,
-        _logoutUseCase = logoutUseCase,
-        super(AccountInitial()) {
+  }) : _getAccountData = getAccountData,
+       _logoutUseCase = logoutUseCase,
+       super(AccountInitial()) {
     on<LoadAccountData>(_onLoadAccountData);
     on<LogoutRequested>(_onLogoutRequested);
   }
@@ -32,11 +31,13 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
     result.fold(
       (failure) => emit(AccountError(message: failure.message)),
-      (account) => emit(AccountLoaded(
-        name:           account.name,
-        email:          account.email,
-        avatarUrl:      account.avatarUrl,
-      )),
+      (account) => emit(
+        AccountLoaded(
+          name: account.name,
+          email: account.email,
+          avatarUrl: account.avatarUrl,
+        ),
+      ),
     );
   }
 
@@ -50,7 +51,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
     result.fold(
       (failure) => emit(AccountError(message: failure.message)),
-      (_)       => emit(AccountLoggedOut()),
+      (_) => emit(AccountLoggedOut()),
     );
   }
 }
