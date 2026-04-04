@@ -16,6 +16,29 @@ class AppTheme {
   static const double spacingXl = 32.0;
   static const double spacingXxl = 40.0;
 
+  // ── Card Dimensions ────────────────────────────────────────────────────────
+  static const double activeCardHeight = 120.0;
+  static const double activeCardAspectWidth = 358.0;
+  static const double activeCardBreakpoint = 350.0;
+  static const double archivedCardWidth = 191.0;
+  static const double archivedCardHeight = 197.0;
+  static const double statusDotSize = 10.0;
+  static const double notifDotSize = 8.0;
+  static const double emptyStateIconSize = 48.0;
+  static const double emptyStatePadding = 32.0;
+
+  // ── Icon Sizes ─────────────────────────────────────────────────────────────
+  static const double iconSm = 16.0;
+  static const double iconMd = 18.0;
+  static const double iconLg = 25.0;
+
+  // ── Font Sizes ─────────────────────────────────────────────────────────────
+  static const double fontSizeXs = 11.0;
+  static const double fontSizeSm = 12.0;
+  static const double fontSizeMd = 13.5;
+  static const double fontSizeLg = 14.0;
+  static const double fontSizeXl = 20.0;
+
   // ── Primary Colors ─────────────────────────────────────────────────────────
   static const Color primaryColor = Color(
     0xFFE8A020,
@@ -35,6 +58,19 @@ class AppTheme {
   static const Color cardColor = Color(
     0xFF2A1E0F,
   ); // Dark brown card background
+
+  // ── Event Card Colors ──────────────────────────────────────────────────────
+  static const Color activeCardBackground = Color(0xFF0F172A);
+  static const Color activeCardBorder = Color(0xFF1E293B);
+  static const Color archivedCardBackground = Color(0xFF0F172A);
+  static const Color archivedCardBorder = Color(0xFF1E293B);
+  static const Color cardDateTextColor = Color(0xFF94A3B8);
+  static const Color archivedTitleColor = Color(0xFF94A3B8);
+  static const Color archivedDateColor = Color(0xFF64748B);
+  static const double activeCardBackgroundOpacity = 0.4;
+  static const double archivedCardBackgroundOpacity = 0.1;
+  static const double archivedCardBorderOpacity = 0.4;
+
 
   // ── Text Colors ────────────────────────────────────────────────────────────
   static const Color primaryTextColor = Color(0xFFFFFFFF); // White primary text
@@ -67,7 +103,8 @@ class AppTheme {
   ); // Very dark brown for inputs
   static const Color inputBorderColor = Color(
     0xFF4A3820,
-  ); // Slightly visible border
+  );
+
   // ── Form Card Color ────────────────────────────────────────────────────────
   static const Color formCardColor = Color(
     0x1AE8A830,
@@ -78,6 +115,7 @@ class AppTheme {
   static const Color errorColor = Color(0xFFD32F2F);
   static const Color warningColor = Color(0xFFFF9800);
   static const Color infoColor = Color(0xFFE8A020);
+  static const Color activeEventDotColor = Color(0xFF22C55E);
 
   // ── Reading Colors ─────────────────────────────────────────────────────────
   static const Color readingBackgroundColor = Color(0xFF1A1008);

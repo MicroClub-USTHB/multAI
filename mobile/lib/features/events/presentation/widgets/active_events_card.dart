@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../../core/extensions/datetime_extensions.dart';
+import '../../../../core/extensions/datetime_extensions.dart';
 
 class ActiveEventsCard extends StatelessWidget {
   const ActiveEventsCard({
@@ -8,126 +8,107 @@ class ActiveEventsCard extends StatelessWidget {
     required this.eventTitle,
     required this.eventStatus,
     required this.eventDate,
-    // required this.eventImage,
   });
 
   final String eventTitle;
   final String eventStatus;
   final DateTime eventDate;
-  // final String eventImage;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
+      height: AppTheme.activeCardHeight,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(15, 23, 42, 1).withValues(alpha: 0.4),
+        color: AppTheme.activeCardBackground
+            .withValues(alpha: AppTheme.activeCardBackgroundOpacity),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: Color.fromRGBO(30, 41, 59, 1), width: 1),
+        border: Border.all(
+          color: AppTheme.activeCardBorder,
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
-          // Image section (backend doesn't provide image for active events yet)
-
-          // Padding(
-          //   padding: const EdgeInsets.only(right: AppTheme.spacingXs),
-          //   child: Container(
-          //     width: 106,
-          //     height: 116,
-          //     decoration: BoxDecoration(
-          //       borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          //       image: DecorationImage(
-          //         image: AssetImage(eventImage),
-          //         fit: BoxFit.cover,
-          //       ),
-          //     ),
-          //   ),
-          // ),
-
-          SizedBox(width: AppTheme.spacingSm),
-
-          // Info section 
+          const SizedBox(width: AppTheme.spacingSm),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch, 
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Title 
                 Padding(
-                  padding: EdgeInsets.only(top: 15, bottom: 8),
+                  padding: const EdgeInsets.only(
+                    top: AppTheme.spacingMd,
+                    bottom: AppTheme.spacingSm,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Title
                       Expanded(
                         child: Text(
                           eventTitle,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13.5,
-                            color: AppTheme.primaryTextColor,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                fontSize: AppTheme.fontSizeMd,
+                                color: AppTheme.primaryTextColor,
+                              ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      // Status 
                       Padding(
-                        padding: EdgeInsets.only(right: 10),
+                        padding:
+                            const EdgeInsets.only(right: AppTheme.spacingSm),
                         child: Text(
                           eventStatus,
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                            color: AppTheme.successColor,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(
+                                fontSize: AppTheme.fontSizeSm,
+                                color: AppTheme.successColor,
+                              ),
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                // Date row
                 Padding(
-                  padding:  EdgeInsets.only(bottom: 19),
+                  padding: const EdgeInsets.only(bottom: AppTheme.spacingMd),
                   child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.calendar_month,
-                        size: 16,
-                        color: Color(0xFF94A3B8),
+                        size: AppTheme.iconSm,
+                        color: AppTheme.cardDateTextColor,
                       ),
-                      SizedBox(width: AppTheme.spacingXs),
+                      const SizedBox(width: AppTheme.spacingXs),
                       Text(
                         eventDate.toDisplayDate(),
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 11,
-                          color: Color(0xFF94A3B8),
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelMedium
+                            ?.copyWith(
+                              fontSize: AppTheme.fontSizeXs,
+                              color: AppTheme.cardDateTextColor,
+                            ),
                       ),
                     ],
                   ),
                 ),
-
-                // Avatar and View
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // bakend doesn't provide user's avatar for active events yet (like figma does)
-                    // CircleAvatar(
-                    //   radius: 16,
-                    //   backgroundImage: AssetImage("assets/images/avatar_img.png"),
-                    // ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 10),
-                      child: Text(
-                        "View",
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          color: AppTheme.primaryColor,
-                        ),
-                      ),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(right: AppTheme.spacingSm),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      "View",
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            fontSize: AppTheme.fontSizeLg,
+                            color: AppTheme.primaryColor,
+                          ),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),

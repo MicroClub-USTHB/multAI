@@ -27,7 +27,6 @@ import '../features/auth/domain/usecases/refresh_token_usecase.dart';
 import '../features/auth/domain/usecases/get_me_usecase.dart';
 import '../features/auth/presentation/blocs/auth_bloc.dart';
 
-<<<<<<< HEAD
 // Face Enrollment
 import '../features/face_enrollment/data/datasources/face_enrollment_local_datasource.dart';
 import '../features/face_enrollment/data/datasources/face_enrollment_remote_datasource.dart';
@@ -46,7 +45,6 @@ import '../features/account/domain/repositories/account_repository.dart';
 import '../features/account/domain/usecases/get_account_data_usecase.dart';
 import '../features/account/presentation/bloc/account_bloc.dart';
 
-=======
 // Events
 import '../features/events/data/datasources/events_remote_datasource.dart';
 import '../features/events/data/repositories/events_repository_impl.dart';
@@ -54,7 +52,6 @@ import '../features/events/domain/repositories/event_repository.dart';
 import '../features/events/domain/usecases/get_events_usecase.dart';
 import '../features/events/presentation/bloc/events_bloc.dart';
  
->>>>>>> 0777338 (feat(events): implement events logic with clean architecture)
 final sl = GetIt.instance;
 
 FutureOr<void> init() async {

@@ -52,23 +52,21 @@ class _EventsScreenState extends State<EventsScreen> {
             Padding(
               padding: const EdgeInsets.only(right: AppTheme.spacingLg),
               child: GestureDetector(
-                onTap: () {
-                  // navigate to notifications page when ready
-                },
+                onTap: () {},
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
                     Icon(
                       Icons.notifications_none,
                       color: AppTheme.secondaryTextColor,
-                      size: 25,
+                      size: AppTheme.iconLg,
                     ),
                     Positioned(
                       top: 1,
-                      right: 4,
+                      right: AppTheme.spacingXs,
                       child: Container(
-                        width: 8,
-                        height: 8,
+                        width: AppTheme.notifDotSize,
+                        height: AppTheme.notifDotSize,
                         decoration: BoxDecoration(
                           color: AppTheme.accentColor,
                           border: Border.all(
@@ -153,29 +151,25 @@ class _EventsScreenState extends State<EventsScreen> {
             const SizedBox(height: AppTheme.spacingSm),
             SizedBox(
               width: double.infinity,
-              height: 48,
+              height: AppTheme.activeCardHeight / 2.5,
               child: ElevatedButton(
                 onPressed: isJoining
                     ? null
                     : () {
                         if (_formKey.currentState!.validate()) {
-                          final code =
-                              _eventCodeController.text.toEventCode();
-                          context
-                              .read<EventsBloc>()
-                              .add(JoinEventRequested(eventCode: code));
+                          final code = _eventCodeController.text.toEventCode();
+                          context.read<EventsBloc>().add(JoinEventRequested(eventCode: code));
                         }
                       },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppTheme.radiusSm),
+                    borderRadius:BorderRadius.circular(AppTheme.radiusSm)
                   ),
                 ),
                 child: isJoining
                     ? const SizedBox(
-                        width: 20,
-                        height: 20,
+                        width: AppTheme.spacingLg,
+                        height: AppTheme.spacingLg,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : Text(
@@ -207,10 +201,10 @@ class _EventsScreenState extends State<EventsScreen> {
               Row(
                 children: [
                   Container(
-                    width: 10,
-                    height: 10,
+                    width: AppTheme.statusDotSize,
+                    height: AppTheme.statusDotSize,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF22C55E),
+                      color: AppTheme.activeEventDotColor,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -220,14 +214,14 @@ class _EventsScreenState extends State<EventsScreen> {
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall
-                        ?.copyWith(fontSize: 20),
+                        ?.copyWith(fontSize: AppTheme.fontSizeXl),
                   ),
                 ],
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  vertical: 4,
-                  horizontal: 8,
+                  vertical: AppTheme.spacingXs,
+                  horizontal: AppTheme.spacingSm,
                 ),
                 decoration: BoxDecoration(
                   color: AppTheme.primaryColor.withAlpha(26),
@@ -236,9 +230,7 @@ class _EventsScreenState extends State<EventsScreen> {
                 child: Text(
                   '${activeEvents.length} Ongoing',
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                        height: 1.33,
+                        fontSize: AppTheme.fontSizeSm,
                         color: AppTheme.primaryColor,
                       ),
                 ),
@@ -258,8 +250,10 @@ class _EventsScreenState extends State<EventsScreen> {
         else
           LayoutBuilder(
             builder: (context, constraints) {
-              int crossAxisCount =
-                  (constraints.maxWidth / 350).floor().clamp(1, 10);
+              final crossAxisCount =
+                  (constraints.maxWidth / AppTheme.activeCardBreakpoint)
+                      .floor()
+                      .clamp(1, 10);
               return GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -267,14 +261,16 @@ class _EventsScreenState extends State<EventsScreen> {
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: AppTheme.spacingMd,
                   mainAxisSpacing: AppTheme.spacingMd,
-                  childAspectRatio: 358 / 120,
+                  childAspectRatio:
+                      AppTheme.activeCardAspectWidth / AppTheme.activeCardHeight,
                 ),
                 itemCount: activeEvents.length,
                 itemBuilder: (context, index) {
                   final event = activeEvents[index];
                   return ActiveEventsCard(
                     eventTitle: event.name,
-                    eventStatus: EventStatusMapper.toDisplayStatus(event.status),
+                    eventStatus:
+                        EventStatusMapper.toDisplayStatus(event.status),
                     eventDate: event.eventDate,
                   );
                 },
@@ -294,14 +290,14 @@ class _EventsScreenState extends State<EventsScreen> {
       children: [
         Row(
           children: [
-            ImageIcon(const AssetImage('assets/icons/archived_icon.png')),
+            const ImageIcon(AssetImage('assets/icons/archived_icon.png')),
             const SizedBox(width: AppTheme.spacingSm),
             Text(
               "Archived Events",
               style: Theme.of(context)
                   .textTheme
                   .headlineSmall
-                  ?.copyWith(fontSize: 20),
+                  ?.copyWith(fontSize: AppTheme.fontSizeXl),
             ),
           ],
         ),
@@ -337,11 +333,16 @@ class _EventsScreenState extends State<EventsScreen> {
   }) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 32.0),
+        padding: const EdgeInsets.symmetric(
+            vertical: AppTheme.emptyStatePadding),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: AppTheme.secondaryTextColor),
+            Icon(
+              icon,
+              size: AppTheme.emptyStateIconSize,
+              color: AppTheme.secondaryTextColor,
+            ),
             const SizedBox(height: AppTheme.spacingMd),
             Text(
               title,

@@ -1,78 +1,66 @@
 import 'package:flutter/material.dart';
-import '../../../../core/extensions/datetime_extensions.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/extensions/datetime_extensions.dart';
 
 class ArchivedEventsCard extends StatelessWidget {
   const ArchivedEventsCard({
     super.key,
     required this.eventTitle,
     required this.eventDate,
-    // required this.eventImage,
   });
 
   final String eventTitle;
   final DateTime eventDate;
-  // final String eventImage;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(right: AppTheme.spacingSm),
-      child: Container(
-        width: 191,          
-        height: 197,        
-        decoration: BoxDecoration(
-          color: Color.fromRGBO(15, 23, 42, 1).withValues(alpha: 0.1), 
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd), // 12px
-          border: Border.all(
-            color: Color.fromRGBO(30, 41, 59, 0.4).withValues(alpha: 0.4), 
-            width: 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image section (backend doesn't provide image for archived events yet)
+    final textTheme = Theme.of(context).textTheme;
 
-            // ClipRRect(
-            //   borderRadius: const BorderRadius.only(
-            //     topLeft: Radius.circular(AppTheme.radiusMd),
-            //     topRight: Radius.circular(AppTheme.radiusMd),
-            //   ),
-            //   child: Image.asset(
-            //     eventImage,
-            //     width: 189,
-            //     height:116,
-            //     fit: BoxFit.cover,
-            //   ),
-            // ),
-            SizedBox(height: AppTheme.spacingMd),
-            // Title
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
-              child: Text(
-                eventTitle,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,             
-                      color: Color(0xFF94A3B8),
-                    ),
-              ),
+    return Padding(
+      padding: const EdgeInsets.only(right: AppTheme.spacingSm),
+      child: SizedBox(
+        width: AppTheme.archivedCardWidth,
+        height: AppTheme.archivedCardHeight,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppTheme.archivedCardBackground
+                .withValues(alpha: AppTheme.archivedCardBackgroundOpacity),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: AppTheme.archivedCardBorder
+                  .withValues(alpha: AppTheme.archivedCardBorderOpacity),
+              width: 1,
             ),
-             SizedBox(height: AppTheme.spacingSm), 
-            // Date
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: AppTheme.spacingXs, horizontal: AppTheme.spacingSm),
-              child: Text(
-                eventDate.toDisplayDate(),
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.w400, 
-                      fontSize: 13,             
-                      color: Color(0xFF64748B), 
-                    ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: AppTheme.spacingMd),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
+                child: Text(
+                  eventTitle,
+                  style: textTheme.labelMedium?.copyWith(
+                    color: AppTheme.archivedTitleColor,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: AppTheme.spacingSm),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppTheme.spacingXs,
+                  horizontal: AppTheme.spacingSm,
+                ),
+                child: Text(
+                  eventDate.toDisplayDate(),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: AppTheme.archivedDateColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
