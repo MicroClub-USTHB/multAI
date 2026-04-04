@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
 
-import '../../../core/errors/failure.dart';
-import '../domain/entities/face_photo_entity.dart';
-import '../domain/repositories/face_enrollment_repository.dart';
-import '../data/datasources/face_enrollment_local_datasource.dart';
-import '../data/datasources/face_enrollment_remote_datasource.dart';
-import '../data/models/face_photo_model.dart';
+import '../../../../core/errors/failure.dart';
+import '../../domain/entities/face_photo_entity.dart';
+import '../../domain/repositories/face_enrollment_repository.dart';
+import '../datasources/face_enrollment_local_datasource.dart';
+import '../datasources/face_enrollment_remote_datasource.dart';
+import '../models/face_photo_model.dart';
 
 class FaceEnrollmentRepositoryImpl implements FaceEnrollmentRepository {
   final FaceEnrollmentRemoteDataSource remoteDataSource;

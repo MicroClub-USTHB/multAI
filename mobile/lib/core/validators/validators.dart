@@ -12,8 +12,10 @@ class AppValidators {
 
   static String? validatePassword(String? v) {
     if (v == null || v.isEmpty) return 'Password is required';
-    if (!_passwordRegex.hasMatch(v))
+    if (!_passwordRegex.hasMatch(v)) {
       return 'Password must be at least 8 characters and include letters and numbers';
+    }
+
     return null;
   }
 }
