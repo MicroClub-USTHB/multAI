@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/extensions/datetime_extensions.dart';
 import '../../../../core/theme/theme.dart';
 
 class ArchivedEventsCard extends StatelessWidget {
@@ -10,7 +11,7 @@ class ArchivedEventsCard extends StatelessWidget {
   });
 
   final String eventTitle;
-  final String eventDate;
+  final DateTime eventDate;
   // final String eventImage;
 
   @override
@@ -63,7 +64,7 @@ class ArchivedEventsCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(vertical: AppTheme.spacingXs, horizontal: AppTheme.spacingSm),
               child: Text(
-                eventDate,
+                eventDate.toDisplayDate(),
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w400, 
                       fontSize: 13,             
