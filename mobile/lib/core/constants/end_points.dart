@@ -17,7 +17,7 @@ class EndPoints {
 
   // ── Notifications ──────────────────────────────────────────────────────────
   static const String notifications = '/notifications';
-  static const String notificationsReads = '/notifications/read';
+  static const String notificationsRead = '/notifications/read';
   static const String registerPushToken = '/notifications/push-token/register';
   static const String revokePushToken = '/notifications/push-token/revoke';
 }
