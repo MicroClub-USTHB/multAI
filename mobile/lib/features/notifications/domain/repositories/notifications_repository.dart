@@ -4,9 +4,9 @@ import '../entities/notification_entity.dart';
 
 abstract class NotificationsRepository {
   Future<Either<Failure, List<NotificationEntity>>> getNotifications();
-  Future<Either<Failure, void>> markAsRead(String notificationId);
-  Future<Either<Failure, void>> markAllAsRead();
-  Future<Either<Failure, void>> registerPushToken({
+  Future<Either<Failure, List<NotificationEntity>>> markAsRead(
+    List<String> notificationIds,
+  );  Future<Either<Failure, void>> registerPushToken({
     required String token,
     required String platform,
   });

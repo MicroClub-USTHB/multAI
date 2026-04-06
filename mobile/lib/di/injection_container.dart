@@ -200,6 +200,8 @@ FutureOr<void> init() async {
     () => AccountBloc(
       getAccountData: sl<GetAccountDataUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
+    ),
+  );
   // Notification Remote DataSource
   sl.registerLazySingleton<NotificationRemoteDataSource>(
     () => NotificationRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
