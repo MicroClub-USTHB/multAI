@@ -20,24 +20,12 @@ class NotificationRepositoryImpl implements NotificationsRepository {
   }
 
   @override
-  Future<Either<Failure, void>> markAsRead(String notificationId) async {
+  Future<Either<Failure, List<NotificationEntity>>> markAsRead(List<String> notificationIds) async {
     try {
-      await remoteDataSource.markAsRead(notificationId);
-      return const Right(null);
+      final r = await remoteDataSource.markAsRead(notificationIds);
+      return  Right(r);
     } on Failure catch (f) {
       return Left(f);
-    } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> markAllAsRead() async {
-    try {
-      await remoteDataSource.markAllAsRead();
-      return Right(null);
-    } on Failure catch (F) {
-      return Left(F);
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }

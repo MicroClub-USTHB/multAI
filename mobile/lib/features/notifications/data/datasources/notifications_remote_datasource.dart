@@ -4,8 +4,7 @@ import '../models/notification_model.dart';
 
 abstract class NotificationRemoteDataSource {
   Future<List<NotificationModel>> getNotifications();
-  Future<void> markAsRead(String notificationId);
-  Future<void> markAllAsRead();
+  Future<List<NotificationModel>> markAsRead(List<String> notificationIds);
   Future<void> registerPushToken({
     required String token,
     required String platform,
@@ -19,23 +18,17 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   @override
   Future<List<NotificationModel>> getNotifications() async {
     final json = await apiClient.get(EndPoints.notifications);
-    final list = json['notifications'] as List<dynamic>? ?? [];
-    return list
-        .map((e) => NotificationModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return _parseList(json);
   }
 
   @override
-  Future<void> markAsRead(String notificationId) async {
-    await apiClient.post(
-      '${EndPoints.notificationsReads}/$notificationId',
+  Future<List<NotificationModel>> markAsRead(List<String> notificationIds) async {
+    final json = await apiClient.post(
+      EndPoints.notificationsReads,
+      body: {'notification_ids' : notificationIds},
       requiresAuth: true,
     );
-  }
-
-  @override
-  Future<void> markAllAsRead() async {
-    await apiClient.post(EndPoints.notificationsReads, requiresAuth: true);
+    return  _parseList(json);
   }
 
   @override
@@ -57,5 +50,11 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       body: {'token': token},
       requiresAuth: true,
     );
+  }
+   List<NotificationModel> _parseList(Map<String, dynamic> json) {
+    final list = json['notifications'] as List<dynamic>? ?? [];
+    return list
+        .map((e) => NotificationModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }
