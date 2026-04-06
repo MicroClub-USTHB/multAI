@@ -5,10 +5,14 @@ abstract class NotificationEvent {}
 class LoadNotifications extends NotificationEvent {}
 
 class MarkNotificationRead extends NotificationEvent {
-  final String notificationId;
-  MarkNotificationRead({required this.notificationId});
+  final List<String> notificationIds;
+  MarkNotificationRead({required this.notificationIds});
 }
-
+class MarkSingleNotificationRead extends NotificationEvent {
+  final String notificationId;
+  MarkSingleNotificationRead({required this.notificationId});
+}
+ 
 class MarkAllNotificationsRead extends NotificationEvent {}
 
 class PushTokenReceived extends NotificationEvent {
