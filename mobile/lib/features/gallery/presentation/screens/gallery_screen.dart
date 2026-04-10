@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../../../core/theme/theme.dart';
-import '../widgets/all_pictures.dart';
-import '../widgets/event_pictures.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/extensions/snackbar_extensions.dart';
+import '../../../../../core/extensions/responsive_extensions.dart';
+import '../../../../../core/extensions/context_extensions.dart';
+import '../../domain/entities/photo_entity.dart';
+import '../../../../core/theme/theme.dart';
+import '../bloc/gallery_bloc.dart';
+import 'widgets/pictures_grid.dart';
 
 class GalleryScreen extends StatefulWidget {
   const GalleryScreen({super.key});
@@ -14,28 +19,12 @@ class _GalleryScreenState extends State<GalleryScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final List<String> allPictures = [
-    'assets/images/gallery_img8.png',
-    'assets/images/gallery_img1.png',
-    'assets/images/gallery_img2.png',
-    'assets/images/gallery_img3.png',
-    'assets/images/gallery_img4.png',
-    'assets/images/gallery_img5.png',
-    'assets/images/gallery_img6.png',
-    'assets/images/gallery_img7.png',
-  ];
-
-  final List<String> eventPictures = [
-    'assets/images/gallery_img1.png',
-    'assets/images/gallery_img2.png',
-    'assets/images/gallery_img3.png',
-    'assets/images/gallery_img4.png',
-  ];
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    // trigger load
+    context.read<GalleryBloc>().add(LoadAllPhotos());
   }
 
   @override
@@ -44,120 +33,179 @@ class _GalleryScreenState extends State<GalleryScreen>
     super.dispose();
   }
 
-  Widget _buildTabContent(String title, int count, bool isSelected) {
-    final textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingLg),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            title,
-            style: isSelected
-                ? textTheme.titleLarge
-                : textTheme.titleLarge?.copyWith(
-                    color: AppTheme.tabUnselectedTextColor,
+  @override
+  Widget build(BuildContext context) {
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
+
+    return BlocConsumer<GalleryBloc, GalleryState>(
+      listener: (context, state) {
+        if (state is GalleryError) {
+          context.showErrorSnackBar(state.message);
+        }
+      },
+      builder: (context, state) {
+        final allPhotos = state is GalleryLoaded ? state.allPhotos : <PhotoEntity>[];
+        final eventPhotos = state is GalleryLoaded ? state.eventPhotos : <PhotoEntity>[];
+        final cachedPaths = state is GalleryLoaded
+            ? state.cachedPaths
+            : <String, String>{};
+        final isLoading = state is GalleryLoading;
+
+        return Scaffold(
+          backgroundColor: AppTheme.backgroundColor,
+          appBar: AppBar(
+            backgroundColor: AppTheme.backgroundColor,
+            elevation: 0,
+            title: Text('Gallery', style: tt.headlineMedium),
+            actions: [
+              // ── Search ──────────────────────────────────────────────
+              Container(
+                decoration: BoxDecoration(
+                  color: cs.primary.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    size: context.iconSize(),
+                    color: cs.primary,
                   ),
-          ),
-          const SizedBox(width: AppTheme.spacingSm),
-          Text(
-            count.toString(),
-            style: isSelected
-                ? textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.primaryTextColor,
-                  )
-                : textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.tabUnselectedTextColor,
+                  onPressed: () {},
+                ),
+              ),
+              // ── Filter ──────────────────────────────────────────────
+              Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: context.widthCalculated(AppTheme.spacingSm),
+                ),
+                decoration: BoxDecoration(
+                  color: cs.primary.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.tune,
+                    size: context.iconSize(),
+                    color: cs.primary,
                   ),
+                  onPressed: () {},
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+          body: Column(
+            children: [
+              // ── Tab bar ──────────────────────────────────────────────
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  indicatorColor: cs.primary,
+                  dividerColor: AppTheme.inputBorderColor,
+                  indicatorSize: TabBarIndicatorSize.label,
+                  labelPadding: EdgeInsets.symmetric(
+                    vertical: context.heightCalculated(AppTheme.spacingSm),
+                  ),
+                  tabs: [
+                    _buildTab('All', allPhotos.length, 0),
+                    _buildTab('Events', eventPhotos.length, 1),
+                  ],
+                ),
+              ),
+
+              // ── Content ──────────────────────────────────────────────
+              Expanded(
+                child: isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(color: cs.primary),
+                      )
+                    : TabBarView(
+                        controller: _tabController,
+                        children: [
+                          RefreshIndicator(
+                            color: cs.primary,
+                            onRefresh: () async => context
+                                .read<GalleryBloc>()
+                                .add(RefreshGallery()),
+                            child: allPhotos.isEmpty
+                                ? _buildEmpty(context)
+                                : PicturesGrid(
+                                    photos: allPhotos,
+                                    cachedPaths: cachedPaths,
+                                  ),
+                          ),
+                          eventPhotos.isEmpty
+                              ? _buildEmpty(context)
+                              : PicturesGrid(
+                                  photos: eventPhotos,
+                                  cachedPaths: cachedPaths,
+                                ),
+                        ],
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          "Gallery",
-          style: textTheme.headlineMedium?.copyWith(
-            fontSize: 24,
+  Widget _buildTab(String title, int count, int index) {
+    return AnimatedBuilder(
+      animation: _tabController,
+      builder: (context, _) {
+        final isSelected = _tabController.index == index;
+        final tt = context.textTheme;
+
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.widthCalculated(AppTheme.spacingLg),
           ),
-        ),
-        actions: [
-          Container(
-            decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.search, size: 18, color: AppTheme.primaryColor),
-              onPressed: () {},
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: ImageIcon(
-                const AssetImage("assets/images/Icon.png"),
-                size: 18,
-                color: AppTheme.primaryColor,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: tt.titleLarge?.copyWith(
+                  color: isSelected
+                      ? AppTheme.primaryTextColor
+                      : AppTheme.secondaryTextColor,
+                ),
               ),
-              onPressed: () {},
-            ),
+              SizedBox(width: context.widthCalculated(AppTheme.spacingSm)),
+              Text(
+                '$count',
+                style: tt.bodyMedium?.copyWith(
+                  color: isSelected
+                      ? AppTheme.primaryTextColor
+                      : AppTheme.secondaryTextColor,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Column(
+        );
+      },
+    );
+  }
+
+  Widget _buildEmpty(BuildContext context) {
+    final tt = context.textTheme;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              indicatorColor: AppTheme.primaryColor,
-              dividerColor: AppTheme.tabDividerColor,
-              indicatorSize: TabBarIndicatorSize.label,
-              labelPadding: const EdgeInsets.symmetric(
-                vertical: AppTheme.spacingSm,
-              ),
-              tabs: [
-                Tab(
-                  child: AnimatedBuilder(
-                    animation: _tabController,
-                    builder: (context, _) {
-                      final isSelected = _tabController.index == 0;
-                      return _buildTabContent('All', allPictures.length, isSelected);
-                    },
-                  ),
-                ),
-                Tab(
-                  child: AnimatedBuilder(
-                    animation: _tabController,
-                    builder: (context, _) {
-                      final isSelected = _tabController.index == 1;
-                      return _buildTabContent('Events', eventPictures.length, isSelected);
-                    },
-                  ),
-                ),
-              ],
-            ),
+          Icon(
+            Icons.photo_library_outlined,
+            size: context.iconSize() * 3,
+            color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
           ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                AllPictures(pictures: allPictures),
-                EventPictures(pictures: eventPictures),
-              ],
-            ),
+          SizedBox(height: context.heightCalculated(16)),
+          Text(
+            'No photos yet',
+            style: tt.titleMedium?.copyWith(color: AppTheme.secondaryTextColor),
           ),
         ],
       ),
