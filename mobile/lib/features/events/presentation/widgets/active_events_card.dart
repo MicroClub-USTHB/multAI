@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/theme.dart';
-import '../../../../core/extensions/datetime_extensions.dart';
+import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/extensions/responsive_extensions.dart';
+import '../../../../../core/extensions/datetime_extensions.dart';
+import '../../../../../core/theme/theme.dart';
 
 class ActiveEventsCard extends StatelessWidget {
   const ActiveEventsCard({
@@ -8,112 +10,116 @@ class ActiveEventsCard extends StatelessWidget {
     required this.eventTitle,
     required this.eventStatus,
     required this.eventDate,
+    this.onTap,
   });
 
   final String eventTitle;
   final String eventStatus;
   final DateTime eventDate;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: AppTheme.activeCardHeight,
-      decoration: BoxDecoration(
-        color: AppTheme.activeCardBackground
-            .withValues(alpha: AppTheme.activeCardBackgroundOpacity),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(
-          color: AppTheme.activeCardBorder,
-          width: 1,
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: context.heightCalculated(120),
+        decoration: BoxDecoration(
+          color: AppTheme.activeCardBackground.withValues(
+            alpha: AppTheme.activeCardBackgroundOpacity,
+          ),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(color: AppTheme.activeCardBorder, width: 1),
         ),
-      ),
-      child: Row(
-        children: [
-          const SizedBox(width: AppTheme.spacingSm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: AppTheme.spacingMd,
-                    bottom: AppTheme.spacingSm,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          eventTitle,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(
-                                fontSize: AppTheme.fontSizeMd,
-                                color: AppTheme.primaryTextColor,
-                              ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(right: AppTheme.spacingSm),
-                        child: Text(
-                          eventStatus,
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelSmall
-                              ?.copyWith(
-                                fontSize: AppTheme.fontSizeSm,
-                                color: AppTheme.successColor,
-                              ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppTheme.spacingMd),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.calendar_month,
-                        size: AppTheme.iconSm,
-                        color: AppTheme.cardDateTextColor,
-                      ),
-                      const SizedBox(width: AppTheme.spacingXs),
-                      Text(
-                        eventDate.toDisplayDate(),
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelMedium
-                            ?.copyWith(
-                              fontSize: AppTheme.fontSizeXs,
-                              color: AppTheme.cardDateTextColor,
+        child: Row(
+          children: [
+            SizedBox(width: context.widthCalculated(AppTheme.spacingSm)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ── Title + status ─────────────────────────────────
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: context.heightCalculated(AppTheme.spacingMd),
+                      bottom: context.heightCalculated(AppTheme.spacingSm),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            eventTitle,
+                            style: tt.titleMedium?.copyWith(
+                              color: AppTheme.primaryTextColor,
                             ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(right: AppTheme.spacingSm),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      "View",
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            fontSize: AppTheme.fontSizeLg,
-                            color: AppTheme.primaryColor,
+                            overflow: TextOverflow.ellipsis,
                           ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: context.widthCalculated(AppTheme.spacingSm),
+                          ),
+                          child: Text(
+                            eventStatus,
+                            style: tt.labelSmall?.copyWith(
+                              color: AppTheme.successColor,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+
+                  // ── Date ──────────────────────────────────────────
+                  Padding(
+                    padding: EdgeInsets.only(
+                      bottom: context.heightCalculated(AppTheme.spacingMd),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_month,
+                          size: context.iconSize() * 0.8,
+                          color: AppTheme.cardDateTextColor,
+                        ),
+                        SizedBox(
+                          width: context.widthCalculated(AppTheme.spacingXs),
+                        ),
+                        Text(
+                          eventDate.toDisplayDate(),
+                          style: tt.labelSmall?.copyWith(
+                            color: AppTheme.cardDateTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // ── View link ──────────────────────────────────────
+                  Padding(
+                    padding: EdgeInsets.only(
+                      right: context.widthCalculated(AppTheme.spacingSm),
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'View',
+                        style: tt.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: cs.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

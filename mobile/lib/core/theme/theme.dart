@@ -17,27 +17,11 @@ class AppTheme {
   static const double spacingXxl = 40.0;
 
   // ── Card Dimensions ────────────────────────────────────────────────────────
-  static const double activeCardHeight = 120.0;
   static const double activeCardAspectWidth = 358.0;
   static const double activeCardBreakpoint = 350.0;
-  static const double archivedCardWidth = 191.0;
-  static const double archivedCardHeight = 197.0;
   static const double statusDotSize = 10.0;
   static const double notifDotSize = 8.0;
-  static const double emptyStateIconSize = 48.0;
   static const double emptyStatePadding = 32.0;
-
-  // ── Icon Sizes ─────────────────────────────────────────────────────────────
-  static const double iconSm = 16.0;
-  static const double iconMd = 18.0;
-  static const double iconLg = 25.0;
-
-  // ── Font Sizes ─────────────────────────────────────────────────────────────
-  static const double fontSizeXs = 11.0;
-  static const double fontSizeSm = 12.0;
-  static const double fontSizeMd = 13.5;
-  static const double fontSizeLg = 14.0;
-  static const double fontSizeXl = 20.0;
 
   // ── Primary Colors ─────────────────────────────────────────────────────────
   static const Color primaryColor = Color(

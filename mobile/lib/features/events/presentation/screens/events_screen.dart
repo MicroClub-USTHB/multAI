@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../../core/theme/theme.dart';
-import '../../../../../core/extensions/string_extensions.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
+import '../../../../../core/extensions/string_extensions.dart';
+import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/theme/theme.dart';
 import '../../domain/validators/event_code_validator.dart';
 import '../bloc/events_bloc.dart';
 import '../mappers/event_status_mapper.dart';
@@ -28,6 +33,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return BlocListener<EventsBloc, EventsState>(
       listener: (context, state) {
         if (state is JoinEventSuccess) {
@@ -42,39 +48,41 @@ class _EventsScreenState extends State<EventsScreen> {
         backgroundColor: AppTheme.backgroundColor,
         appBar: AppBar(
           title: Text(
-            "MultiAi Events",
-            style: Theme.of(context)
-                .appBarTheme
-                .titleTextStyle
-                ?.copyWith(color: AppTheme.accentColor),
+            'MultiAi Events',
+            style: context.theme.appBarTheme.titleTextStyle?.copyWith(
+              color: AppTheme.accentColor,
+            ),
           ),
           actions: [
             Padding(
-              padding: const EdgeInsets.only(right: AppTheme.spacingLg),
+              padding: EdgeInsets.only(
+                right: context.widthCalculated(AppTheme.spacingLg),
+              ),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () => context.go(AppRoutes.notifications),
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
                     Icon(
                       Icons.notifications_none,
                       color: AppTheme.secondaryTextColor,
-                      size: AppTheme.iconLg,
+                      size: context.iconSize(),
                     ),
                     Positioned(
                       top: 1,
-                      right: AppTheme.spacingXs,
+                      right: context.widthCalculated(AppTheme.spacingXs),
                       child: Container(
-                        width: AppTheme.notifDotSize,
-                        height: AppTheme.notifDotSize,
+                        width: context.widthCalculated(AppTheme.notifDotSize),
+                        height: context.widthCalculated(AppTheme.notifDotSize),
                         decoration: BoxDecoration(
                           color: AppTheme.accentColor,
                           border: Border.all(
                             color: AppTheme.backgroundColor,
                             width: 1,
                           ),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusXl),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusXl,
+                          ),
                         ),
                       ),
                     ),
@@ -88,14 +96,20 @@ class _EventsScreenState extends State<EventsScreen> {
           builder: (context, state) {
             return SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(AppTheme.spacingLg),
+                padding: EdgeInsets.all(
+                  context.widthCalculated(AppTheme.spacingLg),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildJoinSection(context, state),
-                    const SizedBox(height: AppTheme.spacingXl),
+                    SizedBox(
+                      height: context.heightCalculated(AppTheme.spacingXl),
+                    ),
                     _buildActiveSection(context, state),
-                    const SizedBox(height: AppTheme.spacingXl),
+                    SizedBox(
+                      height: context.heightCalculated(AppTheme.spacingXl),
+                    ),
                     _buildArchivedSection(context, state),
                   ],
                 ),
@@ -107,19 +121,19 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
+  // ── Join section ───────────────────────────────────────────────────────────
   Widget _buildJoinSection(BuildContext context, EventsState state) {
+    final tt = context.textTheme;
     final isJoining = state is JoinEventLoading;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final containerWidth = screenWidth - AppTheme.spacingMd * 2;
 
     return Container(
-      width: containerWidth,
-      padding: const EdgeInsets.all(AppTheme.spacingLg),
+      width: double.infinity,
+      padding: EdgeInsets.all(context.widthCalculated(AppTheme.spacingLg)),
       decoration: BoxDecoration(
         color: AppTheme.formCardColor,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: AppTheme.borderColor.withValues(alpha: 26),
+          color: AppTheme.borderColor.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -129,55 +143,55 @@ class _EventsScreenState extends State<EventsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Join New Event",
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(color: AppTheme.primaryTextColor),
+              'Join New Event',
+              style: tt.headlineSmall?.copyWith(
+                color: AppTheme.primaryTextColor,
+              ),
             ),
-            const SizedBox(height: AppTheme.spacingXs),
+            SizedBox(height: context.heightCalculated(AppTheme.spacingXs)),
             Text(
-              "Have an invite? Enter the link below to participate.",
-              style: Theme.of(context).textTheme.bodySmall,
+              'Have an invite? Enter the link below to participate.',
+              style: tt.bodySmall,
             ),
-            const SizedBox(height: AppTheme.spacingLg),
+            SizedBox(height: context.heightCalculated(AppTheme.spacingLg)),
             TextFormField(
               controller: _eventCodeController,
               decoration: const InputDecoration(
-                hintText: "https://multiai.app/e/...",
+                hintText: 'https://multiai.app/e/...',
               ),
               validator: EventCodeValidator.validate,
             ),
-            const SizedBox(height: AppTheme.spacingSm),
+            SizedBox(height: context.heightCalculated(AppTheme.spacingSm)),
             SizedBox(
               width: double.infinity,
-              height: AppTheme.activeCardHeight / 2.5,
+              height: context.heightCalculated(48),
               child: ElevatedButton(
                 onPressed: isJoining
                     ? null
                     : () {
                         if (_formKey.currentState!.validate()) {
                           final code = _eventCodeController.text.toEventCode();
-                          context.read<EventsBloc>().add(JoinEventRequested(eventCode: code));
+                          context.read<EventsBloc>().add(
+                            JoinEventRequested(eventCode: code),
+                          );
                         }
                       },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
-                    borderRadius:BorderRadius.circular(AppTheme.radiusSm)
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   ),
                 ),
                 child: isJoining
-                    ? const SizedBox(
-                        width: AppTheme.spacingLg,
-                        height: AppTheme.spacingLg,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                    ? SizedBox(
+                        width: context.widthCalculated(AppTheme.spacingLg),
+                        height: context.widthCalculated(AppTheme.spacingLg),
+                        child: const CircularProgressIndicator(strokeWidth: 2),
                       )
                     : Text(
-                        "Join Event",
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.copyWith(color: AppTheme.primaryTextColor),
+                        'Join Event',
+                        style: tt.titleLarge?.copyWith(
+                          color: AppTheme.primaryTextColor,
+                        ),
                       ),
               ),
             ),
@@ -187,62 +201,60 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
+  // ── Active section ─────────────────────────────────────────────────────────
   Widget _buildActiveSection(BuildContext context, EventsState state) {
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
     final activeEvents = state is EventsLoaded ? state.activeEvents : [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXs),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.widthCalculated(AppTheme.spacingXs),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
                   Container(
-                    width: AppTheme.statusDotSize,
-                    height: AppTheme.statusDotSize,
+                    width: context.widthCalculated(AppTheme.statusDotSize),
+                    height: context.widthCalculated(AppTheme.statusDotSize),
                     decoration: const BoxDecoration(
                       color: AppTheme.activeEventDotColor,
                       shape: BoxShape.circle,
                     ),
                   ),
-                  const SizedBox(width: AppTheme.spacingSm),
-                  Text(
-                    "Active Events",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall
-                        ?.copyWith(fontSize: AppTheme.fontSizeXl),
-                  ),
+                  SizedBox(width: context.widthCalculated(AppTheme.spacingSm)),
+                  Text('Active Events', style: tt.headlineSmall),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppTheme.spacingXs,
-                  horizontal: AppTheme.spacingSm,
+                padding: EdgeInsets.symmetric(
+                  vertical: context.heightCalculated(AppTheme.spacingXs),
+                  horizontal: context.widthCalculated(AppTheme.spacingSm),
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryColor.withAlpha(26),
+                  color: cs.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 ),
                 child: Text(
                   '${activeEvents.length} Ongoing',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        fontSize: AppTheme.fontSizeSm,
-                        color: AppTheme.primaryColor,
-                      ),
+                  style: tt.labelMedium?.copyWith(color: cs.primary),
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: AppTheme.spacingLg),
+        SizedBox(height: context.heightCalculated(AppTheme.spacingLg)),
+
         if (state is EventsLoading)
-          const Center(child: CircularProgressIndicator())
+          Center(child: CircularProgressIndicator(color: cs.primary))
         else if (activeEvents.isEmpty)
           _buildEmptyState(
+            context: context,
             icon: Icons.event_busy,
             title: 'No active events',
             subtitle: 'Join an event to see it here!',
@@ -251,7 +263,10 @@ class _EventsScreenState extends State<EventsScreen> {
           LayoutBuilder(
             builder: (context, constraints) {
               final crossAxisCount =
-                  (constraints.maxWidth / AppTheme.activeCardBreakpoint)
+                  (constraints.maxWidth /
+                          context.widthCalculated(
+                            AppTheme.activeCardBreakpoint,
+                          ))
                       .floor()
                       .clamp(1, 10);
               return GridView.builder(
@@ -259,18 +274,20 @@ class _EventsScreenState extends State<EventsScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: AppTheme.spacingMd,
-                  mainAxisSpacing: AppTheme.spacingMd,
+                  crossAxisSpacing: context.widthCalculated(AppTheme.spacingMd),
+                  mainAxisSpacing: context.heightCalculated(AppTheme.spacingMd),
                   childAspectRatio:
-                      AppTheme.activeCardAspectWidth / AppTheme.activeCardHeight,
+                      AppTheme.activeCardAspectWidth /
+                      context.heightCalculated(120),
                 ),
                 itemCount: activeEvents.length,
                 itemBuilder: (context, index) {
                   final event = activeEvents[index];
                   return ActiveEventsCard(
                     eventTitle: event.name,
-                    eventStatus:
-                        EventStatusMapper.toDisplayStatus(event.status),
+                    eventStatus: EventStatusMapper.toDisplayStatus(
+                      event.status,
+                    ),
                     eventDate: event.eventDate,
                   );
                 },
@@ -281,9 +298,11 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
+  // ── Archived section ───────────────────────────────────────────────────────
   Widget _buildArchivedSection(BuildContext context, EventsState state) {
-    final archivedEvents =
-        state is EventsLoaded ? state.archivedEvents : [];
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
+    final archivedEvents = state is EventsLoaded ? state.archivedEvents : [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,21 +310,17 @@ class _EventsScreenState extends State<EventsScreen> {
         Row(
           children: [
             const ImageIcon(AssetImage('assets/icons/archived_icon.png')),
-            const SizedBox(width: AppTheme.spacingSm),
-            Text(
-              "Archived Events",
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(fontSize: AppTheme.fontSizeXl),
-            ),
+            SizedBox(width: context.widthCalculated(AppTheme.spacingSm)),
+            Text('Archived Events', style: tt.headlineSmall),
           ],
         ),
-        const SizedBox(height: AppTheme.spacingLg),
+        SizedBox(height: context.heightCalculated(AppTheme.spacingLg)),
+
         if (state is EventsLoading)
-          const Center(child: CircularProgressIndicator())
+          Center(child: CircularProgressIndicator(color: cs.primary))
         else if (archivedEvents.isEmpty)
           _buildEmptyState(
+            context: context,
             icon: Icons.archive_outlined,
             title: 'No archived events',
             subtitle: 'Your archived events will appear here.',
@@ -326,40 +341,40 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
+  // ── Empty state ────────────────────────────────────────────────────────────
   Widget _buildEmptyState({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
   }) {
+    final tt = context.textTheme;
+
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-            vertical: AppTheme.emptyStatePadding),
+        padding: EdgeInsets.symmetric(
+          vertical: context.heightCalculated(AppTheme.emptyStatePadding),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              size: AppTheme.emptyStateIconSize,
+              size: context.iconSize() * 2.5,
               color: AppTheme.secondaryTextColor,
             ),
-            const SizedBox(height: AppTheme.spacingMd),
+            SizedBox(height: context.heightCalculated(AppTheme.spacingMd)),
             Text(
               title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppTheme.secondaryTextColor,
-                  ),
+              style: tt.titleMedium?.copyWith(
+                color: AppTheme.secondaryTextColor,
+              ),
             ),
-            const SizedBox(height: AppTheme.spacingXs),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodySmall,
-              textAlign: TextAlign.center,
-            ),
+            SizedBox(height: context.heightCalculated(AppTheme.spacingXs)),
+            Text(subtitle, style: tt.bodySmall, textAlign: TextAlign.center),
           ],
         ),
       ),
     );
   }
 }
-

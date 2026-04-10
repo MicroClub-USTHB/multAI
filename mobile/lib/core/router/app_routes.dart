@@ -7,6 +7,9 @@ abstract class AppRoutes {
   static const String events = '/home/events';
   static const String gallery = '/home/gallery';
   static const String account = '/home/account';
+
   // ── Face enrollment ────────────────────────────────────────────────────────
   static const String faceEnrollment = '/face-enrollment';
+
+  static const String notifications = 'notifications';
 }
