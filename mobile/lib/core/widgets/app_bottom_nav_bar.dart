@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../constants/nav_items.dart';
 import '../theme/theme.dart';
+import '../../features/notifications/presentation/bloc/notifications_bloc.dart';
 
 class AppBottomNavBar extends StatelessWidget {
   final String currentRoute;
@@ -21,16 +23,34 @@ class AppBottomNavBar extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: navItems
-            .map(
-              (data) => _NavBarItem(
-                icon: data.icon,
-                label: data.label,
-                isSelected: currentRoute == data.route,
-                onTap: () => context.go(data.route),
-              ),
-            )
-            .toList(),
+        children: navItems.map((data) {
+          final isSelected = currentRoute.startsWith(data.route);
+
+          // ── notifications tab needs unread badge ────────────────────
+          if (data.item == NavItem.notifications) {
+            return BlocBuilder<NotificationBloc, NotificationState>(
+              builder: (context, state) {
+                final unread = state is NotificationLoaded
+                    ? state.unreadCount
+                    : 0;
+                return _NavBarItem(
+                  icon: data.icon,
+                  label: data.label,
+                  isSelected: isSelected,
+                  badgeCount: unread,
+                  onTap: () => context.go(data.route),
+                );
+              },
+            );
+          }
+
+          return _NavBarItem(
+            icon: data.icon,
+            label: data.label,
+            isSelected: isSelected,
+            onTap: () => context.go(data.route),
+          );
+        }).toList(),
       ),
     );
   }
@@ -41,12 +61,14 @@ class _NavBarItem extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final int badgeCount;
 
   const _NavBarItem({
     required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.badgeCount = 0,
   });
 
   @override
@@ -63,7 +85,37 @@ class _NavBarItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 26),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(icon, color: color, size: 26),
+                if (badgeCount > 0)
+                  Positioned(
+                    top: -4,
+                    right: -6,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(
+                        color: AppTheme.errorColor,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        badgeCount > 99 ? '99+' : '$badgeCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             const SizedBox(height: 4),
             Text(
               label,
