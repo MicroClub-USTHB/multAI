@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/theme.dart';
 import 'features/auth/presentation/blocs/auth_bloc.dart';
+import 'features/events/presentation/bloc/events_bloc.dart';
 import 'features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'features/account/presentation/bloc/account_bloc.dart';
 import 'di/injection_container.dart' as di;
@@ -71,6 +72,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<AuthBloc>(create: (_) => di.sl<AuthBloc>()),
         BlocProvider<OnboardingBloc>(create: (_) => di.sl<OnboardingBloc>()),
         BlocProvider<AccountBloc>(create: (_) => di.sl<AccountBloc>()),
+        BlocProvider<EventsBloc>(create: (_) => di.sl<EventsBloc>()..add(GetUserEventsRequested())),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

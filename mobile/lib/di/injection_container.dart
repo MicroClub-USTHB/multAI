@@ -45,6 +45,13 @@ import '../features/account/domain/repositories/account_repository.dart';
 import '../features/account/domain/usecases/get_account_data_usecase.dart';
 import '../features/account/presentation/bloc/account_bloc.dart';
 
+// Events
+import '../features/events/data/datasources/events_remote_datasource.dart';
+import '../features/events/data/repositories/events_repository_impl.dart';
+import '../features/events/domain/repositories/event_repository.dart';
+import '../features/events/domain/usecases/get_events_usecase.dart';
+import '../features/events/presentation/bloc/events_bloc.dart';
+ 
 final sl = GetIt.instance;
 
 FutureOr<void> init() async {
@@ -188,6 +195,28 @@ FutureOr<void> init() async {
     () => AccountBloc(
       getAccountData: sl<GetAccountDataUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
+    ),
+  );
+
+  // ── Events Data Source ──────────────────────────────────────────────────────
+  sl.registerLazySingleton<EventsRemoteDataSource>(
+    () => EventsRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  // ── Events Repository ───────────────────────────────────────────────────────
+  sl.registerLazySingleton<EventRepository>(
+    () => EventsRepositoryImpl(remoteDataSource: sl<EventsRemoteDataSource>()),
+  );
+
+  // ── Events Use Cases ────────────────────────────────────────────────────────
+  sl.registerLazySingleton(() => GetUserEventsUseCase(sl<EventRepository>()));
+  sl.registerLazySingleton(() => JoinEventUseCase(sl<EventRepository>()));
+
+  // ── Events BLoC ─────────────────────────────────────────────────────────────
+  sl.registerFactory<EventsBloc>(
+    () => EventsBloc(
+      getUserEventsUseCase: sl<GetUserEventsUseCase>(),
+      joinEventUseCase:     sl<JoinEventUseCase>(),
     ),
   );
 }
