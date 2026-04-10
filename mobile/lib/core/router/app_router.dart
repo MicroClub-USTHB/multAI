@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:multai_mobile/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:multai_mobile/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:multai_mobile/features/splash/presentation/pages/splash_screen.dart';
 
@@ -11,11 +12,11 @@ import '../../features/home/presentation/screens/home_shell.dart';
 import '../../features/events/presentation/screens/events_screen.dart';
 import '../../features/gallery/presentation/screens/gallery_screen.dart';
 import '../../features/account/presentation/screens/account_screen.dart';
-import '../../features/notifications/presentation/screens/photo_approval_screen.dart';
+// import '../../features/notifications/presentation/screens/photo_approval_screen.dart';
 import 'app_routes.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppRoutes.photoApproval,
+  initialLocation: AppRoutes.login,
   routes: [
     // ── Splash Screen (initial route) ───────────────────────────────────────
     GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
@@ -39,8 +40,8 @@ final GoRouter appRouter = GoRouter(
 
     // ── Notifications ──────────────────────────────────────────────────────────
     GoRoute(
-      path: AppRoutes.photoApproval,
-      builder: (context, state) => const PhotoApprovalPage(),
+      path: AppRoutes.notifications,
+      builder: (context, state) => const NotificationsScreen(),
     ),
  
     // ── Home shell with bottom nav ─────────────────────────────────────────────
