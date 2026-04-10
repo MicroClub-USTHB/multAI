@@ -3,12 +3,14 @@ abstract class AppRoutes {
   static const String login = '/login';
 
   // ── Home shell ─────────────────────────────────────────────────────────────
-  static const String home = '/home';
   static const String events = '/home/events';
   static const String gallery = '/home/gallery';
+  static const String notifications = '/home/notifications';
   static const String account = '/home/account';
   // ── Face enrollment ────────────────────────────────────────────────────────
   static const String faceEnrollment = '/face-enrollment';
   // ── Notifications ──────────────────────────────────────────────────────────
   static const String photoApproval = '/photo-approval';
 }
+
+
