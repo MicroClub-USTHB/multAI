@@ -3,28 +3,22 @@ import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../../../core/theme/theme.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 
-enum DecisionStatus { approved, rejected }
-
 class DecisionTile extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final DecisionStatus status;
-  final String? imageUrl;
+  final String photoId;
+  final DateTime? decidedAt;
+  final bool isApproved;
 
   const DecisionTile({
     super.key,
-    required this.title,
-    required this.subtitle,
-    required this.status,
-    this.imageUrl,
+    required this.photoId,
+    required this.isApproved,
+    this.decidedAt,
   });
 
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
-    final isApproved = status == DecisionStatus.approved;
 
-    // ── colors from AppTheme ────────────────────────────────────────────
     final badgeColor = isApproved
         ? AppTheme.successColor.withValues(alpha: 0.15)
         : AppTheme.errorColor.withValues(alpha: 0.15);
@@ -45,53 +39,48 @@ class DecisionTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // ── thumbnail ────────────────────────────────────────────────
+          // ── thumbnail placeholder ──────────────────────────────────
           ClipRRect(
             borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-            child: imageUrl != null
-                ? Image.network(
-                    imageUrl!,
-                    width: context.widthCalculated(48),
-                    height: context.widthCalculated(48),
-                    fit: BoxFit.cover,
-                  )
-                : Container(
-                    width: context.widthCalculated(48),
-                    height: context.widthCalculated(48),
-                    color: AppTheme.cardColor,
-                    child: Icon(
-                      Icons.image_outlined,
-                      size: context.iconSize(),
-                      color: AppTheme.secondaryTextColor,
-                    ),
-                  ),
+            child: Container(
+              width: context.widthCalculated(48),
+              height: context.widthCalculated(48),
+              color: AppTheme.cardColor,
+              child: Icon(
+                Icons.image_outlined,
+                size: context.iconSize(),
+                color: AppTheme.secondaryTextColor,
+              ),
+            ),
           ),
           SizedBox(width: context.widthCalculated(12)),
 
-          // ── title + subtitle ─────────────────────────────────────────
+          // ── photo id + time ────────────────────────────────────────
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  'Photo #${photoId.substring(0, 8)}',
                   style: tt.titleSmall?.copyWith(
                     color: AppTheme.primaryTextColor,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: context.heightCalculated(2)),
-                Text(
-                  subtitle,
-                  style: tt.labelSmall?.copyWith(
-                    color: AppTheme.secondaryTextColor,
+                if (decidedAt != null) ...[
+                  SizedBox(height: context.heightCalculated(2)),
+                  Text(
+                    _timeAgo(decidedAt!),
+                    style: tt.labelSmall?.copyWith(
+                      color: AppTheme.secondaryTextColor,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
 
-          // ── status badge ─────────────────────────────────────────────
+          // ── status badge ───────────────────────────────────────────
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: context.widthCalculated(10),
@@ -125,5 +114,13 @@ class DecisionTile extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _timeAgo(DateTime date) {
+    final diff = DateTime.now().difference(date);
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return '${date.day}/${date.month}/${date.year}';
   }
 }

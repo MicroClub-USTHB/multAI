@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
+import '../../../domain/entities/photo_approval_entity.dart';
 import '../../../../../core/theme/theme.dart';
 import 'decision_tile.dart';
 
 class RecentDecisionsSection extends StatelessWidget {
-  const RecentDecisionsSection({super.key});
+  final List<PhotoApprovalEntity> decisions;
+
+  const RecentDecisionsSection({super.key, required this.decisions});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +17,7 @@ class RecentDecisionsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Section title ────────────────────────────────────────────────
+        // ── Section title ──────────────────────────────────────────────
         Row(
           children: [
             Icon(
@@ -35,17 +38,13 @@ class RecentDecisionsSection extends StatelessWidget {
         ),
         SizedBox(height: context.heightCalculated(12)),
 
-        // ── Tiles ────────────────────────────────────────────────────────
-        const DecisionTile(
-          title: 'Sunset Dinner Group',
-          subtitle: '2 hours ago',
-          status: DecisionStatus.approved,
-        ),
-
-        const DecisionTile(
-          title: 'Birthday Bash 2024',
-          subtitle: 'Yesterday',
-          status: DecisionStatus.rejected,
+        // ── Tiles ─────────────────────────────────────────────────────
+        ...decisions.map(
+          (decision) => DecisionTile(
+            photoId: decision.photoId,
+            decidedAt: decision.decidedAt,
+            isApproved: decision.decision.isApproved,
+          ),
         ),
       ],
     );

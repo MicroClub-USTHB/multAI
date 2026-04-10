@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
@@ -9,13 +9,14 @@ import 'core/theme/theme.dart';
 import 'features/auth/presentation/blocs/auth_bloc.dart';
 import 'features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'features/account/presentation/bloc/account_bloc.dart';
+import 'features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'di/injection_container.dart' as di;
 
 // Map<String, String>? _pendingAuthTokens;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  // await Firebase.initializeApp();
   await di.init();
 
   // Load .env with error handling - use defaults if file missing/corrupted
@@ -73,6 +74,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<AuthBloc>(create: (_) => di.sl<AuthBloc>()),
         BlocProvider<OnboardingBloc>(create: (_) => di.sl<OnboardingBloc>()),
         BlocProvider<AccountBloc>(create: (_) => di.sl<AccountBloc>()),
+        BlocProvider<NotificationBloc>(create: (_) => di.sl<NotificationBloc>()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

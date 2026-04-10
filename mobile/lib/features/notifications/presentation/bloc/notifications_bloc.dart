@@ -105,3 +105,5 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     add(LoadNotifications());
   }
 }
+
+

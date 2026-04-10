@@ -24,7 +24,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   @override
   Future<List<NotificationModel>> markAsRead(List<String> notificationIds) async {
     final json = await apiClient.post(
-      EndPoints.notificationsReads,
+      EndPoints.notificationsRead,
       body: {'notification_ids' : notificationIds},
       requiresAuth: true,
     );

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../../../core/extensions/context_extensions.dart';
-import '../../../../../core/extensions/responsive_extensions.dart';
+import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/theme/theme.dart';
-import '../../domain/entities/notification_entity.dart';
+import '../../../notifications/domain/entities/notification_entity.dart';
 
-class NotificationTile extends StatelessWidget {
+class NotificationCard extends StatelessWidget {
   final NotificationEntity notification;
   final VoidCallback onTap;
 
-  const NotificationTile({
+  const NotificationCard({
     super.key,
     required this.notification,
     required this.onTap,
@@ -22,7 +22,7 @@ class NotificationTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: context.heightCalculated(8)),
+        margin: EdgeInsets.only(bottom: context.heightCalculated(10)),
         padding: EdgeInsets.all(context.widthCalculated(14)),
         decoration: BoxDecoration(
           color: notification.isRead
@@ -39,22 +39,22 @@ class NotificationTile extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── icon ───────────────────────────────────────────────────
+            // ── icon container ────────────────────────────────────────
             Container(
-              padding: EdgeInsets.all(context.widthCalculated(8)),
+              padding: EdgeInsets.all(context.widthCalculated(10)),
               decoration: BoxDecoration(
-                color: cs.primary.withValues(alpha: 0.15),
+                color: _iconBgColor(notification.type, cs),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
               child: Icon(
                 _iconFor(notification.type),
                 size: context.iconSize(),
-                color: cs.primary,
+                color: _iconColor(notification.type, cs),
               ),
             ),
             SizedBox(width: context.widthCalculated(12)),
 
-            // ── content ────────────────────────────────────────────────
+            // ── content ───────────────────────────────────────────────
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,6 +79,28 @@ class NotificationTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
+                  SizedBox(height: context.heightCalculated(8)),
+
+                  // ── CTA for photo approval ─────────────────────────
+                  if (notification.type == NotificationType.photoApproval)
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.widthCalculated(10),
+                        vertical: context.heightCalculated(4),
+                      ),
+                      decoration: BoxDecoration(
+                        color: cs.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      ),
+                      child: Text(
+                        'Tap to review photo →',
+                        style: tt.labelSmall?.copyWith(
+                          color: cs.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+
                   SizedBox(height: context.heightCalculated(6)),
                   Text(
                     _timeAgo(notification.createdAt),
@@ -90,7 +112,7 @@ class NotificationTile extends StatelessWidget {
               ),
             ),
 
-            // ── unread dot ─────────────────────────────────────────────
+            // ── unread dot ────────────────────────────────────────────
             if (!notification.isRead)
               Container(
                 width: context.widthCalculated(8),
@@ -119,6 +141,28 @@ class NotificationTile extends StatelessWidget {
         return Icons.info_outline;
       case NotificationType.unknown:
         return Icons.notifications_outlined;
+    }
+  }
+
+  Color _iconBgColor(NotificationType type, ColorScheme cs) {
+    switch (type) {
+      case NotificationType.photoApproval:
+        return AppTheme.warningColor.withValues(alpha: 0.15);
+      case NotificationType.photoDistributed:
+        return AppTheme.successColor.withValues(alpha: 0.15);
+      default:
+        return cs.primary.withValues(alpha: 0.15);
+    }
+  }
+
+  Color _iconColor(NotificationType type, ColorScheme cs) {
+    switch (type) {
+      case NotificationType.photoApproval:
+        return AppTheme.warningColor;
+      case NotificationType.photoDistributed:
+        return AppTheme.successColor;
+      default:
+        return cs.primary;
     }
   }
 
