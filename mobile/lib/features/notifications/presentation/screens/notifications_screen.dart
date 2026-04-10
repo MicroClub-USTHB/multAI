@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/extensions/snackbar_extensions.dart';
-import '../../../../../core/extensions/context_extensions.dart';
-import '../../../../../core/extensions/responsive_extensions.dart';
+import '../../../../core/extensions/responsive_extensions.dart';
+import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/theme.dart';
 import '../bloc/notifications_bloc.dart';
-import '../widgets/notification_tile.dart';
+import '../../domain/entities/notification_entity.dart';
+import '../widgets/notification_card.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -31,10 +33,6 @@ class NotificationsScreen extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: AppTheme.backgroundColor,
             elevation: 0,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: cs.onSurface),
-              onPressed: () => context.pop(),
-            ),
             centerTitle: true,
             title: Text(
               'Notifications',
@@ -63,92 +61,71 @@ class NotificationsScreen extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, NotificationState state) {
-    final tt = context.textTheme;
     final cs = context.theme.colorScheme;
 
-    // ── loading ───────────────────────────────────────────────────────────
-    if (state is NotificationLoading) {
-      return Center(child: CircularProgressIndicator(color: cs.primary));
-    }
-
-    // ── trigger load on initial ───────────────────────────────────────────
     if (state is NotificationInitial) {
       context.read<NotificationBloc>().add(LoadNotifications());
       return Center(child: CircularProgressIndicator(color: cs.primary));
     }
 
-    // ── loaded ────────────────────────────────────────────────────────────
+    if (state is NotificationLoading) {
+      return Center(child: CircularProgressIndicator(color: cs.primary));
+    }
+
     if (state is NotificationLoaded) {
-      if (state.notifications.isEmpty) {
-        return _buildEmpty(context);
-      }
+      if (state.notifications.isEmpty) return _buildEmpty(context);
 
-      return Column(
-        children: [
-          // ── unread count badge ────────────────────────────────────────
-          if (state.unreadCount > 0)
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.hPadding(),
-                vertical: context.heightCalculated(8),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.widthCalculated(10),
-                      vertical: context.heightCalculated(4),
-                    ),
-                    decoration: BoxDecoration(
-                      color: cs.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    ),
-                    child: Text(
-                      '${state.unreadCount} unread',
-                      style: tt.labelSmall?.copyWith(
-                        color: cs.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          // ── list ─────────────────────────────────────────────────────
-          Expanded(
-            child: RefreshIndicator(
-              color: cs.primary,
-              onRefresh: () async {
-                context.read<NotificationBloc>().add(LoadNotifications());
-              },
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.hPadding(),
-                  vertical: context.heightCalculated(8),
-                ),
-                itemCount: state.notifications.length,
-                itemBuilder: (context, index) {
-                  final notification = state.notifications[index];
-                  return NotificationTile(
-                    notification: notification,
-                    onTap: () {
-                      if (!notification.isRead) {
-                        context.read<NotificationBloc>().add(
-                          MarkNotificationRead(notificationId: notification.id),
-                        );
-                      }
-                    },
-                  );
-                },
-              ),
-            ),
+      return RefreshIndicator(
+        color: cs.primary,
+        onRefresh: () async =>
+            context.read<NotificationBloc>().add(LoadNotifications()),
+        child: ListView.builder(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.hPadding(),
+            vertical: context.heightCalculated(12),
           ),
-        ],
+          itemCount: state.notifications.length,
+          itemBuilder: (context, index) {
+            final notification = state.notifications[index];
+            return NotificationCard(
+              notification: notification,
+              onTap: () => _onNotificationTap(context, notification),
+            );
+          },
+        ),
       );
     }
 
     return const SizedBox.shrink();
+  }
+
+  // ── Handle tap based on notification type ─────────────────────────────────
+  void _onNotificationTap(
+    BuildContext context,
+    NotificationEntity notification,
+  ) {
+    // mark as read
+    if (!notification.isRead) {
+      context.read<NotificationBloc>().add(
+        MarkNotificationRead(notificationIds: [notification.id]),
+      );
+    }
+
+    // navigate based on type
+    switch (notification.type) {
+      case NotificationType.photoApproval:
+        context.push(AppRoutes.photoApproval);
+        break;
+      case NotificationType.photoDistributed:
+        context.push(AppRoutes.gallery);
+        break;
+      case NotificationType.eventInvite:
+        context.push(AppRoutes.events);
+        break;
+      case NotificationType.system:
+      case NotificationType.unknown:
+        break;
+    }
   }
 
   Widget _buildEmpty(BuildContext context) {
