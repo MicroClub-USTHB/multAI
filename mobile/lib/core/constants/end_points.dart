@@ -26,4 +26,6 @@ class EndPoints {
   // ── Photo Approval ─────────────────────────────────────────────────────────
   static const String photoApprovals = '/photos/approvals';
   static const String photoDecision = '/photos';
+  // gallary
+  static const String photos = '/photos';
 }

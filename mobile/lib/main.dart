@@ -11,6 +11,7 @@ import 'features/events/presentation/bloc/events_bloc.dart';
 import 'features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'features/account/presentation/bloc/account_bloc.dart';
 import 'features/notifications/presentation/bloc/notifications_bloc.dart';
+import 'features/gallery/presentation/bloc/gallery_bloc.dart';
 import 'di/injection_container.dart' as di;
 
 // Map<String, String>? _pendingAuthTokens;
@@ -77,6 +78,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<AccountBloc>(create: (_) => di.sl<AccountBloc>()),
         BlocProvider<EventsBloc>(create: (_) => di.sl<EventsBloc>()..add(GetUserEventsRequested())),
         BlocProvider<NotificationBloc>(create: (_) => di.sl<NotificationBloc>()),
+        BlocProvider<GalleryBloc>(create: (_) => di.sl<GalleryBloc>()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

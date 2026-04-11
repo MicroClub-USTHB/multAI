@@ -1,4 +1,7 @@
 import 'package:get_it/get_it.dart';
+import 'package:multai_mobile/features/gallery/domain/repositories/photo_repository.dart';
+import 'package:multai_mobile/features/gallery/domain/usecases/get_event_photos_usecase.dart';
+import 'package:multai_mobile/features/gallery/domain/usecases/get_my_photos_usecase.dart';
 import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
 import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:async';
+
 
 import '../core/network/network_info.dart';
 import '../core/network/api_client.dart';
@@ -68,6 +72,14 @@ import '../features/events/data/repositories/events_repository_impl.dart';
 import '../features/events/domain/repositories/event_repository.dart';
 import '../features/events/domain/usecases/get_events_usecase.dart';
 import '../features/events/presentation/bloc/events_bloc.dart';
+// gallery
+import '../features/gallery/presentation/bloc/gallery_bloc.dart';
+import '../features/gallery/data/cache/photo_cache_service.dart';
+import '../features/gallery/data/datasources/photo_remote_datasource.dart';
+import '../features/gallery/data/repositories/photo_repository_impl.dart';
+import '../features/gallery/domain/usecases/get_photo_image_usecase.dart';
+
+
 
 final sl = GetIt.instance;
 
@@ -305,6 +317,35 @@ FutureOr<void> init() async {
     () => PhotoApprovalBloc(
       getApprovals: sl<GetApprovalsUsecase>(),
       decideApproval: sl<DecidePhotoApprovalUseCase>(),
+    ),
+  );
+  // Cache Service
+  sl.registerLazySingleton(() => PhotoCacheService());
+
+  // Gallery Remote DataSource
+  sl.registerLazySingleton<PhotoRemoteDataSource>(
+    () => PhotoRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  // Gallery Repository
+  sl.registerLazySingleton<PhotoRepository>(
+    () => PhotoRepositoryImpl(
+      remoteDataSource: sl<PhotoRemoteDataSource>(),
+      cacheService: sl<PhotoCacheService>(),
+    ),
+  );
+
+  // Gallery Use Cases
+  sl.registerLazySingleton(() => GetMyPhotosUseCase(sl<PhotoRepository>()));
+  sl.registerLazySingleton(() => GetEventPhotosUseCase(sl<PhotoRepository>()));
+  sl.registerLazySingleton(() => GetPhotoImageUseCase(sl<PhotoRepository>()));
+
+  // Gallery BLoC
+  sl.registerFactory<GalleryBloc>(
+    () => GalleryBloc(
+      getMyPhotos: sl<GetMyPhotosUseCase>(),
+      getEventPhotos: sl<GetEventPhotosUseCase>(),
+      getPhotoImage: sl<GetPhotoImageUseCase>(),
     ),
   );
 }

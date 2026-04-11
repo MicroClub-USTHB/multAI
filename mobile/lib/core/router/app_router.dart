@@ -47,7 +47,7 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: AppRoutes.gallery,
-          builder: (context, state) => const GalleryScreen(),
+          builder: (context, state) => GalleryScreen(),
         ),
         GoRoute(
           path: AppRoutes.account,
