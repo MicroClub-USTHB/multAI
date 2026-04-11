@@ -11,21 +11,22 @@ import '../../features/home/presentation/screens/home_shell.dart';
 import '../../features/events/presentation/screens/events_screen.dart';
 import '../../features/gallery/presentation/screens/gallery_screen.dart';
 import '../../features/account/presentation/screens/account_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import 'app_routes.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: AppRoutes.events,
   routes: [
     // ── Splash Screen (initial route) ───────────────────────────────────────
-    GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+    GoRoute(path: AppRoutes.splash, builder: (context, state) => const SplashScreen()),
     // ── Onboarding ───────────────────────────────────────────────────────────
     GoRoute(
-      path: '/onboarding',
+      path: AppRoutes.onboarding ,
       builder: (context, state) => const OnboardingScreen(),
     ),
 
     // ── Auth ──────────────────────────────────────────────────────────────────
-    GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+    GoRoute(path: AppRoutes.login , builder: (context, state) => const LoginPage()),
 
     // ── Face Enrollment ────────────────────────────────────────────────────────
     GoRoute(
@@ -51,6 +52,10 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: AppRoutes.account,
           builder: (context, state) => const AccountScreen(),
+        ),
+          GoRoute(
+          path: AppRoutes.notifications,
+          builder: (context, state) => const NotificationsScreen(),
         ),
       ],
     ),

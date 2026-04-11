@@ -10,4 +10,9 @@ extension NavigationX on BuildContext {
 
     return null;
   }
+  
+   void pop() {
+    Navigator.pop(this);
+  }
 }
+

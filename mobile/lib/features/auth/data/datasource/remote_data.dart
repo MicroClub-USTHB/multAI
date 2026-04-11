@@ -40,7 +40,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> revokeDevice(String deviceId) async {
-    await apiClient.delete('/auth/devices/$deviceId');
+    await apiClient.delete('${EndPoints.revokeDevice}/$deviceId');
   }
 
   @override

@@ -16,4 +16,14 @@ class EndPoints {
   // events
   static const String userEvents = '/user/event/me';
   static const String joinEvent  = '/user/event/join';
+  static const String revokeDevice = '/auth/devices';
+
+  // ── NotificationsNotifications ──────────────────────────────────────────────────────────
+  static const String notifications = '/notifications';
+  static const String notificationsRead = '/notifications/read';
+  static const String registerPushToken = '/notifications/push-token/register';
+  static const String revokePushToken = '/notifications/push-token/revoke';
+  // ── Photo Approval ─────────────────────────────────────────────────────────
+  static const String photoApprovals = '/photos/approvals';
+  static const String photoDecision = '/photos';
 }

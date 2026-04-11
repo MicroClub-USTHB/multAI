@@ -33,7 +33,6 @@ class _EventsScreenState extends State<EventsScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return BlocListener<EventsBloc, EventsState>(
       listener: (context, state) {
         if (state is JoinEventSuccess) {
@@ -308,8 +307,12 @@ class _EventsScreenState extends State<EventsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          children: [
-            const ImageIcon(AssetImage('assets/icons/archived_icon.png')),
+          children:[
+            Icon(
+              Icons.archive_outlined,
+              size:  context.iconSize(),
+              color: AppTheme.secondaryTextColor,
+            ),
             SizedBox(width: context.widthCalculated(AppTheme.spacingSm)),
             Text('Archived Events', style: tt.headlineSmall),
           ],
