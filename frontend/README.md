@@ -1,5 +1,35 @@
 Welcome to your new TanStack Start app! 
 
+# MultAI Integration Notes
+
+## Backend contract (current)
+
+- Backend (FastAPI) base URL (local): `http://localhost:8000`
+- Health check: `GET /health`
+- OpenAPI/Swagger: `GET /openapi.json`, `GET /docs`
+- Web (dashboard) auth: cookie session via `POST /admin/auth/login` + `GET /admin/auth/me`
+- Staff/media-team APIs: prefixed with `GET/POST /stuff/*` (note: backend uses `/stuff`, not `/staff`)
+
+## Frontend ↔ backend networking (dev)
+
+This frontend uses a same-origin API base path in code and proxies to the backend in development:
+
+- Frontend dev server: `http://localhost:3000`
+- Client API base: `VITE_API_BASE_URL=/api` (see `.env.development`)
+- Dev proxy: `/api/*` → `VITE_API_PROXY_TARGET` (configured in `vite.config.ts`)
+
+## Running the backend image locally
+
+See `backend-runtime/README.md`.
+
+## ⚠️ Backend verification checklist
+
+- See `docs/backend-gap-checklist.md` for the detailed, checkable list of endpoints and PDF-driven gaps.
+- Discord OAuth for web app (PDF spec) is not present in the scanned backend (currently email/password login).
+- Direct-to-MinIO upload + presigned URL flow (PDF spec) is not present in the scanned backend (current flow is Google Drive + `drive_file_id` based upload requests).
+- Admin dashboard stats/alerts/logs endpoints used by the current UI mocks are not present in the scanned backend.
+- Logout endpoint to clear the httpOnly cookie is not present (frontend needs `POST /admin/auth/logout` or equivalent).
+
 # Getting Started
 
 To run this application:
