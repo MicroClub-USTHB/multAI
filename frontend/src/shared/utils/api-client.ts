@@ -1,5 +1,7 @@
 export const API_BASE_URL =
-	(import.meta.env.VITE_SERVER_URL as string | undefined) ?? '/api'
+	(import.meta.env.VITE_API_BASE_URL as string | undefined) ??
+	(import.meta.env.VITE_SERVER_URL as string | undefined) ??
+	'/api'
 
 export type ApiRequestOptions = {
 	fallbackErrorMessage?: string

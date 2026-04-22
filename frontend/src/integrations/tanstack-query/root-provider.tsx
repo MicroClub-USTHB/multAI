@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import { ApiError } from '@/shared/utils/api-client';
+
 let queryClient: QueryClient | undefined;
 
 export function getQueryClient() {
@@ -12,10 +14,16 @@ export function getQueryClient() {
           staleTime: 1000 * 60 * 5,
           gcTime: 1000 * 60 * 10,
           refetchOnWindowFocus: import.meta.env.PROD,
-          retry: 2,
+          retry: (failureCount, error) => {
+            if (error instanceof ApiError && error.status === 401) return false;
+            return failureCount < 2;
+          },
         },
         mutations: {
-          retry: 1,
+          retry: (failureCount, error) => {
+            if (error instanceof ApiError && error.status === 401) return false;
+            return failureCount < 1;
+          },
         },
       },
     });

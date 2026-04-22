@@ -1,6 +1,11 @@
 import { createEnv } from '@t3-oss/env-core';
 import { z } from 'zod';
 
+const runtimeEnv = {
+  ...import.meta.env,
+  ...(typeof process !== 'undefined' ? process.env : {}),
+};
+
 export const env = createEnv({
   server: {
     SERVER_URL: z.string().url().optional(),
@@ -15,13 +20,15 @@ export const env = createEnv({
   client: {
     VITE_APP_TITLE: z.string().min(1).optional(),
     VITE_SITE_URL: z.string().url().optional(),
+    VITE_API_BASE_URL: z.string().min(1).default('/api'),
+    VITE_API_PROXY_TARGET: z.string().url().optional(),
   },
 
   /**
    * What object holds the environment variables at runtime. This is usually
    * `process.env` or `import.meta.env`.
    */
-  runtimeEnv: import.meta.env,
+  runtimeEnv,
 
   /**
    * By default, this library will feed the environment variables directly to
