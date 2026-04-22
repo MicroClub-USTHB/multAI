@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.multai_mobile"
-        minSdk = flutter.minSdkVersion   // مهم لتفادي المشاكل
+        minSdk = flutter.minSdkVersion 
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
