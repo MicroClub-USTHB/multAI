@@ -11,19 +11,17 @@ class AccountModel extends AccountEntity {
     final userJson = json['user'] is Map
         ? Map<String, dynamic>.from(json['user'] as Map)
         : json;
-    final email = (userJson['email'] as String?) ??
-        (json['email'] as String?) ??
-        '';
+    final email =
+        (userJson['email'] as String?) ?? (json['email'] as String?) ?? '';
     final name = _deriveDisplayName(
-      (json['name'] as String?) ??
-          (userJson['name'] as String?) ??
-          email,
+      (json['name'] as String?) ?? (userJson['name'] as String?) ?? email,
     );
 
     return AccountModel(
       name: name,
       email: email,
-      avatarUrl: (json['avatar_url'] as String?) ??
+      avatarUrl:
+          (json['avatar_url'] as String?) ??
           (userJson['avatar_url'] as String?),
     );
   }

@@ -33,8 +33,8 @@ class PhotoApprovalRemoteDataSourceImpl
         ? json
         : (json is Map<String, dynamic>
               ? (json['items'] as List<dynamic>? ??
-                  json['data'] as List<dynamic>? ??
-                  [])
+                    json['data'] as List<dynamic>? ??
+                    [])
               : []);
 
     return list

@@ -8,10 +8,7 @@ import '../repositories/notifications_repository.dart';
 class RegisterPushTokenParams {
   final String deviceId;
   final String token;
-  const RegisterPushTokenParams({
-    required this.deviceId,
-    required this.token,
-  });
+  const RegisterPushTokenParams({required this.deviceId, required this.token});
 }
 
 class RegisterPushTokenUseCase extends UseCase<void, RegisterPushTokenParams> {

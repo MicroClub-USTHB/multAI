@@ -44,7 +44,9 @@ class PhotoRemoteDataSourceImpl implements PhotoRemoteDataSource {
     final list = json is List<dynamic>
         ? json
         : (json is Map<String, dynamic>
-              ? (json['data'] as List<dynamic>? ?? json['items'] as List<dynamic>? ?? [])
+              ? (json['data'] as List<dynamic>? ??
+                    json['items'] as List<dynamic>? ??
+                    [])
               : []);
 
     return list

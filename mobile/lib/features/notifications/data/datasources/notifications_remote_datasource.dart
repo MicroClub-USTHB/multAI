@@ -55,7 +55,8 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   }
 
   List<NotificationModel> _parseList(Map<String, dynamic> json) {
-    final list = json['items'] as List<dynamic>? ??
+    final list =
+        json['items'] as List<dynamic>? ??
         json['notifications'] as List<dynamic>? ??
         [];
     return list
