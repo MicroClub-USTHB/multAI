@@ -1,6 +1,5 @@
 part of 'photo_approval_bloc.dart';
 
-
 abstract class PhotoApprovalState {}
 
 class PhotoApprovalInitial extends PhotoApprovalState {}
@@ -9,7 +8,7 @@ class PhotoApprovalLoading extends PhotoApprovalState {}
 
 class PhotoApprovalLoaded extends PhotoApprovalState {
   final List<PhotoApprovalEntity> pending;
-  final List<PhotoApprovalEntity> history; 
+  final List<PhotoApprovalEntity> history;
 
   PhotoApprovalLoaded({required this.pending, required this.history});
 }
@@ -21,7 +20,7 @@ class PhotoApprovalDeciding extends PhotoApprovalState {
 
 class PhotoApprovalDecisionSuccess extends PhotoApprovalState {
   final String photoId;
-  final String decision; 
+  final String decision;
   final String photoStatus;
   PhotoApprovalDecisionSuccess({
     required this.photoId,

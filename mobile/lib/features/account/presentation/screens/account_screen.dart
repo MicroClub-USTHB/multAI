@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -29,7 +29,7 @@ class AccountScreen extends StatelessWidget {
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: AppTheme.backgroundColor,
+          backgroundColor: AppThemeColors.background,
           appBar: const AccountAppBar(),
           body: _buildBody(context, state),
         );

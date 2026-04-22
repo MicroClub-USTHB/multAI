@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
-import '../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class DecisionActionButtons extends StatelessWidget {
   final VoidCallback onAccept;
@@ -58,7 +58,7 @@ class DecisionActionButtons extends StatelessWidget {
             child: Text(
               'Reject',
               style: tt.titleMedium?.copyWith(
-                color: AppTheme.primaryTextColor,
+                color: AppThemeColors.primaryText,
                 fontWeight: FontWeight.w600,
               ),
             ),

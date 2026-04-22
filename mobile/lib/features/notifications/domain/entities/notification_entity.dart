@@ -40,23 +40,21 @@ extension NotificationTypeX on NotificationType {
 
 class NotificationEntity {
   final String id;
-  final String userId;
   final NotificationType type;
   final Map<String, dynamic> payload;
   final DateTime? readAt;
   final DateTime createdAt;
- 
+
   const NotificationEntity({
     required this.id,
-    required this.userId,
     required this.type,
     required this.payload,
     this.readAt,
     required this.createdAt,
   });
- 
+
   bool get isRead => readAt != null;
- 
+
   String get title => payload['title'] as String? ?? type.label;
-  String get body  => payload['body']  as String? ?? '';
+  String get body => payload['body'] as String? ?? '';
 }

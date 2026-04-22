@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/navigation_extensions.dart';
-import '../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class HeaderSection extends StatelessWidget {
   const HeaderSection({super.key});
@@ -30,7 +30,7 @@ class HeaderSection extends StatelessWidget {
                 'MultiAi',
                 style: tt.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryTextColor,
+                  color: AppThemeColors.primaryText,
                 ),
               ),
             ],
@@ -42,13 +42,13 @@ class HeaderSection extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(context.widthCalculated(6)),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceColor,
+                color: AppThemeColors.surface,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.close,
                 size: context.iconSize(),
-                color: AppTheme.secondaryTextColor,
+                color: AppThemeColors.secondaryText,
               ),
             ),
           ),

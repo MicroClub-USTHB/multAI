@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
-import '../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../notifications/domain/entities/notification_entity.dart';
 
 class NotificationCard extends StatelessWidget {
@@ -26,12 +27,12 @@ class NotificationCard extends StatelessWidget {
         padding: EdgeInsets.all(context.widthCalculated(14)),
         decoration: BoxDecoration(
           color: notification.isRead
-              ? AppTheme.surfaceColor
+              ? AppThemeColors.surface
               : cs.primary.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
           border: Border.all(
             color: notification.isRead
-                ? AppTheme.inputBorderColor
+                ? AppThemeColors.inputBorder
                 : cs.primary.withValues(alpha: 0.3),
             width: 0.5,
           ),
@@ -44,7 +45,7 @@ class NotificationCard extends StatelessWidget {
               padding: EdgeInsets.all(context.widthCalculated(10)),
               decoration: BoxDecoration(
                 color: _iconBgColor(notification.type, cs),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
               ),
               child: Icon(
                 _iconFor(notification.type),
@@ -65,7 +66,7 @@ class NotificationCard extends StatelessWidget {
                       fontWeight: notification.isRead
                           ? FontWeight.w500
                           : FontWeight.bold,
-                      color: AppTheme.primaryTextColor,
+                      color: AppThemeColors.primaryText,
                     ),
                   ),
                   if (notification.body.isNotEmpty) ...[
@@ -73,7 +74,7 @@ class NotificationCard extends StatelessWidget {
                     Text(
                       notification.body,
                       style: tt.labelSmall?.copyWith(
-                        color: AppTheme.secondaryTextColor,
+                        color: AppThemeColors.secondaryText,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -90,7 +91,9 @@ class NotificationCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: cs.primary.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                        borderRadius: BorderRadius.circular(
+                          AppThemeMetrics.radiusSm,
+                        ),
                       ),
                       child: Text(
                         'Tap to review photo →',
@@ -105,7 +108,7 @@ class NotificationCard extends StatelessWidget {
                   Text(
                     _timeAgo(notification.createdAt),
                     style: tt.labelSmall?.copyWith(
-                      color: AppTheme.hintTextColor,
+                      color: AppThemeColors.hintText,
                     ),
                   ),
                 ],
@@ -147,9 +150,9 @@ class NotificationCard extends StatelessWidget {
   Color _iconBgColor(NotificationType type, ColorScheme cs) {
     switch (type) {
       case NotificationType.photoApproval:
-        return AppTheme.warningColor.withValues(alpha: 0.15);
+        return AppThemeColors.warning.withValues(alpha: 0.15);
       case NotificationType.photoDistributed:
-        return AppTheme.successColor.withValues(alpha: 0.15);
+        return AppThemeColors.success.withValues(alpha: 0.15);
       default:
         return cs.primary.withValues(alpha: 0.15);
     }
@@ -158,9 +161,9 @@ class NotificationCard extends StatelessWidget {
   Color _iconColor(NotificationType type, ColorScheme cs) {
     switch (type) {
       case NotificationType.photoApproval:
-        return AppTheme.warningColor;
+        return AppThemeColors.warning;
       case NotificationType.photoDistributed:
-        return AppTheme.successColor;
+        return AppThemeColors.success;
       default:
         return cs.primary;
     }

@@ -29,9 +29,13 @@ class PhotoApprovalRemoteDataSourceImpl
 
     final json = await apiClient.get('${EndPoints.photoApprovals}$query');
 
-    final list =
-        json['data'] as List<dynamic>? ??
-        (json is List ? json as List<dynamic> : []);
+    final list = json is List<dynamic>
+        ? json
+        : (json is Map<String, dynamic>
+              ? (json['items'] as List<dynamic>? ??
+                  json['data'] as List<dynamic>? ??
+                  [])
+              : []);
 
     return list
         .map((e) => PhotoApprovalModel.fromJson(e as Map<String, dynamic>))

@@ -41,10 +41,11 @@ class PhotoRemoteDataSourceImpl implements PhotoRemoteDataSource {
 
     final json = await apiClient.get('${EndPoints.photos}$query');
 
-    // response is a list directly
-    final list =
-        json['data'] as List<dynamic>? ??
-        (json is List ? json as List<dynamic> : []);
+    final list = json is List<dynamic>
+        ? json
+        : (json is Map<String, dynamic>
+              ? (json['data'] as List<dynamic>? ?? json['items'] as List<dynamic>? ?? [])
+              : []);
 
     return list
         .map((e) => PhotoModel.fromJson(e as Map<String, dynamic>))

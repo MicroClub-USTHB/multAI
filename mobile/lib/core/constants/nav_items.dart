@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../router/app_routes.dart';
 
-
 enum NavItem { events, gallery, notifications, account }
 
 class NavItemData {

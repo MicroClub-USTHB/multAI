@@ -14,7 +14,7 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
 
   @override
   Future<AccountModel> fetchAccountData() async {
-    final response = await apiClient.get(EndPoints.account); // API endpoint
+    final response = await apiClient.get(EndPoints.account);
     return AccountModel.fromJson(response);
   }
 }

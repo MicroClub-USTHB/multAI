@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
-import '../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'settings_tile.dart';
 
 class SettingsSection extends StatelessWidget {
@@ -23,7 +23,7 @@ class SettingsSection extends StatelessWidget {
           child: Text(
             title.toUpperCase(),
             style: tt.labelMedium?.copyWith(
-              color: AppTheme.secondaryTextColor,
+              color: AppThemeColors.secondaryText,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,
             ),

@@ -13,9 +13,9 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   EventsBloc({
     required GetUserEventsUseCase getUserEventsUseCase,
     required JoinEventUseCase joinEventUseCase,
-  })  : _getUserEventsUseCase = getUserEventsUseCase,
-        _joinEventUseCase = joinEventUseCase,
-        super(EventsInitial()) {
+  }) : _getUserEventsUseCase = getUserEventsUseCase,
+       _joinEventUseCase = joinEventUseCase,
+       super(EventsInitial()) {
     on<GetUserEventsRequested>(_onGetUserEvents);
     on<JoinEventRequested>(_onJoinEvent);
   }
@@ -26,14 +26,13 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   ) async {
     emit(EventsLoading());
     final result = await _getUserEventsUseCase(NoParams());
-    result.fold(
-      (failure) => emit(EventsFailure(message: failure.message)),
-      (events) {
-        final active   = events.where((e) => e.status != 'archived').toList();
-        final archived = events.where((e) => e.status == 'archived').toList();
-        emit(EventsLoaded(activeEvents: active, archivedEvents: archived));
-      },
-    );
+    result.fold((failure) => emit(EventsFailure(message: failure.message)), (
+      events,
+    ) {
+      final active = events.where((e) => e.status != 'archived').toList();
+      final archived = events.where((e) => e.status == 'archived').toList();
+      emit(EventsLoaded(activeEvents: active, archivedEvents: archived));
+    });
   }
 
   Future<void> _onJoinEvent(
@@ -44,12 +43,11 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     final result = await _joinEventUseCase(
       JoinEventParams(eventCode: event.eventCode),
     );
-    result.fold(
-      (failure) => emit(EventsFailure(message: failure.message)),
-      (_) {
-        emit(JoinEventSuccess());
-        add(GetUserEventsRequested());
-      },
-    );
+    result.fold((failure) => emit(EventsFailure(message: failure.message)), (
+      _,
+    ) {
+      emit(JoinEventSuccess());
+      add(GetUserEventsRequested());
+    });
   }
 }

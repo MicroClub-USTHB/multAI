@@ -6,10 +6,10 @@ abstract class NotificationsRepository {
   Future<Either<Failure, List<NotificationEntity>>> getNotifications();
   Future<Either<Failure, List<NotificationEntity>>> markAsRead(
     List<String> notificationIds,
-  );  Future<Either<Failure, void>> registerPushToken({
+  );
+  Future<Either<Failure, void>> registerPushToken({
+    required String deviceId,
     required String token,
-    required String platform,
   });
-  Future<Either<Failure, void>> revokePushToken(String token);
+  Future<Either<Failure, void>> revokePushToken(String deviceId);
 }
-

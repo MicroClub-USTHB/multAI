@@ -10,10 +10,7 @@ class EventsLoaded extends EventsState {
   final List<EventEntity> activeEvents;
   final List<EventEntity> archivedEvents;
 
-  EventsLoaded({
-    required this.activeEvents,
-    required this.archivedEvents,
-  });
+  EventsLoaded({required this.activeEvents, required this.archivedEvents});
 }
 
 class JoinEventSuccess extends EventsState {}

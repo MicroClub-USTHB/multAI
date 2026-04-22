@@ -3,7 +3,8 @@ import 'package:multai_mobile/features/photo_approval/domain/entities/photo_appr
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 
-import '../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'decision_action_buttons.dart';
 import 'info_banner.dart';
 
@@ -29,9 +30,9 @@ class PhotoApprovalCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(context.widthCalculated(16)),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        border: Border.all(color: AppTheme.inputBorderColor, width: 0.5),
+        color: AppThemeColors.surface,
+        borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
+        border: Border.all(color: AppThemeColors.inputBorder, width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,13 +43,13 @@ class PhotoApprovalCard extends StatelessWidget {
               Icon(
                 Icons.verified_outlined,
                 size: context.iconSize() * 0.85,
-                color: AppTheme.warningColor,
+                color: AppThemeColors.warning,
               ),
               SizedBox(width: context.widthCalculated(6)),
               Text(
                 'PHOTO APPROVAL',
                 style: tt.labelSmall?.copyWith(
-                  color: AppTheme.warningColor,
+                  color: AppThemeColors.warning,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
                 ),
@@ -59,15 +60,15 @@ class PhotoApprovalCard extends StatelessWidget {
 
           // ── Photo placeholder (will be real image when photo URL added) ──
           ClipRRect(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
             child: Container(
               width: double.infinity,
               height: context.heightCalculated(220),
-              color: AppTheme.cardColor,
+              color: AppThemeColors.card,
               child: Icon(
                 Icons.image_outlined,
                 size: context.iconSize() * 3,
-                color: AppTheme.secondaryTextColor.withValues(alpha: 0.3),
+                color: AppThemeColors.secondaryText.withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -78,7 +79,7 @@ class PhotoApprovalCard extends StatelessWidget {
             'You appeared in this photo',
             style: tt.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppTheme.primaryTextColor,
+              color: AppThemeColors.primaryText,
             ),
             textAlign: TextAlign.center,
           ),

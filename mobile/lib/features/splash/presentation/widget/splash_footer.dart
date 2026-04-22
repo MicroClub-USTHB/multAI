@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class SplashFooter extends StatelessWidget {
   const SplashFooter({super.key});
@@ -10,7 +10,7 @@ class SplashFooter extends StatelessWidget {
       children: [
         const Expanded(
           child: Divider(
-            color: AppTheme.devider,
+            color: AppThemeColors.divider,
             thickness: 1,
             indent: 28,
             endIndent: 8,
@@ -21,12 +21,12 @@ class SplashFooter extends StatelessWidget {
           style: TextStyle(
             letterSpacing: 3,
             fontSize: 10,
-            color: AppTheme.textDevider,
+            color: AppThemeColors.dividerText,
           ),
         ),
         const Expanded(
           child: Divider(
-            color: AppTheme.devider,
+            color: AppThemeColors.divider,
             thickness: 1,
             indent: 8,
             endIndent: 28,

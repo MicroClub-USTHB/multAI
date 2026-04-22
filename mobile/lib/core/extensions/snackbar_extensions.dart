@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 
 extension SnackBarX on BuildContext {
   void showErrorSnackBar(String message) {
@@ -17,9 +17,9 @@ extension SnackBarX on BuildContext {
           backgroundColor: cs.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
           ),
-          margin: const EdgeInsets.all(AppTheme.spacingMd),
+          margin: const EdgeInsets.all(AppThemeMetrics.spacingMd),
         ),
       );
   }
@@ -39,9 +39,9 @@ extension SnackBarX on BuildContext {
           backgroundColor: cs.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
           ),
-          margin: const EdgeInsets.all(AppTheme.spacingMd),
+          margin: const EdgeInsets.all(AppThemeMetrics.spacingMd),
         ),
       );
   }

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../constants/nav_items.dart';
-import '../theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../../features/notifications/presentation/bloc/notifications_bloc.dart';
 
 class AppBottomNavBar extends StatelessWidget {
@@ -16,9 +16,9 @@ class AppBottomNavBar extends StatelessWidget {
     return Container(
       height: 72,
       decoration: const BoxDecoration(
-        color: AppTheme.backgroundColor,
+        color: AppThemeColors.background,
         border: Border(
-          top: BorderSide(color: AppTheme.inputBorderColor, width: 0.5),
+          top: BorderSide(color: AppThemeColors.inputBorder, width: 0.5),
         ),
       ),
       child: Row(
@@ -74,8 +74,8 @@ class _NavBarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = isSelected
-        ? AppTheme.primaryColor
-        : AppTheme.secondaryTextColor;
+        ? AppThemeColors.primaryAccent
+        : AppThemeColors.secondaryText;
 
     return GestureDetector(
       onTap: onTap,
@@ -96,7 +96,7 @@ class _NavBarItem extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(3),
                       decoration: const BoxDecoration(
-                        color: AppTheme.errorColor,
+                        color: AppThemeColors.error,
                         shape: BoxShape.circle,
                       ),
                       constraints: const BoxConstraints(

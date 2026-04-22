@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
-import '../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 
 class InfoBanner extends StatelessWidget {
   final String message;
@@ -18,10 +19,10 @@ class InfoBanner extends StatelessWidget {
         vertical: context.heightCalculated(10),
       ),
       decoration: BoxDecoration(
-        color: AppTheme.warningColor.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        color: AppThemeColors.warning.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
         border: Border.all(
-          color: AppTheme.warningColor.withValues(alpha: 0.3),
+          color: AppThemeColors.warning.withValues(alpha: 0.3),
           width: 0.5,
         ),
       ),
@@ -30,7 +31,7 @@ class InfoBanner extends StatelessWidget {
         children: [
           Icon(
             Icons.info_outline,
-            color: AppTheme.warningColor,
+            color: AppThemeColors.warning,
             size: context.iconSize() * 0.9,
           ),
           SizedBox(width: context.widthCalculated(8)),
@@ -38,7 +39,7 @@ class InfoBanner extends StatelessWidget {
             child: Text(
               message,
               style: tt.labelMedium?.copyWith(
-                color: AppTheme.warningColor,
+                color: AppThemeColors.warning,
                 height: 1.4,
               ),
             ),

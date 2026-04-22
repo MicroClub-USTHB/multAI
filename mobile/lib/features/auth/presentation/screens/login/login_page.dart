@@ -5,16 +5,13 @@ import 'package:multai_mobile/core/router/app_routes.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
-import '../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../../blocs/auth_bloc.dart';
 import 'widgets/logo_section.dart';
 import 'widgets/email_field.dart';
 import 'widgets/password_field.dart';
 import 'widgets/sign_in_button.dart';
-import 'widgets/divider_with_text.dart';
-import 'widgets/google_button.dart';
-import 'widgets/create_workspace.dart';
-import 'widgets/forgot_password.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -68,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context, state) {
         final isLoading = state is AuthLoading;
         return Scaffold(
-          backgroundColor: AppTheme.backgroundColor,
+          backgroundColor: AppThemeColors.background,
           body: SafeArea(
             child: Column(
               children: [
@@ -79,10 +76,12 @@ class _LoginPageState extends State<LoginPage> {
                       vertical: context.heightCalculated(24),
                     ),
                     child: Container(
-                      padding: EdgeInsets.all(AppTheme.spacingLg),
+                      padding: EdgeInsets.all(AppThemeMetrics.spacingLg),
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceColor,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                        color: AppThemeColors.surface,
+                        borderRadius: BorderRadius.circular(
+                          AppThemeMetrics.radiusLg,
+                        ),
                       ),
                       child: Form(
                         key: _formKey,
@@ -103,18 +102,12 @@ class _LoginPageState extends State<LoginPage> {
                             EmailField(controller: _emailController),
                             SizedBox(height: context.heightCalculated(16)),
 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Password',
-                                  style: tt.titleMedium?.copyWith(
-                                    color: cs.onSurface,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                ForgotPassword(onTap: () {}),
-                              ],
+                            Text(
+                              'Password',
+                              style: tt.titleMedium?.copyWith(
+                                color: cs.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             SizedBox(height: context.heightCalculated(8)),
 
@@ -132,22 +125,16 @@ class _LoginPageState extends State<LoginPage> {
 
                             SignInButton(
                               isLoading: isLoading,
-                              // height: context.heightCalculated(52),
                               onPressed: _onSignInPressed,
                             ),
-                            SizedBox(height: context.heightCalculated(16)),
-
-                            const DividerWithText(),
-                            SizedBox(height: context.heightCalculated(16)),
-
-                            GoogleButton(
-                              // height: context.heightCalculated(52),
-                              onPressed: () {},
+                            SizedBox(height: context.heightCalculated(12)),
+                            Text(
+                              'Use the email and password registered with your workspace.',
+                              style: tt.bodySmall?.copyWith(
+                                color: cs.onSurface.withValues(alpha: 0.7),
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            SizedBox(height: context.heightCalculated(16)),
-
-                            CreateWorkspace(onTap: () {}),
-                            SizedBox(height: context.heightCalculated(24)),
                           ],
                         ),
                       ),

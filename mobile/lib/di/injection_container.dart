@@ -10,9 +10,9 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:async';
 
-
 import '../core/network/network_info.dart';
 import '../core/network/api_client.dart';
+import '../core/storage/app_local_storage.dart';
 
 // Onboarding
 import '../features/onboarding/data/repositories/onboarding_repository_impl.dart';
@@ -79,8 +79,6 @@ import '../features/gallery/data/datasources/photo_remote_datasource.dart';
 import '../features/gallery/data/repositories/photo_repository_impl.dart';
 import '../features/gallery/domain/usecases/get_photo_image_usecase.dart';
 
-
-
 final sl = GetIt.instance;
 
 FutureOr<void> init() async {
@@ -89,6 +87,9 @@ FutureOr<void> init() async {
   // ── External ───────────────────────────────────────────────────────────────
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+  sl.registerLazySingleton<AppLocalStorage>(
+    () => AppLocalStorage(prefs: sl<SharedPreferences>()),
+  );
   sl.registerLazySingleton<InternetConnection>(() => InternetConnection());
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
   sl.registerLazySingleton<http.Client>(() => http.Client());
@@ -114,7 +115,7 @@ FutureOr<void> init() async {
 
   // ── Onboarding ─────────────────────────────────────────────────────────────
   sl.registerLazySingleton<OnboardingRepository>(
-    () => OnboardingRepositoryImpl(sl<SharedPreferences>()),
+    () => OnboardingRepositoryImpl(sl<AppLocalStorage>()),
   );
   sl.registerLazySingleton<GetOnboardingSeen>(
     () => GetOnboardingSeen(sl<OnboardingRepository>()),
@@ -139,7 +140,7 @@ FutureOr<void> init() async {
     () => AuthRepositoryImpl(
       remoteDataSource: sl<AuthRemoteDataSource>(),
       apiClient: sl<ApiClient>(),
-      sharedPreferences: sl<SharedPreferences>(),
+      localStorage: sl<AppLocalStorage>(),
     ),
   );
 
@@ -163,9 +164,8 @@ FutureOr<void> init() async {
 
   // ── Face Enrollment Data Sources ───────────────────────────────────────────
   sl.registerLazySingleton<FaceEnrollmentLocalDataSource>(
-    () => FaceEnrollmentLocalDataSourceImpl(
-      sharedPreferences: sl<SharedPreferences>(),
-    ),
+    () =>
+        FaceEnrollmentLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
   );
   sl.registerLazySingleton<FaceEnrollmentRemoteDataSource>(
     () => FaceEnrollmentRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
@@ -200,8 +200,7 @@ FutureOr<void> init() async {
 
   // ── Account DI ───────────────────────────────────────────────────────────
   sl.registerLazySingleton<AccountLocalDataSource>(
-    () =>
-        AccountLocalDataSourceImpl(sharedPreferences: sl<SharedPreferences>()),
+    () => AccountLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
   );
 
   sl.registerLazySingleton<AccountRemoteDataSource>(
@@ -320,7 +319,9 @@ FutureOr<void> init() async {
     ),
   );
   // Cache Service
-  sl.registerLazySingleton(() => PhotoCacheService());
+  sl.registerLazySingleton(
+    () => PhotoCacheService(localStorage: sl<AppLocalStorage>()),
+  );
 
   // Gallery Remote DataSource
   sl.registerLazySingleton<PhotoRemoteDataSource>(

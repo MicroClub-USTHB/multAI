@@ -6,9 +6,12 @@ import '../../../../core/usecase/usecase.dart';
 import '../repositories/notifications_repository.dart';
 
 class RegisterPushTokenParams {
+  final String deviceId;
   final String token;
-  final String platform;
-  const RegisterPushTokenParams({required this.token, required this.platform});
+  const RegisterPushTokenParams({
+    required this.deviceId,
+    required this.token,
+  });
 }
 
 class RegisterPushTokenUseCase extends UseCase<void, RegisterPushTokenParams> {
@@ -16,6 +19,9 @@ class RegisterPushTokenUseCase extends UseCase<void, RegisterPushTokenParams> {
   RegisterPushTokenUseCase(this.repository);
   @override
   Future<Either<Failure, void>> call(RegisterPushTokenParams params) {
-    return repository.registerPushToken(token: params.token, platform: params.platform);
+    return repository.registerPushToken(
+      deviceId: params.deviceId,
+      token: params.token,
+    );
   }
 }

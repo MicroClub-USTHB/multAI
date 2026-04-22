@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'context_extensions.dart';
 
 extension ResponsiveX on BuildContext {
@@ -12,8 +12,10 @@ extension ResponsiveX on BuildContext {
     return width * this.width / 393;
   }
 
-  double hPadding() =>
-      (width * 0.06).clamp(AppTheme.spacingLg, AppTheme.spacingXxl);
+  double hPadding() => (width * 0.06).clamp(
+    AppThemeMetrics.spacingLg,
+    AppThemeMetrics.spacingXxl,
+  );
 
   double cardMaxWidth() => min(width * 0.92, 480.0);
 
@@ -25,5 +27,6 @@ extension ResponsiveX on BuildContext {
 
   double iconSize() => (width * 0.055).clamp(20.0, 26.0);
 
-  double radius() => (width * 0.03).clamp(AppTheme.radiusSm, AppTheme.radiusMd);
+  double radius() =>
+      (width * 0.03).clamp(AppThemeMetrics.radiusSm, AppThemeMetrics.radiusMd);
 }

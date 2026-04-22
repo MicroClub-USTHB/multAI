@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
 import '../../../../../../core/extensions/responsive_extensions.dart';
-import '../../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 
 class TipsRow extends StatelessWidget {
   const TipsRow({super.key});
@@ -34,10 +35,10 @@ class _TipChip extends StatelessWidget {
     // ── colors ──────────────────────────────────────────────────────────────
     final bgColor = isDone
         ? Colors.green.withValues(alpha: 0.15)
-        : AppTheme.tipsBgColor;
+        : AppThemeColors.tipsBackground;
 
-    final iconColor = isDone ? Colors.green : AppTheme.secondaryTextColor;
-    final textColor = isDone ? Colors.green : AppTheme.primaryTextColor;
+    final iconColor = isDone ? Colors.green : AppThemeColors.secondaryText;
+    final textColor = isDone ? Colors.green : AppThemeColors.primaryText;
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -46,7 +47,7 @@ class _TipChip extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -1,4 +1,3 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/photo_approval_entity.dart';
 import '../../domain/usecases/get_approvals_usecase.dart';

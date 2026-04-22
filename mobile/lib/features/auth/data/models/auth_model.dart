@@ -4,26 +4,23 @@ class AuthRequestModel {
   final String email;
   final String password;
   final String deviceName;
-  final String platform;
+  final String deviceType;
   final String deviceId;
-  final String deviceFingerprint;
 
   const AuthRequestModel({
     required this.email,
     required this.password,
     required this.deviceName,
-    required this.platform,
+    required this.deviceType,
     required this.deviceId,
-    required this.deviceFingerprint,
   });
 
   Map<String, dynamic> toJson() => {
     'email': email,
     'password': password,
     'device_name': deviceName,
-    'platform': platform,
+    'device_type': deviceType,
     'device_id': deviceId,
-    'device_fingerprint': deviceFingerprint,
   };
 }
 

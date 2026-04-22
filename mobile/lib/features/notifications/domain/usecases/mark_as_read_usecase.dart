@@ -13,7 +13,9 @@ class MarkAsReadUsecase extends UseCase<void, MarkAsReadParams> {
   final NotificationsRepository repository;
   MarkAsReadUsecase(this.repository);
   @override
-  Future<Either<Failure,List<NotificationEntity>>> call(MarkAsReadParams params) {
+  Future<Either<Failure, List<NotificationEntity>>> call(
+    MarkAsReadParams params,
+  ) {
     return repository.markAsRead(params.notificationId);
   }
 }

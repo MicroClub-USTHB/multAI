@@ -54,7 +54,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
     result.fold(
       (failure) => emit(NotificationError(message: failure.message)),
-    
+
       (updated) => emit(NotificationLoaded(notifications: updated)),
     );
   }
@@ -91,7 +91,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     await _registerPushToken(
-      RegisterPushTokenParams(token: event.token, platform: event.platform),
+      RegisterPushTokenParams(deviceId: event.deviceId, token: event.token),
     );
     // silent — no state change
   }
@@ -105,5 +105,3 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     add(LoadNotifications());
   }
 }
-
-

@@ -6,8 +6,8 @@ import '../../../../core/usecase/usecase.dart';
 import '../repositories/notifications_repository.dart';
 
 class RevokePushTokenParams {
-  final String token;
-  const RevokePushTokenParams({required this.token});
+  final String deviceId;
+  const RevokePushTokenParams({required this.deviceId});
 }
 
 class RevokePushTokenUsecase extends UseCase<void, RevokePushTokenParams> {
@@ -15,6 +15,6 @@ class RevokePushTokenUsecase extends UseCase<void, RevokePushTokenParams> {
   RevokePushTokenUsecase(this.repository);
   @override
   Future<Either<Failure, void>> call(RevokePushTokenParams params) {
-    return repository.revokePushToken(params.token);
+    return repository.revokePushToken(params.deviceId);
   }
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
-import '../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 
 class LogoutButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -18,10 +19,10 @@ class LogoutButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          backgroundColor: AppTheme.errorColor.withValues(alpha: 0.1),
-          side: BorderSide(color: AppTheme.errorColor.withValues(alpha: 0.4)),
+          backgroundColor: AppThemeColors.error.withValues(alpha: 0.1),
+          side: BorderSide(color: AppThemeColors.error.withValues(alpha: 0.4)),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
           ),
         ),
         child: Row(
@@ -29,14 +30,14 @@ class LogoutButton extends StatelessWidget {
           children: [
             Icon(
               Icons.logout,
-              color: AppTheme.errorColor,
+              color: AppThemeColors.error,
               size: context.iconSize(),
             ),
             SizedBox(width: context.widthCalculated(8)),
             Text(
               'Sign Out',
               style: tt.titleMedium?.copyWith(
-                color: AppTheme.errorColor,
+                color: AppThemeColors.error,
                 fontWeight: FontWeight.w600,
               ),
             ),

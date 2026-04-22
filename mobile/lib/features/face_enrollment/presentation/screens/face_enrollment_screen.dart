@@ -7,7 +7,8 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
-import '../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import './../bloc/face_enrollment_bloc.dart';
 import '../../domain/entities/face_photo_entity.dart';
 import './widgets/photo_slot.dart';
@@ -69,9 +70,9 @@ class FaceEnrollmentScreen extends StatelessWidget {
         final cs = context.theme.colorScheme;
 
         return Scaffold(
-          backgroundColor: AppTheme.backgroundColor,
+          backgroundColor: AppThemeColors.background,
           appBar: AppBar(
-            backgroundColor: AppTheme.backgroundColor,
+            backgroundColor: AppThemeColors.background,
             elevation: 0,
             leading: IconButton(
               icon: Icon(Icons.arrow_back, color: cs.onSurface),
@@ -81,7 +82,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
               'Face Enrollment',
               style: tt.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppTheme.primaryTextColor,
+                color: AppThemeColors.primaryText,
               ),
             ),
             centerTitle: true,
@@ -109,7 +110,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
                           'Enable Face Recognition',
                           style: tt.headlineLarge?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.primaryTextColor,
+                            color: AppThemeColors.primaryText,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -264,14 +265,14 @@ class FaceEnrollmentScreen extends StatelessWidget {
                                 : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: canSubmit
-                                  ? AppTheme.primaryColor
-                                  : AppTheme.enrollDisabledColor,
+                                  ? AppThemeColors.primaryAccent
+                                  : AppThemeColors.enrollDisabled,
                               foregroundColor: canSubmit
                                   ? Colors.black
                                   : Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
-                                  AppTheme.radiusMd,
+                                  AppThemeMetrics.radiusMd,
                                 ),
                               ),
                             ),

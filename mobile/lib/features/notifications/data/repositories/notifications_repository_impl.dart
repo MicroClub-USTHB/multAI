@@ -20,10 +20,12 @@ class NotificationRepositoryImpl implements NotificationsRepository {
   }
 
   @override
-  Future<Either<Failure, List<NotificationEntity>>> markAsRead(List<String> notificationIds) async {
+  Future<Either<Failure, List<NotificationEntity>>> markAsRead(
+    List<String> notificationIds,
+  ) async {
     try {
       final r = await remoteDataSource.markAsRead(notificationIds);
-      return  Right(r);
+      return Right(r);
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
@@ -33,13 +35,13 @@ class NotificationRepositoryImpl implements NotificationsRepository {
 
   @override
   Future<Either<Failure, void>> registerPushToken({
+    required String deviceId,
     required String token,
-    required String platform,
   }) async {
     try {
       await remoteDataSource.registerPushToken(
+        deviceId: deviceId,
         token: token,
-        platform: platform,
       );
       return Right(null);
     } on Failure catch (F) {
@@ -50,9 +52,9 @@ class NotificationRepositoryImpl implements NotificationsRepository {
   }
 
   @override
-  Future<Either<Failure, void>> revokePushToken(String token) async {
+  Future<Either<Failure, void>> revokePushToken(String deviceId) async {
     try {
-      await remoteDataSource.revokePushToken(token);
+      await remoteDataSource.revokePushToken(deviceId);
       return Right(null);
     } on Failure catch (F) {
       return Left(F);

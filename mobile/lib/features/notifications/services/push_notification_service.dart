@@ -6,6 +6,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../../auth/utils/device_utils.dart';
+import '../../../core/errors/failure.dart';
 import '../domain/usecases/register_push_token_usecase.dart';
 import '../domain/usecases/revoke_push_token_usecase.dart';
 
@@ -21,7 +23,8 @@ class PushNotificationService {
       FlutterLocalNotificationsPlugin();
 
   final RegisterPushTokenUseCase _registerToken;
-  final RevokePushTokenUsecase  _revokeToken;
+  final RevokePushTokenUsecase _revokeToken;
+  String? _deviceId;
 
   // callback when notification tapped
   final void Function(RemoteMessage)? onNotificationTap;
@@ -67,6 +70,8 @@ class PushNotificationService {
     }
 
     // ── 7. get and register token ──────────────────────────────────────────
+    final deviceData = await DeviceUtils.getDeviceData();
+    _deviceId = deviceData.deviceId;
     await _registerDeviceToken();
 
     // ── 8. listen for token refresh ───────────────────────────────────────
@@ -78,15 +83,18 @@ class PushNotificationService {
   // ── Register device token to backend ──────────────────────────────────────
   Future<void> _registerDeviceToken({String? token}) async {
     final String? deviceToken = token ?? await _getToken();
-    if (deviceToken == null) return;
+    final deviceId = _deviceId ?? (await DeviceUtils.getDeviceData()).deviceId;
+    if (deviceToken == null || deviceToken.isEmpty) return;
 
-    final platform = Platform.isIOS ? 'ios' : 'android';
+    try {
+      await _registerToken(
+        RegisterPushTokenParams(deviceId: deviceId, token: deviceToken),
+      );
 
-    await _registerToken(
-      RegisterPushTokenParams(token: deviceToken, platform: platform),
-    );
-
-    debugPrint('Push token registered [$platform]: $deviceToken');
+      debugPrint('Push token registered [$deviceId]: $deviceToken');
+    } on Failure catch (failure) {
+      debugPrint('Push token registration skipped: ${failure.message}');
+    }
   }
 
   // ── Get FCM token (Android) or APN token (iOS) ────────────────────────────
@@ -101,11 +109,15 @@ class PushNotificationService {
 
   // ── Revoke token on logout ────────────────────────────────────────────────
   Future<void> revokeToken() async {
-    final token = await _fcm.getToken();
-    if (token == null) return;
+    final deviceId = _deviceId ?? (await DeviceUtils.getDeviceData()).deviceId;
 
-    await _revokeToken(RevokePushTokenParams(token: token));
-    await _fcm.deleteToken();
+    try {
+      await _revokeToken(RevokePushTokenParams(deviceId: deviceId));
+    } on Failure catch (failure) {
+      debugPrint('Push token revoke skipped: ${failure.message}');
+    } finally {
+      await _fcm.deleteToken();
+    }
 
     debugPrint('Push token revoked');
   }
@@ -117,8 +129,8 @@ class PushNotificationService {
 
     await _localNotifications.show(
       id: message.hashCode,
-      title :notification.title,
-      body : notification.body,
+      title: notification.title,
+      body: notification.body,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'multiai_channel',

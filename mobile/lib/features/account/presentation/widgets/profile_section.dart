@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
-import '../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 
 class ProfileSection extends StatelessWidget {
   final String name;
@@ -37,7 +38,7 @@ class ProfileSection extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: context.widthCalculated(52),
-              backgroundColor: AppTheme.surfaceColor,
+              backgroundColor: AppThemeColors.surface,
               backgroundImage: avatarUrl != null
                   ? NetworkImage(avatarUrl!)
                   : null,
@@ -45,7 +46,7 @@ class ProfileSection extends StatelessWidget {
                   ? Icon(
                       Icons.person,
                       size: context.widthCalculated(48),
-                      color: AppTheme.secondaryTextColor,
+                      color: AppThemeColors.secondaryText,
                     )
                   : null,
             ),
@@ -57,7 +58,7 @@ class ProfileSection extends StatelessWidget {
             name,
             style: tt.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppTheme.primaryTextColor,
+              color: AppThemeColors.primaryText,
             ),
           ),
           SizedBox(height: context.heightCalculated(8)),
@@ -70,7 +71,7 @@ class ProfileSection extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: cs.primary,
-              borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+              borderRadius: BorderRadius.circular(AppThemeMetrics.radiusXl),
             ),
             child: Text(
               membershipType.toUpperCase(),

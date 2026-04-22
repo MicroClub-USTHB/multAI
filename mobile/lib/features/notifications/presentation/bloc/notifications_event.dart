@@ -8,17 +8,18 @@ class MarkNotificationRead extends NotificationEvent {
   final List<String> notificationIds;
   MarkNotificationRead({required this.notificationIds});
 }
+
 class MarkSingleNotificationRead extends NotificationEvent {
   final String notificationId;
   MarkSingleNotificationRead({required this.notificationId});
 }
- 
+
 class MarkAllNotificationsRead extends NotificationEvent {}
 
 class PushTokenReceived extends NotificationEvent {
+  final String deviceId;
   final String token;
-  final String platform;
-  PushTokenReceived({required this.token, required this.platform});
+  PushTokenReceived({required this.deviceId, required this.token});
 }
 
 class PushNotificationReceived extends NotificationEvent {

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
 import '../../../../../../core/extensions/responsive_extensions.dart';
-import '../../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../domain/entities/face_photo_entity.dart';
 
 class PhotoSlot extends StatefulWidget {
@@ -111,10 +112,10 @@ class _PhotoSlotState extends State<PhotoSlot> {
             height: slotHeight,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: _hasPhoto ? Colors.transparent : AppTheme.photoSlotColor,
-              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              color: _hasPhoto ? Colors.transparent : AppThemeColors.photoSlot,
+              borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
               border: Border.all(
-                color: _hasPhoto ? cs.primary : AppTheme.inputBorderColor,
+                color: _hasPhoto ? cs.primary : AppThemeColors.inputBorder,
                 width: _hasPhoto ? 1.5 : 0.5,
               ),
             ),
@@ -150,7 +151,7 @@ class _PhotoSlotState extends State<PhotoSlot> {
         Text(
           slotLabel,
           style: tt.labelLarge?.copyWith(
-            color: _hasPhoto ? cs.primary : AppTheme.primaryTextColor,
+            color: _hasPhoto ? cs.primary : AppThemeColors.primaryText,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -189,14 +190,14 @@ class _EmptySlot extends StatelessWidget {
           Icon(
             Icons.camera_alt_outlined,
             size: context.iconSize() * (isOptional ? 1.2 : 1.8),
-            color: AppTheme.secondaryTextColor.withValues(alpha: 0.6),
+            color: AppThemeColors.secondaryText.withValues(alpha: 0.6),
           ),
           if (!isOptional) SizedBox(height: context.heightCalculated(8)),
           if (!isOptional)
             Text(
               'Tap to upload',
               style: context.textTheme.labelSmall?.copyWith(
-                color: AppTheme.secondaryTextColor.withValues(alpha: 0.6),
+                color: AppThemeColors.secondaryText.withValues(alpha: 0.6),
               ),
             ),
         ],
@@ -222,7 +223,7 @@ class _FilledSlot extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+          borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
           child: Image.file(
             File(filePath),
             fit: BoxFit.contain,
@@ -236,7 +237,7 @@ class _FilledSlot extends StatelessWidget {
             child: _badge(
               context,
               'PRIMARY',
-              AppTheme.primaryColor,
+              AppThemeColors.primaryAccent,
               Colors.black,
             ),
           ),
@@ -250,7 +251,7 @@ class _FilledSlot extends StatelessWidget {
                 padding: EdgeInsets.all(context.widthCalculated(6)),
                 decoration: BoxDecoration(
                   color: Colors.black54,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
                 ),
                 child: Icon(
                   Icons.delete_outline,
@@ -272,7 +273,7 @@ class _FilledSlot extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
       ),
       child: Text(
         text,

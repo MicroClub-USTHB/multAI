@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../domain/entities/photo_approval_entity.dart';
-import '../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'decision_tile.dart';
 
 class RecentDecisionsSection extends StatelessWidget {
@@ -23,13 +23,13 @@ class RecentDecisionsSection extends StatelessWidget {
             Icon(
               Icons.history,
               size: context.iconSize() * 0.85,
-              color: AppTheme.secondaryTextColor,
+              color: AppThemeColors.secondaryText,
             ),
             SizedBox(width: context.widthCalculated(6)),
             Text(
               'RECENT DECISIONS',
               style: tt.labelMedium?.copyWith(
-                color: AppTheme.secondaryTextColor,
+                color: AppThemeColors.secondaryText,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
               ),

@@ -5,7 +5,6 @@ import '../../domain/usecases/get_my_photos_usecase.dart';
 import '../../domain/usecases/get_event_photos_usecase.dart';
 import '../../domain/usecases/get_photo_image_usecase.dart';
 
-
 part 'gallery_event.dart';
 part 'gallery_state.dart';
 

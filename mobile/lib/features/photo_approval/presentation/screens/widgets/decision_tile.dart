@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
-import '../../../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 
 class DecisionTile extends StatelessWidget {
@@ -20,12 +21,12 @@ class DecisionTile extends StatelessWidget {
     final tt = context.textTheme;
 
     final badgeColor = isApproved
-        ? AppTheme.successColor.withValues(alpha: 0.15)
-        : AppTheme.errorColor.withValues(alpha: 0.15);
+        ? AppThemeColors.success.withValues(alpha: 0.15)
+        : AppThemeColors.error.withValues(alpha: 0.15);
 
     final badgeTextColor = isApproved
-        ? AppTheme.successColor
-        : AppTheme.errorColor;
+        ? AppThemeColors.success
+        : AppThemeColors.error;
 
     return Container(
       margin: EdgeInsets.only(bottom: context.heightCalculated(8)),
@@ -34,22 +35,22 @@ class DecisionTile extends StatelessWidget {
         vertical: context.heightCalculated(12),
       ),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        color: AppThemeColors.surface,
+        borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
       ),
       child: Row(
         children: [
           // ── thumbnail placeholder ──────────────────────────────────
           ClipRRect(
-            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
             child: Container(
               width: context.widthCalculated(48),
               height: context.widthCalculated(48),
-              color: AppTheme.cardColor,
+              color: AppThemeColors.card,
               child: Icon(
                 Icons.image_outlined,
                 size: context.iconSize(),
-                color: AppTheme.secondaryTextColor,
+                color: AppThemeColors.secondaryText,
               ),
             ),
           ),
@@ -63,7 +64,7 @@ class DecisionTile extends StatelessWidget {
                 Text(
                   'Photo #${photoId.substring(0, 8)}',
                   style: tt.titleSmall?.copyWith(
-                    color: AppTheme.primaryTextColor,
+                    color: AppThemeColors.primaryText,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -72,7 +73,7 @@ class DecisionTile extends StatelessWidget {
                   Text(
                     _timeAgo(decidedAt!),
                     style: tt.labelSmall?.copyWith(
-                      color: AppTheme.secondaryTextColor,
+                      color: AppThemeColors.secondaryText,
                     ),
                   ),
                 ],
@@ -88,7 +89,7 @@ class DecisionTile extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: badgeColor,
-              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

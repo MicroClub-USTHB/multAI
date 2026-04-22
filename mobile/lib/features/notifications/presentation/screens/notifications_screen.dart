@@ -5,7 +5,7 @@ import '../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../bloc/notifications_bloc.dart';
 import '../../domain/entities/notification_entity.dart';
 import '../widgets/notification_card.dart';
@@ -29,16 +29,16 @@ class NotificationsScreen extends StatelessWidget {
         final cs = context.theme.colorScheme;
 
         return Scaffold(
-          backgroundColor: AppTheme.backgroundColor,
+          backgroundColor: AppThemeColors.background,
           appBar: AppBar(
-            backgroundColor: AppTheme.backgroundColor,
+            backgroundColor: AppThemeColors.background,
             elevation: 0,
             centerTitle: true,
             title: Text(
               'Notifications',
               style: tt.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppTheme.primaryTextColor,
+                color: AppThemeColors.primaryText,
               ),
             ),
             actions: [
@@ -138,17 +138,19 @@ class NotificationsScreen extends StatelessWidget {
           Icon(
             Icons.notifications_none_outlined,
             size: context.iconSize() * 3,
-            color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
+            color: AppThemeColors.secondaryText.withValues(alpha: 0.4),
           ),
           SizedBox(height: context.heightCalculated(16)),
           Text(
             'No notifications yet',
-            style: tt.titleMedium?.copyWith(color: AppTheme.secondaryTextColor),
+            style: tt.titleMedium?.copyWith(
+              color: AppThemeColors.secondaryText,
+            ),
           ),
           SizedBox(height: context.heightCalculated(8)),
           Text(
             "We'll notify you when something happens",
-            style: tt.bodySmall?.copyWith(color: AppTheme.hintTextColor),
+            style: tt.bodySmall?.copyWith(color: AppThemeColors.hintText),
           ),
         ],
       ),
