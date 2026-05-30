@@ -44,7 +44,7 @@ class PhotoRemoteDataSourceImpl implements PhotoRemoteDataSource {
     // response is a list directly
     final list =
         json['data'] as List<dynamic>? ??
-        (json is List ? json as List<dynamic> : []);
+        (json is List ? json : []);
 
     return list
         .map((e) => PhotoModel.fromJson(e as Map<String, dynamic>))
