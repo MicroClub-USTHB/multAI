@@ -8,6 +8,8 @@ class PasswordField extends StatelessWidget {
   final bool obscure;
   final VoidCallback onToggle;
   final VoidCallback onSubmit;
+  final String? Function(String?)? validator;
+  final String hintText;
 
   const PasswordField({
     super.key,
@@ -15,6 +17,8 @@ class PasswordField extends StatelessWidget {
     required this.obscure,
     required this.onToggle,
     required this.onSubmit,
+    this.validator,
+    this.hintText = '••••••••',
   });
 
   @override
@@ -29,7 +33,7 @@ class PasswordField extends StatelessWidget {
       onFieldSubmitted: (_) => onSubmit(),
       // InputDecorationTheme from AppTheme handles border/fill/colors
       decoration: InputDecoration(
-        hintText: '••••••••',
+        hintText: hintText,
         prefixIcon: Icon(Icons.lock_outline, size: context.iconSize()),
         suffixIcon: IconButton(
           icon: Icon(
@@ -39,7 +43,7 @@ class PasswordField extends StatelessWidget {
           onPressed: onToggle,
         ),
       ),
-      validator: AppValidators.validatePassword,
+      validator: validator ?? AppValidators.validatePassword,
     );
   }
 }

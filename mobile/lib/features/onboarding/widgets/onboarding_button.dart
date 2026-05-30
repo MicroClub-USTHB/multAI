@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class OnboardingButton extends StatelessWidget {
   final VoidCallback onTap;
@@ -16,7 +16,7 @@ class OnboardingButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Ink(
           decoration: BoxDecoration(
-            color: AppTheme.gold,
+            color: AppThemeColors.gold,
             borderRadius: BorderRadius.circular(12),
           ),
 

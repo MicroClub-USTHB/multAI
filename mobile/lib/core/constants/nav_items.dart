@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../router/app_routes.dart';
 
-enum NavItem { events, gallery, account }
+enum NavItem { events, gallery, notifications, account }
 
 class NavItemData {
   final NavItem item;
@@ -29,6 +29,12 @@ const List<NavItemData> navItems = [
     icon: Icons.image_outlined,
     label: 'GALLERY',
     route: AppRoutes.gallery,
+  ),
+  NavItemData(
+    item: NavItem.notifications,
+    icon: Icons.notifications_outlined,
+    label: 'ALERTS',
+    route: AppRoutes.notifications,
   ),
   NavItemData(
     item: NavItem.account,

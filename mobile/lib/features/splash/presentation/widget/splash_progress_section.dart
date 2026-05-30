@@ -1,56 +1,91 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 
 class SplashProgressSection extends StatelessWidget {
   const SplashProgressSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(seconds: 5),
+      curve: Curves.linear,
+      builder: (context, value, child) {
+        final percent = (value * 100).round().clamp(0, 100);
+
+        return Column(
           children: [
-            Text(
-              'INITIALIZING ENGINE',
-              style: TextStyle(
-                letterSpacing: 2.4,
-                fontSize: 16,
-                color: AppTheme.gold,
-                fontWeight: FontWeight.bold,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'INITIALIZING ENGINE',
+                  style: TextStyle(
+                    letterSpacing: 2.4,
+                    fontSize: 16,
+                    color: AppThemeColors.gold,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '$percent%',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppThemeColors.subtitleText,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppThemeMetrics.spacingSm),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: value,
+                minHeight: 2,
+                backgroundColor: AppThemeColors.border.withValues(alpha: 0.35),
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  AppThemeColors.gold,
+                ),
               ),
             ),
-            const Text(
-              '42%',
-              style: TextStyle(fontSize: 12, color: AppTheme.slateGray),
-            ),
+            const SizedBox(height: AppThemeMetrics.spacingLg),
+            child ?? const SizedBox.shrink(),
           ],
-        ),
-        const SizedBox(height: AppTheme.spacingSm),
-        const LinearProgressIndicator(value: 0.42, minHeight: 2),
-        const SizedBox(height: AppTheme.spacingLg),
-        Row(
-          children: [
-            Expanded(child: _buildCard(Icons.photo_outlined)),
-            const SizedBox(width: 8),
-            Expanded(child: _buildCard(Icons.videocam_outlined)),
-            const SizedBox(width: 8),
-            Expanded(child: _buildCard(Icons.face_outlined)),
-          ],
-        ),
-      ],
+        );
+      },
+      child: const Row(
+        children: [
+          Expanded(child: _SplashCard(icon: Icons.photo_outlined)),
+          SizedBox(width: 8),
+          Expanded(child: _SplashCard(icon: Icons.videocam_outlined)),
+          SizedBox(width: 8),
+          Expanded(child: _SplashCard(icon: Icons.face_outlined)),
+        ],
+      ),
     );
   }
+}
 
-  Widget _buildCard(IconData icon) {
+class _SplashCard extends StatelessWidget {
+  final IconData icon;
+
+  const _SplashCard({required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       height: 80,
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.borderColor),
+        color: AppThemeColors.surface,
+        borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
+        border: Border.all(color: AppThemeColors.border),
       ),
-      child: Icon(icon, color: AppTheme.gold.withValues(alpha: 0.4), size: 24),
+      child: Icon(
+        icon,
+        color: AppThemeColors.gold.withValues(alpha: 0.4),
+        size: 24,
+      ),
     );
   }
 }

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/datetime_extensions.dart';
-import '../../../../../core/theme/theme.dart';
- 
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+
 class ArchivedEventsCard extends StatelessWidget {
   const ArchivedEventsCard({
     super.key,
@@ -11,66 +12,78 @@ class ArchivedEventsCard extends StatelessWidget {
     required this.eventDate,
     this.onTap,
   });
- 
+
   final String eventTitle;
   final DateTime eventDate;
   final VoidCallback? onTap;
- 
+
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
- 
+
     return GestureDetector(
       onTap: onTap,
       child: Padding(
         padding: EdgeInsets.only(
-          right: context.widthCalculated(AppTheme.spacingSm),
+          right: context.widthCalculated(AppThemeMetrics.spacingSm),
         ),
         child: SizedBox(
           // ✅ responsive width + height — no hardcoded values
-          width:  context.widthCalculated(191),
+          width: context.widthCalculated(191),
           height: context.heightCalculated(197),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: AppTheme.archivedCardBackground
-                  .withValues(alpha: AppTheme.archivedCardBackgroundOpacity),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              color: AppThemeColors.archivedCardBackground.withValues(
+                alpha: AppThemeColors.archivedCardBackgroundOpacity,
+              ),
+              borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
               border: Border.all(
-                color: AppTheme.archivedCardBorder
-                    .withValues(alpha: AppTheme.archivedCardBorderOpacity),
+                color: AppThemeColors.archivedCardBorder.withValues(
+                  alpha: AppThemeColors.archivedCardBorderOpacity,
+                ),
                 width: 1,
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: context.heightCalculated(AppTheme.spacingMd)),
- 
+                SizedBox(
+                  height: context.heightCalculated(AppThemeMetrics.spacingMd),
+                ),
+
                 // ── Title ────────────────────────────────────────────
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.widthCalculated(AppTheme.spacingSm),
+                    horizontal: context.widthCalculated(
+                      AppThemeMetrics.spacingSm,
+                    ),
                   ),
                   child: Text(
                     eventTitle,
                     style: tt.labelMedium?.copyWith(
-                      color: AppTheme.archivedTitleColor,
+                      color: AppThemeColors.archivedTitle,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(height: context.heightCalculated(AppTheme.spacingSm)),
- 
+                SizedBox(
+                  height: context.heightCalculated(AppThemeMetrics.spacingSm),
+                ),
+
                 // ── Date ─────────────────────────────────────────────
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    vertical:   context.heightCalculated(AppTheme.spacingXs),
-                    horizontal: context.widthCalculated(AppTheme.spacingSm),
+                    vertical: context.heightCalculated(
+                      AppThemeMetrics.spacingXs,
+                    ),
+                    horizontal: context.widthCalculated(
+                      AppThemeMetrics.spacingSm,
+                    ),
                   ),
                   child: Text(
                     eventDate.toDisplayDate(),
                     style: tt.bodySmall?.copyWith(
-                      color: AppTheme.archivedDateColor,
+                      color: AppThemeColors.archivedDate,
                     ),
                   ),
                 ),

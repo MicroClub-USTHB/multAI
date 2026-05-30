@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/datetime_extensions.dart';
-import '../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class ActiveEventsCard extends StatelessWidget {
   const ActiveEventsCard({
@@ -28,15 +29,15 @@ class ActiveEventsCard extends StatelessWidget {
       child: Container(
         height: context.heightCalculated(120),
         decoration: BoxDecoration(
-          color: AppTheme.activeCardBackground.withValues(
-            alpha: AppTheme.activeCardBackgroundOpacity,
+          color: AppThemeColors.activeCardBackground.withValues(
+            alpha: AppThemeColors.activeCardBackgroundOpacity,
           ),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          border: Border.all(color: AppTheme.activeCardBorder, width: 1),
+          borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
+          border: Border.all(color: AppThemeColors.activeCardBorder, width: 1),
         ),
         child: Row(
           children: [
-            SizedBox(width: context.widthCalculated(AppTheme.spacingSm)),
+            SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -44,8 +45,10 @@ class ActiveEventsCard extends StatelessWidget {
                   // ── Title + status ─────────────────────────────────
                   Padding(
                     padding: EdgeInsets.only(
-                      top: context.heightCalculated(AppTheme.spacingMd),
-                      bottom: context.heightCalculated(AppTheme.spacingSm),
+                      top: context.heightCalculated(AppThemeMetrics.spacingMd),
+                      bottom: context.heightCalculated(
+                        AppThemeMetrics.spacingSm,
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -54,19 +57,21 @@ class ActiveEventsCard extends StatelessWidget {
                           child: Text(
                             eventTitle,
                             style: tt.titleMedium?.copyWith(
-                              color: AppTheme.primaryTextColor,
+                              color: AppThemeColors.primaryText,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.only(
-                            right: context.widthCalculated(AppTheme.spacingSm),
+                            right: context.widthCalculated(
+                              AppThemeMetrics.spacingSm,
+                            ),
                           ),
                           child: Text(
                             eventStatus,
                             style: tt.labelSmall?.copyWith(
-                              color: AppTheme.successColor,
+                              color: AppThemeColors.success,
                             ),
                           ),
                         ),
@@ -77,22 +82,26 @@ class ActiveEventsCard extends StatelessWidget {
                   // ── Date ──────────────────────────────────────────
                   Padding(
                     padding: EdgeInsets.only(
-                      bottom: context.heightCalculated(AppTheme.spacingMd),
+                      bottom: context.heightCalculated(
+                        AppThemeMetrics.spacingMd,
+                      ),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.calendar_month,
                           size: context.iconSize() * 0.8,
-                          color: AppTheme.cardDateTextColor,
+                          color: AppThemeColors.cardDateText,
                         ),
                         SizedBox(
-                          width: context.widthCalculated(AppTheme.spacingXs),
+                          width: context.widthCalculated(
+                            AppThemeMetrics.spacingXs,
+                          ),
                         ),
                         Text(
                           eventDate.toDisplayDate(),
                           style: tt.labelSmall?.copyWith(
-                            color: AppTheme.cardDateTextColor,
+                            color: AppThemeColors.cardDateText,
                           ),
                         ),
                       ],
@@ -102,7 +111,7 @@ class ActiveEventsCard extends StatelessWidget {
                   // ── View link ──────────────────────────────────────
                   Padding(
                     padding: EdgeInsets.only(
-                      right: context.widthCalculated(AppTheme.spacingSm),
+                      right: context.widthCalculated(AppThemeMetrics.spacingSm),
                     ),
                     child: Align(
                       alignment: Alignment.centerRight,

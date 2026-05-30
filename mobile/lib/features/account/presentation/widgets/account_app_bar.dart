@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
   const AccountAppBar({super.key});
@@ -12,7 +12,7 @@ class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
     final tt = context.textTheme;
 
     return AppBar(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: AppThemeColors.background,
       elevation: 0,
       leading: IconButton(
         icon: Icon(
@@ -26,7 +26,7 @@ class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
         'Account',
         style: tt.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
-          color: AppTheme.primaryTextColor,
+          color: AppThemeColors.primaryText,
         ),
       ),
     );

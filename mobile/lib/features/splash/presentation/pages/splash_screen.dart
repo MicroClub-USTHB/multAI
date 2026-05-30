@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:multai_mobile/core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/di/injection_container.dart';
 import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:multai_mobile/features/splash/presentation/widget/splash_footer.dart';
@@ -26,14 +27,14 @@ class SplashScreen extends StatelessWidget {
           }
         },
         child: Scaffold(
-          backgroundColor: AppTheme.splashBackgroundColor,
+          backgroundColor: AppThemeColors.splashBackground,
           body: Stack(
             children: [
               _buildGlow(Alignment.topLeft),
               _buildGlow(Alignment.bottomRight),
               const SafeArea(
                 child: Padding(
-                  padding: EdgeInsets.all(AppTheme.spacingLg),
+                  padding: EdgeInsets.all(AppThemeMetrics.spacingLg),
                   child: Column(
                     children: [
                       Spacer(flex: 3),
@@ -42,7 +43,7 @@ class SplashScreen extends StatelessWidget {
                       SplashProgressSection(),
                       Spacer(flex: 3),
                       SplashFooter(),
-                      SizedBox(height: AppTheme.spacingLg),
+                      SizedBox(height: AppThemeMetrics.spacingLg),
                     ],
                   ),
                 ),
@@ -61,7 +62,10 @@ class SplashScreen extends StatelessWidget {
           gradient: RadialGradient(
             center: alignment,
             radius: 0.5,
-            colors: [AppTheme.gold.withValues(alpha: 0.15), Colors.transparent],
+            colors: [
+              AppThemeColors.gold.withValues(alpha: 0.15),
+              Colors.transparent,
+            ],
           ),
         ),
       ),

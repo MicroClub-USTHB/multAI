@@ -11,19 +11,19 @@ class EventModel extends EventEntity {
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
     return EventModel(
-      id:        json['id']         as String,
-      name:      json['name']       as String,
+      id: json['id'] as String,
+      name: json['name'] as String,
       eventDate: DateTime.parse(json['event_date'] as String),
-      status:    json['status']     as String,
-      joinedAt:  DateTime.parse(json['joined_at']  as String),
+      status: json['status'] as String,
+      joinedAt: DateTime.parse(json['joined_at'] as String),
     );
   }
 
   EventEntity toEntity() => EventEntity(
-        id:        id,
-        name:      name,
-        eventDate: eventDate,
-        status:    status,
-        joinedAt:  joinedAt,
-      );
+    id: id,
+    name: name,
+    eventDate: eventDate,
+    status: status,
+    joinedAt: joinedAt,
+  );
 }

@@ -11,15 +11,21 @@ class MeResponseModel extends UserEntity {
   });
 
   factory MeResponseModel.fromJson(Map<String, dynamic> json) {
+    final userJson = json['user'] is Map
+        ? Map<String, dynamic>.from(json['user'] as Map)
+        : json;
+
     final devicesList = (json['devices'] as List<dynamic>? ?? [])
         .map((d) => DeviceModel.fromJson(d as Map<String, dynamic>))
         .toList();
 
-    final sessionJson = json['session'] as Map<String, dynamic>?;
+    final sessionJson =
+        json['sessions'] as Map<String, dynamic>? ??
+        json['session'] as Map<String, dynamic>?;
 
     return MeResponseModel(
-      id: json['id'] as String,
-      email: json['email'] as String,
+      id: userJson['id']?.toString() ?? '',
+      email: userJson['email']?.toString() ?? '',
       devices: devicesList,
       session: sessionJson != null ? SessionModel.fromJson(sessionJson) : null,
     );
@@ -29,6 +35,6 @@ class MeResponseModel extends UserEntity {
     'id': id,
     'email': email,
     'devices': devices.map((d) => (d as DeviceModel).toJson()).toList(),
-    'session': session != null ? (session as SessionModel).toJson() : null,
+    'sessions': session != null ? (session as SessionModel).toJson() : null,
   };
 }

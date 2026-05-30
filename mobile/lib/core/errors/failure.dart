@@ -43,6 +43,17 @@ class CacheFailure extends Failure {
   const CacheFailure() : super(const []);
 }
 
+class CancelledFailure extends Failure {
+  @override
+  final String message;
+
+  const CancelledFailure({this.message = 'Operation cancelled.'})
+    : super(const []);
+
+  @override
+  List<Object?> get props => [message];
+}
+
 // ── Face Enrollment specific failures ─────────────────────────────────────────
 class FileNotFoundFailure extends Failure {
   @override

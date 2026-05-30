@@ -1,5 +1,5 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/constants/storage_keys.dart';
+import '../../../../core/storage/app_local_storage.dart';
 import '../models/account_model.dart';
 
 abstract class AccountLocalDataSource {
@@ -8,22 +8,20 @@ abstract class AccountLocalDataSource {
 }
 
 class AccountLocalDataSourceImpl implements AccountLocalDataSource {
-  final SharedPreferences sharedPreferences;
-  static const _accountKey = 'CACHED_ACCOUNT';
+  final AppLocalStorage localStorage;
 
-  AccountLocalDataSourceImpl({required this.sharedPreferences});
+  AccountLocalDataSourceImpl({required this.localStorage});
 
   @override
   Future<void> cacheAccountData(AccountModel account) async {
-    final jsonString = jsonEncode(account.toJson());
-    await sharedPreferences.setString(_accountKey, jsonString);
+    await localStorage.setJson(StorageKeys.cachedAccount, account.toJson());
   }
 
   @override
   Future<AccountModel?> getCachedAccountData() async {
-    final jsonString = sharedPreferences.getString(_accountKey);
-    if (jsonString != null) {
-      return AccountModel.fromJson(jsonDecode(jsonString));
+    final cached = localStorage.getJson(StorageKeys.cachedAccount);
+    if (cached != null) {
+      return AccountModel.fromJson(cached);
     }
     return null;
   }

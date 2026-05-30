@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class OnboardingIndicator extends StatelessWidget {
   final int currentPage;
@@ -24,8 +24,8 @@ class OnboardingIndicator extends StatelessWidget {
           width: isActive ? 24 : 8,
           decoration: BoxDecoration(
             color: isActive
-                ? AppTheme.gold
-                : AppTheme.slateGray.withValues(alpha: 0.3),
+                ? AppThemeColors.gold
+                : AppThemeColors.subtitleText.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(4),
           ),
         );

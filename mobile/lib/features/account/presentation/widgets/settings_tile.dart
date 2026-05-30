@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
-import '../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 
 class SettingItemData {
   final IconData icon;
@@ -36,8 +37,8 @@ class SettingsTile extends StatelessWidget {
           vertical: context.heightCalculated(14),
         ),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          color: AppThemeColors.surface,
+          borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
         ),
         child: Row(
           children: [
@@ -46,7 +47,7 @@ class SettingsTile extends StatelessWidget {
               padding: EdgeInsets.all(context.widthCalculated(8)),
               decoration: BoxDecoration(
                 color: cs.primary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
               ),
               child: Icon(
                 data.icon,
@@ -64,7 +65,7 @@ class SettingsTile extends StatelessWidget {
                   Text(
                     data.title,
                     style: tt.titleMedium?.copyWith(
-                      color: AppTheme.primaryTextColor,
+                      color: AppThemeColors.primaryText,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

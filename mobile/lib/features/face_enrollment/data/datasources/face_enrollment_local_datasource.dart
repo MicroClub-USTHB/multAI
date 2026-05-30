@@ -1,4 +1,5 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/constants/storage_keys.dart';
+import '../../../../core/storage/app_local_storage.dart';
 
 abstract class FaceEnrollmentLocalDataSource {
   Future<bool> isEnrollmentDone();
@@ -7,19 +8,17 @@ abstract class FaceEnrollmentLocalDataSource {
 
 class FaceEnrollmentLocalDataSourceImpl
     implements FaceEnrollmentLocalDataSource {
-  final SharedPreferences sharedPreferences;
+  final AppLocalStorage localStorage;
 
-  static const String _enrollmentKey = 'is_face_enrollment_done';
-
-  FaceEnrollmentLocalDataSourceImpl({required this.sharedPreferences});
+  FaceEnrollmentLocalDataSourceImpl({required this.localStorage});
 
   @override
   Future<bool> isEnrollmentDone() async {
-    return sharedPreferences.getBool(_enrollmentKey) ?? false;
+    return localStorage.getBool(StorageKeys.faceEnrollmentDone) ?? false;
   }
 
   @override
   Future<void> saveEnrollmentDone() async {
-    await sharedPreferences.setBool(_enrollmentKey, true);
+    await localStorage.setBool(StorageKeys.faceEnrollmentDone, true);
   }
 }

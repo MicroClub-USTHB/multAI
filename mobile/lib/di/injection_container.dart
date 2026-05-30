@@ -1,4 +1,7 @@
 import 'package:get_it/get_it.dart';
+import 'package:multai_mobile/features/gallery/domain/repositories/photo_repository.dart';
+import 'package:multai_mobile/features/gallery/domain/usecases/get_event_photos_usecase.dart';
+import 'package:multai_mobile/features/gallery/domain/usecases/get_my_photos_usecase.dart';
 import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
 import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +12,7 @@ import 'dart:async';
 
 import '../core/network/network_info.dart';
 import '../core/network/api_client.dart';
+import '../core/storage/app_local_storage.dart';
 
 // Onboarding
 import '../features/onboarding/data/repositories/onboarding_repository_impl.dart';
@@ -37,13 +41,30 @@ import '../features/face_enrollment/domain/usecases/save_enrollment_done_usecase
 import '../features/face_enrollment/domain/usecases/upload_face_photos_usecase.dart';
 import '../features/face_enrollment/presentation/bloc/face_enrollment_bloc.dart';
 
-// ── Account ────────────────────────────────────────────────────────────────
+// ── Account ──────────────────────────────────────────────────────────────────
 import '../features/account/data/datasources/account_local_datasource.dart';
 import '../features/account/data/datasources/account_remote_datasource.dart';
 import '../features/account/data/repositories/account_repository_impl.dart';
 import '../features/account/domain/repositories/account_repository.dart';
 import '../features/account/domain/usecases/get_account_data_usecase.dart';
 import '../features/account/presentation/bloc/account_bloc.dart';
+//  ── Notifications ───────────────────────────────────────────────────────────
+import '../features/notifications/data/datasources/notifications_remote_datasource.dart';
+import '../features/notifications/data/repositories/notifications_repository_impl.dart';
+import '../features/notifications/domain/repositories/notifications_repository.dart';
+import '../features/notifications/domain/usecases/get_notifications_usecase.dart';
+import '../features/notifications/domain/usecases/mark_as_read_usecase.dart';
+import '../features/notifications/domain/usecases/register_push_token_usecase.dart';
+import '../features/notifications/domain/usecases/revoke_push_token_usecase.dart';
+import '../features/notifications/presentation/bloc/notifications_bloc.dart';
+import '../features/notifications/services/push_notification_service.dart';
+// Photo Approval ─────────────────────────────────────────────
+import '../features/photo_approval/presentation/bloc/photo_approval_bloc.dart';
+import '../features/photo_approval/data/datasources/photo_approval_remote_datasource.dart';
+import '../features/photo_approval/data/repositories/photo_approval_repository_impl.dart';
+import '../features/photo_approval/domain/repositories/photo_approval_repository.dart';
+import '../features/photo_approval/domain/usecases/decide_photo_approval_usecase.dart';
+import '../features/photo_approval/domain/usecases/get_approvals_usecase.dart';
 
 // Events
 import '../features/events/data/datasources/events_remote_datasource.dart';
@@ -51,7 +72,13 @@ import '../features/events/data/repositories/events_repository_impl.dart';
 import '../features/events/domain/repositories/event_repository.dart';
 import '../features/events/domain/usecases/get_events_usecase.dart';
 import '../features/events/presentation/bloc/events_bloc.dart';
- 
+// gallery
+import '../features/gallery/presentation/bloc/gallery_bloc.dart';
+import '../features/gallery/data/cache/photo_cache_service.dart';
+import '../features/gallery/data/datasources/photo_remote_datasource.dart';
+import '../features/gallery/data/repositories/photo_repository_impl.dart';
+import '../features/gallery/domain/usecases/get_photo_image_usecase.dart';
+
 final sl = GetIt.instance;
 
 FutureOr<void> init() async {
@@ -60,6 +87,9 @@ FutureOr<void> init() async {
   // ── External ───────────────────────────────────────────────────────────────
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+  sl.registerLazySingleton<AppLocalStorage>(
+    () => AppLocalStorage(prefs: sl<SharedPreferences>()),
+  );
   sl.registerLazySingleton<InternetConnection>(() => InternetConnection());
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
   sl.registerLazySingleton<http.Client>(() => http.Client());
@@ -85,7 +115,7 @@ FutureOr<void> init() async {
 
   // ── Onboarding ─────────────────────────────────────────────────────────────
   sl.registerLazySingleton<OnboardingRepository>(
-    () => OnboardingRepositoryImpl(sl<SharedPreferences>()),
+    () => OnboardingRepositoryImpl(sl<AppLocalStorage>()),
   );
   sl.registerLazySingleton<GetOnboardingSeen>(
     () => GetOnboardingSeen(sl<OnboardingRepository>()),
@@ -110,7 +140,7 @@ FutureOr<void> init() async {
     () => AuthRepositoryImpl(
       remoteDataSource: sl<AuthRemoteDataSource>(),
       apiClient: sl<ApiClient>(),
-      sharedPreferences: sl<SharedPreferences>(),
+      localStorage: sl<AppLocalStorage>(),
     ),
   );
 
@@ -134,9 +164,8 @@ FutureOr<void> init() async {
 
   // ── Face Enrollment Data Sources ───────────────────────────────────────────
   sl.registerLazySingleton<FaceEnrollmentLocalDataSource>(
-    () => FaceEnrollmentLocalDataSourceImpl(
-      sharedPreferences: sl<SharedPreferences>(),
-    ),
+    () =>
+        FaceEnrollmentLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
   );
   sl.registerLazySingleton<FaceEnrollmentRemoteDataSource>(
     () => FaceEnrollmentRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
@@ -171,8 +200,7 @@ FutureOr<void> init() async {
 
   // ── Account DI ───────────────────────────────────────────────────────────
   sl.registerLazySingleton<AccountLocalDataSource>(
-    () =>
-        AccountLocalDataSourceImpl(sharedPreferences: sl<SharedPreferences>()),
+    () => AccountLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
   );
 
   sl.registerLazySingleton<AccountRemoteDataSource>(
@@ -216,7 +244,109 @@ FutureOr<void> init() async {
   sl.registerFactory<EventsBloc>(
     () => EventsBloc(
       getUserEventsUseCase: sl<GetUserEventsUseCase>(),
-      joinEventUseCase:     sl<JoinEventUseCase>(),
+      joinEventUseCase: sl<JoinEventUseCase>(),
+    ),
+  );
+  // Notification Remote DataSource
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  // Notification Repository
+  sl.registerLazySingleton<NotificationsRepository>(
+    () => NotificationRepositoryImpl(
+      remoteDataSource: sl<NotificationRemoteDataSource>(),
+    ),
+  );
+
+  // Notification Use Cases
+  sl.registerLazySingleton(
+    () => GetNotificationsUsecase(sl<NotificationsRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => MarkAsReadUsecase(sl<NotificationsRepository>()),
+  );
+
+  sl.registerLazySingleton(
+    () => RegisterPushTokenUseCase(sl<NotificationsRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => RevokePushTokenUsecase(sl<NotificationsRepository>()),
+  );
+
+  // Push Notification Service
+  sl.registerLazySingleton(
+    () => PushNotificationService(
+      registerToken: sl<RegisterPushTokenUseCase>(),
+      revokeToken: sl<RevokePushTokenUsecase>(),
+    ),
+  );
+
+  // Notification BLoC
+  sl.registerFactory<NotificationBloc>(
+    () => NotificationBloc(
+      getNotifications: sl<GetNotificationsUsecase>(),
+      markAsRead: sl<MarkAsReadUsecase>(),
+      registerPushToken: sl<RegisterPushTokenUseCase>(),
+    ),
+  );
+
+  // Photo Approval Remote DataSource
+  sl.registerLazySingleton<PhotoApprovalRemoteDataSource>(
+    () => PhotoApprovalRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  // Photo Approval Repository
+  sl.registerLazySingleton<PhotoApprovalRepository>(
+    () => PhotoApprovalRepositoryImpl(
+      remoteDataSource: sl<PhotoApprovalRemoteDataSource>(),
+    ),
+  );
+
+  // Photo Approval Use Cases
+  sl.registerLazySingleton(
+    () => GetApprovalsUsecase(repository: sl<PhotoApprovalRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => DecidePhotoApprovalUseCase(sl<PhotoApprovalRepository>()),
+  );
+
+  // Photo Approval BLoC
+  sl.registerFactory<PhotoApprovalBloc>(
+    () => PhotoApprovalBloc(
+      getApprovals: sl<GetApprovalsUsecase>(),
+      decideApproval: sl<DecidePhotoApprovalUseCase>(),
+    ),
+  );
+  // Cache Service
+  sl.registerLazySingleton(
+    () => PhotoCacheService(localStorage: sl<AppLocalStorage>()),
+  );
+
+  // Gallery Remote DataSource
+  sl.registerLazySingleton<PhotoRemoteDataSource>(
+    () => PhotoRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  // Gallery Repository
+  sl.registerLazySingleton<PhotoRepository>(
+    () => PhotoRepositoryImpl(
+      remoteDataSource: sl<PhotoRemoteDataSource>(),
+      cacheService: sl<PhotoCacheService>(),
+    ),
+  );
+
+  // Gallery Use Cases
+  sl.registerLazySingleton(() => GetMyPhotosUseCase(sl<PhotoRepository>()));
+  sl.registerLazySingleton(() => GetEventPhotosUseCase(sl<PhotoRepository>()));
+  sl.registerLazySingleton(() => GetPhotoImageUseCase(sl<PhotoRepository>()));
+
+  // Gallery BLoC
+  sl.registerFactory<GalleryBloc>(
+    () => GalleryBloc(
+      getMyPhotos: sl<GetMyPhotosUseCase>(),
+      getEventPhotos: sl<GetEventPhotosUseCase>(),
+      getPhotoImage: sl<GetPhotoImageUseCase>(),
     ),
   );
 }

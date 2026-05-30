@@ -1,85 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-class AppTheme {
-  // ── Radius ─────────────────────────────────────────────────────────────────
-  static const double radiusSm = 8.0;
-  static const double radiusMd = 12.0;
-  static const double radiusLg = 16.0;
-  static const double radiusXl = 18.0;
+import 'app_theme_colors.dart';
+import 'app_theme_data.dart';
+import 'app_theme_metrics.dart';
+import 'app_theme_text_styles.dart';
 
-  // ── Spacing ────────────────────────────────────────────────────────────────
-  static const double spacingXs = 4.0;
-  static const double spacingSm = 8.0;
-  static const double spacingMd = 16.0;
-  static const double spacingLg = 24.0;
-  static const double spacingXl = 32.0;
-  static const double spacingXxl = 40.0;
-
-  // ── Card Dimensions ────────────────────────────────────────────────────────
-  static const double activeCardAspectWidth = 358.0;
-  static const double activeCardBreakpoint = 350.0;
-  static const double statusDotSize = 10.0;
-  static const double notifDotSize = 8.0;
-  static const double emptyStatePadding = 32.0;
-
-  // ── Primary Colors ─────────────────────────────────────────────────────────
-  static const Color primaryColor = Color(
-    0xFFE8A020,
-  ); // Golden/amber accent from palette
-  static const Color secondaryColor = Color(
-    0xFFD4901A,
-  ); // Darker golden for secondary
-  static const Color accentColor = Color(0xFFFFB830); // Bright golden highlight
-
-  // ── Background Colors ──────────────────────────────────────────────────────
-  static const Color backgroundColor = Color(
-    0xFF1A1008,
-  ); // Very dark brown/black background
-  static const Color surfaceColor = Color(
-    0xFF2A1E0F,
-  ); // Slightly lighter dark brown surface
-  static const Color cardColor = Color(
-    0xFF2A1E0F,
-  ); // Dark brown card background
-
-  // ── Event Card Colors ──────────────────────────────────────────────────────
-  static const Color activeCardBackground = Color(0xFF0F172A);
-  static const Color activeCardBorder = Color(0xFF1E293B);
-  static const Color archivedCardBackground = Color(0xFF0F172A);
-  static const Color archivedCardBorder = Color(0xFF1E293B);
-  static const Color cardDateTextColor = Color(0xFF94A3B8);
-  static const Color archivedTitleColor = Color(0xFF94A3B8);
-  static const Color archivedDateColor = Color(0xFF64748B);
-  static const double activeCardBackgroundOpacity = 0.4;
-  static const double archivedCardBackgroundOpacity = 0.1;
-  static const double archivedCardBorderOpacity = 0.4;
-
-
-  // ── Text Colors ────────────────────────────────────────────────────────────
-  static const Color primaryTextColor = Color(0xFFFFFFFF); // White primary text
-  static const Color secondaryTextColor = Color(0xFFB0A090); // Muted warm gray
-  static const Color hintTextColor = Color(0xFF7A6A5A); // Dim warm gray hints
-
-  // ── Splash Colors ─────────────────────────────────────────────────────
-  static const Color splashBackgroundColor = Color(0xFF0F0E0D);
-  static const Color gold = Color(0xFFE8A830); // The "Ai" color
-  static const Color slateGray = Color(0xFF94A3B8); // The subtitle color
-  static const Color textDevider = Color(0xFF64748B);
-  static const Color devider = Color(0xFF1E293B);
-  static const Color gradient = Color(0x33E8A830);
-
-  // ── Onboarding Colors ─────────────────────────────────────────────────────
-  static const Color onboardingBackgroundColor = Color(0xFF221610);
-
-  // ── Interactive Colors ─────────────────────────────────────────────────────
-  static const Color buttonColor = Color(0xFFE8A020); // Golden button color
-  static const Color selectedColor = Color(
-    0xFF3A2A15,
-  ); // Slightly highlighted dark brown
-  static const Color borderColor = Color(
-    0xFF3D2E1A,
-  ); // Subtle dark brown border
+export 'app_theme_colors.dart';
+export 'app_theme_data.dart';
+export 'app_theme_metrics.dart';
+export 'app_theme_text_styles.dart';
 
   // ── Input Field Colors ─────────────────────────────────────────────────────
   static const Color inputFillColor = Color(

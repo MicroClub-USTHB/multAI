@@ -9,14 +9,14 @@ import '../constants/end_points.dart';
 class ApiClient {
   final http.Client _client;
   final NetworkInfo _networkInfo;
-  final String baseUrl;
 
   String? _accessToken;
 
   ApiClient({required http.Client client, required NetworkInfo networkInfo})
     : _client = client,
-      _networkInfo = networkInfo,
-      baseUrl = EndPoints.baseUrl;
+      _networkInfo = networkInfo;
+
+  String get baseUrl => EndPoints.baseUrl;
 
   void setAccessToken(String token) => _accessToken = token;
   void clearAccessToken() => _accessToken = null;
@@ -35,7 +35,7 @@ class ApiClient {
   }
 
   // ── Existing GET, POST, POST void, DELETE methods untouched ───────────────
-  Future<Map<String, dynamic>> get(String endpoint) async {
+  Future<dynamic> get(String endpoint) async {
     await checkConnection();
     final response = await _client.get(
       Uri.parse('$baseUrl$endpoint'),
@@ -44,7 +44,7 @@ class ApiClient {
     return _handleResponse(response);
   }
 
-  Future<Map<String, dynamic>> post(
+  Future<dynamic> post(
     String endpoint, {
     Map<String, dynamic>? body,
     bool requiresAuth = false,
@@ -58,11 +58,16 @@ class ApiClient {
     return _handleResponse(response);
   }
 
-  Future<void> postVoid(String endpoint, {bool requiresAuth = false}) async {
+  Future<void> postVoid(
+    String endpoint, {
+    Map<String, dynamic>? body,
+    bool requiresAuth = false,
+  }) async {
     await checkConnection();
     final response = await _client.post(
       Uri.parse('$baseUrl$endpoint'),
       headers: requiresAuth ? _headers : {'Content-Type': 'application/json'},
+      body: body != null ? jsonEncode(body) : null,
     );
     _handleVoidResponse(response);
   }
@@ -148,9 +153,9 @@ class ApiClient {
     }
   }
 
-  Map<String, dynamic> _handleResponse(http.Response response) {
+  dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      return jsonDecode(response.body);
     }
     switch (response.statusCode) {
       case 400:

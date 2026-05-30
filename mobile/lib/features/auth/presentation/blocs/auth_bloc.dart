@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:multai_mobile/features/auth/domain/repositories/auth_repository.dart';
 
 import '../../../../core/usecase/usecase.dart';
 import '../../domain/entities/auth_entity.dart';
 import '../../domain/entities/user_entity.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/get_me_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
@@ -39,6 +39,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<GetCurrentUserRequested>(_onGetCurrentUserRequested);
   }
 
+  Future<void> _emitAuthenticatedState(
+    AuthEntity auth,
+    Emitter<AuthState> emit,
+  ) async {
+    final isDone = await _checkEnrollmentDone();
+
+    if (isDone) {
+      emit(AuthAuthenticated(auth: auth));
+    } else {
+      emit(AuthNeedsFaceEnrollment(auth: auth));
+    }
+  }
+
   // ── Login
   Future<void> _onLoginRequested(
     LoginRequested event,
@@ -54,23 +67,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           email: event.email,
           password: event.password,
           deviceName: device.deviceName,
-          platform: device.platform,
+          deviceType: device.deviceType,
           deviceId: device.deviceId,
-          deviceFingerprint: device.deviceFingerprint,
         ),
       );
 
       await result.fold(
         (failure) async => emit(AuthFailure(message: failure.message)),
-        (auth) async {
-          final isDone = await _checkEnrollmentDone();
-
-          if (isDone) {
-            emit(AuthAuthenticated(auth: auth));
-          } else {
-            emit(AuthNeedsFaceEnrollment(auth: auth));
-          }
-        },
+        (auth) async => _emitAuthenticatedState(auth, emit),
       );
     } catch (e) {
       emit(AuthFailure(message: e.toString()));
@@ -91,9 +95,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       result.fold(
         (failure) => emit(AuthFailure(message: failure.message)),
-        (auth) => emit(
-          AuthAuthenticated(auth: auth),
-        ), // assume enrollment done if token refreshed
+        (auth) => _emitAuthenticatedState(auth, emit),
       );
     } catch (e) {
       emit(AuthFailure(message: e.toString()));

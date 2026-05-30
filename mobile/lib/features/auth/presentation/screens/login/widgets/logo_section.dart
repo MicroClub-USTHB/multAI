@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../../../../core/constants/images.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
 import '../../../../../../core/extensions/responsive_extensions.dart';
@@ -20,11 +20,11 @@ class LogoSection extends StatelessWidget {
           height: logoSize,
           decoration: BoxDecoration(
             color: cs.primary,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
           ),
           padding: EdgeInsets.all(context.widthCalculated(4)),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
             child: Image.asset(AppImages.mcLogoWhite, fit: BoxFit.contain),
           ),
         ),

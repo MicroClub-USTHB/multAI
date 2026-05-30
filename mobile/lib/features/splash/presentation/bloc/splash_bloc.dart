@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/usecase/usecase.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../onboarding/domain/usecases/get_onboarding_seen.dart';
 import '../../domain/is_user_loged_in.dart';
 part 'splash_event.dart';
@@ -26,19 +27,15 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       await Future.delayed(const Duration(seconds: 5));
 
       final hasSeenOnboarding = await getOnboardingSeen();
-      if (!hasSeenOnboarding) {
-        emit(const SplashLoaded(route: '/onboarding'));
-        return;
-      }
       final loggedInResult = await isUserLoggedIn(NoParams());
 
       loggedInResult.fold(
-        (failure) => emit(const SplashLoaded(route: '/login')),
+        (failure) => emit(const SplashLoaded(route: AppRoutes.onboarding)),
         (isLoggedIn) {
-          if (isLoggedIn) {
-            emit(const SplashLoaded(route: '/home'));
+          if (isLoggedIn && hasSeenOnboarding) {
+            emit(const SplashLoaded(route: AppRoutes.events));
           } else {
-            emit(const SplashLoaded(route: '/login'));
+            emit(const SplashLoaded(route: AppRoutes.onboarding));
           }
         },
       );

@@ -16,16 +16,14 @@ class LoginParams {
   final String email;
   final String password;
   final String deviceName;
-  final String platform;
+  final String deviceType;
   final String deviceId;
-  final String deviceFingerprint;
 
   const LoginParams({
     required this.email,
     required this.password,
     required this.deviceName,
-    required this.platform,
+    required this.deviceType,
     required this.deviceId,
-    required this.deviceFingerprint,
   });
 }

@@ -20,7 +20,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<AuthResponseModel> login(AuthRequestModel request) async {
-    final json = await apiClient.post(EndPoints.login, body: request.toJson());
+    final json = await apiClient.post(
+      EndPoints.registerLogin,
+      body: request.toJson(),
+    );
     return AuthResponseModel.fromJson(json);
   }
 
@@ -40,7 +43,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> revokeDevice(String deviceId) async {
-    await apiClient.delete('/auth/devices/$deviceId');
+    await apiClient.postVoid(
+      '${EndPoints.revokeDevice}?device_id=$deviceId',
+      requiresAuth: true,
+    );
   }
 
   @override

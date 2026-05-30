@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 
 class OnboardingHeader extends StatelessWidget {
   final VoidCallback onSkip;
@@ -10,7 +11,9 @@ class OnboardingHeader extends StatelessWidget {
     return Align(
       alignment: Alignment.topRight,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingLg),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppThemeMetrics.spacingLg,
+        ),
         child: TextButton(
           style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
@@ -21,7 +24,7 @@ class OnboardingHeader extends StatelessWidget {
           child: Text(
             'Skip',
             style: TextStyle(
-              color: AppTheme.gold,
+              color: AppThemeColors.gold,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),

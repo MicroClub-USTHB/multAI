@@ -1,4 +1,7 @@
 abstract class AppRoutes {
+  // ───────────────────────────────────────────────────────────────────────────
+  static const String onboarding = '/onboarding';
+  static const String splash = '/';
   // ── Auth ───────────────────────────────────────────────────────────────────
   static const String login = '/login';
 
@@ -10,6 +13,6 @@ abstract class AppRoutes {
 
   // ── Face enrollment ────────────────────────────────────────────────────────
   static const String faceEnrollment = '/face-enrollment';
-
-  static const String notifications = 'notifications';
+  static const String photoApproval = '/photo-approval';
+  static const String notifications = '/home/notifications';
 }

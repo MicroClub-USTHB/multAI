@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
 import '../../../../../../core/extensions/responsive_extensions.dart';
-import '../../../../../core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../domain/entities/face_photo_entity.dart';
 
 class StepProgressBar extends StatelessWidget {
@@ -49,25 +50,25 @@ class StepProgressBar extends StatelessWidget {
               'Step ${uploadedRequired + uploadedOptional} of $totalSteps',
               style: tt.labelLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppTheme.primaryTextColor,
+                color: AppThemeColors.primaryText,
               ),
             ),
             Text(
               '${(progress * 100).toInt()}%',
               style: tt.labelLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppTheme.primaryColor,
+                color: AppThemeColors.primaryAccent,
               ),
             ),
           ],
         ),
         SizedBox(height: context.heightCalculated(8)),
         ClipRRect(
-          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: AppTheme.inputBorderColor,
-            color: AppTheme.primaryColor,
+            backgroundColor: AppThemeColors.inputBorder,
+            color: AppThemeColors.primaryAccent,
             minHeight: context.heightCalculated(6),
           ),
         ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:multai_mobile/core/theme/theme.dart';
+import 'package:multai_mobile/core/constants/onboarding_content.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/di/injection_container.dart';
 import 'package:multai_mobile/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:multai_mobile/features/onboarding/widgets/onboarding_button.dart';
@@ -22,6 +24,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final slides = onboardingSlides;
     return BlocProvider(
       create: (context) => sl<OnboardingBloc>(),
       child: BlocListener<OnboardingBloc, OnboardingState>(
@@ -36,58 +39,49 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         },
 
         child: Scaffold(
-          backgroundColor: AppTheme.onboardingBackgroundColor,
+          backgroundColor: AppThemeColors.onboardingBackground,
           body: SafeArea(
             child: Column(
               children: [
-                OnboardingHeader(onSkip: () => _pageController.jumpToPage(2)),
+                OnboardingHeader(
+                  onSkip: () => _pageController.animateToPage(
+                    slides.length - 1,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                  ),
+                ),
                 const SizedBox(height: 24),
                 Expanded(
                   child: PageView(
                     controller: _pageController,
                     onPageChanged: (index) =>
                         setState(() => _currentPage = index),
-                    children: const [
-                      OnboardingCard(
-                        image: 'assets/images/onboarding.png',
-                        title: 'Discover Your',
-                        highlight: 'Moments',
-                        description:
-                            "MultiAi uses advanced neural processing to find you in any event photo automatically",
-                      ),
-                      // test navigation
-                      OnboardingCard(
-                        image: 'assets/images/MC_white.png',
-                        title: 'page',
-                        highlight: '2',
-                        description:
-                            'MultiAi uses advanced neural processing...',
-                      ),
-                      // for test
-                      OnboardingCard(
-                        image: 'assets/images/MC_black.png',
-                        title: 'page',
-                        highlight: '3',
-                        description:
-                            'MultiAi uses advanced neural processing...',
-                      ),
-                    ],
+                    children: slides
+                        .map(
+                          (slide) => OnboardingCard(
+                            image: slide.image,
+                            title: slide.title,
+                            highlight: slide.highlight,
+                            description: slide.description,
+                          ),
+                        )
+                        .toList(),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(AppTheme.spacingLg),
+                  padding: const EdgeInsets.all(AppThemeMetrics.spacingLg),
                   child: Column(
                     children: [
                       OnboardingIndicator(
                         currentPage: _currentPage,
-                        itemCount: 3,
+                        itemCount: slides.length,
                       ),
                       const SizedBox(height: 32),
                       Builder(
                         builder: (buttonContext) {
                           return OnboardingButton(
                             onTap: () async {
-                              if (_currentPage < 2) {
+                              if (_currentPage < slides.length - 1) {
                                 _pageController.nextPage(
                                   duration: const Duration(milliseconds: 300),
                                   curve: Curves.easeIn,
