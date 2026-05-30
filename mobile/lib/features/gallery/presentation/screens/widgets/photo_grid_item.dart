@@ -2,8 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/context_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
-import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import '../../../../../core/theme/theme.dart';
 
 class PhotoGridItem extends StatelessWidget {
   final String photoId;
@@ -22,7 +21,7 @@ class PhotoGridItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         child: localPath != null
             ? Image.file(
                 File(localPath!),
@@ -37,7 +36,7 @@ class PhotoGridItem extends StatelessWidget {
 
   Widget _loading(BuildContext context) {
     return Container(
-      color: AppThemeColors.surface,
+      color: AppTheme.surfaceColor,
       child: Center(
         child: SizedBox(
           width: context.widthCalculated(20),
@@ -53,10 +52,10 @@ class PhotoGridItem extends StatelessWidget {
 
   Widget _placeholder(BuildContext context) {
     return Container(
-      color: AppThemeColors.surface,
+      color: AppTheme.surfaceColor,
       child: Icon(
         Icons.image_outlined,
-        color: AppThemeColors.secondaryText.withValues(alpha: 0.4),
+        color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
         size: context.iconSize() * 1.5,
       ),
     );

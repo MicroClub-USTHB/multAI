@@ -4,8 +4,7 @@ import '../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../domain/entities/photo_entity.dart';
-import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import '../../../../core/theme/theme.dart';
 import '../bloc/gallery_bloc.dart';
 import 'widgets/pictures_grid.dart';
 
@@ -46,21 +45,17 @@ class _GalleryScreenState extends State<GalleryScreen>
         }
       },
       builder: (context, state) {
-        final allPhotos = state is GalleryLoaded
-            ? state.allPhotos
-            : <PhotoEntity>[];
-        final eventPhotos = state is GalleryLoaded
-            ? state.eventPhotos
-            : <PhotoEntity>[];
+        final allPhotos = state is GalleryLoaded ? state.allPhotos : <PhotoEntity>[];
+        final eventPhotos = state is GalleryLoaded ? state.eventPhotos : <PhotoEntity>[];
         final cachedPaths = state is GalleryLoaded
             ? state.cachedPaths
             : <String, String>{};
         final isLoading = state is GalleryLoading;
 
         return Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: AppTheme.backgroundColor,
           appBar: AppBar(
-            backgroundColor: AppThemeColors.background,
+            backgroundColor: AppTheme.backgroundColor,
             elevation: 0,
             title: Text('Gallery', style: tt.headlineMedium),
             actions: [
@@ -82,9 +77,7 @@ class _GalleryScreenState extends State<GalleryScreen>
               // ── Filter ──────────────────────────────────────────────
               Container(
                 margin: EdgeInsets.symmetric(
-                  horizontal: context.widthCalculated(
-                    AppThemeMetrics.spacingSm,
-                  ),
+                  horizontal: context.widthCalculated(AppTheme.spacingSm),
                 ),
                 decoration: BoxDecoration(
                   color: cs.primary.withValues(alpha: 0.15),
@@ -110,12 +103,10 @@ class _GalleryScreenState extends State<GalleryScreen>
                   controller: _tabController,
                   isScrollable: true,
                   indicatorColor: cs.primary,
-                  dividerColor: AppThemeColors.inputBorder,
+                  dividerColor: AppTheme.inputBorderColor,
                   indicatorSize: TabBarIndicatorSize.label,
                   labelPadding: EdgeInsets.symmetric(
-                    vertical: context.heightCalculated(
-                      AppThemeMetrics.spacingSm,
-                    ),
+                    vertical: context.heightCalculated(AppTheme.spacingSm),
                   ),
                   tabs: [
                     _buildTab('All', allPhotos.length, 0),
@@ -170,7 +161,7 @@ class _GalleryScreenState extends State<GalleryScreen>
 
         return Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: context.widthCalculated(AppThemeMetrics.spacingLg),
+            horizontal: context.widthCalculated(AppTheme.spacingLg),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -179,19 +170,17 @@ class _GalleryScreenState extends State<GalleryScreen>
                 title,
                 style: tt.titleLarge?.copyWith(
                   color: isSelected
-                      ? AppThemeColors.primaryText
-                      : AppThemeColors.secondaryText,
+                      ? AppTheme.primaryTextColor
+                      : AppTheme.secondaryTextColor,
                 ),
               ),
-              SizedBox(
-                width: context.widthCalculated(AppThemeMetrics.spacingSm),
-              ),
+              SizedBox(width: context.widthCalculated(AppTheme.spacingSm)),
               Text(
                 '$count',
                 style: tt.bodyMedium?.copyWith(
                   color: isSelected
-                      ? AppThemeColors.primaryText
-                      : AppThemeColors.secondaryText,
+                      ? AppTheme.primaryTextColor
+                      : AppTheme.secondaryTextColor,
                 ),
               ),
             ],
@@ -211,14 +200,12 @@ class _GalleryScreenState extends State<GalleryScreen>
           Icon(
             Icons.photo_library_outlined,
             size: context.iconSize() * 3,
-            color: AppThemeColors.secondaryText.withValues(alpha: 0.4),
+            color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
           ),
           SizedBox(height: context.heightCalculated(16)),
           Text(
             'No photos yet',
-            style: tt.titleMedium?.copyWith(
-              color: AppThemeColors.secondaryText,
-            ),
+            style: tt.titleMedium?.copyWith(color: AppTheme.secondaryTextColor),
           ),
         ],
       ),

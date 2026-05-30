@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/context_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import '../../../../../core/theme/theme.dart';
 import '../../../domain/entities/photo_entity.dart';
 import '../../bloc/gallery_bloc.dart';
 import 'photo_grid_item.dart';
@@ -25,11 +25,11 @@ class PicturesGrid extends StatelessWidget {
         .clamp(1, 6);
 
     return GridView.builder(
-      padding: EdgeInsets.all(AppThemeMetrics.spacingMd),
+      padding: EdgeInsets.all(AppTheme.spacingMd),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        crossAxisSpacing: AppThemeMetrics.spacingSm,
-        mainAxisSpacing: AppThemeMetrics.spacingSm,
+        crossAxisSpacing: AppTheme.spacingSm,
+        mainAxisSpacing: AppTheme.spacingSm,
         childAspectRatio: 1,
       ),
       itemCount: photos.length,
