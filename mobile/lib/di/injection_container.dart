@@ -320,7 +320,7 @@ FutureOr<void> init() async {
   );
   // Cache Service
   sl.registerLazySingleton(
-    () => PhotoCacheService(localStorage: sl<AppLocalStorage>()),
+    () => PhotoCacheService(),
   );
 
   // Gallery Remote DataSource
