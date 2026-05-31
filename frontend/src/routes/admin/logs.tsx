@@ -1,12 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 
+import { AuditsTable } from '@/features/admin/logs/components/audits-table';
 import { FaceMatchingLogsTable } from '@/features/admin/logs/components/face-matching-logs-table';
 import {
   LogDetailsDialog,
   type LogDetailsState,
 } from '@/features/admin/logs/components/log-details-dialog';
 import { SyncErrorsTable } from '@/features/admin/logs/components/sync-errors-table';
+import { useAdminAudits } from '@/features/admin/logs/hooks';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui';
 
 export const Route = createFileRoute('/admin/logs')({
@@ -15,6 +17,7 @@ export const Route = createFileRoute('/admin/logs')({
 
 function LogsView() {
   const [logDetails, setLogDetails] = useState<LogDetailsState>(null);
+  const { audits, isLoading, isError, error } = useAdminAudits();
 
   return (
     <>
@@ -31,6 +34,7 @@ function LogsView() {
           >
             <TabsTrigger value="sync">Sync Errors</TabsTrigger>
             <TabsTrigger value="face">Face Matching Logs</TabsTrigger>
+            <TabsTrigger value="audits">Audits</TabsTrigger>
           </TabsList>
 
           <TabsContent value="sync" className="mt-3 space-y-3">
@@ -49,6 +53,21 @@ function LogsView() {
             <FaceMatchingLogsTable
               onRowClick={(log) => setLogDetails({ type: 'face', data: log })}
             />
+          </TabsContent>
+
+          <TabsContent value="audits" className="mt-3 space-y-3">
+            <p className="text-muted-foreground text-sm">
+              System audit trail from admin/audits
+            </p>
+            {isError ? (
+              <div className="border-destructive/40 bg-destructive/10 text-destructive rounded-lg border p-4 text-sm">
+                {error instanceof Error ? error.message : 'Unable to load audits.'}
+              </div>
+            ) : isLoading ? (
+              <div className="text-muted-foreground text-sm">Loading...</div>
+            ) : (
+              <AuditsTable audits={audits} />
+            )}
           </TabsContent>
         </Tabs>
       </div>

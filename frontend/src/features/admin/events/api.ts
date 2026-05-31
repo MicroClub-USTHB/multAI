@@ -1,3 +1,5 @@
+import { ApiError, apiGet, apiPost } from '@/shared/utils/api-client'
+
 import {
 	type AdminEvent,
 	type CreateAdminEventInput,
@@ -7,62 +9,15 @@ import {
 	toAdminEvent,
 } from './types'
 
-const API_BASE_URL =
-	(import.meta.env.VITE_SERVER_URL as string | undefined) ??
-	'http://localhost:8000'
-
-const getAdminAccessToken = () => {
-	if (typeof window === 'undefined') {
-		return null
-	}
-
-	return window.localStorage.getItem('admin_access_token')
-}
-
-const resolveErrorMessage = (payload: unknown, fallback: string) => {
-	if (!payload || typeof payload !== 'object') {
-		return fallback
-	}
-
-	const details = (payload as { detail?: unknown }).detail
-
-	if (typeof details === 'string') {
-		return details
-	}
-
-	if (Array.isArray(details) && details.length > 0) {
-		const first = details[0]
-		if (typeof first === 'string') {
-			return first
-		}
-
-		if (first && typeof first === 'object' && 'msg' in first) {
-			const message = (first as { msg?: unknown }).msg
-			if (typeof message === 'string') {
-				return message
-			}
-		}
-	}
-
-	return fallback
-}
-
-const jsonHeaders = () => {
-	const token = getAdminAccessToken()
-
-	return {
-		'Content-Type': 'application/json',
-		...(token ? { Authorization: `Bearer ${token}` } : {}),
-	}
-}
-
 export class AdminEventsApiError extends Error {
 	status: number
+	details?: unknown
 
-	constructor(message: string, status: number) {
+	constructor(message: string, status: number, details?: unknown) {
 		super(message)
 		this.name = 'AdminEventsApiError'
 		this.status = status
+		this.details = details
 	}
 }
 
@@ -96,52 +51,42 @@ const createEventPayload = (input: CreateAdminEventInput): EventCreateDto => ({
 })
 
 const request = async <TResponse>(
-	path: string,
-	init: RequestInit,
-	fallbackErrorMessage: string,
+	requestFn: () => Promise<TResponse>,
 ): Promise<TResponse> => {
-	const response = await fetch(`${API_BASE_URL}${path}`, {
-		...init,
-		headers: {
-			...jsonHeaders(),
-			...(init.headers ?? {}),
-		},
-		credentials: 'include',
-	})
+	try {
+		return await requestFn()
+	} catch (error) {
+		if (error instanceof ApiError) {
+			throw new AdminEventsApiError(error.message, error.status, error.details)
+		}
 
-	const rawText = await response.text()
-	const payload = rawText ? (JSON.parse(rawText) as unknown) : null
-
-	if (!response.ok) {
-		throw new AdminEventsApiError(
-			resolveErrorMessage(payload, fallbackErrorMessage),
-			response.status,
-		)
+		throw error
 	}
-
-	return payload as TResponse
 }
 
 export async function listAdminEvents(
 	params: ListAdminEventsParams = {},
 ): Promise<AdminEvent[]> {
-	const events = await request<unknown[]>(
-		`/admin/events/${buildListQuery(params)}`,
-		{ method: 'GET' },
-		'Unable to load events.',
+	const events = await request(() =>
+		apiGet<unknown[]>(`/admin/events/${buildListQuery(params)}`, {
+			fallbackErrorMessage: 'Unable to load events.',
+			tokenKey: 'admin_access_token',
+		}),
 	)
 
 	return events.map(event => toAdminEvent(event as Parameters<typeof toAdminEvent>[0]))
 }
 
 export async function createAdminEvent(input: CreateAdminEventInput): Promise<AdminEvent> {
-	const payload = await request<Parameters<typeof toAdminEvent>[0]>(
-		'/admin/events/',
-		{
-			method: 'POST',
-			body: JSON.stringify(createEventPayload(input)),
-		},
-		'Unable to create event.',
+	const payload = await request(() =>
+		apiPost<Parameters<typeof toAdminEvent>[0]>(
+			'/admin/events/',
+			createEventPayload(input),
+			{
+				fallbackErrorMessage: 'Unable to create event.',
+				tokenKey: 'admin_access_token',
+			},
+		),
 	)
 
 	return toAdminEvent(payload)
@@ -157,10 +102,15 @@ const mutateEventStatus = async (
 		archived: 'archive',
 	}
 
-	const payload = await request<Parameters<typeof toAdminEvent>[0]>(
-		`/admin/events/${eventId}/${actionByStatus[status]}`,
-		{ method: 'POST' },
-		'Unable to update event status.',
+	const payload = await request(() =>
+		apiPost<Parameters<typeof toAdminEvent>[0]>(
+			`/admin/events/${eventId}/${actionByStatus[status]}`,
+			undefined,
+			{
+				fallbackErrorMessage: 'Unable to update event status.',
+				tokenKey: 'admin_access_token',
+			},
+		),
 	)
 
 	return toAdminEvent(payload)
