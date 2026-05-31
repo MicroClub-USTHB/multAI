@@ -1,17 +1,26 @@
-import { useState } from 'react';
-
 import { useForm } from '@tanstack/react-form';
 import { Lock, Mail } from 'lucide-react';
+import { useState } from 'react';
 
 import { useAuth } from '@/hooks/useAuth';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '@/shared/ui';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Label } from '@/shared/ui/label';
 import { Message } from '@/shared/ui/message';
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/shared/ui';
 import { cn } from '@/shared/utils/helpers';
 
-import { LoginSchema } from '../schemas';
 import type { LoginDto } from '../types';
+
+import { LoginSchema } from '../schemas';
 
 export function LoginForm({
   className,
@@ -65,16 +74,26 @@ export function LoginForm({
                   <div className='grid gap-3'>
                     <Label htmlFor='email'>Email</Label>
 
-                    <Input
-                      id='email'
-                      type='text'
-                      placeholder='m@example.com'
-                      leadingIcon={<Mail className='w-4 h-4' />}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                      errors={field.state.meta.errors?.[0]?.message}
-                    />
+                    <InputGroup>
+                      <InputGroupAddon>
+                        <Mail className='h-4 w-4' />
+                      </InputGroupAddon>
+                      <InputGroupInput
+                        id='email'
+                        type='text'
+                        placeholder='m@example.com'
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
+                        aria-invalid={Boolean(field.state.meta.errors?.length)}
+                      />
+                    </InputGroup>
+
+                    {field.state.meta.errors?.[0]?.message ? (
+                      <Message className='text-destructive'>
+                        {field.state.meta.errors[0].message}
+                      </Message>
+                    ) : null}
                   </div>
                 )}
               </form.Field>
@@ -94,16 +113,25 @@ export function LoginForm({
                       </a>
                     </div>
 
-                    <Input
-                      id='password'
-                      type='password'
-                      showPasswordToggle
-                      leadingIcon={<Lock className='w-4 h-4' />}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                      errors={field.state.meta.errors?.[0]?.message}
-                    />
+                    <InputGroup>
+                      <InputGroupAddon>
+                        <Lock className='h-4 w-4' />
+                      </InputGroupAddon>
+                      <InputGroupInput
+                        id='password'
+                        type='password'
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
+                        aria-invalid={Boolean(field.state.meta.errors?.length)}
+                      />
+                    </InputGroup>
+
+                    {field.state.meta.errors?.[0]?.message ? (
+                      <Message className='text-destructive'>
+                        {field.state.meta.errors[0].message}
+                      </Message>
+                    ) : null}
                   </div>
                 )}
               </form.Field>
@@ -122,7 +150,7 @@ export function LoginForm({
               <Button
                 type='submit'
                 className='w-full'
-                loading={form.state.isSubmitting}
+                isLoading={form.state.isSubmitting}
               >
                 Login
               </Button>
