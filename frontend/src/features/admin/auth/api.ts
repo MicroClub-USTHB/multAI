@@ -43,6 +43,7 @@ export async function loginAdmin(
 			input,
 			{
 				fallbackErrorMessage: 'Unable to sign in.',
+				credentials: 'include',
 			},
 		),
 	)
@@ -53,8 +54,9 @@ export async function loginAdmin(
 export async function getAdminMe(): Promise<AdminProfile> {
 	const payload = await request(() =>
 		apiGet<Parameters<typeof toAdminProfile>[0]>('/admin/auth/me', {
-			tokenKey: ADMIN_AUTH_TOKEN_KEY,
 			fallbackErrorMessage: 'Unable to load admin profile.',
+			credentials: 'include',
+			tokenKey: ADMIN_AUTH_TOKEN_KEY,
 		}),
 	)
 
@@ -64,8 +66,9 @@ export async function getAdminMe(): Promise<AdminProfile> {
 export async function logoutAdmin(): Promise<void> {
 	await request(() =>
 		apiPost<void>('/admin/auth/logout', undefined, {
-			tokenKey: ADMIN_AUTH_TOKEN_KEY,
 			fallbackErrorMessage: 'Unable to sign out.',
+			credentials: 'include',
+			tokenKey: ADMIN_AUTH_TOKEN_KEY,
 		}),
 	)
 }

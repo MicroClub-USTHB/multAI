@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
 import { MainLayout } from '@/components/Layouts/MainLayout';
@@ -12,16 +12,20 @@ export const Route = createFileRoute('/admin')({
 
 function RouteComponent() {
   const { isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isLoading || isAuthenticated) {
       return;
     }
 
-    const redirect = window.location.pathname + window.location.search;
-    const search = new URLSearchParams({ redirect });
-    window.location.assign(`/auth/login?${search.toString()}`);
-  }, [isAuthenticated, isLoading]);
+    const currentPath = window.location.pathname + window.location.search;
+    navigate({
+      to: '/auth/login',
+      search: { redirect: currentPath },
+      replace: true,
+    });
+  }, [isAuthenticated, isLoading, navigate]);
 
   if (isLoading) {
     return <LoadingPage message="Checking session..." />;

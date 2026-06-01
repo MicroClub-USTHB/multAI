@@ -1,7 +1,9 @@
-import type { LoginInput } from '@/features/common/auth/types';
-import type { AdminAuthResponse, AdminProfile } from '@/features/admin/auth/types';
 import type { UseMutationResult } from '@tanstack/react-query';
+
 import { createContext, useContext } from 'react';
+
+import type { AdminAuthResponse, AdminProfile } from '@/features/admin/auth/types';
+import type { LoginInput } from '@/features/common/auth/types';
 
 interface AuthContextType {
   user: AdminProfile | null;

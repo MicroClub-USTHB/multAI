@@ -43,11 +43,6 @@ export function LoginForm({
         password: value.password,
         rememberMe,
       });
-
-      const redirectTo =
-        new URLSearchParams(window.location.search).get('redirect') || '/';
-
-      window.location.assign(redirectTo);
     },
   });
 

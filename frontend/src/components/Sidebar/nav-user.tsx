@@ -1,5 +1,7 @@
+import { useNavigate } from '@tanstack/react-router';
 import { ChevronsUpDownIcon, LogOutIcon, MessageSquare } from 'lucide-react';
 
+import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui';
 import {
   DropdownMenu,
@@ -29,6 +31,16 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const onLogout = async () => {
+    try {
+      await logout.mutateAsync();
+    } finally {
+      navigate({ to: '/auth/login', replace: true });
+    }
+  };
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -79,7 +91,13 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              disabled={logout.isPending}
+              onClick={() => {
+                void onLogout();
+              }}
+            >
               <LogOutIcon />
               Log out
             </DropdownMenuItem>
