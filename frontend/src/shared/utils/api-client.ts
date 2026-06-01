@@ -1,12 +1,10 @@
-const DEFAULT_API_BASE_URL = 'http://127.0.0.1:8000'
-
 export const API_BASE_URL =
-	(import.meta.env.VITE_SERVER_URL as string | undefined) ??
-	DEFAULT_API_BASE_URL
+	(import.meta.env.VITE_SERVER_URL as string | undefined) ?? '/api'
 
 export type ApiRequestOptions = {
 	fallbackErrorMessage?: string
 	tokenKey?: string
+	credentials?: RequestCredentials
 }
 
 export class ApiError extends Error {
@@ -26,7 +24,10 @@ const getAccessToken = (tokenKey: string) => {
 		return null
 	}
 
-	return window.localStorage.getItem(tokenKey)
+	return (
+		window.localStorage.getItem(tokenKey) ??
+		window.sessionStorage.getItem(tokenKey)
+	)
 }
 
 const resolveErrorMessage = (payload: unknown, fallback: string) => {
@@ -114,7 +115,7 @@ export const apiRequest = async <TResponse>(
 			tokenKey: options.tokenKey,
 			setJsonContentType,
 		}),
-		credentials: 'include',
+		credentials: options.credentials ?? 'omit',
 	})
 
 	const rawText = await response.text()
