@@ -1,13 +1,19 @@
-import { AuthContext } from '@/hooks/useAuth';
-import type {
-  LoginInput,
-  LoginResponse,
-  UserProfile,
-} from '@/features/common/auth/types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { LoadingPage } from '@/shared/ui/loading';
-import { useServerFn } from '@tanstack/react-start';
 import type React from 'react';
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+
+import type { AdminProfile } from '@/features/admin/auth/types';
+import type { LoginInput } from '@/features/common/auth/types';
+
+import {
+  ADMIN_AUTH_TOKEN_KEY,
+  getAdminMe,
+  loginAdmin,
+  logoutAdmin,
+} from '@/features/admin/auth/api';
+import { AuthContext } from '@/hooks/useAuth';
+import { LoadingPage } from '@/shared/ui/loading';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -15,28 +21,24 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const queryClient = useQueryClient();
-  const getCurrentUser = useServerFn(async () => {
-    await new Promise((res) => setTimeout(res, 500));
-    throw new Error('Not implemented');
-  });
-  const loginRequest = useServerFn(async (data: { data: LoginInput }) => {
-    await new Promise((res) => setTimeout(res, 500));
-    throw new Error('Not implemented');
-  });
-  const logoutRequest = useServerFn(async () => {
-    await new Promise((res) => setTimeout(res, 500));
-    throw new Error('Not implemented');
-  });
+  const [token, setToken] = useState(() =>
+    typeof window === 'undefined'
+      ? null
+      : window.localStorage.getItem(ADMIN_AUTH_TOKEN_KEY),
+  );
+
+  const currentUserQueryKey = ['currentUser', token] as const;
 
   const currentUserQuery = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => getCurrentUser(),
+    queryKey: currentUserQueryKey,
+    queryFn: () => getAdminMe(),
+    enabled: Boolean(token),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
 
   const logout = useMutation({
-    mutationFn: () => logoutRequest(),
+    mutationFn: () => logoutAdmin(),
     onError: (error) => {
       console.error(
         'Logout failed on server, proceeding with client-side cleanup.',
@@ -44,21 +46,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       );
     },
     onSettled: () => {
-      queryClient.setQueryData(['currentUser'], null);
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(ADMIN_AUTH_TOKEN_KEY);
+      }
+      setToken(null);
+      queryClient.removeQueries({ queryKey: ['currentUser'] });
     },
   });
 
   const login = useMutation({
-    mutationFn: (input: LoginInput) => loginRequest({ data: input }),
-    onSuccess: (data: LoginResponse) => {
-      queryClient.setQueryData(['currentUser'], data.user);
+    mutationFn: async (input: LoginInput) => {
+      const response = await loginAdmin({
+        email: input.email,
+        password: input.password,
+      });
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(ADMIN_AUTH_TOKEN_KEY, response.accessToken);
+      }
+      setToken(response.accessToken);
+
+      return response;
+    },
+    onSuccess: async (response) => {
+      const profile = await queryClient.fetchQuery({
+        queryKey: ['currentUser', response.accessToken],
+        queryFn: () => getAdminMe(),
+      });
+      queryClient.setQueryData(['currentUser', response.accessToken], profile);
     },
   });
 
   const value = {
-    user:
-      (currentUserQuery.data as unknown as Partial<UserProfile> | null) ?? null,
-    isAuthenticated: !!currentUserQuery.data,
+    user: (currentUserQuery.data as AdminProfile | null) ?? null,
+    isAuthenticated: Boolean(currentUserQuery.data),
     isLoading: currentUserQuery.isPending,
     login,
     logout,

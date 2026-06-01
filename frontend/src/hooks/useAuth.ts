@@ -1,21 +1,14 @@
-import type {
-  LoginInput,
-  LoginResponse,
-  UserProfile,
-} from '@/features/common/auth/types';
+import type { LoginInput } from '@/features/common/auth/types';
+import type { AdminAuthResponse, AdminProfile } from '@/features/admin/auth/types';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
 
 interface AuthContextType {
-  user: Partial<UserProfile> | null;
+  user: AdminProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: UseMutationResult<
-    LoginResponse,
-    Error,
-    LoginInput
-  >;
-  logout: UseMutationResult<{ success: true }, Error, void>;
+  login: UseMutationResult<AdminAuthResponse, Error, LoginInput>;
+  logout: UseMutationResult<void, Error, void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
