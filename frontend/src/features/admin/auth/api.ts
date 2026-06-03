@@ -56,7 +56,6 @@ export async function getAdminMe(): Promise<AdminProfile> {
 		apiGet<Parameters<typeof toAdminProfile>[0]>('/admin/auth/me', {
 			fallbackErrorMessage: 'Unable to load admin profile.',
 			credentials: 'include',
-			tokenKey: ADMIN_AUTH_TOKEN_KEY,
 		}),
 	)
 
@@ -68,7 +67,6 @@ export async function logoutAdmin(): Promise<void> {
 		apiPost<void>('/admin/auth/logout', undefined, {
 			fallbackErrorMessage: 'Unable to sign out.',
 			credentials: 'include',
-			tokenKey: ADMIN_AUTH_TOKEN_KEY,
 		}),
 	)
 }
