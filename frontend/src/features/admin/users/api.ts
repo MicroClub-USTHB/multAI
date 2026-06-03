@@ -16,8 +16,6 @@ import {
 	toAdminUserUpdatePayload,
 } from './types'
 
-const TOKEN_KEY = 'admin_access_token'
-
 export class AdminUsersApiError extends Error {
 	status: number
 	details?: unknown
@@ -62,7 +60,7 @@ export async function listAdminUsers(
 ): Promise<AdminUser[]> {
 	const users = await request(() =>
 		apiGet<unknown[]>(`/admin/users/${buildListQuery(params)}`, {
-			tokenKey: TOKEN_KEY,
+			credentials: 'include',
 			fallbackErrorMessage: 'Unable to load users.',
 		}),
 	)
@@ -73,7 +71,7 @@ export async function listAdminUsers(
 export async function getAdminUser(userId: string): Promise<AdminUser> {
 	const user = await request(() =>
 		apiGet<Parameters<typeof toAdminUser>[0]>(`/admin/users/${userId}`, {
-			tokenKey: TOKEN_KEY,
+			credentials: 'include',
 			fallbackErrorMessage: 'Unable to load user.',
 		}),
 	)
@@ -89,7 +87,7 @@ export async function createAdminUser(
 			'/admin/users/',
 			toAdminUserCreatePayload(input),
 			{
-				tokenKey: TOKEN_KEY,
+				credentials: 'include',
 				fallbackErrorMessage: 'Unable to create user.',
 			},
 		),
@@ -107,7 +105,7 @@ export async function updateAdminUser(
 			`/admin/users/${userId}`,
 			toAdminUserUpdatePayload(input),
 			{
-				tokenKey: TOKEN_KEY,
+				credentials: 'include',
 				fallbackErrorMessage: 'Unable to update user.',
 			},
 		),
@@ -119,7 +117,7 @@ export async function updateAdminUser(
 export async function deleteAdminUser(userId: string): Promise<AdminUser> {
 	const payload = await request(() =>
 		apiDelete<Parameters<typeof toAdminUser>[0]>(`/admin/users/${userId}`, {
-			tokenKey: TOKEN_KEY,
+			credentials: 'include',
 			fallbackErrorMessage: 'Unable to delete user.',
 		}),
 	)
@@ -133,7 +131,7 @@ export async function blockAdminUser(userId: string): Promise<AdminUser> {
 			`/admin/users/${userId}/block`,
 			undefined,
 			{
-				tokenKey: TOKEN_KEY,
+				credentials: 'include',
 				fallbackErrorMessage: 'Unable to block user.',
 			},
 		),
@@ -148,7 +146,7 @@ export async function unblockAdminUser(userId: string): Promise<AdminUser> {
 			`/admin/users/${userId}/unblock`,
 			undefined,
 			{
-				tokenKey: TOKEN_KEY,
+				credentials: 'include',
 				fallbackErrorMessage: 'Unable to unblock user.',
 			},
 		),
