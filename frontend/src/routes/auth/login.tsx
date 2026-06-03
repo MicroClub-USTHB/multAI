@@ -20,14 +20,15 @@ function RouteComponent() {
   const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
+  const safeRedirect = redirect?.startsWith('/') ? redirect : '/admin';
 
   useEffect(() => {
     if (isLoading || !isAuthenticated) {
       return;
     }
 
-    navigate({ to: redirect ?? '/admin', replace: true });
-  }, [isAuthenticated, isLoading, navigate, redirect]);
+    navigate({ to: safeRedirect, replace: true });
+  }, [isAuthenticated, isLoading, navigate, safeRedirect]);
 
   if (isLoading || isAuthenticated) {
     return <LoadingPage message="Checking session..." />;

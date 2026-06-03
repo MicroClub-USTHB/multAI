@@ -1,7 +1,7 @@
 import type React from 'react';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { AdminProfile } from '@/features/admin/auth/types';
 import type { LoginInput } from '@/features/common/auth/types';
@@ -56,6 +56,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     document.cookie = 'access_token=; Max-Age=0; path=/; SameSite=Lax';
   };
 
+  const clearSessionState = useCallback(() => {
+    clearStoredToken();
+    clearAuthCookie();
+    setToken(null);
+    queryClient.removeQueries({ queryKey: ['currentUser'] });
+  }, [queryClient]);
+
   const writeAuthCookie = (value: string, rememberMe: boolean) => {
     if (typeof document === 'undefined') {
       return;
@@ -106,6 +113,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [isMounted, queryClient, token]);
 
+  useEffect(() => {
+    if (!isMounted || typeof window === 'undefined') {
+      return;
+    }
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key && event.key !== ADMIN_AUTH_TOKEN_KEY) {
+        return;
+      }
+
+      const storedToken = readStoredToken();
+
+      if (!storedToken) {
+        clearSessionState();
+        return;
+      }
+
+      if (storedToken !== token) {
+        setToken(storedToken);
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [isMounted, token, clearSessionState]);
+
   const currentUserQueryKey = ['currentUser', token] as const;
 
   const currentUserQuery = useQuery({
@@ -123,11 +157,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    clearStoredToken();
-    clearAuthCookie();
-    setToken(null);
-    queryClient.removeQueries({ queryKey: ['currentUser'] });
-  }, [currentUserQuery.error, queryClient]);
+    clearSessionState();
+  }, [clearSessionState, currentUserQuery.error]);
 
   const logout = useMutation({
     mutationFn: () => logoutAdmin(),
@@ -138,10 +169,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       );
     },
     onSettled: () => {
-      clearStoredToken();
-      clearAuthCookie();
-      setToken(null);
-      queryClient.removeQueries({ queryKey: ['currentUser'] });
+      clearSessionState();
     },
   });
 
@@ -162,14 +190,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       writeAuthCookie(nextToken, input.rememberMe);
       setToken(nextToken);
 
-      return response;
-    },
-    onSuccess: async (response) => {
-      const profile = await queryClient.fetchQuery({
-        queryKey: ['currentUser', response.accessToken],
-        queryFn: () => getAdminMe(),
-      });
-      queryClient.setQueryData(['currentUser', response.accessToken], profile);
+      try {
+        const profile = await queryClient.fetchQuery({
+          queryKey: ['currentUser', nextToken],
+          queryFn: () => getAdminMe(),
+        });
+        queryClient.setQueryData(['currentUser', nextToken], profile);
+
+        return response;
+      } catch (error) {
+        clearSessionState();
+
+        if (error instanceof AdminAuthApiError) {
+          throw error;
+        }
+
+        throw new AdminAuthApiError(
+          'Unable to complete sign in.',
+          500,
+          error,
+        );
+      }
     },
   });
 

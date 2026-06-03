@@ -46,13 +46,18 @@ export function LoginForm({
     },
   });
 
+  const isSubmitting = form.state.isSubmitting || login.isPending;
+
   const error = login.error?.message;
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className='text-center'>
-          <CardTitle className='text-xl'>Welcome back</CardTitle>
+          <CardTitle className='text-xl'>Admin sign in</CardTitle>
+          <p className='text-sm text-muted-foreground'>
+            Use your admin credentials to access the dashboard.
+          </p>
         </CardHeader>
 
         <CardContent>
@@ -63,7 +68,6 @@ export function LoginForm({
             }}
           >
             <div className='grid gap-6'>
-              {/* EMAIL FIELD */}
               <form.Field name='email'>
                 {(field) => (
                   <div className='grid gap-3'>
@@ -75,8 +79,10 @@ export function LoginForm({
                       </InputGroupAddon>
                       <InputGroupInput
                         id='email'
-                        type='text'
+                        type='email'
                         placeholder='m@example.com'
+                        autoComplete='email'
+                        disabled={isSubmitting}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
@@ -93,19 +99,11 @@ export function LoginForm({
                 )}
               </form.Field>
 
-              {/* PASSWORD FIELD */}
               <form.Field name='password'>
                 {(field) => (
                   <div className='grid gap-3'>
                     <div className='flex items-center'>
                       <Label htmlFor='password'>Password</Label>
-
-                      <a
-                        href='#'
-                        className='ml-auto text-sm underline-offset-4 hover:underline'
-                      >
-                        Forgot your password?
-                      </a>
                     </div>
 
                     <InputGroup>
@@ -115,6 +113,8 @@ export function LoginForm({
                       <InputGroupInput
                         id='password'
                         type='password'
+                        autoComplete='current-password'
+                        disabled={isSubmitting}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
@@ -131,26 +131,25 @@ export function LoginForm({
                 )}
               </form.Field>
 
-              {/* REMEMBER ME */}
               <div className='flex items-center gap-3'>
                 <Checkbox
                   id='remember-me'
                   checked={rememberMe}
+                  disabled={isSubmitting}
                   onCheckedChange={(e) => setRememberMe(!!e)}
                 />
                 <Label htmlFor='remember-me'>Remember me</Label>
               </div>
 
-              {/* SUBMIT */}
               <Button
                 type='submit'
                 className='w-full'
-                isLoading={form.state.isSubmitting}
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
               >
-                Login
+                Sign in
               </Button>
 
-              {/* LOGIN ERROR */}
               {error && (
                 <Message className='text-destructive -my-2'>{error}</Message>
               )}
