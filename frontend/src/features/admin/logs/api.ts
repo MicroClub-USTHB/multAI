@@ -2,8 +2,6 @@ import { ApiError, apiGet } from '@/shared/utils/api-client'
 
 import { type AuditEvent, type AuditEventType, toAuditEvent } from './types'
 
-const TOKEN_KEY = 'admin_access_token'
-
 export type ListAuditsParams = {
 	eventType?: AuditEventType | null
 	userId?: string | null
@@ -77,7 +75,7 @@ export async function listAudits(
 ): Promise<AuditEvent[]> {
 	const response = await request(() =>
 		apiGet<AuditEventListResponse>(`/admin/audits${buildListQuery(params)}`, {
-			tokenKey: TOKEN_KEY,
+			credentials: 'include',
 			fallbackErrorMessage: 'Unable to load audits.',
 		}),
 	)

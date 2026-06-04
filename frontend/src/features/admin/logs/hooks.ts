@@ -32,7 +32,7 @@ export function useAdminAudits(params: ListAuditsParams = defaultListParams) {
 	}
 }
 
-export const AUDIT_EVENT_TYPES: AuditEventType[] = [
+export const AUDIT_EVENT_TYPES = [
 	'user.signup',
 	'user.login',
 	'user.logout',
@@ -41,4 +41,4 @@ export const AUDIT_EVENT_TYPES: AuditEventType[] = [
 	'upload_request.rejected',
 	'photo.processed',
 	'photo_approval.decided',
-]
+] as const satisfies readonly AuditEventType[]
