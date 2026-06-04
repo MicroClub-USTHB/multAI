@@ -129,6 +129,12 @@ sequenceDiagram
 | Staff users | Users page - tab Staff users | POST /admin/staff-users/ | lie    | Creation d'un staff user |
 | Staff users | Users page - tab Staff users | PATCH /admin/staff-users/{staff_user_id} | lie | Mise a jour d'un staff user |
 | Staff users | Users page - tab Staff users | DELETE /admin/staff-users/{staff_user_id} | lie | Suppression d'un staff user |
+| Admin events | Events page      | GET /admin/events/      | lie    | Liste et filtres des events |
+| Admin events | Events page      | POST /admin/events/     | lie    | Creation d'un event |
+| Admin events | Events page      | POST /admin/events/{event_id}/draft | lie | Retour en draft |
+| Admin events | Events page      | POST /admin/events/{event_id}/schedule | lie | Passage en scheduled |
+| Admin events | Events page      | POST /admin/events/{event_id}/archive | lie | Archivage d'un event |
+| Admin audits | Logs page         | GET /admin/audits      | lie    | Journal d'audit admin |
 
 ## Hors scope
 

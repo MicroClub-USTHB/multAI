@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router';
-import { Search } from 'lucide-react';
 
 import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
 import {
@@ -10,7 +9,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/shared/ui';
-import { Input } from '@/shared/ui';
 import { Separator } from '@/shared/ui';
 import { SidebarTrigger } from '@/shared/ui';
 
@@ -60,11 +58,6 @@ export function AdminHeader() {
             )}
           </BreadcrumbList>
         </Breadcrumb>
-      </div>
-
-      <div className="relative ml-auto max-w-md flex-1">
-        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-        <Input placeholder="Search..." className="h-9 pl-10" />
       </div>
     </header>
   );
