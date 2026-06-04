@@ -16,6 +16,15 @@ Les fonctionnalites suivantes ne sont pas encore branchees dans cette version:
 
 ## Vue d'ensemble
 
+La page admin `Users` centralise maintenant deux vues:
+
+- `Users` pour les end users
+- `Staff users` pour les comptes internes
+
+Les endpoints backend restent separes, mais l'interface front les expose dans une seule page avec un toggle.
+
+La route `/admin/staff-users` reste disponible comme alias technique et redirige vers `Users` avec la vue staff.
+
 ```mermaid
 flowchart LR
   subgraph Client[Front]
@@ -109,6 +118,17 @@ sequenceDiagram
 | Admin auth  | AuthProvider    | POST /admin/auth/login | lie    | Login et retour du token |
 | Admin auth  | AuthProvider    | GET /admin/auth/me     | lie    | Hydratation de session |
 | Admin auth  | AuthProvider    | POST /admin/auth/logout | lie   | Logout best-effort + cleanup client |
+| Admin users | Users page - tab Users | GET /admin/users/      | lie    | Liste paginee des users |
+| Admin users | Users page - tab Users | GET /admin/users/{id}  | lie    | Chargement d'un user par id |
+| Admin users | Users page - tab Users | POST /admin/users/     | lie    | Creation d'un user |
+| Admin users | Users page - tab Users | PUT /admin/users/{id}  | lie    | Mise a jour d'un user |
+| Admin users | Users page - tab Users | DELETE /admin/users/{id} | lie  | Suppression d'un user |
+| Admin users | Users page - tab Users | POST /admin/users/{id}/block | lie | Blocage d'un user |
+| Admin users | Users page - tab Users | POST /admin/users/{id}/unblock | lie | Deblocage d'un user |
+| Staff users | Users page - tab Staff users | GET /admin/staff-users/ | lie    | Liste des staff users |
+| Staff users | Users page - tab Staff users | POST /admin/staff-users/ | lie    | Creation d'un staff user |
+| Staff users | Users page - tab Staff users | PATCH /admin/staff-users/{staff_user_id} | lie | Mise a jour d'un staff user |
+| Staff users | Users page - tab Staff users | DELETE /admin/staff-users/{staff_user_id} | lie | Suppression d'un staff user |
 
 ## Hors scope
 
