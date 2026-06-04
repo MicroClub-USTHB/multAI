@@ -21,6 +21,7 @@ const STATUS_LABELS: Record<EventStatus, string> = {
 interface EventsFiltersProps {
   searchInput: string
   statusFilter: 'all' | EventStatus
+  isBusy?: boolean
   onSearchInputChange: (value: string) => void
   onStatusFilterChange: (value: 'all' | EventStatus) => void
   onApply: () => void
@@ -30,6 +31,7 @@ interface EventsFiltersProps {
 export function EventsFilters({
   searchInput,
   statusFilter,
+  isBusy = false,
   onSearchInputChange,
   onStatusFilterChange,
   onApply,
@@ -44,12 +46,20 @@ export function EventsFilters({
           onChange={event => onSearchInputChange(event.target.value)}
           placeholder="Search by event name"
           className="pl-9"
+          disabled={isBusy}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              event.preventDefault()
+              onApply()
+            }
+          }}
         />
       </div>
 
       <Select
         value={statusFilter}
         onValueChange={value => onStatusFilterChange(value as 'all' | EventStatus)}
+        disabled={isBusy}
       >
         <SelectTrigger className="w-full">
           <SelectValue />
@@ -64,11 +74,11 @@ export function EventsFilters({
         </SelectContent>
       </Select>
 
-      <Button variant="outline" onClick={onApply}>
+      <Button variant="outline" onClick={onApply} disabled={isBusy}>
         Apply
       </Button>
 
-      <Button variant="ghost" onClick={onReset}>
+      <Button variant="ghost" onClick={onReset} disabled={isBusy}>
         Reset
       </Button>
     </div>
