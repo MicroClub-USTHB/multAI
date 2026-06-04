@@ -149,14 +149,37 @@ function UsersPanel() {
 		unblockUser,
 	} = useAdminUsers()
 
+	const [searchInput, setSearchInput] = useState('')
+	const [appliedSearch, setAppliedSearch] = useState('')
 	const [userDialog, setUserDialog] = useState<UserDialogState>(null)
 	const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null)
 	const [actionError, setActionError] = useState<string | null>(null)
 
 	const isBusy = isLoading || isMutating
+	const filteredUsers = useMemo(() => {
+		const normalizedSearch = appliedSearch.trim().toLowerCase()
+
+		if (!normalizedSearch) {
+			return users
+		}
+
+		return users.filter((user) => {
+			const email = user.email.toLowerCase()
+			const displayName = user.displayName?.toLowerCase() ?? ''
+			const status = user.blocked ? 'blocked' : 'active'
+
+			return (
+				email.includes(normalizedSearch) ||
+				displayName.includes(normalizedSearch) ||
+				status.includes(normalizedSearch)
+			)
+		})
+	}, [appliedSearch, users])
+
 	const userDialogOpen = Boolean(userDialog)
 	const userDialogMode = userDialog?.mode ?? 'create'
 	const userDialogUser = userDialog?.mode === 'edit' ? userDialog.user : null
+	const isSearchActive = Boolean(appliedSearch.trim())
 
 	const openCreateDialog = () => {
 		setActionError(null)
@@ -204,6 +227,17 @@ function UsersPanel() {
 		}
 	}
 
+	const handleSearch = () => {
+		setActionError(null)
+		setAppliedSearch(searchInput)
+	}
+
+	const handleResetSearch = () => {
+		setActionError(null)
+		setSearchInput('')
+		setAppliedSearch('')
+	}
+
 	const handleDeleteUser = async () => {
 		if (!userToDelete) {
 			return
@@ -221,11 +255,36 @@ function UsersPanel() {
 
 	return (
 		<div className='space-y-6'>
-			<div className='flex flex-wrap items-center justify-between gap-3'>
-				<p className='text-muted-foreground text-sm'>
-					End users from <span className='font-mono'>/admin/users</span>
-				</p>
-				<div className='flex flex-wrap gap-2'>
+			<div className='grid gap-3 rounded-lg border border-border/60 bg-card/50 p-4 lg:grid-cols-[1.5fr_auto_auto] lg:items-end'>
+				<div className='grid gap-2'>
+					<label className='text-sm font-medium' htmlFor='users-search'>
+						Search
+					</label>
+					<Input
+						id='users-search'
+						value={searchInput}
+						onChange={(event) => setSearchInput(event.target.value)}
+						placeholder='Search by email, display name, or status'
+						onKeyDown={(event) => {
+							if (event.key === 'Enter') {
+								event.preventDefault()
+								handleSearch()
+							}
+						}}
+						disabled={isBusy}
+					/>
+				</div>
+
+				<div className='flex gap-2'>
+					<Button variant='outline' onClick={handleSearch} disabled={isBusy}>
+						Search
+					</Button>
+					<Button variant='ghost' onClick={handleResetSearch} disabled={isBusy}>
+						Reset
+					</Button>
+				</div>
+
+				<div className='flex flex-wrap gap-2 lg:justify-end'>
 					<Button
 						variant='outline'
 						onClick={() => {
@@ -255,16 +314,37 @@ function UsersPanel() {
 			) : isLoading ? (
 				<div className='text-muted-foreground text-sm'>Loading users...</div>
 			) : (
-				<div className='border-border/40 overflow-hidden rounded-md border'>
-					<UsersTable
-						users={users}
-						isBusy={isBusy}
-						onEdit={openEditDialog}
-						onDelete={(user) => setUserToDelete(user)}
-						onToggleBlocked={(user) => {
-							void handleToggleBlocked(user)
-						}}
-					/>
+				<div className='space-y-3'>
+					<div className='text-muted-foreground flex flex-wrap items-center justify-between gap-2 text-sm'>
+						<p>
+							Showing {filteredUsers.length} of {users.length} loaded users
+							{isSearchActive ? ` for "${appliedSearch}"` : ''}
+						</p>
+						{isSearchActive ? (
+							<p className='text-xs uppercase tracking-[0.2em]'>
+								Filtered view
+							</p>
+						) : null}
+					</div>
+					<div className='border-border/40 overflow-hidden rounded-md border'>
+						{filteredUsers.length ? (
+							<UsersTable
+								users={filteredUsers}
+								isBusy={isBusy}
+								onEdit={openEditDialog}
+								onDelete={(user) => setUserToDelete(user)}
+								onToggleBlocked={(user) => {
+									void handleToggleBlocked(user)
+								}}
+							/>
+						) : (
+							<div className='text-muted-foreground flex h-24 items-center justify-center text-sm'>
+								{isSearchActive
+									? `No users match "${appliedSearch}".`
+									: 'No users found.'}
+							</div>
+						)}
+					</div>
 				</div>
 			)}
 

@@ -22,6 +22,7 @@ import { Route as MultiNotificationsRouteImport } from './routes/multi/notificat
 import { Route as MultiEventsRouteImport } from './routes/multi/events'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminStaffUsersRouteImport } from './routes/admin/staff-users'
 import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
 import { Route as AdminLogsRouteImport } from './routes/admin/logs'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
@@ -92,6 +93,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminStaffUsersRoute = AdminStaffUsersRouteImport.update({
+  id: '/staff-users',
+  path: '/staff-users',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/admin/events': typeof AdminEventsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/staff-users': typeof AdminStaffUsersRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/multi/events': typeof MultiEventsRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/admin/events': typeof AdminEventsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/staff-users': typeof AdminStaffUsersRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/multi/events': typeof MultiEventsRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/admin/events': typeof AdminEventsRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/staff-users': typeof AdminStaffUsersRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/multi/events': typeof MultiEventsRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/logs'
     | '/admin/notifications'
+    | '/admin/staff-users'
     | '/admin/users'
     | '/auth/login'
     | '/multi/events'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/logs'
     | '/admin/notifications'
+    | '/admin/staff-users'
     | '/admin/users'
     | '/auth/login'
     | '/multi/events'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/logs'
     | '/admin/notifications'
+    | '/admin/staff-users'
     | '/admin/users'
     | '/auth/login'
     | '/multi/events'
@@ -328,6 +340,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/staff-users': {
+      id: '/admin/staff-users'
+      path: '/staff-users'
+      fullPath: '/admin/staff-users'
+      preLoaderRoute: typeof AdminStaffUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/notifications': {
       id: '/admin/notifications'
       path: '/notifications'
@@ -363,6 +382,7 @@ interface AdminRouteChildren {
   AdminEventsRoute: typeof AdminEventsRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminStaffUsersRoute: typeof AdminStaffUsersRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminDriveSettingsIndexRoute: typeof AdminDriveSettingsIndexRoute
@@ -372,6 +392,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEventsRoute: AdminEventsRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminStaffUsersRoute: AdminStaffUsersRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminDriveSettingsIndexRoute: AdminDriveSettingsIndexRoute,
