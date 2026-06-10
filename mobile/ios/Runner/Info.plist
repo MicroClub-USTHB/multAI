@@ -66,5 +66,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>MultAI uses Face ID to secure your account and sensitive data.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>MultAI needs camera access to capture photos for face enrollment.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>MultAI needs photo library access to upload photos for face enrollment.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

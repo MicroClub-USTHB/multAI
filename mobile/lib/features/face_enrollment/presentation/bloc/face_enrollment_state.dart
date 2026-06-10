@@ -1,9 +1,17 @@
 part of 'face_enrollment_bloc.dart';
 
-abstract class FaceEnrollmentState {}
+abstract class FaceEnrollmentState extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
 class FaceEnrollmentInitial extends FaceEnrollmentState {
-  final Map<FacePhotoType, String> photos = {};
+  final Map<FacePhotoType, String> photos;
+
+  FaceEnrollmentInitial({this.photos = const {}});
+
+  @override
+  List<Object?> get props => [photos];
 }
 
 class FaceEnrollmentUpdated extends FaceEnrollmentState {
@@ -12,6 +20,9 @@ class FaceEnrollmentUpdated extends FaceEnrollmentState {
   FaceEnrollmentUpdated({required this.photos});
 
   bool get canSubmit => photos.canSubmit;
+
+  @override
+  List<Object?> get props => [photos];
 }
 
 class FaceEnrollmentLoading extends FaceEnrollmentState {}
@@ -20,8 +31,12 @@ class FaceEnrollmentSuccess extends FaceEnrollmentState {}
 
 class FaceEnrollmentFailure extends FaceEnrollmentState {
   final String message;
+  final Map<FacePhotoType, String> photos;
 
-  FaceEnrollmentFailure({required this.message});
+  FaceEnrollmentFailure({required this.message, this.photos = const {}});
+
+  @override
+  List<Object?> get props => [message, photos];
 }
 
 class FaceEnrollmentPhotoLoading extends FaceEnrollmentState {
@@ -31,6 +46,9 @@ class FaceEnrollmentPhotoLoading extends FaceEnrollmentState {
   FaceEnrollmentPhotoLoading({required this.type, required this.photos});
 
   bool get canSubmit => photos.canSubmit;
+
+  @override
+  List<Object?> get props => [type, photos];
 }
 
 extension CanSubmitExtension on Map<FacePhotoType, String> {

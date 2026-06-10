@@ -7,7 +7,7 @@ import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../domain/entities/face_photo_entity.dart';
 
-class PhotoSlot extends StatefulWidget {
+class PhotoSlot extends StatelessWidget {
   final FacePhotoType type;
   final String? filePath;
   final VoidCallback onTap;
@@ -29,40 +29,13 @@ class PhotoSlot extends StatefulWidget {
     this.isLoading = false,
   });
 
-  @override
-  State<PhotoSlot> createState() => _PhotoSlotState();
-}
+  bool get _hasPhoto => filePath != null;
 
-class _PhotoSlotState extends State<PhotoSlot> {
-  late String? _currentFilePath;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentFilePath = widget.filePath;
-  }
-
-  @override
-  void didUpdateWidget(PhotoSlot oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Update when bloc state changes
-    if (oldWidget.filePath != widget.filePath) {
-      setState(() => _currentFilePath = widget.filePath);
-    }
-  }
-
-  bool get _hasPhoto => _currentFilePath != null;
-
-  void _handleDelete() {
-    setState(() => _currentFilePath = null);
-    widget.onDelete?.call();
-  }
-
-  void _handleTap() {
+  void _handleTap(BuildContext context) {
     if (_hasPhoto) {
       _openPhoto(context);
     } else {
-      widget.onTap();
+      onTap();
     }
   }
 
@@ -77,7 +50,7 @@ class _PhotoSlotState extends State<PhotoSlot> {
         child: Stack(
           children: [
             PhotoView(
-              imageProvider: FileImage(File(_currentFilePath!)),
+              imageProvider: FileImage(File(filePath!)),
               backgroundDecoration: const BoxDecoration(color: Colors.black),
               minScale: PhotoViewComputedScale.contained,
               maxScale: PhotoViewComputedScale.covered * 2,
@@ -100,15 +73,16 @@ class _PhotoSlotState extends State<PhotoSlot> {
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
-    final slotHeight = widget.height ?? context.heightCalculated(200);
-    final slotLabel = widget.label ?? widget.type.label;
+    final slotHeight = height ?? context.heightCalculated(200);
+    final slotLabel = label ?? type.label;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: _handleTap,
-          child: Container(
+          onTap: () => _handleTap(context),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
             height: slotHeight,
             width: double.infinity,
             decoration: BoxDecoration(
@@ -120,13 +94,17 @@ class _PhotoSlotState extends State<PhotoSlot> {
               ),
             ),
             clipBehavior: Clip.hardEdge,
-            child: _hasPhoto
-                ? _FilledSlot(
-                    filePath: _currentFilePath!,
-                    isPrimary: widget.type.isPrimary,
-                    onDelete: _handleDelete,
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
                   )
-                : _EmptySlot(isOptional: widget.isOptional),
+                : _hasPhoto
+                    ? _FilledSlot(
+                        filePath: filePath!,
+                        isPrimary: type.isPrimary,
+                        onDelete: onDelete,
+                      )
+                    : _EmptySlot(isOptional: isOptional),
           ),
         ),
         SizedBox(height: context.heightCalculated(6)),
@@ -136,7 +114,7 @@ class _PhotoSlotState extends State<PhotoSlot> {
   }
 
   Widget _buildLabelRow(TextTheme tt, ColorScheme cs, String slotLabel) {
-    if (widget.isOptional) {
+    if (isOptional) {
       return Text(
         slotLabel,
         style: tt.labelMedium?.copyWith(
@@ -162,7 +140,7 @@ class _PhotoSlotState extends State<PhotoSlot> {
               color: cs.onSurface.withValues(alpha: 0.5),
             ),
           ),
-        if (widget.type.isPrimary && _hasPhoto)
+        if (type.isPrimary && _hasPhoto)
           Text(
             'PRIMARY',
             style: tt.labelSmall?.copyWith(

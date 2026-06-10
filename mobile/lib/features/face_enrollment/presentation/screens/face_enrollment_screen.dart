@@ -19,18 +19,54 @@ class FaceEnrollmentScreen extends StatelessWidget {
   const FaceEnrollmentScreen({super.key});
 
   Future<void> _pickPhoto(BuildContext context, FacePhotoType type) async {
-    final picker = ImagePicker();
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: AppThemeColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(
+                  'Select Photo Source',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Camera'),
+                onTap: () => Navigator.of(context).pop(ImageSource.camera),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Gallery'),
+                onTap: () => Navigator.of(context).pop(ImageSource.gallery),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
 
+    if (source == null || !context.mounted) return;
+
+    final picker = ImagePicker();
     final picked = await picker.pickImage(
-      source: ImageSource.gallery,
+      source: source,
       imageQuality: 90,
     );
 
     if (picked == null || !context.mounted) return;
 
     final file = File(picked.path);
-
-    // Optimistically update UI
     context.read<FaceEnrollmentBloc>().add(
       PhotoSelected(type: type, filePath: file.path),
     );
@@ -53,6 +89,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
         final Map<FacePhotoType, String> photos = switch (state) {
           FaceEnrollmentUpdated s => s.photos,
           FaceEnrollmentPhotoLoading s => s.photos,
+          FaceEnrollmentFailure s => s.photos,
           _ => {},
         };
 
