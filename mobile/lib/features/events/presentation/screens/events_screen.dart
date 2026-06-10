@@ -27,6 +27,17 @@ class _EventsScreenState extends State<EventsScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final state = context.read<EventsBloc>().state;
+      if (state is EventsInitial || state is EventsFailure) {
+        context.read<EventsBloc>().add(GetUserEventsRequested());
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _eventCodeController.dispose();
     super.dispose();
@@ -98,6 +109,9 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
         body: BlocBuilder<EventsBloc, EventsState>(
           builder: (context, state) {
+            if (state is EventsFailure) {
+              return _buildErrorState(context);
+            }
             return SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.all(
@@ -106,6 +120,15 @@ class _EventsScreenState extends State<EventsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (state is EventsLoaded && state.isOffline)
+                      _buildOfflineBanner(context),
+                    if (state is EventsLoaded && state.isRefreshing)
+                      _buildRefreshingIndicator(context),
+                    SizedBox(
+                      height: context.heightCalculated(
+                        AppThemeMetrics.spacingMd,
+                      ),
+                    ),
                     _buildJoinSection(context, state),
                     SizedBox(
                       height: context.heightCalculated(
@@ -125,6 +148,113 @@ class _EventsScreenState extends State<EventsScreen> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  // ── Error state (no cached data, no network) ─────────────────────────────
+  Widget _buildErrorState(BuildContext context) {
+    final tt = context.textTheme;
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(
+          context.widthCalculated(AppThemeMetrics.spacingXl),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.wifi_off_rounded,
+              size: context.iconSize() * 3,
+              color: AppThemeColors.secondaryText,
+            ),
+            SizedBox(
+              height: context.heightCalculated(AppThemeMetrics.spacingLg),
+            ),
+            Text(
+              'No internet connection',
+              style: tt.headlineSmall?.copyWith(
+                color: AppThemeColors.primaryText,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(
+              height: context.heightCalculated(AppThemeMetrics.spacingSm),
+            ),
+            Text(
+              'Please check your connection and try again.',
+              style: tt.bodySmall,
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(
+              height: context.heightCalculated(AppThemeMetrics.spacingXl),
+            ),
+            ElevatedButton.icon(
+              onPressed: () => context.read<EventsBloc>().add(
+                EventsRetryRequested(),
+              ),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: AppThemeColors.primaryText,
+                backgroundColor: AppThemeColors.gold,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    AppThemeMetrics.radiusSm,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Refresh indicator ────────────────────────────────────────────────────
+  Widget _buildRefreshingIndicator(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: context.heightCalculated(AppThemeMetrics.spacingSm),
+      ),
+      child: LinearProgressIndicator(
+        backgroundColor: AppThemeColors.border.withValues(alpha: 0.2),
+        valueColor: const AlwaysStoppedAnimation<Color>(AppThemeColors.gold),
+      ),
+    );
+  }
+
+  // ── Offline banner (showing cached data) ─────────────────────────────────
+  Widget _buildOfflineBanner(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(
+        context.widthCalculated(AppThemeMetrics.spacingSm),
+      ),
+      decoration: BoxDecoration(
+        color: AppThemeColors.gold.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
+        border: Border.all(
+          color: AppThemeColors.gold.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.wifi_off_rounded,
+            size: context.iconSize(),
+            color: AppThemeColors.gold,
+          ),
+          SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
+          Expanded(
+            child: Text(
+              'Showing cached data. Connect to the internet to see the latest.',
+              style: context.textTheme.bodySmall?.copyWith(
+                color: AppThemeColors.gold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

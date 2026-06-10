@@ -67,6 +67,7 @@ import '../features/photo_approval/domain/usecases/decide_photo_approval_usecase
 import '../features/photo_approval/domain/usecases/get_approvals_usecase.dart';
 
 // Events
+import '../features/events/data/datasources/events_local_datasource.dart';
 import '../features/events/data/datasources/events_remote_datasource.dart';
 import '../features/events/data/repositories/events_repository_impl.dart';
 import '../features/events/domain/repositories/event_repository.dart';
@@ -110,6 +111,7 @@ FutureOr<void> init() async {
     () => SplashBloc(
       getOnboardingSeen: sl<GetOnboardingSeen>(),
       isUserLoggedIn: sl<IsUserLoggedIn>(),
+      networkInfo: sl<NetworkInfo>(),
     ),
   );
 
@@ -231,9 +233,16 @@ FutureOr<void> init() async {
     () => EventsRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
 
+  sl.registerLazySingleton<EventsLocalDataSource>(
+    () => EventsLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
+  );
+
   // ── Events Repository ───────────────────────────────────────────────────────
   sl.registerLazySingleton<EventRepository>(
-    () => EventsRepositoryImpl(remoteDataSource: sl<EventsRemoteDataSource>()),
+    () => EventsRepositoryImpl(
+      remoteDataSource: sl<EventsRemoteDataSource>(),
+      localDataSource: sl<EventsLocalDataSource>(),
+    ),
   );
 
   // ── Events Use Cases ────────────────────────────────────────────────────────
@@ -245,6 +254,7 @@ FutureOr<void> init() async {
     () => EventsBloc(
       getUserEventsUseCase: sl<GetUserEventsUseCase>(),
       joinEventUseCase: sl<JoinEventUseCase>(),
+      networkInfo: sl<NetworkInfo>(),
     ),
   );
   // Notification Remote DataSource

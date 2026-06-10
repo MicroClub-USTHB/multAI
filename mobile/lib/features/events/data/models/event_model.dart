@@ -19,6 +19,14 @@ class EventModel extends EventEntity {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'event_date': eventDate.toIso8601String(),
+    'status': status,
+    'joined_at': joinedAt.toIso8601String(),
+  };
+
   EventEntity toEntity() => EventEntity(
     id: id,
     name: name,

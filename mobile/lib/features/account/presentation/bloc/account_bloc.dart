@@ -25,6 +25,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     LoadAccountData event,
     Emitter<AccountState> emit,
   ) async {
+    if (state is AccountLoaded || state is AccountLoading) return;
     emit(AccountLoading());
 
     final result = await _getAccountData(NoParams());

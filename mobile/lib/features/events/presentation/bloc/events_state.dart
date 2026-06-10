@@ -9,8 +9,15 @@ class EventsLoading extends EventsState {}
 class EventsLoaded extends EventsState {
   final List<EventEntity> activeEvents;
   final List<EventEntity> archivedEvents;
+  final bool isOffline;
+  final bool isRefreshing;
 
-  EventsLoaded({required this.activeEvents, required this.archivedEvents});
+  EventsLoaded({
+    required this.activeEvents,
+    required this.archivedEvents,
+    this.isOffline = false,
+    this.isRefreshing = false,
+  });
 }
 
 class JoinEventSuccess extends EventsState {}
