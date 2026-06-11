@@ -6,10 +6,8 @@ import 'package:multai_mobile/features/gallery/domain/usecases/get_my_photos_use
 import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
 import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'dart:async';
 
 import '../core/network/network_info.dart';
 import '../core/network/api_client.dart';
@@ -88,7 +86,7 @@ void registerSessionManager(SessionManager manager) {
   sl.registerLazySingleton<SessionManager>(() => manager);
 }
 
-FutureOr<void> init() async {
+Future<void> init() async {
   await sl.reset();
 
   // ── External ───────────────────────────────────────────────────────────────
@@ -99,8 +97,6 @@ FutureOr<void> init() async {
   );
   sl.registerLazySingleton<InternetConnection>(() => InternetConnection());
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
-  sl.registerLazySingleton<http.Client>(() => http.Client());
-
   // ── Core ───────────────────────────────────────────────────────────────────
   sl.registerLazySingleton<NetworkInfo>(
     () => NetworkInfoImpl(
@@ -110,7 +106,7 @@ FutureOr<void> init() async {
   );
 
   sl.registerLazySingleton(
-    () => ApiClient(client: sl<http.Client>(), networkInfo: sl<NetworkInfo>()),
+    () => ApiClient(networkInfo: sl<NetworkInfo>()),
   );
 
   sl.registerLazySingleton<DioClient>(

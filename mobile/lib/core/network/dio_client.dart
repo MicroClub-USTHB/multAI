@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../errors/failure.dart';
-import '../constants/end_points.dart';
+import '../config/app_config.dart';
 
 class DioClient {
   late final Dio _dio;
@@ -22,7 +22,7 @@ class DioClient {
         _errorInterceptor = DioClientError() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: EndPoints.baseUrl,
+        baseUrl: AppConfig.baseUrl,
         connectTimeout: connectTimeout,
         receiveTimeout: receiveTimeout,
         headers: {

@@ -4,20 +4,19 @@ class EndPoints {
   static String get baseUrl => dotenv.env['BASE_URL']?.trim() ?? '';
 
   // ── Auth ───────────────────────────────────────────────────────────────────
-  static const String registerLogin = '/auth/register-login';
-  static const String login = registerLogin;
-  static const String refresh = '/auth/refresh';
-  static const String logout = '/auth/logout';
-  static const String me = '/auth/me';
-  static const String account = me;
-  static const String revokeDevice = '/auth/revoke-device';
-  static const String updateDeviceToken = '/auth/devices/token';
-  static const String inactivateDevice = '/auth/devices/inactivate';
+  static const String register = '/user/auth/register';
+  static const String login = '/user/auth/login';
+  static const String refresh = '/user/auth/refresh';
+  static const String logout = '/user/auth/logout';
+  static const String me = '/user/auth/me';
+  static const String revokeDevice = '/user/auth/revoke-device';
+  static const String updateDeviceToken = '/user/auth/devices/token';
+  static const String inactivateDevice = '/user/auth/devices/inactivate';
 
   // ── Face Enrollment ────────────────────────────────────────────────────────
   static const String faceEnrollment = '/user/enroll';
 
-  // ── Events  ────────────────────────────────────────────────────────────────
+  // ── Events ─────────────────────────────────────────────────────────────────
   static const String userEvents = '/user/event/me';
   static const String joinEvent = '/user/event/join';
 

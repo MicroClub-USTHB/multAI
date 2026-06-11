@@ -14,8 +14,8 @@ class ApiClient {
 
   String? _accessToken;
 
-  ApiClient({required http.Client client, required NetworkInfo networkInfo})
-    : _client = client,
+  ApiClient({http.Client? client, required NetworkInfo networkInfo})
+    : _client = client ?? http.Client(),
       _networkInfo = networkInfo;
 
   String get baseUrl => EndPoints.baseUrl;

@@ -37,17 +37,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _checkEnrollmentDone = checkEnrollmentDone,
        super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
+    on<RegisterRequested>(_onRegisterRequested);
     on<RefreshTokenRequested>(_onRefreshTokenRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<GetCurrentUserRequested>(_onGetCurrentUserRequested);
   }
 
-  Future<void> _emitAuthenticatedState(
-    AuthEntity auth,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _emitAuthenticatedState(AuthEntity auth, Emitter<AuthState> emit) async {
     final isDone = await _checkEnrollmentDone();
-
     if (isDone) {
       emit(AuthAuthenticated(auth: auth));
     } else {
@@ -60,15 +57,34 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthFailure(message: FailureHandler.getUserFriendlyMessage(failure)));
   }
 
-  Future<void> _onLoginRequested(
-    LoginRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onRegisterRequested(RegisterRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
-
     try {
       final device = await DeviceUtils.getDeviceData();
+      final result = await _loginUseCase.callWithRegister(
+        LoginParams(
+          email: event.email,
+          password: event.password,
+          deviceName: device.deviceName,
+          deviceType: device.deviceType,
+          deviceId: device.deviceId,
+        ),
+        isRegister: true,
+      );
+      await result.fold(
+        (failure) async => _emitFailure(emit, failure),
+        (auth) async => _emitAuthenticatedState(auth, emit),
+      );
+    } catch (e) {
+      SecureLogger.error('AuthBloc', 'Register failed', e);
+      emit(AuthFailure(message: 'Registration failed. Please try again.'));
+    }
+  }
 
+  Future<void> _onLoginRequested(LoginRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      final device = await DeviceUtils.getDeviceData();
       final result = await _loginUseCase(
         LoginParams(
           email: event.email,
@@ -78,7 +94,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           deviceId: device.deviceId,
         ),
       );
-
       await result.fold(
         (failure) async => _emitFailure(emit, failure),
         (auth) async => _emitAuthenticatedState(auth, emit),
@@ -89,17 +104,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onRefreshTokenRequested(
-    RefreshTokenRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onRefreshTokenRequested(RefreshTokenRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
-
     try {
       final result = await _refreshTokenUseCase(
         RefreshTokenParams(refreshToken: event.refreshToken),
       );
-
       result.fold(
         (failure) => _emitFailure(emit, failure),
         (auth) => _emitAuthenticatedState(auth, emit),
@@ -110,15 +120,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLogoutRequested(
-    LogoutRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
-
     try {
       final result = await _logoutUseCase(NoParams());
-
       result.fold(
         (failure) {
           FailureHandler.logFailure(failure, 'AuthBloc');
@@ -132,15 +137,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onGetCurrentUserRequested(
-    GetCurrentUserRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onGetCurrentUserRequested(GetCurrentUserRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
-
     try {
       final result = await _getCurrentUserUseCase(NoParams());
-
       result.fold(
         (failure) => _emitFailure(emit, failure),
         (user) => emit(GetCurrentUserSuccess(user: user)),

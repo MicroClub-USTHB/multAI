@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/material.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 abstract class NetworkInfo {
@@ -21,18 +20,14 @@ class NetworkInfoImpl implements NetworkInfo {
   Future<bool> get isConnected async {
     try {
       final results = await connectivity.checkConnectivity();
-
       if (results.length == 1 && results.contains(ConnectivityResult.none)) {
         return false;
       }
-
       final hasInternet = await connectionChecker.hasInternetAccess.timeout(
         const Duration(seconds: 3),
       );
-
       return hasInternet;
-    } catch (e) {
-      debugPrint('Network check error: $e');
+    } catch (_) {
       return false;
     }
   }

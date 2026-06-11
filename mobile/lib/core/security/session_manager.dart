@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 class SessionManager {
   final Duration _timeoutDuration;
@@ -61,7 +60,7 @@ class SessionManager {
     _inactivityTimer?.cancel();
     _inactivityTimer = Timer(_timeoutDuration, () {
       if (_isAuthenticated && !_isPaused) {
-        debugPrint('[SessionManager] Session expired due to inactivity');
+        // Session expired silently
         _isAuthenticated = false;
         _onSessionExpired?.call();
       }

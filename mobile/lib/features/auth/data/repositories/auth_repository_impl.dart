@@ -3,7 +3,6 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/constants/storage_keys.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/failure_handler.dart';
-import '../../../../core/security/secure_logger.dart';
 import '../../../../core/storage/app_local_storage.dart';
 import '../../domain/entities/auth_entity.dart';
 import '../../domain/entities/user_entity.dart';
@@ -25,14 +24,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
   Future<void> _persistTokens(AuthEntity result) async {
     apiClient.setAccessToken(result.accessToken);
-    await localStorage.setSecureString(
-      StorageKeys.accessToken,
-      result.accessToken,
-    );
-    await localStorage.setSecureString(
-      StorageKeys.refreshToken,
-      result.refreshToken,
-    );
+    await localStorage.setSecureString(StorageKeys.accessToken, result.accessToken);
+    await localStorage.setSecureString(StorageKeys.refreshToken, result.refreshToken);
   }
 
   Future<void> _clearTokens() async {
@@ -42,12 +35,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   Future<String?> _loadAccessToken() async {
-    final secureToken = await localStorage.getSecureString(
-      StorageKeys.accessToken,
-    );
-    if (secureToken != null && secureToken.isNotEmpty) {
-      return secureToken;
-    }
+    final secureToken = await localStorage.getSecureString(StorageKeys.accessToken);
+    if (secureToken != null && secureToken.isNotEmpty) return secureToken;
     return null;
   }
 
@@ -57,40 +46,60 @@ class AuthRepositoryImpl implements AuthRepository {
       String? token = apiClient.currentAccessToken;
       if (token == null || token.isEmpty) {
         token = await _loadAccessToken();
-        if (token != null) {
-          apiClient.setAccessToken(token);
-        }
+        if (token != null) apiClient.setAccessToken(token);
       }
       return Right(token);
     } catch (e) {
-      SecureLogger.error('AuthRepository', 'getToken failed', e);
       return Left(const ServerFailure(message: 'Failed to retrieve session'));
     }
   }
 
-  @override
-  Future<Either<Failure, AuthEntity>> login(LoginParams params) async {
+  Future<Either<Failure, AuthEntity>> _authenticate(
+    Future<AuthResponseModel> Function() request,
+    LoginParams params,
+  ) async {
     try {
-      final sanitizedEmail = params.email.trim().toLowerCase();
-      final result = await remoteDataSource.login(
-        AuthRequestModel(
-          email: sanitizedEmail,
-          password: params.password,
-          deviceName: params.deviceName,
-          deviceType: params.deviceType,
-          deviceId: params.deviceId,
-        ),
-      );
+      final result = await request();
       await _persistTokens(result);
-      SecureLogger.info('AuthRepository', 'Login successful');
       return Right(result);
     } on Failure catch (f) {
       FailureHandler.logFailure(f, 'AuthRepository');
       return Left(f);
     } catch (e) {
-      SecureLogger.error('AuthRepository', 'Login failed', e);
-      return Left(ServerFailure(message: 'Login failed. Please try again.'));
+      return Left(ServerFailure(message: 'Authentication failed. Please try again.'));
     }
+  }
+
+  @override
+  Future<Either<Failure, AuthEntity>> register(LoginParams params) async {
+    return _authenticate(
+      () => remoteDataSource.register(
+        AuthRequestModel(
+          email: params.email.trim().toLowerCase(),
+          password: params.password,
+          deviceName: params.deviceName,
+          deviceType: params.deviceType,
+          deviceId: params.deviceId,
+        ),
+      ),
+      params,
+    );
+  }
+
+  @override
+  Future<Either<Failure, AuthEntity>> login(LoginParams params) async {
+    return _authenticate(
+      () => remoteDataSource.login(
+        AuthRequestModel(
+          email: params.email.trim().toLowerCase(),
+          password: params.password,
+          deviceName: params.deviceName,
+          deviceType: params.deviceType,
+          deviceId: params.deviceId,
+        ),
+      ),
+      params,
+    );
   }
 
   @override
@@ -104,11 +113,8 @@ class AuthRepositoryImpl implements AuthRepository {
       await _clearTokens();
       return Left(f);
     } catch (e) {
-      SecureLogger.error('AuthRepository', 'Token refresh failed', e);
       await _clearTokens();
-      return Left(const UnauthorizedFailure(
-        message: 'Session expired. Please sign in again.',
-      ));
+      return Left(const UnauthorizedFailure(message: 'Session expired. Please sign in again.'));
     }
   }
 
@@ -117,14 +123,11 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await remoteDataSource.logout();
       await _clearTokens();
-      SecureLogger.info('AuthRepository', 'Logout successful');
       return const Right(null);
-    } on Failure catch (f) {
-      FailureHandler.logFailure(f, 'AuthRepository');
+    } on Failure {
       await _clearTokens();
       return const Right(null);
     } catch (e) {
-      SecureLogger.error('AuthRepository', 'Logout failed', e);
       await _clearTokens();
       return const Right(null);
     }
@@ -139,7 +142,6 @@ class AuthRepositoryImpl implements AuthRepository {
       FailureHandler.logFailure(f, 'AuthRepository');
       return Left(f);
     } catch (e) {
-      SecureLogger.error('AuthRepository', 'getMe failed', e);
       return Left(ServerFailure(message: 'Failed to load user data'));
     }
   }
