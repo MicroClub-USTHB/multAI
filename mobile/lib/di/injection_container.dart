@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:multai_mobile/core/security/session_manager.dart';
 import 'package:multai_mobile/features/gallery/domain/repositories/photo_repository.dart';
 import 'package:multai_mobile/features/gallery/domain/usecases/get_event_photos_usecase.dart';
 import 'package:multai_mobile/features/gallery/domain/usecases/get_my_photos_usecase.dart';
@@ -12,7 +13,9 @@ import 'dart:async';
 
 import '../core/network/network_info.dart';
 import '../core/network/api_client.dart';
+import '../core/network/dio_client.dart';
 import '../core/storage/app_local_storage.dart';
+import '../core/security/app_security.dart';
 
 // Onboarding
 import '../features/onboarding/data/repositories/onboarding_repository_impl.dart';
@@ -82,6 +85,10 @@ import '../features/gallery/domain/usecases/get_photo_image_usecase.dart';
 
 final sl = GetIt.instance;
 
+void registerSessionManager(SessionManager manager) {
+  sl.registerLazySingleton<SessionManager>(() => manager);
+}
+
 FutureOr<void> init() async {
   await sl.reset();
 
@@ -105,6 +112,12 @@ FutureOr<void> init() async {
 
   sl.registerLazySingleton(
     () => ApiClient(client: sl<http.Client>(), networkInfo: sl<NetworkInfo>()),
+  );
+
+  sl.registerLazySingleton<IBiometricAuth>(() => AppSecurity());
+
+  sl.registerLazySingleton<DioClient>(
+    () => DioClient(),
   );
   // ── Onboarding ─────────────────────────────────────────────────────────────
   sl.registerFactory<SplashBloc>(

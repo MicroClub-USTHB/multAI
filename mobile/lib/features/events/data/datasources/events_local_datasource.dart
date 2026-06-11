@@ -10,26 +10,29 @@ abstract class EventsLocalDataSource {
 }
 
 class EventsLocalDataSourceImpl implements EventsLocalDataSource {
-  final AppLocalStorage localStorage;
+  final LocalStorage localStorage;
 
   EventsLocalDataSourceImpl({required this.localStorage});
 
   @override
   Future<void> cacheEvents(List<EventModel> events) async {
     final jsonList = events.map((e) => e.toJson()).toList();
-    await localStorage.setString(
+    final raw = jsonEncode(jsonList);
+    await localStorage.setSecureString(
       StorageKeys.cachedEvents,
-      jsonEncode(jsonList),
+      raw,
     );
   }
 
   @override
   Future<List<EventModel>?> getCachedEvents() async {
-    final raw = localStorage.getString(StorageKeys.cachedEvents);
-    if (raw == null || raw.isEmpty) return null;
+    final encrypted = await localStorage.getSecureString(
+      StorageKeys.cachedEvents,
+    );
+    if (encrypted == null || encrypted.isEmpty) return null;
 
     try {
-      final List<dynamic> items = jsonDecode(raw) as List<dynamic>;
+      final List<dynamic> items = jsonDecode(encrypted) as List<dynamic>;
       return items
           .map((e) => EventModel.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -40,6 +43,6 @@ class EventsLocalDataSourceImpl implements EventsLocalDataSource {
 
   @override
   Future<void> clearCache() async {
-    await localStorage.removePref(StorageKeys.cachedEvents);
+    await localStorage.removeSecure(StorageKeys.cachedEvents);
   }
 }

@@ -1,20 +1,31 @@
 import 'package:local_auth/local_auth.dart';
 
-class AppSecurity {
-  AppSecurity._();
+import 'secure_logger.dart';
 
-  static final LocalAuthentication _localAuth = LocalAuthentication();
+abstract class IBiometricAuth {
+  Future<bool> isBiometricAvailable();
+  Future<bool> authenticateWithBiometrics({String reason});
+}
 
-  static Future<bool> isBiometricAvailable() async {
+class AppSecurity implements IBiometricAuth {
+  final LocalAuthentication _localAuth;
+
+  AppSecurity({LocalAuthentication? localAuth})
+      : _localAuth = localAuth ?? LocalAuthentication();
+
+  @override
+  Future<bool> isBiometricAvailable() async {
     try {
       return await _localAuth.canCheckBiometrics ||
           await _localAuth.isDeviceSupported();
-    } catch (_) {
+    } catch (e) {
+      SecureLogger.error('AppSecurity', 'Biometric availability check failed', e);
       return false;
     }
   }
 
-  static Future<bool> authenticateWithBiometrics({
+  @override
+  Future<bool> authenticateWithBiometrics({
     String reason = 'Authenticate to access the app',
   }) async {
     try {
@@ -25,7 +36,8 @@ class AppSecurity {
           stickyAuth: true,
         ),
       );
-    } catch (_) {
+    } catch (e) {
+      SecureLogger.error('AppSecurity', 'Biometric authentication failed', e);
       return false;
     }
   }

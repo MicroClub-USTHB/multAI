@@ -1,11 +1,13 @@
 import 'dart:async';
-// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/router/app_router.dart';
 import 'core/security/env_validator.dart';
+import 'core/security/device_security.dart';
+import 'core/security/secure_logger.dart';
+import 'core/security/session_manager.dart';
 import 'core/theme/theme.dart';
 import 'features/auth/presentation/blocs/auth_bloc.dart';
 import 'features/events/presentation/bloc/events_bloc.dart';
@@ -14,23 +16,43 @@ import 'features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'features/gallery/presentation/bloc/gallery_bloc.dart';
 import 'di/injection_container.dart' as di;
 
+late final SessionManager sessionManager;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+
+  if (DeviceSecurity.isDebugMode()) {
+    SecureLogger.warning('App', 'Running in debug mode');
+  }
 
   try {
-    await dotenv.load(fileName: ".env");
+    await dotenv.load(fileName: '.env');
   } catch (e) {
-    debugPrint('Warning: Could not load .env file: $e');
+    SecureLogger.error('App', 'Could not load .env file', e);
   }
 
   final missingVars = EnvValidator.validate();
   if (missingVars.isNotEmpty) {
-    debugPrint('Warning: Missing env vars: $missingVars');
+    SecureLogger.error('App', 'Missing env vars: $missingVars');
   }
+
   if (!EnvValidator.isBaseUrlValid()) {
-    debugPrint('Warning: Invalid or missing BASE_URL in .env');
+    SecureLogger.error('App', 'Invalid or missing BASE_URL in .env');
   }
+
+  if (!EnvValidator.isProduction()) {
+    SecureLogger.warning('App', 'Using non-HTTPS base URL');
+  }
+
+  sessionManager = SessionManager(
+    timeoutDuration: const Duration(minutes: 15),
+  );
+
+  di.registerSessionManager(sessionManager);
+
+  sessionManager.setOnSessionExpired(() {
+    SecureLogger.info('App', 'Session expired due to inactivity');
+  });
 
   await di.init();
   runApp(MyApp());
@@ -45,13 +67,14 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (widget.enableDeepLinks) {
       _initDeepLinks();
     }
@@ -59,8 +82,19 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _linkSubscription?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      sessionManager.resume();
+      sessionManager.recordActivity();
+    } else if (state == AppLifecycleState.paused) {
+      sessionManager.pause();
+    }
   }
 
   Future<void> _initDeepLinks() async {
@@ -70,9 +104,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void _handleDeepLink(Uri uri) {
-    //to be implemented
-  }
+  void _handleDeepLink(Uri uri) {}
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +121,8 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<GalleryBloc>(create: (_) => di.sl<GalleryBloc>()),
       ],
       child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: !DeviceSecurity.isDebugMode(),
+        title: 'MultAI',
         theme: AppTheme.lightTheme,
         routerConfig: appRouter,
       ),

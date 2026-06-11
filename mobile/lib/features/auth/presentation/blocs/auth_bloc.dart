@@ -1,5 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/errors/failure.dart';
+import '../../../../core/errors/failure_handler.dart';
+import '../../../../core/security/secure_logger.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../domain/entities/auth_entity.dart';
 import '../../domain/entities/user_entity.dart';
@@ -52,7 +55,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  // ── Login
+  void _emitFailure(Emitter<AuthState> emit, Failure failure) {
+    FailureHandler.logFailure(failure, 'AuthBloc');
+    emit(AuthFailure(message: FailureHandler.getUserFriendlyMessage(failure)));
+  }
+
   Future<void> _onLoginRequested(
     LoginRequested event,
     Emitter<AuthState> emit,
@@ -73,15 +80,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       await result.fold(
-        (failure) async => emit(AuthFailure(message: failure.message)),
+        (failure) async => _emitFailure(emit, failure),
         (auth) async => _emitAuthenticatedState(auth, emit),
       );
     } catch (e) {
-      emit(AuthFailure(message: e.toString()));
+      SecureLogger.error('AuthBloc', 'Login failed', e);
+      emit(AuthFailure(message: 'Sign in failed. Please try again.'));
     }
   }
 
-  // ── Refresh token
   Future<void> _onRefreshTokenRequested(
     RefreshTokenRequested event,
     Emitter<AuthState> emit,
@@ -94,15 +101,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       result.fold(
-        (failure) => emit(AuthFailure(message: failure.message)),
+        (failure) => _emitFailure(emit, failure),
         (auth) => _emitAuthenticatedState(auth, emit),
       );
     } catch (e) {
-      emit(AuthFailure(message: e.toString()));
+      SecureLogger.error('AuthBloc', 'Token refresh failed', e);
+      emit(AuthFailure(message: 'Session expired. Please sign in again.'));
     }
   }
 
-  // ── Logout
   Future<void> _onLogoutRequested(
     LogoutRequested event,
     Emitter<AuthState> emit,
@@ -113,15 +120,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _logoutUseCase(NoParams());
 
       result.fold(
-        (failure) => emit(AuthFailure(message: failure.message)),
+        (failure) {
+          FailureHandler.logFailure(failure, 'AuthBloc');
+          emit(Unauthenticated());
+        },
         (_) => emit(Unauthenticated()),
       );
     } catch (e) {
-      emit(AuthFailure(message: e.toString()));
+      SecureLogger.error('AuthBloc', 'Logout failed', e);
+      emit(Unauthenticated());
     }
   }
 
-  // ── Get current user
   Future<void> _onGetCurrentUserRequested(
     GetCurrentUserRequested event,
     Emitter<AuthState> emit,
@@ -132,11 +142,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _getCurrentUserUseCase(NoParams());
 
       result.fold(
-        (failure) => emit(AuthFailure(message: failure.message)),
+        (failure) => _emitFailure(emit, failure),
         (user) => emit(GetCurrentUserSuccess(user: user)),
       );
     } catch (e) {
-      emit(AuthFailure(message: e.toString()));
+      SecureLogger.error('AuthBloc', 'Get current user failed', e);
+      emit(AuthFailure(message: 'Could not load user data.'));
     }
   }
 }

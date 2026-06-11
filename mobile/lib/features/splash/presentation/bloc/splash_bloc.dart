@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/network/network_info.dart';
+import '../../../../core/security/device_security.dart';
+import '../../../../core/security/secure_logger.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../onboarding/domain/usecases/get_onboarding_seen.dart';
@@ -30,6 +32,19 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
   ) async {
     emit(const SplashLoading());
     try {
+      if (DeviceSecurity.isDebugMode()) {
+        SecureLogger.warning('SplashBloc', 'App running in debug mode');
+      }
+
+      final isCompromised = await DeviceSecurity.isDeviceCompromised();
+      if (isCompromised) {
+        SecureLogger.warning('SplashBloc', 'Device is rooted/jailbroken');
+        emit(const SplashSecurityWarning(
+          message: 'This app cannot run on rooted or jailbroken devices.',
+        ));
+        return;
+      }
+
       await Future.delayed(const Duration(milliseconds: 1500));
 
       final isOnline = await networkInfo.isConnected;
@@ -51,7 +66,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
         emit(SplashOffline());
       }
     } catch (e) {
-      emit(SplashError(message: e.toString()));
+      SecureLogger.error('SplashBloc', 'Initialization failed', e);
+      emit(SplashError(message: 'Could not start the application.'));
     }
   }
 
@@ -79,7 +95,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
         emit(SplashOffline());
       }
     } catch (e) {
-      emit(SplashError(message: e.toString()));
+      SecureLogger.error('SplashBloc', 'Retry connection failed', e);
+      emit(SplashError(message: 'Could not connect. Please try again.'));
     }
   }
 }

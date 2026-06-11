@@ -1,3 +1,4 @@
+import 'dart:convert';
 import '../../../../core/constants/storage_keys.dart';
 import '../../../../core/storage/app_local_storage.dart';
 import '../models/account_model.dart';
@@ -14,15 +15,25 @@ class AccountLocalDataSourceImpl implements AccountLocalDataSource {
 
   @override
   Future<void> cacheAccountData(AccountModel account) async {
-    await localStorage.setJson(StorageKeys.cachedAccount, account.toJson());
+    final raw = jsonEncode(account.toJson());
+    await localStorage.setSecureString(
+      StorageKeys.cachedAccount,
+      raw,
+    );
   }
 
   @override
   Future<AccountModel?> getCachedAccountData() async {
-    final cached = localStorage.getJson(StorageKeys.cachedAccount);
-    if (cached != null) {
-      return AccountModel.fromJson(cached);
+    final encrypted = await localStorage.getSecureString(
+      StorageKeys.cachedAccount,
+    );
+    if (encrypted == null || encrypted.isEmpty) return null;
+
+    try {
+      final decoded = jsonDecode(encrypted);
+      return AccountModel.fromJson(decoded as Map<String, dynamic>);
+    } catch (_) {
+      return null;
     }
-    return null;
   }
 }

@@ -94,6 +94,9 @@ class _SplashScreenState extends State<SplashScreen>
           if (state is SplashOffline) {
             return _buildOfflineScreen(context);
           }
+          if (state is SplashSecurityWarning) {
+            return _buildSecurityWarningScreen(context, state);
+          }
           return Scaffold(
             backgroundColor: AppThemeColors.splashBackground,
             body: Stack(
@@ -135,6 +138,48 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSecurityWarningScreen(
+    BuildContext context,
+    SplashSecurityWarning state,
+  ) {
+    final tt = Theme.of(context).textTheme;
+    return Scaffold(
+      backgroundColor: AppThemeColors.splashBackground,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppThemeMetrics.spacingXl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SplashLogo(),
+              const SizedBox(height: AppThemeMetrics.spacingXl),
+              Icon(
+                Icons.security_rounded,
+                size: 80,
+                color: AppThemeColors.error.withValues(alpha: 0.8),
+              ),
+              const SizedBox(height: AppThemeMetrics.spacingLg),
+              Text(
+                'Security Alert',
+                style: tt.headlineSmall?.copyWith(
+                  color: AppThemeColors.primaryText,
+                ),
+              ),
+              const SizedBox(height: AppThemeMetrics.spacingSm),
+              Text(
+                state.message,
+                style: tt.bodySmall?.copyWith(
+                  color: AppThemeColors.secondaryText,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
