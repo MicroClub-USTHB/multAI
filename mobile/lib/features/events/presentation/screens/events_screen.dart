@@ -10,6 +10,7 @@ import '../../../../../core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../../domain/validators/event_code_validator.dart';
+import 'package:multai_mobile/features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../bloc/events_bloc.dart';
 import '../mappers/event_status_mapper.dart';
 import '../widgets/active_events_card.dart';
@@ -79,27 +80,37 @@ class _EventsScreenState extends State<EventsScreen> {
                       color: AppThemeColors.secondaryText,
                       size: context.iconSize(),
                     ),
-                    Positioned(
-                      top: 1,
-                      right: context.widthCalculated(AppThemeMetrics.spacingXs),
-                      child: Container(
-                        width: context.widthCalculated(
-                          AppThemeMetrics.notifDotSize,
-                        ),
-                        height: context.widthCalculated(
-                          AppThemeMetrics.notifDotSize,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppThemeColors.accent,
-                          border: Border.all(
-                            color: AppThemeColors.background,
-                            width: 1,
+                    BlocBuilder<NotificationBloc, NotificationState>(
+                      builder: (context, nState) {
+                        final unread = nState is NotificationLoaded
+                            ? nState.unreadCount
+                            : 0;
+                        if (unread <= 0) return const SizedBox.shrink();
+                        return Positioned(
+                          top: 1,
+                          right: context.widthCalculated(
+                            AppThemeMetrics.spacingXs,
                           ),
-                          borderRadius: BorderRadius.circular(
-                            AppThemeMetrics.radiusXl,
+                          child: Container(
+                            width: context.widthCalculated(
+                              AppThemeMetrics.notifDotSize,
+                            ),
+                            height: context.widthCalculated(
+                              AppThemeMetrics.notifDotSize,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppThemeColors.accent,
+                              border: Border.all(
+                                color: AppThemeColors.background,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                AppThemeMetrics.radiusXl,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ],
                 ),

@@ -15,7 +15,6 @@ import '../core/network/network_info.dart';
 import '../core/network/api_client.dart';
 import '../core/network/dio_client.dart';
 import '../core/storage/app_local_storage.dart';
-import '../core/security/app_security.dart';
 
 // Onboarding
 import '../features/onboarding/data/repositories/onboarding_repository_impl.dart';
@@ -113,8 +112,6 @@ FutureOr<void> init() async {
   sl.registerLazySingleton(
     () => ApiClient(client: sl<http.Client>(), networkInfo: sl<NetworkInfo>()),
   );
-
-  sl.registerLazySingleton<IBiometricAuth>(() => AppSecurity());
 
   sl.registerLazySingleton<DioClient>(
     () => DioClient(),

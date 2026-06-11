@@ -35,18 +35,22 @@ class DioClient {
     _dio.interceptors.addAll([
       _authInterceptor,
       _errorInterceptor,
-      LogInterceptor(
-        request: kDebugMode,
-        responseBody: kDebugMode,
-        error: kDebugMode,
-        requestHeader: kDebugMode,
-        responseHeader: false,
-        logPrint: (obj) {
-          if (kDebugMode) {
+      if (kDebugMode)
+        LogInterceptor(
+          request: true,
+          responseBody: true,
+          error: true,
+          requestHeader: false,
+          responseHeader: false,
+          logPrint: (obj) {
+            final message = obj.toString();
+            if (message.contains('Authorization') ||
+                message.contains('Bearer ')) {
+              return;
+            }
             debugPrint('[DIO] $obj');
-          }
-        },
-      ),
+          },
+        ),
     ]);
   }
 

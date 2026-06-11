@@ -14,7 +14,7 @@ import '../domain/usecases/revoke_push_token_usecase.dart';
 // ── Background message handler — must be top-level ────────────────────────────
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  debugPrint('Background message: ${message.messageId}');
+  // background handler — no-op
 }
 
 class PushNotificationService {
@@ -90,19 +90,15 @@ class PushNotificationService {
       await _registerToken(
         RegisterPushTokenParams(deviceId: deviceId, token: deviceToken),
       );
-
-      debugPrint('Push token registered [$deviceId]: $deviceToken');
     } on Failure catch (failure) {
-      debugPrint('Push token registration skipped: ${failure.message}');
+      // push token registration skipped
     }
   }
 
   // ── Get FCM token (Android) or APN token (iOS) ────────────────────────────
   Future<String?> _getToken() async {
     if (Platform.isIOS) {
-      // iOS needs APN token first
-      final apnToken = await _fcm.getAPNSToken();
-      debugPrint('APN token: $apnToken');
+      await _fcm.getAPNSToken();
     }
     return await _fcm.getToken();
   }
@@ -113,13 +109,11 @@ class PushNotificationService {
 
     try {
       await _revokeToken(RevokePushTokenParams(deviceId: deviceId));
-    } on Failure catch (failure) {
-      debugPrint('Push token revoke skipped: ${failure.message}');
+    } on Failure {
+      // push token revoke skipped
     } finally {
       await _fcm.deleteToken();
     }
-
-    debugPrint('Push token revoked');
   }
 
   // ── Handle foreground message ──────────────────────────────────────────────
@@ -157,7 +151,7 @@ class PushNotificationService {
     await _localNotifications.initialize(
       settings: InitializationSettings(android: android, iOS: ios),
       onDidReceiveNotificationResponse: (details) {
-        debugPrint('Notification tapped: ${details.payload}');
+        // notification tapped
       },
     );
 

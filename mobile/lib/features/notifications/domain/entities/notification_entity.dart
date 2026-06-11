@@ -57,4 +57,20 @@ class NotificationEntity {
 
   String get title => payload['title'] as String? ?? type.label;
   String get body => payload['body'] as String? ?? '';
+
+  NotificationEntity copyWith({
+    String? id,
+    NotificationType? type,
+    Map<String, dynamic>? payload,
+    DateTime? readAt,
+    DateTime? createdAt,
+  }) {
+    return NotificationEntity(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      payload: payload ?? this.payload,
+      readAt: readAt,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }
