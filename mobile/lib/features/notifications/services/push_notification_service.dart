@@ -3,7 +3,6 @@
 
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../auth/utils/device_utils.dart';
@@ -90,7 +89,7 @@ class PushNotificationService {
       await _registerToken(
         RegisterPushTokenParams(deviceId: deviceId, token: deviceToken),
       );
-    } on Failure catch (failure) {
+    } on Failure {
       // push token registration skipped
     }
   }
