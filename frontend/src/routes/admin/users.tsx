@@ -24,6 +24,7 @@ import {
 } from '@/features/admin/staff-users/constants'
 import { useStaffUsers } from '@/features/admin/staff-users/hooks'
 import { UserConfirmDialog } from '@/features/admin/users/components/user-confirm-dialog'
+import { UserDetailsDialog } from '@/features/admin/users/components/user-details-dialog'
 import { UserFormDialog } from '@/features/admin/users/components/user-form-dialog'
 import { UsersTable } from '@/features/admin/users/components/users-table'
 import { useAdminUsers } from '@/features/admin/users/hooks'
@@ -152,6 +153,7 @@ function UsersPanel() {
 	const [searchInput, setSearchInput] = useState('')
 	const [appliedSearch, setAppliedSearch] = useState('')
 	const [userDialog, setUserDialog] = useState<UserDialogState>(null)
+	const [userDetailsId, setUserDetailsId] = useState<string | null>(null)
 	const [userToDelete, setUserToDelete] = useState<AdminUser | null>(null)
 	const [actionError, setActionError] = useState<string | null>(null)
 
@@ -184,6 +186,11 @@ function UsersPanel() {
 	const openCreateDialog = () => {
 		setActionError(null)
 		setUserDialog({ mode: 'create' })
+	}
+
+	const openUserDetails = (user: AdminUser) => {
+		setActionError(null)
+		setUserDetailsId(user.id)
 	}
 
 	const openEditDialog = (user: AdminUser) => {
@@ -331,6 +338,7 @@ function UsersPanel() {
 							<UsersTable
 								users={filteredUsers}
 								isBusy={isBusy}
+								onViewDetails={openUserDetails}
 								onEdit={openEditDialog}
 								onDelete={(user) => setUserToDelete(user)}
 								onToggleBlocked={(user) => {
@@ -359,6 +367,16 @@ function UsersPanel() {
 					}
 				}}
 				onSubmit={handleSubmitUser}
+			/>
+
+			<UserDetailsDialog
+				userId={userDetailsId}
+				open={Boolean(userDetailsId)}
+				onOpenChange={(open) => {
+					if (!open) {
+						setUserDetailsId(null)
+					}
+				}}
 			/>
 
 			<UserConfirmDialog

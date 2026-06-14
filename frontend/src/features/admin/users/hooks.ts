@@ -11,6 +11,7 @@ import {
 	blockAdminUser,
 	createAdminUser,
 	deleteAdminUser,
+	getAdminUser,
 	listAdminUsers,
 	unblockAdminUser,
 	updateAdminUser,
@@ -32,6 +33,20 @@ export function useAdminUsersQuery(
 	return useQuery({
 		queryKey: [...ADMIN_USERS_QUERY_KEY, params],
 		queryFn: () => listAdminUsers(params),
+	})
+}
+
+export function useAdminUserQuery(userId: string | null, enabled = true) {
+	return useQuery({
+		queryKey: [...ADMIN_USERS_QUERY_KEY, 'detail', userId],
+		queryFn: () => {
+			if (!userId) {
+				throw new Error('Missing user id.')
+			}
+
+			return getAdminUser(userId)
+		},
+		enabled: Boolean(userId) && enabled,
 	})
 }
 

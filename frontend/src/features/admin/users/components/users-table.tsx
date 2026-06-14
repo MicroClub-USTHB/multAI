@@ -1,13 +1,5 @@
 import { splitTimestamp } from '@/features/admin/logs/utils'
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from '@/shared/ui'
-import { Badge } from '@/shared/ui'
+import { Badge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui'
 
 import type { AdminUser } from '../types'
 
@@ -16,6 +8,7 @@ import { UserActionsMenu } from './user-actions-menu'
 interface UsersTableProps {
 	users: AdminUser[]
 	isBusy?: boolean
+	onViewDetails: (user: AdminUser) => void
 	onEdit: (user: AdminUser) => void
 	onDelete: (user: AdminUser) => void
 	onToggleBlocked: (user: AdminUser) => void
@@ -24,6 +17,7 @@ interface UsersTableProps {
 export function UsersTable({
 	users,
 	isBusy = false,
+	onViewDetails,
 	onEdit,
 	onDelete,
 	onToggleBlocked,
@@ -60,7 +54,7 @@ export function UsersTable({
 									{user.email}
 								</TableCell>
 								<TableCell className='text-muted-foreground px-2 py-2.5 text-sm'>
-									{user.displayName ?? '—'}
+									{user.displayName ?? '-'}
 								</TableCell>
 								<TableCell className='px-2 py-2.5'>
 									<Badge
@@ -84,6 +78,7 @@ export function UsersTable({
 									<UserActionsMenu
 										user={user}
 										isBusy={isBusy}
+										onViewDetails={() => onViewDetails(user)}
 										onEdit={() => onEdit(user)}
 										onDelete={() => onDelete(user)}
 										onToggleBlocked={() => onToggleBlocked(user)}

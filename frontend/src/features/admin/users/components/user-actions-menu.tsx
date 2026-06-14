@@ -1,4 +1,11 @@
-import { MoreHorizontal, PencilLine, ShieldAlert, ShieldCheck, Trash2 } from 'lucide-react'
+import {
+	MoreHorizontal,
+	PencilLine,
+	ShieldAlert,
+	ShieldCheck,
+	Trash2,
+	UserSearch,
+} from 'lucide-react'
 
 import { Button } from '@/shared/ui'
 import {
@@ -13,6 +20,7 @@ import type { AdminUser } from '../types'
 interface UserActionsMenuProps {
 	user: AdminUser
 	isBusy?: boolean
+	onViewDetails: () => void
 	onEdit: () => void
 	onDelete: () => void
 	onToggleBlocked: () => void
@@ -21,6 +29,7 @@ interface UserActionsMenuProps {
 export function UserActionsMenu({
 	user,
 	isBusy = false,
+	onViewDetails,
 	onEdit,
 	onDelete,
 	onToggleBlocked,
@@ -34,11 +43,15 @@ export function UserActionsMenu({
 			>
 				<MoreHorizontal />
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align='end' className='min-w-44'>
-				<DropdownMenuItem disabled={isBusy} onClick={onEdit}>
-					<PencilLine />
-					Edit user
-				</DropdownMenuItem>
+		<DropdownMenuContent align='end' className='min-w-44'>
+			<DropdownMenuItem disabled={isBusy} onClick={onViewDetails}>
+				<UserSearch />
+				View details
+			</DropdownMenuItem>
+			<DropdownMenuItem disabled={isBusy} onClick={onEdit}>
+				<PencilLine />
+				Edit user
+			</DropdownMenuItem>
 				<DropdownMenuItem disabled={isBusy} onClick={onToggleBlocked}>
 					{user.blocked ? <ShieldCheck /> : <ShieldAlert />}
 					{blockLabel}
