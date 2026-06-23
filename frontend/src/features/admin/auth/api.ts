@@ -8,8 +8,6 @@ import {
 	toAdminProfile,
 } from './types'
 
-export const ADMIN_AUTH_TOKEN_KEY = 'admin_access_token'
-
 export class AdminAuthApiError extends Error {
 	status: number
 	details?: unknown

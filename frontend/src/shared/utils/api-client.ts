@@ -5,7 +5,6 @@ export const API_BASE_URL =
 
 export type ApiRequestOptions = {
 	fallbackErrorMessage?: string
-	tokenKey?: string
 	credentials?: RequestCredentials
 }
 
@@ -19,17 +18,6 @@ export class ApiError extends Error {
 		this.status = status
 		this.details = details
 	}
-}
-
-const getAccessToken = (tokenKey: string) => {
-	if (typeof window === 'undefined') {
-		return null
-	}
-
-	return (
-		window.localStorage.getItem(tokenKey) ??
-		window.sessionStorage.getItem(tokenKey)
-	)
 }
 
 const resolveErrorMessage = (payload: unknown, fallback: string) => {
@@ -70,22 +58,12 @@ const resolveErrorMessage = (payload: unknown, fallback: string) => {
 
 const buildHeaders = (
 	initHeaders: HeadersInit | undefined,
-	{
-		tokenKey,
-		setJsonContentType,
-	}: { tokenKey?: string; setJsonContentType: boolean },
+	{ setJsonContentType }: { setJsonContentType: boolean },
 ) => {
 	const headers = new Headers(initHeaders)
 
 	if (setJsonContentType && !headers.has('Content-Type')) {
 		headers.set('Content-Type', 'application/json')
-	}
-
-	if (tokenKey) {
-		const token = getAccessToken(tokenKey)
-		if (token) {
-			headers.set('Authorization', `Bearer ${token}`)
-		}
 	}
 
 	return headers
@@ -114,7 +92,6 @@ export const apiRequest = async <TResponse>(
 	const response = await fetch(`${API_BASE_URL}${path}`, {
 		...init,
 		headers: buildHeaders(init.headers, {
-			tokenKey: options.tokenKey,
 			setJsonContentType,
 		}),
 		credentials: options.credentials ?? 'include',

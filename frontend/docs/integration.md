@@ -31,18 +31,17 @@ flowchart LR
     Login[Login page]
     Provider[AuthProvider]
     ClientAPI[api-client]
-    Storage[(localStorage / sessionStorage)]
-    Cookie[(access_token cookie)]
   end
 
   API[Backend admin API]
+  Cookie[(httpOnly session cookie)]
 
   Login --> Provider
-  Provider --> Storage
-  Provider --> Cookie
   Provider --> ClientAPI
   ClientAPI --> API
   API --> ClientAPI
+  API --> Cookie
+  Cookie --> ClientAPI
   ClientAPI --> Provider
   Provider --> Login
 ```
@@ -62,10 +61,9 @@ sequenceDiagram
   UI->>Auth: login()
   Auth->>API: POST /admin/auth/login
   API-->>Auth: access_token, user_id, role
+  API-->>Browser: set httpOnly session cookie
   Auth->>API: GET /admin/auth/me
   API-->>Auth: admin profile
-  Auth->>Storage: persist token
-  Auth->>Cookie: mirror access_token
   Auth-->>UI: session ready
   UI-->>User: redirect /admin or redirect param
 ```
@@ -73,13 +71,14 @@ sequenceDiagram
 ### 2. Session restore
 
 ```mermaid
-sequenceDiagram
+  sequenceDiagram
+  participant Browser
   participant App as App shell
   participant Auth as AuthProvider
   participant API as Backend
 
   App->>Auth: mount
-  Auth->>Storage: read admin_access_token
+  Browser->>API: GET /admin/auth/me with cookie
   Auth->>API: GET /admin/auth/me
   API-->>Auth: admin profile
   Auth-->>App: user + authenticated state
@@ -96,26 +95,22 @@ sequenceDiagram
   User->>Auth: logout()
   Auth->>API: POST /admin/auth/logout
   API-->>Auth: 204 / success
-  Auth->>Storage: clear token
-  Auth->>Cookie: clear access_token
   Auth-->>User: redirect /auth/login
 ```
 
 ## Auth state rules
 
-- `admin_access_token` is the client token key used by the app.
-- `remember me` stores the token in `localStorage`.
-- otherwise the token is stored in `sessionStorage`.
-- `api-client` automatically adds `Authorization: Bearer <token>` when a token key is provided.
-- `AuthProvider` also mirrors the token in an `access_token` cookie for backend compatibility.
+- `AuthProvider` relies on the backend session cookie and hydrates the user with `GET /admin/auth/me`.
+- `api-client` sends `credentials: 'include'` by default so the backend cookie is attached.
 - if `GET /admin/auth/me` returns `401`, the client clears the session and forces a new login.
 - if login succeeds but session hydration fails, the client rolls back the session instead of keeping a half-open state.
+- the frontend never stores the admin access token in `localStorage` or `sessionStorage`.
 
 ## Endpoints branches
 
 | Domaine     | Front           | Endpoint               | Statut | Notes |
 | ----------- | --------------- | ---------------------- | ------ | ----- |
-| Admin auth  | AuthProvider    | POST /admin/auth/login | lie    | Login et retour du token |
+| Admin auth  | AuthProvider    | POST /admin/auth/login | lie    | Login et hydration de session |
 | Admin auth  | AuthProvider    | GET /admin/auth/me     | lie    | Hydratation de session |
 | Admin auth  | AuthProvider    | POST /admin/auth/logout | lie   | Logout best-effort + cleanup client |
 | Admin users | Users page - tab Users | GET /admin/users/      | lie    | Liste paginee des users |
