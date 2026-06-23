@@ -1,17 +1,17 @@
 import 'package:get_it/get_it.dart';
+import 'package:multai_mobile/core/security/session_manager.dart';
 import 'package:multai_mobile/features/gallery/domain/repositories/photo_repository.dart';
 import 'package:multai_mobile/features/gallery/domain/usecases/get_event_photos_usecase.dart';
 import 'package:multai_mobile/features/gallery/domain/usecases/get_my_photos_usecase.dart';
 import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
 import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'dart:async';
 
 import '../core/network/network_info.dart';
 import '../core/network/api_client.dart';
+import '../core/network/dio_client.dart';
 import '../core/storage/app_local_storage.dart';
 
 // Onboarding
@@ -67,6 +67,7 @@ import '../features/photo_approval/domain/usecases/decide_photo_approval_usecase
 import '../features/photo_approval/domain/usecases/get_approvals_usecase.dart';
 
 // Events
+import '../features/events/data/datasources/events_local_datasource.dart';
 import '../features/events/data/datasources/events_remote_datasource.dart';
 import '../features/events/data/repositories/events_repository_impl.dart';
 import '../features/events/domain/repositories/event_repository.dart';
@@ -81,7 +82,11 @@ import '../features/gallery/domain/usecases/get_photo_image_usecase.dart';
 
 final sl = GetIt.instance;
 
-FutureOr<void> init() async {
+void registerSessionManager(SessionManager manager) {
+  sl.registerLazySingleton<SessionManager>(() => manager);
+}
+
+Future<void> init() async {
   await sl.reset();
 
   // ── External ───────────────────────────────────────────────────────────────
@@ -92,8 +97,6 @@ FutureOr<void> init() async {
   );
   sl.registerLazySingleton<InternetConnection>(() => InternetConnection());
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
-  sl.registerLazySingleton<http.Client>(() => http.Client());
-
   // ── Core ───────────────────────────────────────────────────────────────────
   sl.registerLazySingleton<NetworkInfo>(
     () => NetworkInfoImpl(
@@ -103,13 +106,18 @@ FutureOr<void> init() async {
   );
 
   sl.registerLazySingleton(
-    () => ApiClient(client: sl<http.Client>(), networkInfo: sl<NetworkInfo>()),
+    () => ApiClient(networkInfo: sl<NetworkInfo>()),
+  );
+
+  sl.registerLazySingleton<DioClient>(
+    () => DioClient(),
   );
   // ── Onboarding ─────────────────────────────────────────────────────────────
   sl.registerFactory<SplashBloc>(
     () => SplashBloc(
       getOnboardingSeen: sl<GetOnboardingSeen>(),
       isUserLoggedIn: sl<IsUserLoggedIn>(),
+      networkInfo: sl<NetworkInfo>(),
     ),
   );
 
@@ -231,9 +239,16 @@ FutureOr<void> init() async {
     () => EventsRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
 
+  sl.registerLazySingleton<EventsLocalDataSource>(
+    () => EventsLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
+  );
+
   // ── Events Repository ───────────────────────────────────────────────────────
   sl.registerLazySingleton<EventRepository>(
-    () => EventsRepositoryImpl(remoteDataSource: sl<EventsRemoteDataSource>()),
+    () => EventsRepositoryImpl(
+      remoteDataSource: sl<EventsRemoteDataSource>(),
+      localDataSource: sl<EventsLocalDataSource>(),
+    ),
   );
 
   // ── Events Use Cases ────────────────────────────────────────────────────────
@@ -245,6 +260,7 @@ FutureOr<void> init() async {
     () => EventsBloc(
       getUserEventsUseCase: sl<GetUserEventsUseCase>(),
       joinEventUseCase: sl<JoinEventUseCase>(),
+      networkInfo: sl<NetworkInfo>(),
     ),
   );
   // Notification Remote DataSource

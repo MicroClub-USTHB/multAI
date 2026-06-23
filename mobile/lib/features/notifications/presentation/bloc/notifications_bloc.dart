@@ -48,14 +48,39 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     MarkNotificationRead event,
     Emitter<NotificationState> emit,
   ) async {
+    final previousState = state;
+
     final result = await _markAsRead(
       MarkAsReadParams(notificationId: event.notificationIds),
     );
 
     result.fold(
-      (failure) => emit(NotificationError(message: failure.message)),
-
-      (updated) => emit(NotificationLoaded(notifications: updated)),
+      (failure) {
+        if (previousState is NotificationLoaded) {
+          final updated = previousState.notifications.map((n) {
+            if (event.notificationIds.contains(n.id)) {
+              return n.copyWith(readAt: n.readAt ?? DateTime.now());
+            }
+            return n;
+          }).toList();
+          emit(NotificationLoaded(notifications: updated));
+        } else {
+          emit(NotificationError(message: failure.message));
+        }
+      },
+      (updated) {
+        if (updated.isNotEmpty) {
+          emit(NotificationLoaded(notifications: updated));
+        } else if (previousState is NotificationLoaded) {
+          final localUpdated = previousState.notifications.map((n) {
+            if (event.notificationIds.contains(n.id)) {
+              return n.copyWith(readAt: n.readAt ?? DateTime.now());
+            }
+            return n;
+          }).toList();
+          emit(NotificationLoaded(notifications: localUpdated));
+        }
+      },
     );
   }
 

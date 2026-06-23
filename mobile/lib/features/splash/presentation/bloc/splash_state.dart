@@ -33,3 +33,16 @@ class SplashError extends SplashState {
   @override
   List<Object> get props => [message];
 }
+
+class SplashOffline extends SplashState {
+  const SplashOffline();
+}
+
+class SplashSecurityWarning extends SplashState {
+  final String message;
+
+  const SplashSecurityWarning({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}

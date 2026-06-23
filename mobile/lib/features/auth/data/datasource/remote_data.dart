@@ -4,11 +4,14 @@ import '../models/auth_model.dart';
 import '../models/me_model.dart';
 
 abstract class AuthRemoteDataSource {
+  Future<AuthResponseModel> register(AuthRequestModel request);
   Future<AuthResponseModel> login(AuthRequestModel request);
   Future<AuthResponseModel> refreshToken(String refreshToken);
   Future<void> logout();
   Future<void> revokeDevice(String deviceId);
   Future<MeResponseModel> getMe();
+  Future<void> updateDeviceToken(String deviceId, String pushToken);
+  Future<void> inactivateDevice(String deviceId);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -19,9 +22,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   void setAccessToken(String token) => apiClient.setAccessToken(token);
 
   @override
+  Future<AuthResponseModel> register(AuthRequestModel request) async {
+    final json = await apiClient.post(
+      EndPoints.register,
+      body: request.toJson(),
+    );
+    return AuthResponseModel.fromJson(json);
+  }
+
+  @override
   Future<AuthResponseModel> login(AuthRequestModel request) async {
     final json = await apiClient.post(
-      EndPoints.registerLogin,
+      EndPoints.login,
       body: request.toJson(),
     );
     return AuthResponseModel.fromJson(json);
@@ -45,6 +57,24 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<void> revokeDevice(String deviceId) async {
     await apiClient.postVoid(
       '${EndPoints.revokeDevice}?device_id=$deviceId',
+      requiresAuth: true,
+    );
+  }
+
+  @override
+  Future<void> updateDeviceToken(String deviceId, String pushToken) async {
+    await apiClient.postVoid(
+      EndPoints.updateDeviceToken,
+      body: {'device_id': deviceId, 'push_token': pushToken},
+      requiresAuth: true,
+    );
+  }
+
+  @override
+  Future<void> inactivateDevice(String deviceId) async {
+    await apiClient.postVoid(
+      EndPoints.inactivateDevice,
+      body: {'device_id': deviceId},
       requiresAuth: true,
     );
   }

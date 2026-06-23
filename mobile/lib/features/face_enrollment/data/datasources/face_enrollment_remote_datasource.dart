@@ -18,22 +18,18 @@ class FaceEnrollmentRemoteDataSourceImpl
 
   @override
   Future<void> uploadFacePhotos(List<FacePhotoModel> photos) async {
-    // Validate each photo before upload
     for (final photo in photos) {
-      final validation = await PhotoProcessor.processAndValidate(
-        photo.filePath,
-      );
+      final validation = await PhotoProcessor.processAndValidate(photo.filePath);
       validation.fold((failure) => throw failure, (_) {});
     }
 
     int attempt = 0;
     while (attempt < _maxRetries) {
       try {
-        // Use ApiClient to handle HTTP request
         await apiClient.postMultipart(
           EndPoints.faceEnrollment,
           files: photos.map((p) => File(p.filePath)).toList(),
-          fieldNames: List<String>.filled(photos.length, 'files'),
+          fieldNames: List.filled(photos.length, 'files'),
           requiresAuth: true,
         );
         return;

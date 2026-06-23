@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -50,12 +51,68 @@ class AccountScreen extends StatelessWidget {
       return _buildContent(context, state);
     }
 
-    // initial — trigger load
     if (state is AccountInitial) {
       context.read<AccountBloc>().add(LoadAccountData());
       return Center(
         child: CircularProgressIndicator(
           color: context.theme.colorScheme.primary,
+        ),
+      );
+    }
+
+    if (state is AccountError) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(
+            context.widthCalculated(AppThemeMetrics.spacingXl),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.wifi_off_rounded,
+                size: context.iconSize() * 3,
+                color: AppThemeColors.secondaryText,
+              ),
+              SizedBox(
+                height: context.heightCalculated(AppThemeMetrics.spacingLg),
+              ),
+              Text(
+                'Could not load account data',
+                style: context.textTheme.headlineSmall?.copyWith(
+                  color: AppThemeColors.primaryText,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: context.heightCalculated(AppThemeMetrics.spacingSm),
+              ),
+              Text(
+                state.message,
+                style: context.textTheme.bodySmall,
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: context.heightCalculated(AppThemeMetrics.spacingXl),
+              ),
+              ElevatedButton.icon(
+                onPressed: () => context.read<AccountBloc>().add(
+                  LoadAccountData(),
+                ),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: AppThemeColors.primaryText,
+                  backgroundColor: AppThemeColors.gold,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      AppThemeMetrics.radiusSm,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }

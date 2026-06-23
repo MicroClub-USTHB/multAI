@@ -28,17 +28,20 @@ class AuthResponseModel extends AuthEntity {
   const AuthResponseModel({
     required super.accessToken,
     required super.refreshToken,
+    required super.sessionId,
+    required super.expiresIn,
+    required super.userId,
+    super.isNewUser = false,
   });
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
     return AuthResponseModel(
-      accessToken: json['access_token'] as String,
-      refreshToken: json['refresh_token'] as String,
+      accessToken: json['access_token'] as String? ?? '',
+      refreshToken: json['refresh_token'] as String? ?? '',
+      sessionId: json['session_id'] as String? ?? '',
+      expiresIn: json['expires_in'] as int? ?? 0,
+      userId: json['user_id']?.toString() ?? '',
+      isNewUser: json['is_new_user'] as bool? ?? false,
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    'access_token': accessToken,
-    'refresh_token': refreshToken,
-  };
 }

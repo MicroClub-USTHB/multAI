@@ -8,3 +8,5 @@ class JoinEventRequested extends EventsEvent {
   final String eventCode;
   JoinEventRequested({required this.eventCode});
 }
+
+class EventsRetryRequested extends EventsEvent {}

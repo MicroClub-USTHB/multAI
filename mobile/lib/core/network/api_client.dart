@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import '../errors/failure.dart';
 import 'network_info.dart';
 import '../constants/end_points.dart';
@@ -12,8 +14,8 @@ class ApiClient {
 
   String? _accessToken;
 
-  ApiClient({required http.Client client, required NetworkInfo networkInfo})
-    : _client = client,
+  ApiClient({http.Client? client, required NetworkInfo networkInfo})
+    : _client = client ?? http.Client(),
       _networkInfo = networkInfo;
 
   String get baseUrl => EndPoints.baseUrl;
@@ -23,10 +25,34 @@ class ApiClient {
 
   String? get currentAccessToken => _accessToken;
 
-  Map<String, String> get _headers => {
-    'Content-Type': 'application/json',
-    if (_accessToken != null) 'Authorization': 'Bearer $_accessToken',
-  };
+  Future<Map<String, String>> _getHeaders({bool requiresAuth = false}) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+    };
+    if (_accessToken != null) {
+      headers['Authorization'] = 'Bearer $_accessToken';
+    }
+
+    try {
+      final info = await PackageInfo.fromPlatform();
+      headers['X-App-Version'] = '${info.version}+${info.buildNumber}';
+    } catch (_) {}
+
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        headers['X-Device-Info'] =
+            '${androidInfo.brand}/${androidInfo.model}';
+      } else if (Platform.isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        headers['X-Device-Info'] =
+            '${iosInfo.name}/${iosInfo.model}';
+      }
+    } catch (_) {}
+
+    return headers;
+  }
 
   Future<void> checkConnection() async {
     if (!await _networkInfo.isConnected) {
@@ -34,12 +60,11 @@ class ApiClient {
     }
   }
 
-  // ── Existing GET, POST, POST void, DELETE methods untouched ───────────────
   Future<dynamic> get(String endpoint) async {
     await checkConnection();
     final response = await _client.get(
       Uri.parse('$baseUrl$endpoint'),
-      headers: _headers,
+      headers: await _getHeaders(),
     );
     return _handleResponse(response);
   }
@@ -52,7 +77,7 @@ class ApiClient {
     await checkConnection();
     final response = await _client.post(
       Uri.parse('$baseUrl$endpoint'),
-      headers: requiresAuth ? _headers : {'Content-Type': 'application/json'},
+      headers: await _getHeaders(requiresAuth: requiresAuth),
       body: body != null ? jsonEncode(body) : null,
     );
     return _handleResponse(response);
@@ -66,7 +91,7 @@ class ApiClient {
     await checkConnection();
     final response = await _client.post(
       Uri.parse('$baseUrl$endpoint'),
-      headers: requiresAuth ? _headers : {'Content-Type': 'application/json'},
+      headers: await _getHeaders(requiresAuth: requiresAuth),
       body: body != null ? jsonEncode(body) : null,
     );
     _handleVoidResponse(response);
@@ -76,7 +101,7 @@ class ApiClient {
     await checkConnection();
     final response = await _client.delete(
       Uri.parse('$baseUrl$endpoint'),
-      headers: _headers,
+      headers: await _getHeaders(),
     );
     _handleVoidResponse(response);
   }
@@ -106,7 +131,6 @@ class ApiClient {
     }
   }
 
-  // ── New: POST multipart for face enrollment only ──────────────────────────
   Future<void> postMultipart(
     String endpoint, {
     required List<File> files,
@@ -117,14 +141,20 @@ class ApiClient {
     final uri = Uri.parse('$baseUrl$endpoint');
     final request = http.MultipartRequest('POST', uri);
 
-    if (requiresAuth && currentAccessToken != null) {
-      request.headers['Authorization'] = 'Bearer $currentAccessToken';
+    if (_accessToken != null) {
+      request.headers['Authorization'] = 'Bearer $_accessToken';
     }
+
+    try {
+      final info = await PackageInfo.fromPlatform();
+      request.headers['X-App-Version'] = '${info.version}+${info.buildNumber}';
+    } catch (_) {}
 
     for (int i = 0; i < files.length; i++) {
       final file = files[i];
       final stream = http.ByteStream(file.openRead());
       final length = await file.length();
+      final ext = file.path.split('.').last.toLowerCase();
 
       request.files.add(
         http.MultipartFile(
@@ -132,7 +162,10 @@ class ApiClient {
           stream,
           length,
           filename: file.path.split('/').last,
-          contentType: MediaType('image', 'jpeg'),
+          contentType: MediaType(
+            'image',
+            _mimeTypeFromExtension(ext),
+          ),
         ),
       );
     }
@@ -150,6 +183,20 @@ class ApiClient {
       throw ServerFailure(
         message: 'Failed to upload photos. Please try again.',
       );
+    }
+  }
+
+  String _mimeTypeFromExtension(String ext) {
+    switch (ext) {
+      case 'png':
+        return 'png';
+      case 'heic':
+      case 'heif':
+        return 'heic';
+      case 'webp':
+        return 'webp';
+      default:
+        return 'jpeg';
     }
   }
 

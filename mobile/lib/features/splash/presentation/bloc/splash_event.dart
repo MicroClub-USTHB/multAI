@@ -11,3 +11,7 @@ sealed class SplashEvent extends Equatable {
 class InitializeApp extends SplashEvent {
   const InitializeApp();
 }
+
+class RetryConnection extends SplashEvent {
+  const RetryConnection();
+}

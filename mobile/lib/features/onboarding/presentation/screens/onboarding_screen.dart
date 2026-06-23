@@ -18,9 +18,58 @@ class OnboardingScreen extends StatefulWidget {
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends State<OnboardingScreen>
+    with SingleTickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  late AnimationController _animController;
+  late Animation<double> _cardFade;
+  late Animation<Offset> _cardSlide;
+  late Animation<double> _textFade;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _cardFade = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animController,
+        curve: const Interval(0, 0.5, curve: Curves.easeOut),
+      ),
+    );
+    _cardSlide = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animController,
+        curve: const Interval(0, 0.5, curve: Curves.easeOutCubic),
+      ),
+    );
+    _textFade = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animController,
+        curve: const Interval(0.3, 0.8, curve: Curves.easeIn),
+      ),
+    );
+    _animController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onPageChanged(int index) {
+    setState(() => _currentPage = index);
+    _animController.reset();
+    _animController.forward();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +86,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             context.go(state.route);
           }
         },
-
         child: Scaffold(
           backgroundColor: AppThemeColors.onboardingBackground,
           body: SafeArea(
@@ -46,23 +94,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 OnboardingHeader(
                   onSkip: () => _pageController.animateToPage(
                     slides.length - 1,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOut,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeOutCubic,
                   ),
                 ),
                 const SizedBox(height: 24),
                 Expanded(
                   child: PageView(
                     controller: _pageController,
-                    onPageChanged: (index) =>
-                        setState(() => _currentPage = index),
+                    onPageChanged: _onPageChanged,
                     children: slides
                         .map(
-                          (slide) => OnboardingCard(
-                            image: slide.image,
-                            title: slide.title,
-                            highlight: slide.highlight,
-                            description: slide.description,
+                          (slide) => AnimatedBuilder(
+                            animation: _animController,
+                            builder: (context, child) {
+                              return FadeTransition(
+                                opacity: _cardFade,
+                                child: SlideTransition(
+                                  position: _cardSlide,
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: OnboardingCard(
+                              image: slide.image,
+                              title: slide.title,
+                              highlight: slide.highlight,
+                              description: slide.description,
+                            ),
                           ),
                         )
                         .toList(),
@@ -77,23 +136,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         itemCount: slides.length,
                       ),
                       const SizedBox(height: 32),
-                      Builder(
-                        builder: (buttonContext) {
-                          return OnboardingButton(
-                            onTap: () async {
-                              if (_currentPage < slides.length - 1) {
-                                _pageController.nextPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeIn,
-                                );
-                              } else {
-                                buttonContext.read<OnboardingBloc>().add(
-                                  CompleteOnboarding(),
-                                );
-                              }
-                            },
-                          );
-                        },
+                      FadeTransition(
+                        opacity: _textFade,
+                        child: Builder(
+                          builder: (buttonContext) {
+                            return OnboardingButton(
+                              onTap: () async {
+                                if (_currentPage < slides.length - 1) {
+                                  _pageController.nextPage(
+                                    duration: const Duration(milliseconds: 400),
+                                    curve: Curves.easeOutCubic,
+                                  );
+                                } else {
+                                  buttonContext.read<OnboardingBloc>().add(
+                                    CompleteOnboarding(),
+                                  );
+                                }
+                              },
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
