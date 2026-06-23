@@ -117,7 +117,7 @@ export const apiRequest = async <TResponse>(
 			tokenKey: options.tokenKey,
 			setJsonContentType,
 		}),
-		credentials: options.credentials ?? 'omit',
+		credentials: options.credentials ?? 'include',
 	})
 
 	const rawText = await response.text()

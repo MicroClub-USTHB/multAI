@@ -12,17 +12,15 @@ export type UserProfile = {
 // DTOs for API requests
 export type LoginDto = z.infer<typeof LoginSchema>;
 
-export type LoginInput = LoginDto & {
-  rememberMe: boolean;
-};
+export type LoginInput = LoginDto;
 
 export interface LoginResponse {
-  user: Partial<UserProfile>;
+  access_token: string;
+  user_id: string;
+  role: string;
 }
 
-export interface BackendLoginResponse extends LoginResponse {
-  token: string;
-}
+export type BackendLoginResponse = LoginResponse;
 
 export interface VerifyTokenResponse {
   valid: true;

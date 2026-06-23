@@ -1,6 +1,5 @@
 import { useForm } from '@tanstack/react-form';
 import { Lock, Mail } from 'lucide-react';
-import { useState } from 'react';
 
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -13,7 +12,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from '@/shared/ui';
-import { Checkbox } from '@/shared/ui/checkbox';
 import { Label } from '@/shared/ui/label';
 import { Message } from '@/shared/ui/message';
 import { cn } from '@/shared/utils/helpers';
@@ -26,7 +24,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const [rememberMe, setRememberMe] = useState(true);
   const { login } = useAuth();
 
   const form = useForm({
@@ -41,7 +38,6 @@ export function LoginForm({
       await login.mutateAsync({
         email: value.email,
         password: value.password,
-        rememberMe,
       });
     },
   });
@@ -130,16 +126,6 @@ export function LoginForm({
                   </div>
                 )}
               </form.Field>
-
-              <div className='flex items-center gap-3'>
-                <Checkbox
-                  id='remember-me'
-                  checked={rememberMe}
-                  disabled={isSubmitting}
-                  onCheckedChange={(e) => setRememberMe(!!e)}
-                />
-                <Label htmlFor='remember-me'>Remember me</Label>
-              </div>
 
               <Button
                 type='submit'

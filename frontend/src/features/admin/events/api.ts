@@ -71,7 +71,6 @@ export async function listAdminEvents(
 		apiGet<unknown[]>(`/admin/events/${buildListQuery(params)}`, {
 			fallbackErrorMessage: 'Unable to load events.',
 			credentials: 'include',
-			tokenKey: 'admin_access_token',
 		}),
 	)
 
@@ -86,7 +85,6 @@ export async function createAdminEvent(input: CreateAdminEventInput): Promise<Ad
 			{
 				fallbackErrorMessage: 'Unable to create event.',
 				credentials: 'include',
-				tokenKey: 'admin_access_token',
 			},
 		),
 	)
@@ -111,7 +109,6 @@ const mutateEventStatus = async (
 			{
 				fallbackErrorMessage: 'Unable to update event status.',
 				credentials: 'include',
-				tokenKey: 'admin_access_token',
 			},
 		),
 	)
