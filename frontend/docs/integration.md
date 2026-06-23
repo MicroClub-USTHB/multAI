@@ -25,6 +25,11 @@ Les endpoints backend restent separes, mais l'interface front les expose dans un
 
 La route `/admin/staff-users` reste disponible comme alias technique et redirige vers `Users` avec la vue staff.
 
+La page `Drive Settings` a ete deplacee sous la navigation `Multi`:
+
+- nouvelle route: `/multi/drive-settings`
+- ancienne route admin: `/admin/drive-settings` reste un alias de redirection
+
 ```mermaid
 flowchart LR
   subgraph Client[Front]

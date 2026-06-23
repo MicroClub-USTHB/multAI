@@ -25,11 +25,6 @@ export const ADMIN_NAV_DATA: NavData = {
       icon: Megaphone,
     },
     {
-      title: 'Drive Settings',
-      url: '/admin/drive-settings',
-      icon: CloudUpload,
-    },
-    {
       title: 'Users',
       url: '/admin/users',
       icon: UsersRound,
@@ -72,6 +67,11 @@ export const MULTI_NAV_LINKS: NavData = {
     {
       title: 'Upload & Storage',
       url: '/multi/upload',
+      icon: CloudUpload,
+    },
+    {
+      title: 'Drive Settings',
+      url: '/multi/drive-settings',
       icon: CloudUpload,
     },
     {

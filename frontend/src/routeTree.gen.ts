@@ -26,6 +26,7 @@ import { Route as AdminStaffUsersRouteImport } from './routes/admin/staff-users'
 import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
 import { Route as AdminLogsRouteImport } from './routes/admin/logs'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
+import { Route as MultiDriveSettingsIndexRouteImport } from './routes/multi/drive-settings/index'
 import { Route as AdminDriveSettingsIndexRouteImport } from './routes/admin/drive-settings/index'
 
 const RssDotxmlRoute = RssDotxmlRouteImport.update({
@@ -113,6 +114,11 @@ const AdminEventsRoute = AdminEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AdminRoute,
 } as any)
+const MultiDriveSettingsIndexRoute = MultiDriveSettingsIndexRouteImport.update({
+  id: '/drive-settings/',
+  path: '/drive-settings/',
+  getParentRoute: () => MultiRoute,
+} as any)
 const AdminDriveSettingsIndexRoute = AdminDriveSettingsIndexRouteImport.update({
   id: '/drive-settings/',
   path: '/drive-settings/',
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/multi/': typeof MultiIndexRoute
   '/admin/drive-settings/': typeof AdminDriveSettingsIndexRoute
+  '/multi/drive-settings/': typeof MultiDriveSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -156,6 +163,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/multi': typeof MultiIndexRoute
   '/admin/drive-settings': typeof AdminDriveSettingsIndexRoute
+  '/multi/drive-settings': typeof MultiDriveSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/multi/': typeof MultiIndexRoute
   '/admin/drive-settings/': typeof AdminDriveSettingsIndexRoute
+  '/multi/drive-settings/': typeof MultiDriveSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/multi/'
     | '/admin/drive-settings/'
+    | '/multi/drive-settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/multi'
     | '/admin/drive-settings'
+    | '/multi/drive-settings'
   id:
     | '__root__'
     | '/'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/multi/'
     | '/admin/drive-settings/'
+    | '/multi/drive-settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -368,6 +380,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEventsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/multi/drive-settings/': {
+      id: '/multi/drive-settings/'
+      path: '/drive-settings'
+      fullPath: '/multi/drive-settings/'
+      preLoaderRoute: typeof MultiDriveSettingsIndexRouteImport
+      parentRoute: typeof MultiRoute
+    }
     '/admin/drive-settings/': {
       id: '/admin/drive-settings/'
       path: '/drive-settings'
@@ -407,6 +426,7 @@ interface MultiRouteChildren {
   MultiTeamRoute: typeof MultiTeamRoute
   MultiUploadRoute: typeof MultiUploadRoute
   MultiIndexRoute: typeof MultiIndexRoute
+  MultiDriveSettingsIndexRoute: typeof MultiDriveSettingsIndexRoute
 }
 
 const MultiRouteChildren: MultiRouteChildren = {
@@ -416,6 +436,7 @@ const MultiRouteChildren: MultiRouteChildren = {
   MultiTeamRoute: MultiTeamRoute,
   MultiUploadRoute: MultiUploadRoute,
   MultiIndexRoute: MultiIndexRoute,
+  MultiDriveSettingsIndexRoute: MultiDriveSettingsIndexRoute,
 }
 
 const MultiRouteWithChildren = MultiRoute._addFileChildren(MultiRouteChildren)
