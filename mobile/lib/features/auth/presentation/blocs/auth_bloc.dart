@@ -11,6 +11,8 @@ import '../../domain/usecases/get_me_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/refresh_token_usecase.dart';
+import '../../domain/usecases/register_usecase.dart';
+import '../../domain/usecases/verify_register_usecase.dart';
 import '../../utils/device_utils.dart';
 import '../../../face_enrollment/domain/usecases/check_enrollment_done_usecase.dart';
 
@@ -19,6 +21,8 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase _loginUseCase;
+  final RegisterUseCase _registerUseCase;
+  final VerifyRegisterUseCase _verifyRegisterUseCase;
   final RefreshTokenUseCase _refreshTokenUseCase;
   final LogoutUseCase _logoutUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
@@ -26,18 +30,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc({
     required LoginUseCase loginUseCase,
+    required RegisterUseCase registerUseCase,
+    required VerifyRegisterUseCase verifyRegisterUseCase,
     required RefreshTokenUseCase refreshTokenUseCase,
     required LogoutUseCase logoutUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
     required CheckEnrollmentDoneUseCase checkEnrollmentDone,
   }) : _loginUseCase = loginUseCase,
+       _registerUseCase = registerUseCase,
+       _verifyRegisterUseCase = verifyRegisterUseCase,
        _refreshTokenUseCase = refreshTokenUseCase,
        _logoutUseCase = logoutUseCase,
        _getCurrentUserUseCase = getCurrentUserUseCase,
        _checkEnrollmentDone = checkEnrollmentDone,
        super(AuthInitial()) {
+    on<SendOtpRequested>(_onSendOtpRequested);
+    on<VerifyOtpRequested>(_onVerifyOtpRequested);
     on<LoginRequested>(_onLoginRequested);
-    on<RegisterRequested>(_onRegisterRequested);
     on<RefreshTokenRequested>(_onRefreshTokenRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<GetCurrentUserRequested>(_onGetCurrentUserRequested);
@@ -57,11 +66,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthFailure(message: FailureHandler.getUserFriendlyMessage(failure)));
   }
 
-  Future<void> _onRegisterRequested(RegisterRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onSendOtpRequested(SendOtpRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       final device = await DeviceUtils.getDeviceData();
-      final result = await _loginUseCase.callWithRegister(
+      final result = await _registerUseCase(
         LoginParams(
           email: event.email,
           password: event.password,
@@ -69,15 +78,40 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           deviceType: device.deviceType,
           deviceId: device.deviceId,
         ),
-        isRegister: true,
+      );
+      await result.fold(
+        (failure) async => _emitFailure(emit, failure),
+        (_) async => emit(AuthOtpSent(email: event.email)),
+      );
+    } catch (e) {
+      SecureLogger.error('AuthBloc', 'Send OTP failed', e);
+      emit(AuthFailure(message: 'Failed to send OTP. Please try again.'));
+    }
+  }
+
+  Future<void> _onVerifyOtpRequested(VerifyOtpRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      final device = await DeviceUtils.getDeviceData();
+      final result = await _verifyRegisterUseCase(
+        VerifyRegisterParams(
+          loginParams: LoginParams(
+            email: event.email,
+            password: event.password,
+            deviceName: device.deviceName,
+            deviceType: device.deviceType,
+            deviceId: device.deviceId,
+          ),
+          otp: event.otp,
+        ),
       );
       await result.fold(
         (failure) async => _emitFailure(emit, failure),
         (auth) async => _emitAuthenticatedState(auth, emit),
       );
     } catch (e) {
-      SecureLogger.error('AuthBloc', 'Register failed', e);
-      emit(AuthFailure(message: 'Registration failed. Please try again.'));
+      SecureLogger.error('AuthBloc', 'Verify OTP failed', e);
+      emit(AuthFailure(message: 'Verification failed. Please try again.'));
     }
   }
 

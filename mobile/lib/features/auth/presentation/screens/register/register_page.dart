@@ -25,6 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _otpController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
@@ -34,17 +35,32 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _otpController.dispose();
     super.dispose();
   }
 
-  void _onRegisterPressed() {
+  void _onSendOtpPressed() {
     if (!_formKey.currentState!.validate()) return;
     context.unfocus();
 
     context.read<AuthBloc>().add(
-      RegisterRequested(
+      SendOtpRequested(
         email: _emailController.text.trim(),
         password: _passwordController.text,
+      ),
+    );
+  }
+
+  void _onVerifyOtpPressed() {
+    final otp = _otpController.text.trim();
+    if (otp.length != 6) return;
+    context.unfocus();
+
+    context.read<AuthBloc>().add(
+      VerifyOtpRequested(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        otp: otp,
       ),
     );
   }
@@ -61,10 +77,14 @@ class _RegisterPageState extends State<RegisterPage> {
         } else if (state is AuthNeedsFaceEnrollment) {
           context.go(AppRoutes.faceEnrollment);
         }
-        if (state is AuthFailure) context.showErrorSnackBar(state.message);
+        if (state is AuthFailure) {
+          context.showErrorSnackBar(state.message);
+        }
       },
       builder: (context, state) {
         final isLoading = state is AuthLoading;
+        final isOtpStep = state is AuthOtpSent;
+
         return Scaffold(
           backgroundColor: AppThemeColors.background,
           body: SafeArea(
@@ -92,104 +112,194 @@ class _RegisterPageState extends State<RegisterPage> {
                             const LogoSection(),
                             SizedBox(height: context.heightCalculated(24)),
 
-                            Text(
-                              'Email',
-                              style: tt.titleMedium?.copyWith(
-                                color: cs.onSurface,
-                                fontWeight: FontWeight.bold,
+                            if (isOtpStep) ...[
+                              Text(
+                                'Enter OTP',
+                                style: tt.titleMedium?.copyWith(
+                                  color: cs.onSurface,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: context.heightCalculated(8)),
-                            EmailField(controller: _emailController),
-                            SizedBox(height: context.heightCalculated(16)),
-
-                            Text(
-                              'Password',
-                              style: tt.titleMedium?.copyWith(
-                                color: cs.onSurface,
-                                fontWeight: FontWeight.bold,
+                              SizedBox(height: context.heightCalculated(8)),
+                              Text(
+                                'A 6-digit code was sent to ${_emailController.text.trim()}',
+                                style: tt.bodySmall?.copyWith(
+                                  color: cs.onSurface.withValues(alpha: 0.7),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: context.heightCalculated(8)),
-                            PasswordField(
-                              controller: _passwordController,
-                              obscure: _obscurePassword,
-                              onToggle: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                              onSubmit: () {},
-                            ),
-                            SizedBox(height: context.heightCalculated(16)),
-
-                            Text(
-                              'Confirm Password',
-                              style: tt.titleMedium?.copyWith(
-                                color: cs.onSurface,
-                                fontWeight: FontWeight.bold,
+                              SizedBox(height: context.heightCalculated(16)),
+                              TextFormField(
+                                controller: _otpController,
+                                keyboardType: TextInputType.number,
+                                maxLength: 6,
+                                textAlign: TextAlign.center,
+                                style: tt.headlineLarge?.copyWith(
+                                  letterSpacing: 12,
+                                  color: cs.onSurface,
+                                ),
+                                decoration: InputDecoration(
+                                  counterText: '',
+                                  hintText: '------',
+                                  hintStyle: tt.headlineLarge?.copyWith(
+                                    letterSpacing: 12,
+                                    color: cs.onSurface.withValues(alpha: 0.2),
+                                  ),
+                                  filled: true,
+                                  fillColor: AppThemeColors.inputFill,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      AppThemeMetrics.radiusMd,
+                                    ),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                ),
+                                validator: (v) {
+                                  if (v == null || v.trim().length != 6) {
+                                    return 'Enter the 6-digit OTP';
+                                  }
+                                  return null;
+                                },
                               ),
-                            ),
-                            SizedBox(height: context.heightCalculated(8)),
-                            PasswordField(
-                              controller: _confirmPasswordController,
-                              obscure: _obscureConfirm,
-                              onToggle: () {
-                                setState(() {
-                                  _obscureConfirm = !_obscureConfirm;
-                                });
-                              },
-                              onSubmit: _onRegisterPressed,
-                              hintText: '••••••••',
-                              validator: (v) => AppValidators.validateConfirmPassword(
-                                v,
-                                password: _passwordController.text,
-                              ),
-                            ),
-                            SizedBox(height: context.heightCalculated(24)),
-
-                            SizedBox(
-                              height: context.heightCalculated(52),
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: isLoading ? null : _onRegisterPressed,
-                                child: isLoading
-                                    ? SizedBox(
-                                        height: context.heightCalculated(20),
-                                        width: context.heightCalculated(20),
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.5,
-                                          color: cs.onPrimary,
-                                        ),
-                                      )
-                                    : Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'Sign Up',
-                                            style: tt.titleLarge?.copyWith(
-                                              color: cs.onPrimary,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(width: context.widthCalculated(6)),
-                                          Icon(
-                                            Icons.arrow_forward,
+                              SizedBox(height: context.heightCalculated(24)),
+                              SizedBox(
+                                height: context.heightCalculated(52),
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed:
+                                      isLoading ? null : _onVerifyOtpPressed,
+                                  child: isLoading
+                                      ? SizedBox(
+                                          height: context.heightCalculated(20),
+                                          width: context.heightCalculated(20),
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
                                             color: cs.onPrimary,
-                                            size: context.iconSize(),
                                           ),
-                                        ],
-                                      ),
+                                        )
+                                      : Text(
+                                          'Verify OTP',
+                                          style: tt.titleLarge?.copyWith(
+                                            color: cs.onPrimary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: context.heightCalculated(12)),
-                            Text(
-                              'Use your workspace email to create an account.',
-                              style: tt.bodySmall?.copyWith(
-                                color: cs.onSurface.withValues(alpha: 0.7),
+                              SizedBox(height: context.heightCalculated(12)),
+                              TextButton(
+                                onPressed: isLoading ? null : _onSendOtpPressed,
+                                child: Text(
+                                  'Resend OTP',
+                                  style: tt.bodySmall?.copyWith(
+                                    color: AppThemeColors.primaryAccent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
+                            ] else ...[
+                              Text(
+                                'Email',
+                                style: tt.titleMedium?.copyWith(
+                                  color: cs.onSurface,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: context.heightCalculated(8)),
+                              EmailField(controller: _emailController),
+                              SizedBox(height: context.heightCalculated(16)),
+
+                              Text(
+                                'Password',
+                                style: tt.titleMedium?.copyWith(
+                                  color: cs.onSurface,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: context.heightCalculated(8)),
+                              PasswordField(
+                                controller: _passwordController,
+                                obscure: _obscurePassword,
+                                onToggle: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                                onSubmit: () {},
+                              ),
+                              SizedBox(height: context.heightCalculated(16)),
+
+                              Text(
+                                'Confirm Password',
+                                style: tt.titleMedium?.copyWith(
+                                  color: cs.onSurface,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: context.heightCalculated(8)),
+                              PasswordField(
+                                controller: _confirmPasswordController,
+                                obscure: _obscureConfirm,
+                                onToggle: () {
+                                  setState(() {
+                                    _obscureConfirm = !_obscureConfirm;
+                                  });
+                                },
+                                onSubmit: _onSendOtpPressed,
+                                hintText: '••••••••',
+                                validator: (v) =>
+                                    AppValidators.validateConfirmPassword(
+                                  v,
+                                  password: _passwordController.text,
+                                ),
+                              ),
+                              SizedBox(height: context.heightCalculated(24)),
+
+                              SizedBox(
+                                height: context.heightCalculated(52),
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed:
+                                      isLoading ? null : _onSendOtpPressed,
+                                  child: isLoading
+                                      ? SizedBox(
+                                          height: context.heightCalculated(20),
+                                          width: context.heightCalculated(20),
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            color: cs.onPrimary,
+                                          ),
+                                        )
+                                      : Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'Sign Up',
+                                              style: tt.titleLarge?.copyWith(
+                                                color: cs.onPrimary,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: context.widthCalculated(6),
+                                            ),
+                                            Icon(
+                                              Icons.arrow_forward,
+                                              color: cs.onPrimary,
+                                              size: context.iconSize(),
+                                            ),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                              SizedBox(height: context.heightCalculated(12)),
+                              Text(
+                                'Use your workspace email to create an account.',
+                                style: tt.bodySmall?.copyWith(
+                                  color: cs.onSurface.withValues(alpha: 0.7),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -205,15 +315,26 @@ class _RegisterPageState extends State<RegisterPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Already have an account? ',
+                        isOtpStep ? 'Wrong email? ' : 'Already have an account? ',
                         style: tt.bodySmall?.copyWith(
                           color: cs.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => context.go(AppRoutes.login),
+                        onTap: () {
+                          if (isOtpStep) {
+                            context.read<AuthBloc>().add(
+                              SendOtpRequested(
+                                email: _emailController.text.trim(),
+                                password: _passwordController.text,
+                              ),
+                            );
+                          } else {
+                            context.go(AppRoutes.login);
+                          }
+                        },
                         child: Text(
-                          'Sign In',
+                          isOtpStep ? 'Resend' : 'Sign In',
                           style: tt.bodySmall?.copyWith(
                             color: AppThemeColors.primaryAccent,
                             fontWeight: FontWeight.bold,
