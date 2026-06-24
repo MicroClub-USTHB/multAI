@@ -71,7 +71,7 @@ void main() {
     expect(find.text('Enter OTP'), findsOneWidget);
     expect(find.text('Verify OTP'), findsOneWidget);
     expect(find.text('Resend OTP'), findsOneWidget);
-    expect(find.text('Resend'), findsWidgets);
+    expect(find.text('Go back'), findsOneWidget);
   });
 
   testWidgets('shows loading indicator when AuthLoading state is emitted',

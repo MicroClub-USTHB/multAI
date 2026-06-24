@@ -153,12 +153,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     borderSide: BorderSide.none,
                                   ),
                                 ),
-                                validator: (v) {
-                                  if (v == null || v.trim().length != 6) {
-                                    return 'Enter the 6-digit OTP';
-                                  }
-                                  return null;
-                                },
+
                               ),
                               SizedBox(height: context.heightCalculated(24)),
                               SizedBox(
@@ -323,18 +318,15 @@ class _RegisterPageState extends State<RegisterPage> {
                       GestureDetector(
                         onTap: () {
                           if (isOtpStep) {
-                            context.read<AuthBloc>().add(
-                              SendOtpRequested(
-                                email: _emailController.text.trim(),
-                                password: _passwordController.text,
-                              ),
-                            );
+                            setState(() {
+                              _otpController.clear();
+                            });
                           } else {
                             context.go(AppRoutes.login);
                           }
                         },
                         child: Text(
-                          isOtpStep ? 'Resend' : 'Sign In',
+                          isOtpStep ? 'Go back' : 'Sign In',
                           style: tt.bodySmall?.copyWith(
                             color: AppThemeColors.primaryAccent,
                             fontWeight: FontWeight.bold,
