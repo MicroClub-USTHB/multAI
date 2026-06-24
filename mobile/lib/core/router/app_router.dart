@@ -5,6 +5,7 @@ import 'package:multai_mobile/features/splash/presentation/pages/splash_screen.d
 
 import '../../di/injection_container.dart' as di;
 import '../../features/auth/presentation/screens/login/login_page.dart';
+import '../../features/auth/presentation/screens/register/register_page.dart';
 import '../../features/face_enrollment/presentation/screens/face_enrollment_screen.dart';
 import '../../features/face_enrollment/presentation/bloc/face_enrollment_bloc.dart';
 import '../../features/home/presentation/screens/home_shell.dart';
@@ -17,7 +18,7 @@ import '../../features/photo_approval/presentation/screens/photo_approval_page.d
 import 'app_routes.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppRoutes.gallery,
+  initialLocation: AppRoutes.splash,
   routes: [
     // ── Splash Screen (initial route) ───────────────────────────────────────
     GoRoute(
@@ -34,6 +35,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.login,
       builder: (context, state) => const LoginPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.register,
+      builder: (context, state) => const RegisterPage(),
     ),
 
     // ── Face Enrollment ────────────────────────────────────────────────────────

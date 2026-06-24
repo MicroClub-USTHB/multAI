@@ -146,6 +146,32 @@ class _LoginPageState extends State<LoginPage> {
                   padding: EdgeInsets.symmetric(
                     vertical: context.heightCalculated(8),
                   ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Don't have an account? ",
+                        style: tt.bodySmall?.copyWith(
+                          color: cs.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => context.go(AppRoutes.register),
+                        child: Text(
+                          'Sign Up',
+                          style: tt.bodySmall?.copyWith(
+                            color: AppThemeColors.primaryAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: context.heightCalculated(8),
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
