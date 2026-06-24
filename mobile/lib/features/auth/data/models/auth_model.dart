@@ -24,6 +24,25 @@ class AuthRequestModel {
   };
 }
 
+class RegisterVerifyRequestModel extends AuthRequestModel {
+  final String otp;
+
+  const RegisterVerifyRequestModel({
+    required super.email,
+    required super.password,
+    required super.deviceName,
+    required super.deviceType,
+    required super.deviceId,
+    required this.otp,
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+    ...super.toJson(),
+    'otp': otp,
+  };
+}
+
 class AuthResponseModel extends AuthEntity {
   const AuthResponseModel({
     required super.accessToken,

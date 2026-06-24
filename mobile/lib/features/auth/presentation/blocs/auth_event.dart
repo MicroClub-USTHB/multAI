@@ -2,11 +2,23 @@ part of 'auth_bloc.dart';
 
 abstract class AuthEvent {}
 
-class RegisterRequested extends AuthEvent {
+class SendOtpRequested extends AuthEvent {
   final String email;
   final String password;
 
-  RegisterRequested({required this.email, required this.password});
+  SendOtpRequested({required this.email, required this.password});
+}
+
+class VerifyOtpRequested extends AuthEvent {
+  final String email;
+  final String password;
+  final String otp;
+
+  VerifyOtpRequested({
+    required this.email,
+    required this.password,
+    required this.otp,
+  });
 }
 
 class LoginRequested extends AuthEvent {

@@ -5,6 +5,7 @@ class EndPoints {
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   static const String register = '/user/auth/register';
+  static const String registerVerify = '/user/auth/register/verify';
   static const String login = '/user/auth/login';
   static const String refresh = '/user/auth/refresh';
   static const String logout = '/user/auth/logout';

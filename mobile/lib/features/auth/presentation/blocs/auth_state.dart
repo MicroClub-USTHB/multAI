@@ -6,6 +6,11 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
+class AuthOtpSent extends AuthState {
+  final String email;
+  AuthOtpSent({required this.email});
+}
+
 class AuthAuthenticated extends AuthState {
   final AuthEntity auth;
   AuthAuthenticated({required this.auth});

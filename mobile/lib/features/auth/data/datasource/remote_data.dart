@@ -4,7 +4,8 @@ import '../models/auth_model.dart';
 import '../models/me_model.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<AuthResponseModel> register(AuthRequestModel request);
+  Future<void> register(AuthRequestModel request);
+  Future<AuthResponseModel> verifyRegister(RegisterVerifyRequestModel request);
   Future<AuthResponseModel> login(AuthRequestModel request);
   Future<AuthResponseModel> refreshToken(String refreshToken);
   Future<void> logout();
@@ -22,9 +23,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   void setAccessToken(String token) => apiClient.setAccessToken(token);
 
   @override
-  Future<AuthResponseModel> register(AuthRequestModel request) async {
-    final json = await apiClient.post(
+  Future<void> register(AuthRequestModel request) async {
+    await apiClient.postVoid(
       EndPoints.register,
+      body: request.toJson(),
+    );
+  }
+
+  @override
+  Future<AuthResponseModel> verifyRegister(RegisterVerifyRequestModel request) async {
+    final json = await apiClient.post(
+      EndPoints.registerVerify,
       body: request.toJson(),
     );
     return AuthResponseModel.fromJson(json);

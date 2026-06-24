@@ -71,15 +71,37 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthEntity>> register(LoginParams params) async {
-    return _authenticate(
-      () => remoteDataSource.register(
+  Future<Either<Failure, void>> register(LoginParams params) async {
+    try {
+      await remoteDataSource.register(
         AuthRequestModel(
           email: params.email.trim().toLowerCase(),
           password: params.password,
           deviceName: params.deviceName,
           deviceType: params.deviceType,
           deviceId: params.deviceId,
+        ),
+      );
+      return const Right(null);
+    } on Failure catch (f) {
+      FailureHandler.logFailure(f, 'AuthRepository');
+      return Left(f);
+    } catch (e) {
+      return Left(ServerFailure(message: 'Registration failed. Please try again.'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AuthEntity>> verifyRegister(LoginParams params, String otp) async {
+    return _authenticate(
+      () => remoteDataSource.verifyRegister(
+        RegisterVerifyRequestModel(
+          email: params.email.trim().toLowerCase(),
+          password: params.password,
+          deviceName: params.deviceName,
+          deviceType: params.deviceType,
+          deviceId: params.deviceId,
+          otp: otp,
         ),
       ),
       params,

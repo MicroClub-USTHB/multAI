@@ -4,6 +4,7 @@ abstract class AppRoutes {
   static const String splash = '/';
   // ── Auth ───────────────────────────────────────────────────────────────────
   static const String login = '/login';
+  static const String register = '/register';
 
   // ── Home shell ─────────────────────────────────────────────────────────────
   static const String home = '/home';
