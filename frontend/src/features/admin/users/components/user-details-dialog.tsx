@@ -11,6 +11,7 @@ import {
 } from '@/shared/ui'
 
 import type { AdminUser } from '../types'
+
 import { useAdminUserQuery } from '../hooks'
 
 type UserDetailsDialogProps = {

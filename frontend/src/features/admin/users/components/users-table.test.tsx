@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { AdminUser } from '../types';
+
 import { UsersTable } from './users-table';
 
 vi.mock('./user-actions-menu', () => ({

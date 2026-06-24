@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createQueryWrapper, createTestQueryClient } from '@/test/query-client';
 
-import { useAdminEvents, useCreateAdminEventMutation, useScheduleAdminEventMutation } from './hooks';
 import * as api from './api';
+import { useAdminEvents, useCreateAdminEventMutation, useScheduleAdminEventMutation } from './hooks';
 
 vi.mock('./api', () => ({
   archiveAdminEvent: vi.fn(),

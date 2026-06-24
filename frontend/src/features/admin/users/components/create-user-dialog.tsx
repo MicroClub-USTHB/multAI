@@ -12,23 +12,14 @@ import {
 	DialogHeader,
 	DialogTitle,
 	Input,
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
 } from '@/shared/ui'
 
-import {
-	ADMIN_USER_EDITABLE_ROLES,
-	type CreateAdminUserInput,
-	type EditableAdminUserRole,
-} from '../types'
+import type { AdminUserCreateInput } from '../types'
 
 type CreateUserDialogProps = {
 	open: boolean
 	onOpenChange: (open: boolean) => void
-	onSubmit: (input: CreateAdminUserInput) => Promise<unknown>
+	onSubmit: (input: AdminUserCreateInput) => Promise<unknown>
 	isSubmitting?: boolean
 }
 
@@ -40,14 +31,12 @@ export function CreateUserDialog({
 }: CreateUserDialogProps) {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
-	const [role, setRole] = useState<EditableAdminUserRole>('multi')
 	const [error, setError] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (!open) {
 			setEmail('')
 			setPassword('')
-			setRole('multi')
 			setError(null)
 		}
 	}, [open])
@@ -65,7 +54,7 @@ export function CreateUserDialog({
 			await onSubmit({
 				email: email.trim(),
 				password,
-				role,
+				displayName: null,
 			})
 			onOpenChange(false)
 		} catch (submissionError) {
@@ -113,25 +102,6 @@ export function CreateUserDialog({
 							value={password}
 							onChange={event => setPassword(event.target.value)}
 						/>
-					</div>
-
-					<div className="space-y-1.5">
-						<label className="text-sm text-muted-foreground">Role</label>
-						<Select
-							value={role}
-							onValueChange={value => setRole(value as EditableAdminUserRole)}
-						>
-							<SelectTrigger>
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								{ADMIN_USER_EDITABLE_ROLES.map(item => (
-									<SelectItem key={item} value={item}>
-										{item.replace('_', ' ')}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
 					</div>
 
 					<DialogFooter>

@@ -68,6 +68,8 @@ export async function listAdminUsers(
 	return users.map(user => toAdminUser(user as Parameters<typeof toAdminUser>[0]))
 }
 
+export const getAdminUsers = listAdminUsers
+
 export async function getAdminUser(userId: string): Promise<AdminUser> {
 	const user = await request(() =>
 		apiGet<Parameters<typeof toAdminUser>[0]>(`/admin/users/${userId}`, {

@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createQueryWrapper, createTestQueryClient } from '@/test/query-client';
 
-import { useCreateStaffUserMutation, useStaffUsers } from './hooks';
 import * as api from './api';
+import { useCreateStaffUserMutation, useStaffUsers } from './hooks';
 
 vi.mock('./api', () => ({
   createStaffUser: vi.fn(),
