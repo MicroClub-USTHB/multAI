@@ -6,9 +6,6 @@
 -keep class io.flutter.**  { *; }
 -keep class io.flutter.plugins.**  { *; }
 
-# Keep Dart SDK classes
--keep class dart:** { *; }
-
 # Keep FlutterSecureStorage
 -keep class com.it_nomads.fluttersecurestorage.** { *; }
 
