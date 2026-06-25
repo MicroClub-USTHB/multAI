@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
-import '../../../../../../core/extensions/responsive_extensions.dart';
+import '../../../../../../core/theme/app_theme_colors.dart';
 import '../../../../../../core/validators/validators.dart';
 
 class PasswordField extends StatelessWidget {
@@ -23,22 +23,21 @@ class PasswordField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tt = context.textTheme;
-
     return TextFormField(
       controller: controller,
       obscureText: obscure,
       textInputAction: TextInputAction.done,
-      style: tt.bodyMedium,
+      style: context.textTheme.bodyMedium,
       onFieldSubmitted: (_) => onSubmit(),
-      // InputDecorationTheme from AppTheme handles border/fill/colors
       decoration: InputDecoration(
         hintText: hintText,
-        prefixIcon: Icon(Icons.lock_outline, size: context.iconSize()),
         suffixIcon: IconButton(
           icon: Icon(
-            obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-            size: context.iconSize(),
+            obscure
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+            color: AppThemeColors.neutral300,
+            size: 20,
           ),
           onPressed: onToggle,
         ),

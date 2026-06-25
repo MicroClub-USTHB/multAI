@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
-import '../../../../../../core/extensions/responsive_extensions.dart';
 
 class SignInButton extends StatelessWidget {
   final bool isLoading;
@@ -18,17 +17,16 @@ class SignInButton extends StatelessWidget {
     final tt = context.textTheme;
 
     return SizedBox(
-      height: context.heightCalculated(52),
+      height: 52,
       width: double.infinity,
       child: ElevatedButton(
-        // ElevatedButtonTheme from AppTheme handles color + shape
         onPressed: isLoading ? null : onPressed,
         child: isLoading
             ? SizedBox(
-                height: context.heightCalculated(20),
-                width: context.heightCalculated(20),
+                height: 20,
+                width: 20,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
+                  strokeWidth: 2,
                   color: cs.onPrimary,
                 ),
               )
@@ -37,17 +35,14 @@ class SignInButton extends StatelessWidget {
                 children: [
                   Text(
                     'Sign In',
-                    style: tt.titleLarge?.copyWith(
+                    style: tt.titleMedium?.copyWith(
                       color: cs.onPrimary,
                       fontWeight: FontWeight.bold,
+                      letterSpacing: 0.3,
                     ),
                   ),
-                  SizedBox(width: context.widthCalculated(6)),
-                  Icon(
-                    Icons.arrow_forward,
-                    color: cs.onPrimary,
-                    size: context.iconSize(),
-                  ),
+                  const SizedBox(width: 8),
+                  Icon(Icons.arrow_forward_rounded, color: cs.onPrimary, size: 18),
                 ],
               ),
       ),

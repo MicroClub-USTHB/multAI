@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/validators/validators.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
-import '../../../../../../core/extensions/responsive_extensions.dart';
 
 class EmailField extends StatelessWidget {
   final TextEditingController controller;
@@ -10,19 +9,13 @@ class EmailField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tt = context.textTheme;
-
     return TextFormField(
       controller: controller,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
-      style: tt.bodyMedium,
+      style: context.textTheme.bodyMedium,
       autofillHints: const [AutofillHints.email],
-      // InputDecorationTheme from AppTheme handles border/fill/colors
-      decoration: InputDecoration(
-        hintText: 'name@example.com',
-        prefixIcon: Icon(Icons.email_outlined, size: context.iconSize()),
-      ),
+      decoration: const InputDecoration(hintText: 'name@example.com'),
       validator: AppValidators.validateEmail,
     );
   }
