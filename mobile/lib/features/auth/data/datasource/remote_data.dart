@@ -11,8 +11,6 @@ abstract class AuthRemoteDataSource {
   Future<void> logout();
   Future<void> revokeDevice(String deviceId);
   Future<MeResponseModel> getMe();
-  Future<void> updateDeviceToken(String deviceId, String pushToken);
-  Future<void> inactivateDevice(String deviceId);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -66,24 +64,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<void> revokeDevice(String deviceId) async {
     await apiClient.postVoid(
       '${EndPoints.revokeDevice}?device_id=$deviceId',
-      requiresAuth: true,
-    );
-  }
-
-  @override
-  Future<void> updateDeviceToken(String deviceId, String pushToken) async {
-    await apiClient.postVoid(
-      EndPoints.updateDeviceToken,
-      body: {'device_id': deviceId, 'push_token': pushToken},
-      requiresAuth: true,
-    );
-  }
-
-  @override
-  Future<void> inactivateDevice(String deviceId) async {
-    await apiClient.postVoid(
-      EndPoints.inactivateDevice,
-      body: {'device_id': deviceId},
       requiresAuth: true,
     );
   }
