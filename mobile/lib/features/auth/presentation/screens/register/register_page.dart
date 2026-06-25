@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:multai_mobile/core/constants/images.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../../../core/extensions/context_extensions.dart';
-import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../../core/validators/validators.dart';
-import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../../blocs/auth_bloc.dart';
-import '../login/widgets/logo_section.dart';
 import '../login/widgets/email_field.dart';
 import '../login/widgets/password_field.dart';
 
@@ -42,7 +41,6 @@ class _RegisterPageState extends State<RegisterPage> {
   void _onSendOtpPressed() {
     if (!_formKey.currentState!.validate()) return;
     context.unfocus();
-
     context.read<AuthBloc>().add(
       SendOtpRequested(
         email: _emailController.text.trim(),
@@ -55,7 +53,6 @@ class _RegisterPageState extends State<RegisterPage> {
     final otp = _otpController.text.trim();
     if (otp.length != 6) return;
     context.unfocus();
-
     context.read<AuthBloc>().add(
       VerifyOtpRequested(
         email: _emailController.text.trim(),
@@ -67,9 +64,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    final tt = context.textTheme;
-    final cs = context.theme.colorScheme;
-
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
@@ -92,273 +86,57 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.hPadding(),
-                      vertical: context.heightCalculated(24),
-                    ),
-                    child: Container(
-                      padding: EdgeInsets.all(AppThemeMetrics.spacingLg),
-                      decoration: BoxDecoration(
-                        color: AppThemeColors.surface,
-                        borderRadius: BorderRadius.circular(
-                          AppThemeMetrics.radiusLg,
-                        ),
-                      ),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const LogoSection(),
-                            SizedBox(height: context.heightCalculated(24)),
-
-                            if (isOtpStep) ...[
-                              Text(
-                                'Enter OTP',
-                                style: tt.titleMedium?.copyWith(
-                                  color: cs.onSurface,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: context.heightCalculated(8)),
-                              Text(
-                                'A 6-digit code was sent to ${_emailController.text.trim()}',
-                                style: tt.bodySmall?.copyWith(
-                                  color: cs.onSurface.withValues(alpha: 0.7),
-                                ),
-                              ),
-                              SizedBox(height: context.heightCalculated(16)),
-                              TextFormField(
-                                controller: _otpController,
-                                keyboardType: TextInputType.number,
-                                maxLength: 6,
-                                textAlign: TextAlign.center,
-                                style: tt.headlineLarge?.copyWith(
-                                  letterSpacing: 12,
-                                  color: cs.onSurface,
-                                ),
-                                decoration: InputDecoration(
-                                  counterText: '',
-                                  hintText: '------',
-                                  hintStyle: tt.headlineLarge?.copyWith(
-                                    letterSpacing: 12,
-                                    color: cs.onSurface.withValues(alpha: 0.2),
-                                  ),
-                                  filled: true,
-                                  fillColor: AppThemeColors.inputFill,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      AppThemeMetrics.radiusMd,
-                                    ),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-
-                              ),
-                              SizedBox(height: context.heightCalculated(24)),
-                              SizedBox(
-                                height: context.heightCalculated(52),
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed:
-                                      isLoading ? null : _onVerifyOtpPressed,
-                                  child: isLoading
-                                      ? SizedBox(
-                                          height: context.heightCalculated(20),
-                                          width: context.heightCalculated(20),
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.5,
-                                            color: cs.onPrimary,
-                                          ),
-                                        )
-                                      : Text(
-                                          'Verify OTP',
-                                          style: tt.titleLarge?.copyWith(
-                                            color: cs.onPrimary,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                ),
-                              ),
-                              SizedBox(height: context.heightCalculated(12)),
-                              TextButton(
-                                onPressed: isLoading ? null : _onSendOtpPressed,
-                                child: Text(
-                                  'Resend OTP',
-                                  style: tt.bodySmall?.copyWith(
-                                    color: AppThemeColors.primaryAccent,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ] else ...[
-                              Text(
-                                'Email',
-                                style: tt.titleMedium?.copyWith(
-                                  color: cs.onSurface,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: context.heightCalculated(8)),
-                              EmailField(controller: _emailController),
-                              SizedBox(height: context.heightCalculated(16)),
-
-                              Text(
-                                'Password',
-                                style: tt.titleMedium?.copyWith(
-                                  color: cs.onSurface,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: context.heightCalculated(8)),
-                              PasswordField(
-                                controller: _passwordController,
-                                obscure: _obscurePassword,
-                                onToggle: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                                onSubmit: () {},
-                              ),
-                              SizedBox(height: context.heightCalculated(16)),
-
-                              Text(
-                                'Confirm Password',
-                                style: tt.titleMedium?.copyWith(
-                                  color: cs.onSurface,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: context.heightCalculated(8)),
-                              PasswordField(
-                                controller: _confirmPasswordController,
-                                obscure: _obscureConfirm,
-                                onToggle: () {
-                                  setState(() {
-                                    _obscureConfirm = !_obscureConfirm;
-                                  });
-                                },
-                                onSubmit: _onSendOtpPressed,
-                                hintText: '••••••••',
-                                validator: (v) =>
-                                    AppValidators.validateConfirmPassword(
-                                  v,
-                                  password: _passwordController.text,
-                                ),
-                              ),
-                              SizedBox(height: context.heightCalculated(24)),
-
-                              SizedBox(
-                                height: context.heightCalculated(52),
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed:
-                                      isLoading ? null : _onSendOtpPressed,
-                                  child: isLoading
-                                      ? SizedBox(
-                                          height: context.heightCalculated(20),
-                                          width: context.heightCalculated(20),
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.5,
-                                            color: cs.onPrimary,
-                                          ),
-                                        )
-                                      : Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              'Sign Up',
-                                              style: tt.titleLarge?.copyWith(
-                                                color: cs.onPrimary,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: context.widthCalculated(6),
-                                            ),
-                                            Icon(
-                                              Icons.arrow_forward,
-                                              color: cs.onPrimary,
-                                              size: context.iconSize(),
-                                            ),
-                                          ],
-                                        ),
-                                ),
-                              ),
-                              SizedBox(height: context.heightCalculated(12)),
-                              Text(
-                                'Use your workspace email to create an account.',
-                                style: tt.bodySmall?.copyWith(
-                                  color: cs.onSurface.withValues(alpha: 0.7),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: context.heightCalculated(8),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        isOtpStep ? 'Wrong email? ' : 'Already have an account? ',
-                        style: tt.bodySmall?.copyWith(
-                          color: cs.onSurface.withValues(alpha: 0.7),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          if (isOtpStep) {
-                            setState(() {
-                              _otpController.clear();
-                            });
-                          } else {
-                            context.go(AppRoutes.login);
-                          }
-                        },
-                        child: Text(
-                          isOtpStep ? 'Go back' : 'Sign In',
-                          style: tt.bodySmall?.copyWith(
-                            color: AppThemeColors.primaryAccent,
-                            fontWeight: FontWeight.bold,
+                    physics: const ClampingScrollPhysics(),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _RegisterPhotoComposition(
+                            isOtpStep: isOtpStep,
                           ),
-                        ),
+                          isOtpStep
+                              ? _OtpFormContent(
+                                  email: _emailController.text.trim(),
+                                  otpController: _otpController,
+                                  isLoading: isLoading,
+                                  onVerify: _onVerifyOtpPressed,
+                                  onResend: _onSendOtpPressed,
+                                )
+                              : _RegisterFormContent(
+                                  emailController: _emailController,
+                                  passwordController: _passwordController,
+                                  confirmPasswordController:
+                                      _confirmPasswordController,
+                                  obscurePassword: _obscurePassword,
+                                  obscureConfirm: _obscureConfirm,
+                                  isLoading: isLoading,
+                                  onTogglePassword: () => setState(
+                                    () => _obscurePassword = !_obscurePassword,
+                                  ),
+                                  onToggleConfirm: () => setState(
+                                    () => _obscureConfirm = !_obscureConfirm,
+                                  ),
+                                  onSubmit: _onSendOtpPressed,
+                                ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
+
+                // Bottom link
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: context.heightCalculated(8),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'PROTECTED BY ADVANCED NEURAL ENCRYPTION',
-                        style: tt.labelSmall?.copyWith(
-                          color: cs.onSurface.withValues(alpha: 0.7),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: context.heightCalculated(2)),
-                      Text(
-                        '© 2024 MULTIAI CORP',
-                        style: tt.labelSmall?.copyWith(
-                          color: cs.onSurface.withValues(alpha: 0.7),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: _BottomLink(
+                    isOtpStep: isOtpStep,
+                    onTap: () {
+                      if (isOtpStep) {
+                        setState(() => _otpController.clear());
+                      } else {
+                        context.go(AppRoutes.login);
+                      }
+                    },
                   ),
                 ),
               ],
@@ -366,6 +144,407 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         );
       },
+    );
+  }
+}
+
+// ── Photo composition ──────────────────────────────────────────────────────────
+
+class _RegisterPhotoComposition extends StatelessWidget {
+  final bool isOtpStep;
+  const _RegisterPhotoComposition({required this.isOtpStep});
+
+  @override
+  Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    // Slightly shorter on the form step (3 fields) to give more room
+    final height = screenHeight * (isOtpStep ? 0.34 : 0.28);
+    final circleSize = height * 0.80;
+    final photoSize = height * 0.74;
+
+    return SizedBox(
+      height: height,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Large gold circle — top-right, partially off-screen
+          Positioned(
+            top: -(height * 0.14),
+            right: -(height * 0.08),
+            child: Container(
+              width: circleSize,
+              height: circleSize,
+              decoration: const BoxDecoration(
+                color: AppThemeColors.gold,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          // Main photo circle — left, overlapping the gold circle
+          Positioned(
+            top: height * 0.08,
+            left: 28,
+            child: ClipOval(
+              child: Image.asset(
+                AppImages.onboarding1,
+                width: photoSize,
+                height: photoSize,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          // Small accent dot
+          Positioned(
+            bottom: height * 0.08,
+            right: 52,
+            child: Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                color: AppThemeColors.gold.withValues(alpha: 0.28),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Registration form (step 1) ─────────────────────────────────────────────────
+
+class _RegisterFormContent extends StatelessWidget {
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final TextEditingController confirmPasswordController;
+  final bool obscurePassword;
+  final bool obscureConfirm;
+  final bool isLoading;
+  final VoidCallback onTogglePassword;
+  final VoidCallback onToggleConfirm;
+  final VoidCallback onSubmit;
+
+  const _RegisterFormContent({
+    required this.emailController,
+    required this.passwordController,
+    required this.confirmPasswordController,
+    required this.obscurePassword,
+    required this.obscureConfirm,
+    required this.isLoading,
+    required this.onTogglePassword,
+    required this.onToggleConfirm,
+    required this.onSubmit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(28, 24, 28, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Gold accent bar
+          Container(
+            width: 28,
+            height: 2,
+            decoration: BoxDecoration(
+              color: AppThemeColors.gold,
+              borderRadius: BorderRadius.circular(1),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Create account.',
+            style: tt.displaySmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              height: 1.1,
+              color: AppThemeColors.primaryText,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Join Micro Club. Your moments await.',
+            style: tt.bodyMedium?.copyWith(
+              color: AppThemeColors.secondaryText,
+              fontSize: 15,
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          Text(
+            'Email',
+            style: tt.labelMedium?.copyWith(color: AppThemeColors.neutral200),
+          ),
+          const SizedBox(height: 8),
+          EmailField(controller: emailController),
+          const SizedBox(height: 18),
+
+          Text(
+            'Password',
+            style: tt.labelMedium?.copyWith(color: AppThemeColors.neutral200),
+          ),
+          const SizedBox(height: 8),
+          PasswordField(
+            controller: passwordController,
+            obscure: obscurePassword,
+            onToggle: onTogglePassword,
+            onSubmit: () {},
+          ),
+          const SizedBox(height: 18),
+
+          Text(
+            'Confirm Password',
+            style: tt.labelMedium?.copyWith(color: AppThemeColors.neutral200),
+          ),
+          const SizedBox(height: 8),
+          PasswordField(
+            controller: confirmPasswordController,
+            obscure: obscureConfirm,
+            onToggle: onToggleConfirm,
+            onSubmit: onSubmit,
+            validator: (v) => AppValidators.validateConfirmPassword(
+              v,
+              password: passwordController.text,
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          SizedBox(
+            height: 52,
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: isLoading ? null : onSubmit,
+              child: isLoading
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: cs.onPrimary,
+                      ),
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Continue',
+                          style: tt.titleMedium?.copyWith(
+                            color: cs.onPrimary,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          color: cs.onPrimary,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+}
+
+// ── OTP step (step 2) ──────────────────────────────────────────────────────────
+
+class _OtpFormContent extends StatelessWidget {
+  final String email;
+  final TextEditingController otpController;
+  final bool isLoading;
+  final VoidCallback onVerify;
+  final VoidCallback onResend;
+
+  const _OtpFormContent({
+    required this.email,
+    required this.otpController,
+    required this.isLoading,
+    required this.onVerify,
+    required this.onResend,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(28, 28, 28, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Gold accent bar
+          Container(
+            width: 28,
+            height: 2,
+            decoration: BoxDecoration(
+              color: AppThemeColors.gold,
+              borderRadius: BorderRadius.circular(1),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Check your email.',
+            style: tt.displaySmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              height: 1.1,
+              color: AppThemeColors.primaryText,
+            ),
+          ),
+          const SizedBox(height: 6),
+          RichText(
+            text: TextSpan(
+              style: tt.bodyMedium?.copyWith(
+                color: AppThemeColors.secondaryText,
+                fontSize: 15,
+              ),
+              children: [
+                const TextSpan(text: 'We sent a 6-digit code to '),
+                TextSpan(
+                  text: email,
+                  style: TextStyle(
+                    color: AppThemeColors.gold,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 40),
+
+          // OTP input — centered, spaced digits
+          TextFormField(
+            controller: otpController,
+            keyboardType: TextInputType.number,
+            maxLength: 6,
+            textAlign: TextAlign.center,
+            autofocus: true,
+            style: tt.displayMedium?.copyWith(
+              letterSpacing: 14,
+              color: AppThemeColors.primaryText,
+              fontWeight: FontWeight.bold,
+            ),
+            decoration: InputDecoration(
+              counterText: '',
+              hintText: '------',
+              hintStyle: tt.displayMedium?.copyWith(
+                letterSpacing: 14,
+                color: AppThemeColors.neutral300.withValues(alpha: 0.3),
+                fontWeight: FontWeight.bold,
+              ),
+              filled: true,
+              fillColor: AppThemeColors.inputFill,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
+                borderSide: const BorderSide(color: AppThemeColors.inputBorder),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
+                borderSide: const BorderSide(
+                  color: AppThemeColors.gold,
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          SizedBox(
+            height: 52,
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: isLoading ? null : onVerify,
+              child: isLoading
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: cs.onPrimary,
+                      ),
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Verify',
+                          style: tt.titleMedium?.copyWith(
+                            color: cs.onPrimary,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.check_rounded,
+                          color: cs.onPrimary,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Resend link
+          Center(
+            child: TextButton(
+              onPressed: isLoading ? null : onResend,
+              child: Text(
+                'Resend code',
+                style: tt.bodySmall?.copyWith(
+                  color: AppThemeColors.gold,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Bottom sign-in / go-back link ──────────────────────────────────────────────
+
+class _BottomLink extends StatelessWidget {
+  final bool isOtpStep;
+  final VoidCallback onTap;
+
+  const _BottomLink({required this.isOtpStep, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = context.textTheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          isOtpStep ? 'Wrong email? ' : 'Already have an account? ',
+          style: tt.bodySmall?.copyWith(color: AppThemeColors.secondaryText),
+        ),
+        GestureDetector(
+          onTap: onTap,
+          child: Text(
+            isOtpStep ? 'Go back' : 'Sign In',
+            style: tt.bodySmall?.copyWith(
+              color: AppThemeColors.gold,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
