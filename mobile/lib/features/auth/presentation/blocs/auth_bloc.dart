@@ -4,6 +4,7 @@ import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/failure_handler.dart';
 import '../../../../core/errors/logger.dart';
 import '../../../../core/usecase/usecase.dart';
+import '../../../../features/notifications/services/push_notification_service.dart';
 import '../../domain/entities/auth_entity.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -27,6 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LogoutUseCase _logoutUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
   final CheckEnrollmentDoneUseCase _checkEnrollmentDone;
+  final PushNotificationService _pushNotificationService;
   final FailureHandler _failureHandler;
   final Logger _logger;
 
@@ -38,6 +40,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required LogoutUseCase logoutUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
     required CheckEnrollmentDoneUseCase checkEnrollmentDone,
+    required PushNotificationService pushNotificationService,
     FailureHandler? failureHandler,
     Logger? logger,
   }) : _loginUseCase = loginUseCase,
@@ -47,6 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _logoutUseCase = logoutUseCase,
        _getCurrentUserUseCase = getCurrentUserUseCase,
        _checkEnrollmentDone = checkEnrollmentDone,
+       _pushNotificationService = pushNotificationService,
        _failureHandler = failureHandler ?? FailureHandler.instance,
        _logger = logger ?? Logger.create(),
        super(AuthInitial()) {
@@ -163,6 +167,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
+      await _pushNotificationService.revokeToken();
       final result = await _logoutUseCase(NoParams());
       result.fold(
         (failure) {

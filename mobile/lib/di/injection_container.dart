@@ -174,6 +174,7 @@ Future<void> init() async {
       refreshTokenUseCase: sl<RefreshTokenUseCase>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
       checkEnrollmentDone: sl<CheckEnrollmentDoneUseCase>(),
+      pushNotificationService: sl<PushNotificationService>(),
     ),
   );
 
@@ -238,6 +239,7 @@ Future<void> init() async {
     () => AccountBloc(
       getAccountData: sl<GetAccountDataUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
+      pushNotificationService: sl<PushNotificationService>(),
     ),
   );
 
