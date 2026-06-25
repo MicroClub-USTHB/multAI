@@ -113,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen>
                             child: const SplashLogo(),
                           ),
                         ),
-                        const Spacer(flex: 1),
+                        const Spacer(flex: 2),
                         FadeTransition(
                           opacity: _progressFade,
                           child: SlideTransition(
@@ -246,9 +246,9 @@ class _SplashScreenState extends State<SplashScreen>
         decoration: BoxDecoration(
           gradient: RadialGradient(
             center: alignment,
-            radius: 0.5,
+            radius: 0.6,
             colors: [
-              AppThemeColors.gold.withValues(alpha: 0.15),
+              AppThemeColors.primaryAccent.withValues(alpha: 0.10),
               Colors.transparent,
             ],
           ),
