@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import Logo from '@/components/Logo';
 import { LoginForm } from '@/features/common/auth/components/LoginForm';
+import { getAuthRedirectPath } from '@/features/common/auth/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { LoadingPage } from '@/shared/ui/loading';
 
@@ -17,10 +18,13 @@ export const Route = createFileRoute('/auth/login')({
 });
 
 function RouteComponent() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
-  const safeRedirect = redirect?.startsWith('/') ? redirect : '/admin';
+  const safeRedirect = getAuthRedirectPath({
+    redirect,
+    role: user?.role,
+  });
 
   useEffect(() => {
     if (isLoading || !isAuthenticated) {
