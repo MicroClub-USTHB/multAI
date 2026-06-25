@@ -46,7 +46,7 @@ class NotificationNavigationService {
       } else {
         _router!.push(AppRoutes.photoApproval);
       }
-    } else if (path.contains('gallery')) {
+    } else if (path.contains('face-match') || path.contains('gallery')) {
       _router!.push(AppRoutes.gallery);
     } else if (path.contains('events')) {
       _router!.push(AppRoutes.events);
