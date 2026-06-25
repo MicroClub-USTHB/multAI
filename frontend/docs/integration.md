@@ -113,28 +113,28 @@ sequenceDiagram
 
 ## Endpoints branches
 
-| Domaine     | Front           | Endpoint               | Statut | Notes |
+| Domaine | Front | Endpoint | Statut | Notes |
 | ----------- | --------------- | ---------------------- | ------ | ----- |
-| Admin auth  | AuthProvider    | POST /admin/auth/login | lie    | Login et hydration de session |
-| Admin auth  | AuthProvider    | GET /admin/auth/me     | lie    | Hydratation de session |
-| Admin auth  | AuthProvider    | POST /admin/auth/logout | lie   | Logout best-effort + cleanup client |
-| Admin users | Users page - tab Users | GET /admin/users/      | lie    | Liste paginee des users |
-| Admin users | Users page - tab Users | GET /admin/users/{id}  | lie    | Chargement d'un user par id |
-| Admin users | Users page - tab Users | POST /admin/users/     | lie    | Creation d'un user |
-| Admin users | Users page - tab Users | PUT /admin/users/{id}  | lie    | Mise a jour d'un user |
-| Admin users | Users page - tab Users | DELETE /admin/users/{id} | lie  | Suppression d'un user |
+| Admin auth | AuthProvider | POST /admin/auth/login | lie | Login et hydration de session |
+| Admin auth | AuthProvider | GET /admin/auth/me | lie | Hydratation de session |
+| Admin auth | AuthProvider | POST /admin/auth/logout | lie | Logout best-effort + cleanup client |
+| Admin users | Users page - tab Users | GET /admin/users/ | lie | Liste paginee des users |
+| Admin users | Users page - tab Users | GET /admin/users/{id} | lie | Chargement d'un user par id |
+| Admin users | Users page - tab Users | POST /admin/users/ | lie | Creation d'un user |
+| Admin users | Users page - tab Users | PUT /admin/users/{id} | lie | Mise a jour d'un user |
+| Admin users | Users page - tab Users | DELETE /admin/users/{id} | lie | Suppression d'un user |
 | Admin users | Users page - tab Users | POST /admin/users/{id}/block | lie | Blocage d'un user |
 | Admin users | Users page - tab Users | POST /admin/users/{id}/unblock | lie | Deblocage d'un user |
-| Staff users | Users page - tab Staff users | GET /admin/staff-users/ | lie    | Liste des staff users |
-| Staff users | Users page - tab Staff users | POST /admin/staff-users/ | lie    | Creation d'un staff user |
+| Staff users | Users page - tab Staff users | GET /admin/staff-users/ | lie | Liste des staff users |
+| Staff users | Users page - tab Staff users | POST /admin/staff-users/ | lie | Creation d'un staff user |
 | Staff users | Users page - tab Staff users | PATCH /admin/staff-users/{staff_user_id} | lie | Mise a jour d'un staff user |
 | Staff users | Users page - tab Staff users | DELETE /admin/staff-users/{staff_user_id} | lie | Suppression d'un staff user |
-| Admin events | Events page      | GET /admin/events/      | lie    | Liste et filtres des events |
-| Admin events | Events page      | POST /admin/events/     | lie    | Creation d'un event |
-| Admin events | Events page      | POST /admin/events/{event_id}/draft | lie | Retour en draft |
-| Admin events | Events page      | POST /admin/events/{event_id}/schedule | lie | Passage en scheduled |
-| Admin events | Events page      | POST /admin/events/{event_id}/archive | lie | Archivage d'un event |
-| Admin audits | Logs page         | GET /admin/audits      | lie    | Journal d'audit admin |
+| Admin events | Events page | GET /admin/events/ | lie | Liste et filtres des events |
+| Admin events | Events page | POST /admin/events/ | lie | Creation d'un event |
+| Admin events | Events page | POST /admin/events/{event_id}/draft | lie | Retour en draft |
+| Admin events | Events page | POST /admin/events/{event_id}/schedule | lie | Passage en scheduled |
+| Admin events | Events page | POST /admin/events/{event_id}/archive | lie | Archivage d'un event |
+| Admin audits | Logs page | GET /admin/audits | lie | Journal d'audit admin |
 
 ## Hors scope
 

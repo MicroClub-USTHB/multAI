@@ -33,7 +33,7 @@ export const getDriveSettings = createServerFn({ method: 'GET' }).handler(
 );
 
 export const connectGoogleDrive = createServerFn({ method: 'POST' })
-  .inputValidator(connectGoogleDriveInput)
+  .validator(connectGoogleDriveInput)
   .handler(async (): Promise<DriveSettings> => {
     await sleep(MOCK_LATENCY_MS);
 
@@ -49,7 +49,7 @@ export const connectGoogleDrive = createServerFn({ method: 'POST' })
   });
 
 export const updateSyncFrequency = createServerFn({ method: 'POST' })
-  .inputValidator(updateSyncFrequencyInput)
+  .validator(updateSyncFrequencyInput)
   .handler(async ({ data: input }): Promise<DriveSettings> => {
     await sleep(MOCK_LATENCY_MS);
 
@@ -63,7 +63,7 @@ export const updateSyncFrequency = createServerFn({ method: 'POST' })
   });
 
 export const updateOutputFolder = createServerFn({ method: 'POST' })
-  .inputValidator(updateOutputFolderInput)
+  .validator(updateOutputFolderInput)
   .handler(async ({ data: input }): Promise<DriveSettings> => {
     const normalizedPath = input.outputFolder.trim();
 
