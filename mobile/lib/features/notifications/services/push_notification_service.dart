@@ -24,10 +24,10 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   );
 
   await localNotifications.show(
-    message.hashCode,
-    notification.title,
-    notification.body,
-    NotificationDetails(
+    id: message.hashCode,
+    title: notification.title,
+    body: notification.body,
+    notificationDetails: NotificationDetails(
       android: AndroidNotificationDetails(
         'multiai_channel',
         'MultiAi Notifications',
@@ -146,10 +146,10 @@ class PushNotificationService {
     if (notification == null) return;
 
     await _localNotifications.show(
-      message.hashCode,
-      notification.title,
-      notification.body,
-      NotificationDetails(
+      id: message.hashCode,
+      title: notification.title,
+      body: notification.body,
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'multiai_channel',
           'MultiAi Notifications',
