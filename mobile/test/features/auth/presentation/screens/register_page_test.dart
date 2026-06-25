@@ -93,9 +93,8 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsWidgets);
   });
 
-  testWidgets('sends SendOtpRequested when Sign Up button is tapped', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('sends SendOtpRequested when Continue button is tapped',
+      (WidgetTester tester) async {
     when(() => mockAuthBloc.state).thenReturn(AuthInitial());
 
     await tester.pumpWidget(buildTestWidget());
@@ -106,16 +105,14 @@ void main() {
     await tester.enterText(find.byType(TextFormField).at(2), 'Password1!');
 
     await tester.ensureVisible(find.text('Continue'));
-    await tester.pump();
     await tester.tap(find.text('Continue'));
     await tester.pump();
 
     verify(() => mockAuthBloc.add(any<SendOtpRequested>())).called(1);
   });
 
-  testWidgets('sends VerifyOtpRequested when Verify OTP is tapped', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('sends VerifyOtpRequested when Verify is tapped',
+      (WidgetTester tester) async {
     whenListen(
       mockAuthBloc,
       Stream.fromIterable([AuthOtpSent(email: 'test@test.com')]),
