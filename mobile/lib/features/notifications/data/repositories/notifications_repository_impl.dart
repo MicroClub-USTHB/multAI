@@ -12,10 +12,10 @@ class NotificationRepositoryImpl implements NotificationsRepository {
     try {
       final r = await remoteDataSource.getNotifications();
       return Right(r);
-    } on Failure catch (F) {
-      return Left(F);
+    } on Failure catch (f) {
+      return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to load notifications'));
     }
   }
 
@@ -29,7 +29,7 @@ class NotificationRepositoryImpl implements NotificationsRepository {
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to mark as read'));
     }
   }
 
@@ -44,10 +44,10 @@ class NotificationRepositoryImpl implements NotificationsRepository {
         token: token,
       );
       return Right(null);
-    } on Failure catch (F) {
-      return Left(F);
+    } on Failure catch (f) {
+      return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to register push token'));
     }
   }
 
@@ -56,10 +56,10 @@ class NotificationRepositoryImpl implements NotificationsRepository {
     try {
       await remoteDataSource.revokePushToken(deviceId);
       return Right(null);
-    } on Failure catch (F) {
-      return Left(F);
+    } on Failure catch (f) {
+      return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to revoke push token'));
     }
   }
 }

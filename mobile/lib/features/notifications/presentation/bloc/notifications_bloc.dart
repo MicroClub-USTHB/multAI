@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/errors/failure_handler.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../domain/entities/notification_entity.dart';
 import '../../domain/usecases/get_notifications_usecase.dart';
@@ -13,14 +14,17 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final GetNotificationsUsecase _getNotifications;
   final MarkAsReadUsecase _markAsRead;
   final RegisterPushTokenUseCase _registerPushToken;
+  final FailureHandler _failureHandler;
 
   NotificationBloc({
     required GetNotificationsUsecase getNotifications,
     required MarkAsReadUsecase markAsRead,
     required RegisterPushTokenUseCase registerPushToken,
+    FailureHandler? failureHandler,
   }) : _getNotifications = getNotifications,
        _markAsRead = markAsRead,
        _registerPushToken = registerPushToken,
+       _failureHandler = failureHandler ?? FailureHandler.instance,
        super(NotificationInitial()) {
     on<LoadNotifications>(_onLoad);
     on<MarkNotificationRead>(_onMarkRead);
@@ -30,7 +34,6 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     on<PushNotificationReceived>(_onPushReceived);
   }
 
-  // ── Load ───────────────────────────────────────────────────────────────────
   Future<void> _onLoad(
     LoadNotifications event,
     Emitter<NotificationState> emit,
@@ -39,7 +42,10 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
     final result = await _getNotifications(NoParams());
     result.fold(
-      (failure) => emit(NotificationError(message: failure.message)),
+      (failure) {
+        _failureHandler.logFailure(failure, 'NotificationBloc');
+        emit(NotificationError(message: _failureHandler.getUserFriendlyMessage(failure)));
+      },
       (list) => emit(NotificationLoaded(notifications: list)),
     );
   }
@@ -56,6 +62,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
     result.fold(
       (failure) {
+        _failureHandler.logFailure(failure, 'NotificationBloc');
         if (previousState is NotificationLoaded) {
           final updated = previousState.notifications.map((n) {
             if (event.notificationIds.contains(n.id)) {
@@ -65,7 +72,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           }).toList();
           emit(NotificationLoaded(notifications: updated));
         } else {
-          emit(NotificationError(message: failure.message));
+          emit(NotificationError(message: _failureHandler.getUserFriendlyMessage(failure)));
         }
       },
       (updated) {
@@ -84,7 +91,6 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     );
   }
 
-  // ── Mark single — wraps as list ────────────────────────────────────────────
   Future<void> _onMarkSingleRead(
     MarkSingleNotificationRead event,
     Emitter<NotificationState> emit,
@@ -92,7 +98,6 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     add(MarkNotificationRead(notificationIds: [event.notificationId]));
   }
 
-  // ── Mark all — sends all unread IDs ───────────────────────────────────────
   Future<void> _onMarkAllRead(
     MarkAllNotificationsRead event,
     Emitter<NotificationState> emit,
@@ -110,7 +115,6 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     add(MarkNotificationRead(notificationIds: unreadIds));
   }
 
-  // ── Register push token ────────────────────────────────────────────────────
   Future<void> _onPushTokenReceived(
     PushTokenReceived event,
     Emitter<NotificationState> emit,
@@ -118,10 +122,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     await _registerPushToken(
       RegisterPushTokenParams(deviceId: event.deviceId, token: event.token),
     );
-    // silent — no state change
   }
 
-  // ── Foreground push received — reload list ────────────────────────────────
   void _onPushReceived(
     PushNotificationReceived event,
     Emitter<NotificationState> emit,

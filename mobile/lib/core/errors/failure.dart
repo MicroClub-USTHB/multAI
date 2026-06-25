@@ -1,83 +1,113 @@
 import 'package:equatable/equatable.dart';
+import 'app_exception.dart';
 
 abstract class Failure extends Equatable {
-  const Failure([this.properties = const <dynamic>[]]);
+  const Failure(this.message);
 
-  final List<dynamic> properties;
-
-  String get message =>
-      properties.isNotEmpty ? properties.first.toString() : '';
-
-  @override
-  List get props => properties;
-}
-
-class ServerFailure extends Failure {
-  @override
   final String message;
-  const ServerFailure({required this.message}) : super(const []);
+
+  String get userFriendlyMessage => message;
+
+  AppException get appException;
 
   @override
   List<Object?> get props => [message];
 }
 
 class NetworkFailure extends Failure {
-  @override
-  final String message;
-  const NetworkFailure({required this.message}) : super(const []);
+  const NetworkFailure([super.message = 'Unable to connect']);
 
   @override
-  List<Object?> get props => [message];
+  AppException get appException => const NetworkException();
+}
+
+class TimeoutFailure extends Failure {
+  const TimeoutFailure([super.message = 'Request timed out']);
+
+  @override
+  AppException get appException => const TimeoutException();
+}
+
+class RateLimitFailure extends Failure {
+  const RateLimitFailure([super.message = 'Too many requests']);
+
+  @override
+  AppException get appException => const RateLimitException();
 }
 
 class UnauthorizedFailure extends Failure {
-  @override
-  final String message;
-  const UnauthorizedFailure({required this.message}) : super(const []);
+  const UnauthorizedFailure([super.message = 'Session expired']);
 
   @override
-  List<Object?> get props => [message];
+  AppException get appException => const AuthenticationException();
+}
+
+class ServerFailure extends Failure {
+  final int? statusCode;
+  final String? requestId;
+
+  const ServerFailure([super.message = 'Server error', this.statusCode, this.requestId]);
+
+  @override
+  AppException get appException => ServerException(
+    message: message,
+    statusCode: statusCode,
+  );
 }
 
 class CacheFailure extends Failure {
-  const CacheFailure() : super(const []);
+  const CacheFailure([super.message = 'Cache error']);
+
+  @override
+  AppException get appException => const CacheException();
 }
 
 class CancelledFailure extends Failure {
-  @override
-  final String message;
-
-  const CancelledFailure({this.message = 'Operation cancelled.'})
-    : super(const []);
+  const CancelledFailure([super.message = '']);
 
   @override
-  List<Object?> get props => [message];
+  AppException get appException => const UnknownException();
 }
 
-// ── Face Enrollment specific failures ─────────────────────────────────────────
-class FileNotFoundFailure extends Failure {
-  @override
-  final String message;
-  const FileNotFoundFailure({required this.message}) : super(const []);
+class ValidationFailure extends Failure {
+  const ValidationFailure([super.message = 'Validation error']);
 
   @override
-  List<Object?> get props => [message];
+  AppException get appException => const ValidationException();
+}
+
+class NotFoundFailure extends Failure {
+  const NotFoundFailure([super.message = 'Resource not found']);
+
+  @override
+  AppException get appException => const NotFoundException();
+}
+
+class UnknownFailure extends Failure {
+  const UnknownFailure([super.message = 'Unknown error']);
+
+  @override
+  AppException get appException => const UnknownException();
+}
+
+// Face Enrollment specific failures
+class FileNotFoundFailure extends Failure {
+  const FileNotFoundFailure([super.message = 'File not found']);
+
+  @override
+  AppException get appException => const NotFoundException();
 }
 
 class FileTooLargeFailure extends Failure {
-  @override
-  final String message;
-  const FileTooLargeFailure({required this.message}) : super(const []);
+  const FileTooLargeFailure([super.message = 'File too large']);
 
   @override
-  List<Object?> get props => [message];
+  AppException get appException => const ValidationException();
 }
 
 class InvalidFileFormatFailure extends Failure {
-  @override
-  final String message;
-  const InvalidFileFormatFailure({required this.message}) : super(const []);
+  const InvalidFileFormatFailure([super.message = 'Invalid file format']);
 
   @override
-  List<Object?> get props => [message];
+  AppException get appException => const ValidationException();
 }

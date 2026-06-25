@@ -50,7 +50,11 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       return Right(token);
     } catch (e) {
-      return Left(const ServerFailure(message: 'Failed to retrieve session'));
+      FailureHandler.instance.logFailure(
+        UnknownFailure('Failed to retrieve session'),
+        'AuthRepository',
+      );
+      return Left(const ServerFailure('Failed to retrieve session'));
     }
   }
 
@@ -63,10 +67,14 @@ class AuthRepositoryImpl implements AuthRepository {
       await _persistTokens(result);
       return Right(result);
     } on Failure catch (f) {
-      FailureHandler.logFailure(f, 'AuthRepository');
+      FailureHandler.instance.logFailure(f, 'AuthRepository');
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: 'Authentication failed. Please try again.'));
+      FailureHandler.instance.logFailure(
+        UnknownFailure('Authentication failed'),
+        'AuthRepository',
+      );
+      return Left(ServerFailure('Authentication failed. Please try again.'));
     }
   }
 
@@ -84,10 +92,14 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return const Right(null);
     } on Failure catch (f) {
-      FailureHandler.logFailure(f, 'AuthRepository');
+      FailureHandler.instance.logFailure(f, 'AuthRepository');
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: 'Registration failed. Please try again.'));
+      FailureHandler.instance.logFailure(
+        UnknownFailure('Registration failed'),
+        'AuthRepository',
+      );
+      return Left(ServerFailure('Registration failed. Please try again.'));
     }
   }
 
@@ -131,12 +143,16 @@ class AuthRepositoryImpl implements AuthRepository {
       await _persistTokens(result);
       return Right(result);
     } on Failure catch (f) {
-      FailureHandler.logFailure(f, 'AuthRepository');
+      FailureHandler.instance.logFailure(f, 'AuthRepository');
       await _clearTokens();
       return Left(f);
     } catch (e) {
+      FailureHandler.instance.logFailure(
+        UnknownFailure('Token refresh failed'),
+        'AuthRepository',
+      );
       await _clearTokens();
-      return Left(const UnauthorizedFailure(message: 'Session expired. Please sign in again.'));
+      return Left(const UnauthorizedFailure('Session expired. Please sign in again.'));
     }
   }
 
@@ -161,10 +177,14 @@ class AuthRepositoryImpl implements AuthRepository {
       final result = await remoteDataSource.getMe();
       return Right(result);
     } on Failure catch (f) {
-      FailureHandler.logFailure(f, 'AuthRepository');
+      FailureHandler.instance.logFailure(f, 'AuthRepository');
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to load user data'));
+      FailureHandler.instance.logFailure(
+        UnknownFailure('Failed to load user data'),
+        'AuthRepository',
+      );
+      return Left(ServerFailure('Failed to load user data'));
     }
   }
 }

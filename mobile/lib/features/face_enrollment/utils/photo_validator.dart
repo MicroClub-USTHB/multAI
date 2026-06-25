@@ -25,16 +25,14 @@ class PhotoProcessor {
 
       // 1. Quick Check: Existence
       if (!await file.exists()) {
-        return const Left(FileNotFoundFailure(message: 'File does not exist.'));
+        return const Left(FileNotFoundFailure('File does not exist.'));
       }
 
       // 2. Quick Check: Extension (Use Set.contains for O(1) lookup)
       final ext = p.extension(filePath).replaceFirst('.', '').toLowerCase();
       if (!_allowedExtensions.contains(ext)) {
         return const Left(
-          InvalidFileFormatFailure(
-            message: 'Invalid format. Use JPG, PNG, HEIC, or WEBP.',
-          ),
+          InvalidFileFormatFailure('Invalid format. Use JPG, PNG, HEIC, or WEBP.'),
         );
       }
 
@@ -44,7 +42,7 @@ class PhotoProcessor {
       if (initialSize > _maxFileSizeBytes * 2) {
         // Allow some headroom before compression
         return const Left(
-          FileTooLargeFailure(message: 'Original image is too large.'),
+          FileTooLargeFailure('Original image is too large.'),
         );
       }
 
@@ -54,15 +52,13 @@ class PhotoProcessor {
       // 5. Final Size Validation
       if (await compressedFile.length() > _maxFileSizeBytes) {
         return const Left(
-          FileTooLargeFailure(
-            message: 'Photo exceeds 5MB limit after compression.',
-          ),
+          FileTooLargeFailure('Photo exceeds 5MB limit after compression.'),
         );
       }
 
       return Right(compressedFile);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(UnknownFailure('Failed to process photo'));
     }
   }
 

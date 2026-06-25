@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/failure_handler.dart';
-import '../../../../core/security/secure_logger.dart';
+import '../../../../core/errors/logger.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../domain/entities/auth_entity.dart';
 import '../../domain/entities/user_entity.dart';
@@ -27,6 +27,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LogoutUseCase _logoutUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
   final CheckEnrollmentDoneUseCase _checkEnrollmentDone;
+  final FailureHandler _failureHandler;
+  final Logger _logger;
 
   AuthBloc({
     required LoginUseCase loginUseCase,
@@ -36,6 +38,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required LogoutUseCase logoutUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
     required CheckEnrollmentDoneUseCase checkEnrollmentDone,
+    FailureHandler? failureHandler,
+    Logger? logger,
   }) : _loginUseCase = loginUseCase,
        _registerUseCase = registerUseCase,
        _verifyRegisterUseCase = verifyRegisterUseCase,
@@ -43,6 +47,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _logoutUseCase = logoutUseCase,
        _getCurrentUserUseCase = getCurrentUserUseCase,
        _checkEnrollmentDone = checkEnrollmentDone,
+       _failureHandler = failureHandler ?? FailureHandler.instance,
+       _logger = logger ?? Logger.create(),
        super(AuthInitial()) {
     on<SendOtpRequested>(_onSendOtpRequested);
     on<VerifyOtpRequested>(_onVerifyOtpRequested);
@@ -62,8 +68,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _emitFailure(Emitter<AuthState> emit, Failure failure) {
-    FailureHandler.logFailure(failure, 'AuthBloc');
-    emit(AuthFailure(message: FailureHandler.getUserFriendlyMessage(failure)));
+    _failureHandler.logFailure(failure, 'AuthBloc');
+    emit(AuthFailure(message: _failureHandler.getUserFriendlyMessage(failure)));
   }
 
   Future<void> _onSendOtpRequested(SendOtpRequested event, Emitter<AuthState> emit) async {
@@ -83,8 +89,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         (failure) async => _emitFailure(emit, failure),
         (_) async => emit(AuthOtpSent(email: event.email)),
       );
-    } catch (e) {
-      SecureLogger.error('AuthBloc', 'Send OTP failed', e);
+    } catch (e, s) {
+      _logger.error('AuthBloc', 'Send OTP failed', e, s);
       emit(AuthFailure(message: 'Failed to send OTP. Please try again.'));
     }
   }
@@ -109,8 +115,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         (failure) async => _emitFailure(emit, failure),
         (auth) async => _emitAuthenticatedState(auth, emit),
       );
-    } catch (e) {
-      SecureLogger.error('AuthBloc', 'Verify OTP failed', e);
+    } catch (e, s) {
+      _logger.error('AuthBloc', 'Verify OTP failed', e, s);
       emit(AuthFailure(message: 'Verification failed. Please try again.'));
     }
   }
@@ -132,8 +138,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         (failure) async => _emitFailure(emit, failure),
         (auth) async => _emitAuthenticatedState(auth, emit),
       );
-    } catch (e) {
-      SecureLogger.error('AuthBloc', 'Login failed', e);
+    } catch (e, s) {
+      _logger.error('AuthBloc', 'Login failed', e, s);
       emit(AuthFailure(message: 'Sign in failed. Please try again.'));
     }
   }
@@ -148,8 +154,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         (failure) => _emitFailure(emit, failure),
         (auth) => _emitAuthenticatedState(auth, emit),
       );
-    } catch (e) {
-      SecureLogger.error('AuthBloc', 'Token refresh failed', e);
+    } catch (e, s) {
+      _logger.error('AuthBloc', 'Token refresh failed', e, s);
       emit(AuthFailure(message: 'Session expired. Please sign in again.'));
     }
   }
@@ -160,13 +166,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _logoutUseCase(NoParams());
       result.fold(
         (failure) {
-          FailureHandler.logFailure(failure, 'AuthBloc');
+          _failureHandler.logFailure(failure, 'AuthBloc');
           emit(Unauthenticated());
         },
         (_) => emit(Unauthenticated()),
       );
-    } catch (e) {
-      SecureLogger.error('AuthBloc', 'Logout failed', e);
+    } catch (e, s) {
+      _logger.error('AuthBloc', 'Logout failed', e, s);
       emit(Unauthenticated());
     }
   }
@@ -179,8 +185,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         (failure) => _emitFailure(emit, failure),
         (user) => emit(GetCurrentUserSuccess(user: user)),
       );
-    } catch (e) {
-      SecureLogger.error('AuthBloc', 'Get current user failed', e);
+    } catch (e, s) {
+      _logger.error('AuthBloc', 'Get current user failed', e, s);
       emit(AuthFailure(message: 'Could not load user data.'));
     }
   }

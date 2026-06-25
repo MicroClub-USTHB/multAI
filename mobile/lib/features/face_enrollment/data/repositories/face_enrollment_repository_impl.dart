@@ -30,7 +30,7 @@ class FaceEnrollmentRepositoryImpl implements FaceEnrollmentRepository {
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to upload photos'));
     }
   }
 

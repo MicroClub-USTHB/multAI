@@ -25,7 +25,7 @@ class PhotoApprovalRepositoryImpl implements PhotoApprovalRepository {
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to load approvals'));
     }
   }
 
@@ -43,7 +43,7 @@ class PhotoApprovalRepositoryImpl implements PhotoApprovalRepository {
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to process decision'));
     }
   }
 }

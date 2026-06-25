@@ -25,9 +25,9 @@ class EventsRepositoryImpl implements EventRepository {
       if (cached != null && cached.isNotEmpty) {
         return Right(cached.map((m) => m.toEntity()).toList());
       }
-      return Left(ServerFailure(message: 'No internet connection'));
+      return Left(const NetworkFailure('No internet connection'));
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to load events'));
     }
   }
 
@@ -39,7 +39,7 @@ class EventsRepositoryImpl implements EventRepository {
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to join event'));
     }
   }
 }

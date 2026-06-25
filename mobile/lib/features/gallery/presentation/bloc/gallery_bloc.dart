@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/errors/failure_handler.dart';
 import '../../domain/entities/photo_entity.dart';
 import '../../domain/usecases/get_my_photos_usecase.dart';
 import '../../domain/usecases/get_event_photos_usecase.dart';
@@ -13,14 +14,17 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
   final GetMyPhotosUseCase _getMyPhotos;
   final GetEventPhotosUseCase _getEventPhotos;
   final GetPhotoImageUseCase _getPhotoImage;
+  final FailureHandler _failureHandler;
 
   GalleryBloc({
     required GetMyPhotosUseCase getMyPhotos,
     required GetEventPhotosUseCase getEventPhotos,
     required GetPhotoImageUseCase getPhotoImage,
+    FailureHandler? failureHandler,
   }) : _getMyPhotos = getMyPhotos,
        _getEventPhotos = getEventPhotos,
        _getPhotoImage = getPhotoImage,
+       _failureHandler = failureHandler ?? FailureHandler.instance,
        super(GalleryInitial()) {
     on<LoadAllPhotos>(_onLoadAll);
     on<LoadEventPhotos>(_onLoadEvent);
@@ -28,7 +32,6 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     on<RefreshGallery>(_onRefresh);
   }
 
-  // ── Load all photos ────────────────────────────────────────────────────────
   Future<void> _onLoadAll(
     LoadAllPhotos event,
     Emitter<GalleryState> emit,
@@ -39,18 +42,17 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
       GetMyPhotosParams(limit: event.limit, offset: event.offset),
     );
 
-    result.fold((failure) => emit(GalleryError(message: failure.message)), (
-      photos,
-    ) {
-      emit(GalleryLoaded(allPhotos: photos));
-      // auto-load images for visible photos
-      for (final photo in photos.take(20)) {
-        add(LoadPhotoImage(photoId: photo.id));
-      }
-    });
+    result.fold(
+      (failure) => emit(GalleryError(message: _failureHandler.getUserFriendlyMessage(failure))),
+      (photos) {
+        emit(GalleryLoaded(allPhotos: photos));
+        for (final photo in photos.take(20)) {
+          add(LoadPhotoImage(photoId: photo.id));
+        }
+      },
+    );
   }
 
-  // ── Load event photos ──────────────────────────────────────────────────────
   Future<void> _onLoadEvent(
     LoadEventPhotos event,
     Emitter<GalleryState> emit,
@@ -66,17 +68,17 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
       ),
     );
 
-    result.fold((failure) => emit(GalleryError(message: failure.message)), (
-      data,
-    ) {
-      emit(current.copyWith(eventPhotos: data.items, eventTotal: data.total));
-      for (final photo in data.items.take(20)) {
-        add(LoadPhotoImage(photoId: photo.id));
-      }
-    });
+    result.fold(
+      (failure) => emit(GalleryError(message: _failureHandler.getUserFriendlyMessage(failure))),
+      (data) {
+        emit(current.copyWith(eventPhotos: data.items, eventTotal: data.total));
+        for (final photo in data.items.take(20)) {
+          add(LoadPhotoImage(photoId: photo.id));
+        }
+      },
+    );
   }
 
-  // ── Load single photo image — cache first ──────────────────────────────────
   Future<void> _onLoadImage(
     LoadPhotoImage event,
     Emitter<GalleryState> emit,
@@ -84,7 +86,6 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     final current = state;
     if (current is! GalleryLoaded) return;
 
-    // skip if already cached
     if (current.cachedPaths.containsKey(event.photoId)) return;
 
     final result = await _getPhotoImage(
@@ -92,7 +93,7 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     );
 
     result.fold(
-      (_) {}, // silent fail — show placeholder
+      (_) {},
       (localPath) {
         final updated = Map<String, String>.from(current.cachedPaths)
           ..[event.photoId] = localPath;
@@ -101,7 +102,6 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     );
   }
 
-  // ── Refresh ────────────────────────────────────────────────────────────────
   Future<void> _onRefresh(
     RefreshGallery event,
     Emitter<GalleryState> emit,
