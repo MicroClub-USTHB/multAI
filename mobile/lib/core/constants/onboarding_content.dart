@@ -2,31 +2,36 @@ import 'images.dart';
 
 class OnboardingSlide {
   final String image;
+  final String? secondImage;
   final String title;
-  final String highlight;
   final String description;
 
   const OnboardingSlide({
     required this.image,
+    this.secondImage,
     required this.title,
-    required this.highlight,
     required this.description,
   });
 }
 
 const List<OnboardingSlide> onboardingSlides = [
   OnboardingSlide(
-    image: AppImages.onboardingHero,
-    title: 'Discover Your',
-    highlight: 'Moments',
+    image: AppImages.onboarding1,
+    title: 'Your events,\ncaptured.',
     description:
-        'MultiAi uses advanced matching to surface your event photos automatically.',
+        'Join Micro Club events — our team captures every moment for you.',
   ),
   OnboardingSlide(
-    image: AppImages.mcLogoBackground,
-    title: 'Powered by',
-    highlight: 'Micro Club',
+    image: AppImages.onboarding2,
+    secondImage: AppImages.onboarding3,
+    title: 'Found\nautomatically.',
     description:
-        'Your profile stays consistent across the app with a clean branded identity.',
+        'Our AI finds your face across every photo from every event.',
+  ),
+  OnboardingSlide(
+    image: AppImages.onboarding3,
+    title: 'Keep your\nmoments.',
+    description:
+        'View, approve and download your photos whenever you want.',
   ),
 ];

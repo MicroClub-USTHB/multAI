@@ -3,44 +3,31 @@ import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class OnboardingButton extends StatelessWidget {
   final VoidCallback onTap;
-  final String text;
+  final bool isLast;
 
-  const OnboardingButton({super.key, required this.onTap, this.text = 'Next'});
+  const OnboardingButton({
+    super.key,
+    required this.onTap,
+    this.isLast = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: AppThemeColors.gold,
-            borderRadius: BorderRadius.circular(12),
-          ),
-
-          child: SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    text,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.arrow_forward, color: Colors.white),
-                ],
-              ),
-            ),
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: AppThemeColors.gold, width: 1.5),
+          color: isLast ? AppThemeColors.gold : Colors.transparent,
+        ),
+        child: Icon(
+          isLast ? Icons.check_rounded : Icons.arrow_forward_rounded,
+          color: isLast ? Colors.white : AppThemeColors.gold,
+          size: 22,
         ),
       ),
     );
