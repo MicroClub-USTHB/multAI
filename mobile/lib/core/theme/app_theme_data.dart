@@ -15,7 +15,7 @@ abstract class AppThemeData {
       primaryColor: AppThemeColors.primaryAccent,
       scaffoldBackgroundColor: AppThemeColors.background,
       cardColor: AppThemeColors.card,
-      splashFactory: InkSparkle.splashFactory,
+      splashFactory: InkRipple.splashFactory,
       colorScheme: const ColorScheme.dark(
         primary: AppThemeColors.primaryAccent,
         secondary: AppThemeColors.secondaryAccent,
@@ -23,11 +23,11 @@ abstract class AppThemeData {
         surfaceContainerHighest: AppThemeColors.surfaceHigh,
         error: AppThemeColors.error,
         outline: AppThemeColors.inputBorder,
-        onPrimary: Colors.black,
-        onSecondary: Colors.black,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
         onSurface: AppThemeColors.primaryText,
         onSurfaceVariant: AppThemeColors.secondaryText,
-        onError: Colors.white,
+        onError: Colors.black,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: AppThemeColors.background,
@@ -40,15 +40,15 @@ abstract class AppThemeData {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppThemeColors.button,
-          foregroundColor: Colors.black,
+          foregroundColor: Colors.white,
           disabledBackgroundColor: AppThemeColors.button.withValues(
             alpha: AppThemeMetrics.opacityDisabled,
           ),
-          disabledForegroundColor: Colors.black54,
+          disabledForegroundColor: Colors.white70,
           elevation: AppThemeMetrics.elevationNone,
-          minimumSize: const Size.fromHeight(52),
+          minimumSize: const Size.fromHeight(54),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
+            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusPill),
           ),
           textStyle: AppThemeTextStyles.buttonTextStyle,
         ),
@@ -60,11 +60,11 @@ abstract class AppThemeData {
             color: AppThemeColors.inputBorder,
             width: AppThemeMetrics.borderThick,
           ),
-          minimumSize: const Size.fromHeight(52),
+          minimumSize: const Size.fromHeight(54),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
+            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusPill),
           ),
-          backgroundColor: AppThemeColors.surface,
+          backgroundColor: Colors.transparent,
           textStyle: AppThemeTextStyles.buttonTextStyle,
         ),
       ),
