@@ -9,6 +9,7 @@ import '../../../../../core/extensions/string_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/widgets/app_error_view.dart';
 import '../../domain/validators/event_code_validator.dart';
 import 'package:multai_mobile/features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../bloc/events_bloc.dart';
@@ -163,62 +164,11 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  // ── Error state (no cached data, no network) ─────────────────────────────
   Widget _buildErrorState(BuildContext context) {
-    final tt = context.textTheme;
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(
-          context.widthCalculated(AppThemeMetrics.spacingXl),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.wifi_off_rounded,
-              size: context.iconSize() * 3,
-              color: AppThemeColors.secondaryText,
-            ),
-            SizedBox(
-              height: context.heightCalculated(AppThemeMetrics.spacingLg),
-            ),
-            Text(
-              'No internet connection',
-              style: tt.headlineSmall?.copyWith(
-                color: AppThemeColors.primaryText,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(
-              height: context.heightCalculated(AppThemeMetrics.spacingSm),
-            ),
-            Text(
-              'Please check your connection and try again.',
-              style: tt.bodySmall,
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(
-              height: context.heightCalculated(AppThemeMetrics.spacingXl),
-            ),
-            ElevatedButton.icon(
-              onPressed: () => context.read<EventsBloc>().add(
-                EventsRetryRequested(),
-              ),
-              icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: AppThemeColors.primaryText,
-                backgroundColor: AppThemeColors.gold,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    AppThemeMetrics.radiusSm,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return AppErrorView(
+      title: 'No internet connection',
+      subtitle: 'Please check your connection and try again.',
+      onRetry: () => context.read<EventsBloc>().add(EventsRetryRequested()),
     );
   }
 
