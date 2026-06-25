@@ -18,6 +18,7 @@ import 'package:multai_mobile/features/auth/domain/usecases/register_usecase.dar
 import 'package:multai_mobile/features/auth/domain/usecases/verify_register_usecase.dart';
 import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:multai_mobile/features/face_enrollment/domain/usecases/check_enrollment_done_usecase.dart';
+import 'package:multai_mobile/features/notifications/services/push_notification_service.dart';
 
 class MockRegisterUseCase extends Mock implements RegisterUseCase {}
 class MockVerifyRegisterUseCase extends Mock implements VerifyRegisterUseCase {}
@@ -26,6 +27,7 @@ class MockLogoutUseCase extends Mock implements LogoutUseCase {}
 class MockRefreshTokenUseCase extends Mock implements RefreshTokenUseCase {}
 class MockGetCurrentUserUseCase extends Mock implements GetCurrentUserUseCase {}
 class MockCheckEnrollmentDoneUseCase extends Mock implements CheckEnrollmentDoneUseCase {}
+class MockPushNotificationService extends Mock implements PushNotificationService {}
 
 void main() {
   late MockRegisterUseCase registerUseCase;
@@ -35,6 +37,7 @@ void main() {
   late MockRefreshTokenUseCase refreshTokenUseCase;
   late MockGetCurrentUserUseCase getCurrentUserUseCase;
   late MockCheckEnrollmentDoneUseCase checkEnrollmentDoneUseCase;
+  late MockPushNotificationService pushNotificationService;
   late AuthBloc authBloc;
 
   setUpAll(() {
@@ -71,6 +74,7 @@ void main() {
     refreshTokenUseCase = MockRefreshTokenUseCase();
     getCurrentUserUseCase = MockGetCurrentUserUseCase();
     checkEnrollmentDoneUseCase = MockCheckEnrollmentDoneUseCase();
+    pushNotificationService = MockPushNotificationService();
 
     authBloc = AuthBloc(
       loginUseCase: loginUseCase,
@@ -80,6 +84,7 @@ void main() {
       refreshTokenUseCase: refreshTokenUseCase,
       getCurrentUserUseCase: getCurrentUserUseCase,
       checkEnrollmentDone: checkEnrollmentDoneUseCase,
+      pushNotificationService: pushNotificationService,
     );
   });
 
