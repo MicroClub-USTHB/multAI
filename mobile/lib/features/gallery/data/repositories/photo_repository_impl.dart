@@ -33,7 +33,7 @@ class PhotoRepositoryImpl implements PhotoRepository {
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to load photos'));
     }
   }
 
@@ -56,28 +56,24 @@ class PhotoRepositoryImpl implements PhotoRepository {
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to load event photos'));
     }
   }
 
   @override
   Future<Either<Failure, String>> getPhotoImage(String photoId) async {
     try {
-      // ── 1. check cache first ─────────────────────────────────────────────
       final cached = await cacheService.getCachedPath(photoId);
       if (cached != null) return Right(cached);
 
-      // ── 2. download from backend ─────────────────────────────────────────
       final bytes = await remoteDataSource.getPhotoImageBytes(photoId);
-
-      // ── 3. save to cache ─────────────────────────────────────────────────
       final localPath = await cacheService.saveToCache(photoId, bytes);
 
       return Right(localPath);
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to load photo'));
     }
   }
 }

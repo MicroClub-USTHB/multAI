@@ -162,7 +162,7 @@ class DioClient {
           final newToken = await onTokenRefresh!();
           if (newToken == null) {
             onUnauthorized?.call();
-            throw const UnauthorizedFailure(message: 'Session expired');
+            throw const UnauthorizedFailure('Session expired');
           }
         }
       }
@@ -178,9 +178,49 @@ class DioClient {
           } catch (_) {}
         }
         onUnauthorized?.call();
-        throw const UnauthorizedFailure(message: 'Session expired. Please log in again.');
+        throw const UnauthorizedFailure('Session expired. Please log in again.');
       }
-      rethrow;
+      throw _convertDioException(e);
+    }
+  }
+
+  Failure _convertDioException(DioException e) {
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return const TimeoutFailure('Request timed out');
+      case DioExceptionType.connectionError:
+        return const NetworkFailure('Unable to connect');
+      case DioExceptionType.badResponse:
+        final statusCode = e.response?.statusCode;
+        if (statusCode == 429) {
+          return const RateLimitFailure('Too many requests');
+        }
+        return ServerFailure(
+          _parseDioError(e),
+          statusCode,
+        );
+      case DioExceptionType.cancel:
+        return const CancelledFailure();
+      case DioExceptionType.badCertificate:
+        return const NetworkFailure('Connection not secure');
+      default:
+        return const UnknownFailure('Request failed');
+    }
+  }
+
+  String _parseDioError(DioException e) {
+    try {
+      final data = e.response?.data;
+      if (data is Map) {
+        return (data['message'] as String?) ??
+            (data['error'] as String?) ??
+            'Server error ${e.response?.statusCode}';
+      }
+      return 'Server error ${e.response?.statusCode}';
+    } catch (_) {
+      return 'Server error ${e.response?.statusCode}';
     }
   }
 

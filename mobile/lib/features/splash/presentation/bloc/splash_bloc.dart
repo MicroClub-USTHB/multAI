@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/errors/logger.dart';
 import '../../../../core/network/network_info.dart';
 import '../../../../core/security/device_security.dart';
 import '../../../../core/security/secure_logger.dart';
@@ -16,12 +17,15 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
   final GetOnboardingSeen getOnboardingSeen;
   final IsUserLoggedIn isUserLoggedIn;
   final NetworkInfo networkInfo;
+  final Logger _logger;
 
   SplashBloc({
     required this.getOnboardingSeen,
     required this.isUserLoggedIn,
     required this.networkInfo,
-  }) : super(const SplashInitial()) {
+    Logger? logger,
+  }) : _logger = logger ?? Logger.create(),
+       super(const SplashInitial()) {
     on<InitializeApp>(_onInitializeApp);
     on<RetryConnection>(_onRetryConnection);
   }
@@ -65,8 +69,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       } else {
         emit(SplashOffline());
       }
-    } catch (e) {
-      SecureLogger.error('SplashBloc', 'Initialization failed', e);
+    } catch (e, s) {
+      _logger.error('SplashBloc', 'Initialization failed', e, s);
       emit(SplashError(message: 'Could not start the application.'));
     }
   }
@@ -94,8 +98,8 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       } else {
         emit(SplashOffline());
       }
-    } catch (e) {
-      SecureLogger.error('SplashBloc', 'Retry connection failed', e);
+    } catch (e, s) {
+      _logger.error('SplashBloc', 'Retry connection failed', e, s);
       emit(SplashError(message: 'Could not connect. Please try again.'));
     }
   }

@@ -34,7 +34,7 @@ class AccountRepositoryImpl implements AccountRepository {
       }
       return Left(f);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(const UnknownFailure('Failed to load account data'));
     }
   }
 }

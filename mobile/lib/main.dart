@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/errors/error_handler.dart';
+import 'core/errors/error_mapper.dart';
 import 'core/router/app_router.dart';
 import 'core/security/env_validator.dart';
 import 'core/security/device_security.dart';
@@ -24,6 +27,8 @@ void main() async {
   if (DeviceSecurity.isDebugMode()) {
     SecureLogger.warning('App', 'Running in debug mode');
   }
+
+  _setupGlobalErrorHandlers();
 
   try {
     await dotenv.load(fileName: '.env');
@@ -56,6 +61,29 @@ void main() async {
 
   await di.init();
   runApp(MyApp());
+}
+
+void _setupGlobalErrorHandlers() {
+  final errorHandler = ErrorHandler(
+    errorMapper: const ErrorMapper(),
+  );
+
+  FlutterError.onError = (details) {
+    final exception = errorHandler.wrapException(
+      details.exception,
+      stackTrace: details.stack,
+    );
+    errorHandler.handleException('FlutterError', exception);
+  };
+
+  PlatformDispatcher.instance.onError = (exception, stackTrace) {
+    final appException = errorHandler.wrapException(
+      exception,
+      stackTrace: stackTrace,
+    );
+    errorHandler.handleException('PlatformDispatcher', appException);
+    return true;
+  };
 }
 
 class MyApp extends StatefulWidget {

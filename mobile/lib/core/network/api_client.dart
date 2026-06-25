@@ -42,12 +42,10 @@ class ApiClient {
       final deviceInfo = DeviceInfoPlugin();
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
-        headers['X-Device-Info'] =
-            '${androidInfo.brand}/${androidInfo.model}';
+        headers['X-Device-Info'] = '${androidInfo.brand}/${androidInfo.model}';
       } else if (Platform.isIOS) {
         final iosInfo = await deviceInfo.iosInfo;
-        headers['X-Device-Info'] =
-            '${iosInfo.name}/${iosInfo.model}';
+        headers['X-Device-Info'] = '${iosInfo.name}/${iosInfo.model}';
       }
     } catch (_) {}
 
@@ -56,7 +54,7 @@ class ApiClient {
 
   Future<void> checkConnection() async {
     if (!await _networkInfo.isConnected) {
-      throw const NetworkFailure(message: 'No internet connection');
+      throw const NetworkFailure();
     }
   }
 
@@ -108,27 +106,7 @@ class ApiClient {
 
   void _handleVoidResponse(http.Response response) {
     if (response.statusCode == 200 || response.statusCode == 204) return;
-    switch (response.statusCode) {
-      case 400:
-      case 422:
-        throw ServerFailure(message: _parseError(response));
-      case 401:
-        throw const UnauthorizedFailure(
-          message: 'Session expired. Please log in again.',
-        );
-      case 403:
-        throw const ServerFailure(message: 'Access denied.');
-      case 404:
-        throw const ServerFailure(message: 'Resource not found.');
-      case 429:
-        throw const ServerFailure(
-          message: 'Too many attempts. Try again later.',
-        );
-      case 500:
-        throw const ServerFailure(message: 'Server error. Try again later.');
-      default:
-        throw ServerFailure(message: _parseError(response));
-    }
+    _throwForStatus(response);
   }
 
   Future<void> postMultipart(
@@ -162,10 +140,7 @@ class ApiClient {
           stream,
           length,
           filename: file.path.split('/').last,
-          contentType: MediaType(
-            'image',
-            _mimeTypeFromExtension(ext),
-          ),
+          contentType: MediaType('image', _mimeTypeFromExtension(ext)),
         ),
       );
     }
@@ -174,15 +149,11 @@ class ApiClient {
     final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 401) {
-      throw const UnauthorizedFailure(
-        message: 'Session expired. Please log in again.',
-      );
+      throw const UnauthorizedFailure('Session expired. Please log in again.');
     }
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw ServerFailure(
-        message: 'Failed to upload photos. Please try again.',
-      );
+      throw ServerFailure('Failed to upload photos. Please try again.', response.statusCode);
     }
   }
 
@@ -204,26 +175,26 @@ class ApiClient {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return jsonDecode(response.body);
     }
+    _throwForStatus(response);
+  }
+
+  void _throwForStatus(http.Response response) {
     switch (response.statusCode) {
       case 400:
       case 422:
-        throw ServerFailure(message: _parseError(response));
+        throw ServerFailure(_parseError(response), response.statusCode);
       case 401:
-        throw const UnauthorizedFailure(
-          message: 'Session expired. Please log in again.',
-        );
+        throw const UnauthorizedFailure('Session expired. Please log in again.');
       case 403:
-        throw const ServerFailure(message: 'Access denied.');
+        throw const ServerFailure('Access denied.');
       case 404:
-        throw const ServerFailure(message: 'Resource not found.');
+        throw NotFoundFailure(_parseError(response));
       case 429:
-        throw const ServerFailure(
-          message: 'Too many attempts. Try again later.',
-        );
+        throw const RateLimitFailure('Too many attempts. Try again later.');
       case 500:
-        throw const ServerFailure(message: 'Server error. Try again later.');
+        throw ServerFailure(_parseError(response), response.statusCode);
       default:
-        throw ServerFailure(message: _parseError(response));
+        throw ServerFailure(_parseError(response), response.statusCode);
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/errors/failure_handler.dart';
 import '../../../../core/network/network_info.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../domain/entities/event_entity.dart';
@@ -12,15 +13,18 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   final GetUserEventsUseCase _getUserEventsUseCase;
   final JoinEventUseCase _joinEventUseCase;
   final NetworkInfo _networkInfo;
+  final FailureHandler _failureHandler;
   StreamSubscription<bool>? _connectivitySubscription;
 
   EventsBloc({
     required GetUserEventsUseCase getUserEventsUseCase,
     required JoinEventUseCase joinEventUseCase,
     required NetworkInfo networkInfo,
+    FailureHandler? failureHandler,
   }) : _getUserEventsUseCase = getUserEventsUseCase,
        _joinEventUseCase = joinEventUseCase,
        _networkInfo = networkInfo,
+       _failureHandler = failureHandler ?? FailureHandler.instance,
        super(EventsInitial()) {
     on<GetUserEventsRequested>(_onGetUserEvents);
     on<JoinEventRequested>(_onJoinEvent);
@@ -64,6 +68,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     }
     final result = await _getUserEventsUseCase(NoParams());
     result.fold((failure) {
+      _failureHandler.logFailure(failure, 'EventsBloc');
       if (state is EventsLoaded) {
         final previous = state as EventsLoaded;
         emit(EventsLoaded(
@@ -73,7 +78,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
           isRefreshing: false,
         ));
       } else {
-        emit(EventsFailure(message: failure.message));
+        emit(EventsFailure(message: _failureHandler.getUserFriendlyMessage(failure)));
       }
     }, (events) {
       final active = events.where((e) => e.status != 'archived').toList();
@@ -94,12 +99,16 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     final result = await _joinEventUseCase(
       JoinEventParams(eventCode: event.eventCode),
     );
-    result.fold((failure) => emit(EventsFailure(message: failure.message)), (
-      _,
-    ) {
-      emit(JoinEventSuccess());
-      add(GetUserEventsRequested());
-    });
+    result.fold(
+      (failure) {
+        _failureHandler.logFailure(failure, 'EventsBloc');
+        emit(EventsFailure(message: _failureHandler.getUserFriendlyMessage(failure)));
+      },
+      (_) {
+        emit(JoinEventSuccess());
+        add(GetUserEventsRequested());
+      },
+    );
   }
 
   Future<void> _onEventsRetry(
@@ -119,6 +128,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     }
     final result = await _getUserEventsUseCase(NoParams());
     result.fold((failure) {
+      _failureHandler.logFailure(failure, 'EventsBloc');
       if (state is EventsLoaded) {
         final previous = state as EventsLoaded;
         emit(EventsLoaded(
@@ -128,7 +138,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
           isRefreshing: false,
         ));
       } else {
-        emit(EventsFailure(message: failure.message));
+        emit(EventsFailure(message: _failureHandler.getUserFriendlyMessage(failure)));
       }
     }, (events) {
       final active = events.where((e) => e.status != 'archived').toList();

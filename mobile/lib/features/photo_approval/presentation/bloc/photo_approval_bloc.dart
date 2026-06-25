@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/errors/failure_handler.dart';
 import '../../domain/entities/photo_approval_entity.dart';
 import '../../domain/usecases/get_approvals_usecase.dart';
 import '../../domain/usecases/decide_photo_approval_usecase.dart';
@@ -9,12 +10,15 @@ part 'photo_approval_state.dart';
 class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
   final GetApprovalsUsecase _getApprovals;
   final DecidePhotoApprovalUseCase _decideApproval;
+  final FailureHandler _failureHandler;
 
   PhotoApprovalBloc({
     required GetApprovalsUsecase getApprovals,
     required DecidePhotoApprovalUseCase decideApproval,
+    FailureHandler? failureHandler,
   }) : _getApprovals = getApprovals,
        _decideApproval = decideApproval,
+       _failureHandler = failureHandler ?? FailureHandler.instance,
        super(PhotoApprovalInitial()) {
     on<LoadApprovals>(_onLoadApprovals);
     on<LoadPendingApprovals>(_onLoadPending);
@@ -33,7 +37,10 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
     );
 
     result.fold(
-      (failure) => emit(PhotoApprovalError(message: failure.message)),
+      (failure) {
+        _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
+        emit(PhotoApprovalError(message: _failureHandler.getUserFriendlyMessage(failure)));
+      },
       (approvals) {
         final pending = approvals.where((a) => a.decision.isPending).toList();
         final history = approvals.where((a) => !a.decision.isPending).toList();
@@ -60,7 +67,10 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
     );
 
     result.fold(
-      (failure) => emit(PhotoApprovalError(message: failure.message)),
+      (failure) {
+        _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
+        emit(PhotoApprovalError(message: _failureHandler.getUserFriendlyMessage(failure)));
+      },
       (photoStatus) {
         emit(
           PhotoApprovalDecisionSuccess(
@@ -85,7 +95,10 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
     );
 
     result.fold(
-      (failure) => emit(PhotoApprovalError(message: failure.message)),
+      (failure) {
+        _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
+        emit(PhotoApprovalError(message: _failureHandler.getUserFriendlyMessage(failure)));
+      },
       (photoStatus) {
         emit(
           PhotoApprovalDecisionSuccess(

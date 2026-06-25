@@ -1,8 +1,8 @@
-import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bloc_test/bloc_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:multai_mobile/core/errors/failure.dart';
@@ -113,7 +113,7 @@ void main() {
       'emits [AuthLoading, AuthFailure] on server failure',
       build: () {
         when(() => registerUseCase(any())).thenAnswer(
-          (_) async => Left(ServerFailure(message: 'Email already in use')),
+          (_) async => Left(ServerFailure('Email already in use')),
         );
         return authBloc;
       },
@@ -205,7 +205,7 @@ void main() {
       'emits [AuthLoading, AuthFailure] on invalid OTP',
       build: () {
         when(() => verifyRegisterUseCase(any())).thenAnswer(
-          (_) async => Left(UnauthorizedFailure(message: 'Invalid or expired OTP')),
+          (_) async => Left(UnauthorizedFailure('Invalid or expired OTP')),
         );
         return authBloc;
       },
@@ -255,7 +255,7 @@ void main() {
       'emits [AuthLoading, AuthFailure] on invalid credentials',
       build: () {
         when(() => loginUseCase(any())).thenAnswer(
-          (_) async => Left(UnauthorizedFailure(message: 'Invalid credentials')),
+          (_) async => Left(UnauthorizedFailure('Invalid credentials')),
         );
         return authBloc;
       },
@@ -313,7 +313,7 @@ void main() {
       'emits [AuthLoading, AuthFailure] on failure',
       build: () {
         when(() => getCurrentUserUseCase(any())).thenAnswer(
-          (_) async => Left(ServerFailure(message: 'Failed to load user')),
+          (_) async => Left(ServerFailure('Failed to load user')),
         );
         return authBloc;
       },

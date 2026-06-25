@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/errors/failure.dart';
+import '../../../../core/errors/failure_handler.dart';
 import '../../domain/entities/face_photo_entity.dart';
 import '../../domain/usecases/upload_face_photos_usecase.dart';
 import '../../domain/usecases/save_enrollment_done_usecase.dart';
@@ -13,14 +15,17 @@ class FaceEnrollmentBloc
     extends Bloc<FaceEnrollmentEvent, FaceEnrollmentState> {
   final UploadFacePhotosUseCase _uploadFacePhotos;
   final SaveEnrollmentDoneUseCase _saveEnrollmentDone;
+  final FailureHandler _failureHandler;
 
   final Map<FacePhotoType, String> _photos = {};
 
   FaceEnrollmentBloc({
     required UploadFacePhotosUseCase uploadFacePhotos,
     required SaveEnrollmentDoneUseCase saveEnrollmentDone,
+    FailureHandler? failureHandler,
   }) : _uploadFacePhotos = uploadFacePhotos,
        _saveEnrollmentDone = saveEnrollmentDone,
+       _failureHandler = failureHandler ?? FailureHandler.instance,
        super(FaceEnrollmentInitial()) {
     on<PhotoSelected>(_onPhotoSelected);
     on<PhotoRemoved>(_onPhotoRemoved);
@@ -39,9 +44,10 @@ class FaceEnrollmentBloc
 
     result.fold(
       (failure) {
+        _failureHandler.logFailure(failure, 'FaceEnrollmentBloc');
         emit(
           FaceEnrollmentFailure(
-            message: failure.message,
+            message: _failureHandler.getUserFriendlyMessage(failure),
             photos: Map.from(_photos),
           ),
         );
@@ -74,15 +80,27 @@ class FaceEnrollmentBloc
       );
 
       await result.fold(
-        (failure) async =>
-            emit(FaceEnrollmentFailure(message: failure.message)),
+        (failure) async {
+          _failureHandler.logFailure(failure, 'FaceEnrollmentBloc');
+          emit(FaceEnrollmentFailure(
+            message: _failureHandler.getUserFriendlyMessage(failure),
+          ));
+        },
         (_) async {
           await _saveEnrollmentDone();
           emit(FaceEnrollmentSuccess());
         },
       );
     } catch (e) {
-      emit(FaceEnrollmentFailure(message: e.toString()));
+      _failureHandler.logFailure(
+        UnknownFailure('Enrollment failed'),
+        'FaceEnrollmentBloc',
+      );
+      emit(FaceEnrollmentFailure(
+        message: _failureHandler.getUserFriendlyMessage(
+          const UnknownFailure('Enrollment failed'),
+        ),
+      ));
     }
   }
 }
