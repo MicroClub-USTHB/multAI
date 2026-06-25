@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'core/errors/error_handler.dart';
 import 'core/errors/error_mapper.dart';
 import 'core/router/app_router.dart';
@@ -16,6 +17,8 @@ import 'features/auth/presentation/blocs/auth_bloc.dart';
 import 'features/events/presentation/bloc/events_bloc.dart';
 import 'features/account/presentation/bloc/account_bloc.dart';
 import 'features/notifications/presentation/bloc/notifications_bloc.dart';
+import 'features/notifications/services/push_notification_service.dart';
+import 'features/notifications/services/notification_navigation_service.dart';
 import 'features/gallery/presentation/bloc/gallery_bloc.dart';
 import 'di/injection_container.dart' as di;
 
@@ -60,6 +63,12 @@ void main() async {
   });
 
   await di.init();
+
+  await Firebase.initializeApp();
+
+  final pushService = di.sl<PushNotificationService>();
+  await pushService.init();
+
   runApp(MyApp());
 }
 
@@ -127,12 +136,21 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future<void> _initDeepLinks() async {
     _appLinks = AppLinks();
+
+    final initialUri = await _appLinks.getInitialLink();
+    if (initialUri != null) {
+      _handleDeepLink(initialUri);
+    }
+
     _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
       _handleDeepLink(uri);
     });
   }
 
-  void _handleDeepLink(Uri uri) {}
+  void _handleDeepLink(Uri uri) {
+    final nav = di.sl<NotificationNavigationService>();
+    nav.handleDeepLink(uri);
+  }
 
   @override
   Widget build(BuildContext context) {
