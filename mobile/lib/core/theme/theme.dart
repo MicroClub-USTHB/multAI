@@ -75,16 +75,28 @@ abstract class AppTheme {
   static const Color slateGray = AppThemeColors.subtitleText;
 
   // Metric aliases.
+  static const double radiusXs = AppThemeMetrics.radiusXs;
   static const double radiusSm = AppThemeMetrics.radiusSm;
   static const double radiusMd = AppThemeMetrics.radiusMd;
   static const double radiusLg = AppThemeMetrics.radiusLg;
   static const double radiusXl = AppThemeMetrics.radiusXl;
+  static const double radiusXxl = AppThemeMetrics.radiusXxl;
+  static const double radiusPill = AppThemeMetrics.radiusPill;
+  static const double spacing2xs = AppThemeMetrics.spacing2xs;
   static const double spacingXs = AppThemeMetrics.spacingXs;
   static const double spacingSm = AppThemeMetrics.spacingSm;
   static const double spacingMd = AppThemeMetrics.spacingMd;
   static const double spacingLg = AppThemeMetrics.spacingLg;
   static const double spacingXl = AppThemeMetrics.spacingXl;
   static const double spacingXxl = AppThemeMetrics.spacingXxl;
+  static const double spacing3xl = AppThemeMetrics.spacing3xl;
+  static const Duration durationFast = AppThemeMetrics.durationFast;
+  static const Duration durationMedium = AppThemeMetrics.durationMedium;
+  static const Duration durationSlow = AppThemeMetrics.durationSlow;
+  static const Curve curveStandard = AppThemeMetrics.curveStandard;
+  static const Curve curveEmphasized = AppThemeMetrics.curveEmphasized;
+  static const double largeScreenMinWidth =
+      AppThemeMetrics.largeScreenMinWidth;
   static const double activeCardAspectWidth =
       AppThemeMetrics.activeCardAspectWidth;
   static const double activeCardBreakpoint =

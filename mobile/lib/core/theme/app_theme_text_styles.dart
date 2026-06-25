@@ -43,15 +43,19 @@ abstract class AppThemeTextStyles {
     fontStyle: FontStyle.italic,
   );
 
-  static TextStyle get onboardingLargeText => GoogleFonts.publicSans(
+  static TextStyle get onboardingLargeText => GoogleFonts.raleway(
     color: AppThemeColors.primaryText,
     fontSize: 36,
+    fontWeight: FontWeight.w700,
+    height: 1.15,
+    letterSpacing: -0.5,
     fontStyle: FontStyle.normal,
   );
 
-  static TextStyle get onboardingMediumText => GoogleFonts.publicSans(
+  static TextStyle get onboardingMediumText => GoogleFonts.montserrat(
     color: AppThemeColors.subtitleText,
     fontSize: 18,
+    height: 1.5,
     fontStyle: FontStyle.normal,
   );
 
@@ -60,19 +64,22 @@ abstract class AppThemeTextStyles {
       color: AppThemeColors.primaryText,
       fontSize: 32,
       fontWeight: FontWeight.bold,
-      height: 1.2,
+      height: 1.15,
+      letterSpacing: -0.5,
     ),
     displayMedium: GoogleFonts.raleway(
       color: AppThemeColors.primaryText,
       fontSize: 28,
       fontWeight: FontWeight.bold,
       height: 1.2,
+      letterSpacing: -0.4,
     ),
     displaySmall: GoogleFonts.raleway(
       color: AppThemeColors.primaryText,
       fontSize: 24,
       fontWeight: FontWeight.bold,
       height: 1.3,
+      letterSpacing: -0.3,
     ),
     headlineLarge: GoogleFonts.raleway(
       color: AppThemeColors.primaryText,
