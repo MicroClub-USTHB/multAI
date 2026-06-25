@@ -7,6 +7,9 @@ class DeviceSecurity {
   static Future<bool> isDeviceCompromised() async {
     if (kIsWeb) return false;
 
+    // Skip security checks in debug mode (simulator, dev builds)
+    if (kDebugMode) return false;
+
     try {
       if (Platform.isAndroid) {
         return await _isAndroidRooted();
@@ -52,7 +55,6 @@ class DeviceSecurity {
     final jailbreakPaths = [
       '/Applications/Cydia.app',
       '/Library/MobileSubstrate/MobileSubstrate.dylib',
-      '/bin/bash',
       '/usr/sbin/sshd',
       '/etc/apt',
       '/private/var/lib/apt',
