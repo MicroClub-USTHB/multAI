@@ -13,7 +13,6 @@ part 'notifications_state.dart';
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final GetNotificationsUsecase _getNotifications;
   final MarkAsReadUsecase _markAsRead;
-  final RegisterPushTokenUseCase _registerPushToken;
   final FailureHandler _failureHandler;
 
   NotificationBloc({
@@ -23,14 +22,12 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     FailureHandler? failureHandler,
   }) : _getNotifications = getNotifications,
        _markAsRead = markAsRead,
-       _registerPushToken = registerPushToken,
        _failureHandler = failureHandler ?? FailureHandler.instance,
        super(NotificationInitial()) {
     on<LoadNotifications>(_onLoad);
     on<MarkNotificationRead>(_onMarkRead);
     on<MarkSingleNotificationRead>(_onMarkSingleRead);
     on<MarkAllNotificationsRead>(_onMarkAllRead);
-    on<PushTokenReceived>(_onPushTokenReceived);
     on<PushNotificationReceived>(_onPushReceived);
   }
 
@@ -113,15 +110,6 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     if (unreadIds.isEmpty) return;
 
     add(MarkNotificationRead(notificationIds: unreadIds));
-  }
-
-  Future<void> _onPushTokenReceived(
-    PushTokenReceived event,
-    Emitter<NotificationState> emit,
-  ) async {
-    await _registerPushToken(
-      RegisterPushTokenParams(deviceId: event.deviceId, token: event.token),
-    );
   }
 
   void _onPushReceived(

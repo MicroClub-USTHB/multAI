@@ -10,8 +10,24 @@ import '../bloc/notifications_bloc.dart';
 import '../../domain/entities/notification_entity.dart';
 import '../widgets/notification_card.dart';
 
-class NotificationsScreen extends StatelessWidget {
+class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
+
+  @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  bool _initialLoad = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialLoad) {
+      _initialLoad = false;
+      context.read<NotificationBloc>().add(LoadNotifications());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,12 +79,7 @@ class NotificationsScreen extends StatelessWidget {
   Widget _buildBody(BuildContext context, NotificationState state) {
     final cs = context.theme.colorScheme;
 
-    if (state is NotificationInitial) {
-      context.read<NotificationBloc>().add(LoadNotifications());
-      return Center(child: CircularProgressIndicator(color: cs.primary));
-    }
-
-    if (state is NotificationLoading) {
+    if (state is NotificationInitial || state is NotificationLoading) {
       return Center(child: CircularProgressIndicator(color: cs.primary));
     }
 
@@ -99,29 +110,28 @@ class NotificationsScreen extends StatelessWidget {
     return const SizedBox.shrink();
   }
 
-  // ── Handle tap based on notification type ─────────────────────────────────
   void _onNotificationTap(
     BuildContext context,
     NotificationEntity notification,
   ) {
-    // mark as read
     if (!notification.isRead) {
       context.read<NotificationBloc>().add(
         MarkNotificationRead(notificationIds: [notification.id]),
       );
     }
 
-    // navigate based on type
     switch (notification.type) {
       case NotificationType.photoApproval:
-        context.push(AppRoutes.photoApproval);
-        break;
+        final photoId = notification.payload['photo_id'];
+        if (photoId != null) {
+          context.push('${AppRoutes.photoApproval}?photoId=$photoId');
+        } else {
+          context.push(AppRoutes.photoApproval);
+        }
       case NotificationType.photoDistributed:
         context.push(AppRoutes.gallery);
-        break;
       case NotificationType.eventInvite:
         context.push(AppRoutes.events);
-        break;
       case NotificationType.system:
       case NotificationType.unknown:
         break;
