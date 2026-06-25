@@ -1,37 +1,14 @@
-import 'package:flutter/foundation.dart';
-
 import 'app_exception.dart';
 
 class ErrorMapper {
-  final bool isDebug;
-
-  const ErrorMapper({this.isDebug = kDebugMode});
+  const ErrorMapper();
 
   String getUserFriendlyMessage(AppException exception) {
-    if (isDebug) {
-      return _debugMessage(exception);
-    }
     return _productionMessage(exception);
   }
 
   String getLogMessage(AppException exception) {
     return exception.debugInfo;
-  }
-
-  String _debugMessage(AppException exception) {
-    final buffer = StringBuffer()
-      ..writeln(exception.message)
-      ..writeln('[${exception.runtimeType}]');
-    if (exception.statusCode != null) {
-      buffer.writeln('HTTP ${exception.statusCode}');
-    }
-    if (exception.requestId != null) {
-      buffer.writeln('ReqID: ${exception.requestId}');
-    }
-    if (exception.provider != null) {
-      buffer.writeln('Provider: ${exception.provider}');
-    }
-    return buffer.toString().trim();
   }
 
   String _productionMessage(AppException exception) {

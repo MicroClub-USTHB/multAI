@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'app_exception.dart';
@@ -10,7 +9,7 @@ class ErrorHandler {
   final Logger _logger;
 
   ErrorHandler({ErrorMapper? errorMapper, Logger? logger})
-    : _errorMapper = errorMapper ?? ErrorMapper(isDebug: kDebugMode),
+    : _errorMapper = errorMapper ?? const ErrorMapper(),
       _logger = logger ?? Logger.create();
 
   void handleException(
