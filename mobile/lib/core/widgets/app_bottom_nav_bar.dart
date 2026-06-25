@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../constants/nav_items.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../features/notifications/presentation/bloc/notifications_bloc.dart';
 
 class AppBottomNavBar extends StatelessWidget {
@@ -14,43 +15,49 @@ class AppBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 72,
       decoration: const BoxDecoration(
         color: AppThemeColors.background,
         border: Border(
-          top: BorderSide(color: AppThemeColors.inputBorder, width: 0.5),
+          top: BorderSide(
+            color: AppThemeColors.divider,
+            width: AppThemeMetrics.borderHairline,
+          ),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: navItems.map((data) {
-          final isSelected = currentRoute.startsWith(data.route);
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: navItems.map((data) {
+              final isSelected = currentRoute.startsWith(data.route);
 
-          // ── notifications tab needs unread badge ────────────────────
-          if (data.item == NavItem.notifications) {
-            return BlocBuilder<NotificationBloc, NotificationState>(
-              builder: (context, state) {
-                final unread = state is NotificationLoaded
-                    ? state.unreadCount
-                    : 0;
-                return _NavBarItem(
-                  icon: data.icon,
-                  label: data.label,
-                  isSelected: isSelected,
-                  badgeCount: unread,
-                  onTap: () => context.go(data.route),
+              if (data.item == NavItem.notifications) {
+                return BlocBuilder<NotificationBloc, NotificationState>(
+                  builder: (context, state) {
+                    final unread =
+                        state is NotificationLoaded ? state.unreadCount : 0;
+                    return _NavBarItem(
+                      icon: data.icon,
+                      label: data.label,
+                      isSelected: isSelected,
+                      badgeCount: unread,
+                      onTap: () => context.go(data.route),
+                    );
+                  },
                 );
-              },
-            );
-          }
+              }
 
-          return _NavBarItem(
-            icon: data.icon,
-            label: data.label,
-            isSelected: isSelected,
-            onTap: () => context.go(data.route),
-          );
-        }).toList(),
+              return _NavBarItem(
+                icon: data.icon,
+                label: data.label,
+                isSelected: isSelected,
+                onTap: () => context.go(data.route),
+              );
+            }).toList(),
+          ),
+        ),
       ),
     );
   }
@@ -75,29 +82,49 @@ class _NavBarItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = isSelected
         ? AppThemeColors.primaryAccent
-        : AppThemeColors.secondaryText;
+        : AppThemeColors.tabUnselectedText;
 
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        width: 80,
+        width: 72,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Icon(icon, color: color, size: 26),
+                // Active pill behind the icon.
+                AnimatedContainer(
+                  duration: AppThemeMetrics.durationFast,
+                  curve: AppThemeMetrics.curveStandard,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppThemeMetrics.spacingMd,
+                    vertical: AppThemeMetrics.spacingXs + 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppThemeColors.primaryAccent.withValues(alpha: 0.14)
+                        : Colors.transparent,
+                    borderRadius:
+                        BorderRadius.circular(AppThemeMetrics.radiusPill),
+                  ),
+                  child: Icon(icon, color: color, size: AppThemeMetrics.iconMd),
+                ),
                 if (badgeCount > 0)
                   Positioned(
-                    top: -4,
-                    right: -6,
+                    top: -2,
+                    right: 0,
                     child: Container(
                       padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppThemeColors.error,
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppThemeColors.background,
+                          width: AppThemeMetrics.borderThin,
+                        ),
                       ),
                       constraints: const BoxConstraints(
                         minWidth: 16,
@@ -116,14 +143,14 @@ class _NavBarItem extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppThemeMetrics.spacingXs),
             Text(
               label,
               style: TextStyle(
                 color: color,
                 fontSize: 10,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.2,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                letterSpacing: 0.8,
               ),
             ),
           ],
