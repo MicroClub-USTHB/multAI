@@ -60,6 +60,7 @@ import '../features/notifications/domain/usecases/register_push_token_usecase.da
 import '../features/notifications/domain/usecases/revoke_push_token_usecase.dart';
 import '../features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../features/notifications/services/push_notification_service.dart';
+import '../features/notifications/services/notification_navigation_service.dart';
 // Photo Approval ─────────────────────────────────────────────
 import '../features/photo_approval/presentation/bloc/photo_approval_bloc.dart';
 import '../features/photo_approval/data/datasources/photo_approval_remote_datasource.dart';
@@ -296,11 +297,17 @@ Future<void> init() async {
     () => RevokePushTokenUsecase(sl<NotificationsRepository>()),
   );
 
+  // Notification Navigation Service
+  sl.registerLazySingleton(
+    () => NotificationNavigationService(),
+  );
+
   // Push Notification Service
   sl.registerLazySingleton(
     () => PushNotificationService(
       registerToken: sl<RegisterPushTokenUseCase>(),
       revokeToken: sl<RevokePushTokenUsecase>(),
+      navigationService: sl<NotificationNavigationService>(),
     ),
   );
 

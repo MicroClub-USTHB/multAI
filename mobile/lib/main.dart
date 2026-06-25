@@ -68,6 +68,7 @@ void main() async {
 
   final pushService = di.sl<PushNotificationService>();
   await pushService.init();
+  di.sl<NotificationNavigationService>().init(appRouter);
 
   runApp(MyApp());
 }
