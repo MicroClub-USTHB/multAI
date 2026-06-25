@@ -88,7 +88,7 @@ class AccountScreen extends StatelessWidget {
                 height: context.heightCalculated(AppThemeMetrics.spacingSm),
               ),
               Text(
-                state.message,
+                'Please check your connection and try again.',
                 style: context.textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
