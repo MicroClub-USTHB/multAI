@@ -63,9 +63,7 @@ class AppErrorView extends StatelessWidget {
                 foregroundColor: AppThemeColors.primaryText,
                 backgroundColor: AppThemeColors.gold,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    AppThemeMetrics.radiusSm,
-                  ),
+                  borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
                 ),
               ),
             ),

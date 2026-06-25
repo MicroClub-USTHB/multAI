@@ -26,9 +26,7 @@ class ApiClient {
   String? get currentAccessToken => _accessToken;
 
   Future<Map<String, String>> _getHeaders({bool requiresAuth = false}) async {
-    final headers = <String, String>{
-      'Content-Type': 'application/json',
-    };
+    final headers = <String, String>{'Content-Type': 'application/json'};
     if (_accessToken != null) {
       headers['Authorization'] = 'Bearer $_accessToken';
     }
@@ -153,7 +151,10 @@ class ApiClient {
     }
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw ServerFailure('Failed to upload photos. Please try again.', response.statusCode);
+      throw ServerFailure(
+        'Failed to upload photos. Please try again.',
+        response.statusCode,
+      );
     }
   }
 
@@ -184,7 +185,9 @@ class ApiClient {
       case 422:
         throw ServerFailure(_parseError(response), response.statusCode);
       case 401:
-        throw const UnauthorizedFailure('Session expired. Please log in again.');
+        throw const UnauthorizedFailure(
+          'Session expired. Please log in again.',
+        );
       case 403:
         throw const ServerFailure('Access denied.');
       case 404:

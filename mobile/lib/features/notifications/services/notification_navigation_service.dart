@@ -36,7 +36,7 @@ class NotificationNavigationService {
   void handleDeepLink(Uri uri) {
     if (_router == null) return;
 
-    final path = uri.path;
+    final path = uri.path.replaceAll('_', '-');
     final queryParams = uri.queryParameters;
 
     if (path.contains('photo-approval')) {

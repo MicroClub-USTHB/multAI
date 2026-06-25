@@ -21,13 +21,22 @@ import 'package:multai_mobile/features/face_enrollment/domain/usecases/check_enr
 import 'package:multai_mobile/features/notifications/services/push_notification_service.dart';
 
 class MockRegisterUseCase extends Mock implements RegisterUseCase {}
+
 class MockVerifyRegisterUseCase extends Mock implements VerifyRegisterUseCase {}
+
 class MockLoginUseCase extends Mock implements LoginUseCase {}
+
 class MockLogoutUseCase extends Mock implements LogoutUseCase {}
+
 class MockRefreshTokenUseCase extends Mock implements RefreshTokenUseCase {}
+
 class MockGetCurrentUserUseCase extends Mock implements GetCurrentUserUseCase {}
-class MockCheckEnrollmentDoneUseCase extends Mock implements CheckEnrollmentDoneUseCase {}
-class MockPushNotificationService extends Mock implements PushNotificationService {}
+
+class MockCheckEnrollmentDoneUseCase extends Mock
+    implements CheckEnrollmentDoneUseCase {}
+
+class MockPushNotificationService extends Mock
+    implements PushNotificationService {}
 
 void main() {
   late MockRegisterUseCase registerUseCase;
@@ -41,23 +50,27 @@ void main() {
   late AuthBloc authBloc;
 
   setUpAll(() {
-    registerFallbackValue(LoginParams(
-      email: 'test@test.com',
-      password: 'pass',
-      deviceName: 'test',
-      deviceType: 'test',
-      deviceId: 'test',
-    ));
-    registerFallbackValue(VerifyRegisterParams(
-      loginParams: LoginParams(
+    registerFallbackValue(
+      LoginParams(
         email: 'test@test.com',
         password: 'pass',
         deviceName: 'test',
         deviceType: 'test',
         deviceId: 'test',
       ),
-      otp: '123456',
-    ));
+    );
+    registerFallbackValue(
+      VerifyRegisterParams(
+        loginParams: LoginParams(
+          email: 'test@test.com',
+          password: 'pass',
+          deviceName: 'test',
+          deviceType: 'test',
+          deviceId: 'test',
+        ),
+        otp: '123456',
+      ),
+    );
     registerFallbackValue(RefreshTokenParams(refreshToken: 'token'));
     registerFallbackValue(NoParams());
   });
@@ -75,6 +88,10 @@ void main() {
     getCurrentUserUseCase = MockGetCurrentUserUseCase();
     checkEnrollmentDoneUseCase = MockCheckEnrollmentDoneUseCase();
     pushNotificationService = MockPushNotificationService();
+    when(
+      () => pushNotificationService.registerCurrentToken(),
+    ).thenAnswer((_) async {});
+    when(() => pushNotificationService.revokeToken()).thenAnswer((_) async {});
 
     authBloc = AuthBloc(
       loginUseCase: loginUseCase,
@@ -96,19 +113,15 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthOtpSent] on success',
       build: () {
-        when(() => registerUseCase(any())).thenAnswer(
-          (_) async => const Right(null),
-        );
+        when(
+          () => registerUseCase(any()),
+        ).thenAnswer((_) async => const Right(null));
         return authBloc;
       },
-      act: (bloc) => bloc.add(SendOtpRequested(
-        email: 'test@test.com',
-        password: 'Password1!',
-      )),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<AuthOtpSent>(),
-      ],
+      act: (bloc) => bloc.add(
+        SendOtpRequested(email: 'test@test.com', password: 'Password1!'),
+      ),
+      expect: () => [isA<AuthLoading>(), isA<AuthOtpSent>()],
       verify: (_) {
         verify(() => registerUseCase(any())).called(1);
       },
@@ -117,35 +130,29 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthFailure] on server failure',
       build: () {
-        when(() => registerUseCase(any())).thenAnswer(
-          (_) async => Left(ServerFailure('Email already in use')),
-        );
+        when(
+          () => registerUseCase(any()),
+        ).thenAnswer((_) async => Left(ServerFailure('Email already in use')));
         return authBloc;
       },
-      act: (bloc) => bloc.add(SendOtpRequested(
-        email: 'existing@test.com',
-        password: 'Password1!',
-      )),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<AuthFailure>(),
-      ],
+      act: (bloc) => bloc.add(
+        SendOtpRequested(email: 'existing@test.com', password: 'Password1!'),
+      ),
+      expect: () => [isA<AuthLoading>(), isA<AuthFailure>()],
     );
 
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthFailure] on exception',
       build: () {
-        when(() => registerUseCase(any())).thenThrow(Exception('Network error'));
+        when(
+          () => registerUseCase(any()),
+        ).thenThrow(Exception('Network error'));
         return authBloc;
       },
-      act: (bloc) => bloc.add(SendOtpRequested(
-        email: 'test@test.com',
-        password: 'Password1!',
-      )),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<AuthFailure>(),
-      ],
+      act: (bloc) => bloc.add(
+        SendOtpRequested(email: 'test@test.com', password: 'Password1!'),
+      ),
+      expect: () => [isA<AuthLoading>(), isA<AuthFailure>()],
       verify: (_) {
         verify(() => registerUseCase(any())).called(1);
       },
@@ -165,45 +172,49 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthNeedsFaceEnrollment] when face enrollment not done',
       build: () {
-        when(() => verifyRegisterUseCase(any())).thenAnswer(
-          (_) async => Right(authEntity),
-        );
-        when(() => checkEnrollmentDoneUseCase.call()).thenAnswer(
-          (_) async => false,
-        );
+        when(
+          () => verifyRegisterUseCase(any()),
+        ).thenAnswer((_) async => Right(authEntity));
+        when(
+          () => checkEnrollmentDoneUseCase.call(),
+        ).thenAnswer((_) async => false);
         return authBloc;
       },
-      act: (bloc) => bloc.add(VerifyOtpRequested(
-        email: 'test@test.com',
-        password: 'Password1!',
-        otp: '123456',
-      )),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<AuthNeedsFaceEnrollment>(),
-      ],
+      act: (bloc) => bloc.add(
+        VerifyOtpRequested(
+          email: 'test@test.com',
+          password: 'Password1!',
+          otp: '123456',
+        ),
+      ),
+      expect: () => [isA<AuthLoading>(), isA<AuthNeedsFaceEnrollment>()],
+      verify: (_) {
+        verify(() => pushNotificationService.registerCurrentToken()).called(1);
+      },
     );
 
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthAuthenticated] when face enrollment done',
       build: () {
-        when(() => verifyRegisterUseCase(any())).thenAnswer(
-          (_) async => Right(authEntity),
-        );
-        when(() => checkEnrollmentDoneUseCase.call()).thenAnswer(
-          (_) async => true,
-        );
+        when(
+          () => verifyRegisterUseCase(any()),
+        ).thenAnswer((_) async => Right(authEntity));
+        when(
+          () => checkEnrollmentDoneUseCase.call(),
+        ).thenAnswer((_) async => true);
         return authBloc;
       },
-      act: (bloc) => bloc.add(VerifyOtpRequested(
-        email: 'test@test.com',
-        password: 'Password1!',
-        otp: '123456',
-      )),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<AuthAuthenticated>(),
-      ],
+      act: (bloc) => bloc.add(
+        VerifyOtpRequested(
+          email: 'test@test.com',
+          password: 'Password1!',
+          otp: '123456',
+        ),
+      ),
+      expect: () => [isA<AuthLoading>(), isA<AuthAuthenticated>()],
+      verify: (_) {
+        verify(() => pushNotificationService.registerCurrentToken()).called(1);
+      },
     );
 
     blocTest<AuthBloc, AuthState>(
@@ -214,15 +225,14 @@ void main() {
         );
         return authBloc;
       },
-      act: (bloc) => bloc.add(VerifyOtpRequested(
-        email: 'test@test.com',
-        password: 'Password1!',
-        otp: '000000',
-      )),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<AuthFailure>(),
-      ],
+      act: (bloc) => bloc.add(
+        VerifyOtpRequested(
+          email: 'test@test.com',
+          password: 'Password1!',
+          otp: '000000',
+        ),
+      ),
+      expect: () => [isA<AuthLoading>(), isA<AuthFailure>()],
     );
   });
 
@@ -238,22 +248,21 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthAuthenticated] on success',
       build: () {
-        when(() => loginUseCase(any())).thenAnswer(
-          (_) async => Right(authEntity),
-        );
-        when(() => checkEnrollmentDoneUseCase.call()).thenAnswer(
-          (_) async => true,
-        );
+        when(
+          () => loginUseCase(any()),
+        ).thenAnswer((_) async => Right(authEntity));
+        when(
+          () => checkEnrollmentDoneUseCase.call(),
+        ).thenAnswer((_) async => true);
         return authBloc;
       },
-      act: (bloc) => bloc.add(LoginRequested(
-        email: 'test@test.com',
-        password: 'Password1!',
-      )),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<AuthAuthenticated>(),
-      ],
+      act: (bloc) => bloc.add(
+        LoginRequested(email: 'test@test.com', password: 'Password1!'),
+      ),
+      expect: () => [isA<AuthLoading>(), isA<AuthAuthenticated>()],
+      verify: (_) {
+        verify(() => pushNotificationService.registerCurrentToken()).called(1);
+      },
     );
 
     blocTest<AuthBloc, AuthState>(
@@ -264,14 +273,9 @@ void main() {
         );
         return authBloc;
       },
-      act: (bloc) => bloc.add(LoginRequested(
-        email: 'wrong@test.com',
-        password: 'bad',
-      )),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<AuthFailure>(),
-      ],
+      act: (bloc) =>
+          bloc.add(LoginRequested(email: 'wrong@test.com', password: 'bad')),
+      expect: () => [isA<AuthLoading>(), isA<AuthFailure>()],
     );
   });
 
@@ -279,16 +283,19 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, Unauthenticated] on success',
       build: () {
-        when(() => logoutUseCase(any())).thenAnswer(
-          (_) async => const Right(null),
-        );
+        when(
+          () => logoutUseCase(any()),
+        ).thenAnswer((_) async => const Right(null));
+        when(
+          () => pushNotificationService.revokeToken(),
+        ).thenAnswer((_) async {});
         return authBloc;
       },
       act: (bloc) => bloc.add(LogoutRequested()),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<Unauthenticated>(),
-      ],
+      expect: () => [isA<AuthLoading>(), isA<Unauthenticated>()],
+      verify: (_) {
+        verify(() => pushNotificationService.revokeToken()).called(1);
+      },
     );
   });
 
@@ -302,31 +309,25 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, GetCurrentUserSuccess] on success',
       build: () {
-        when(() => getCurrentUserUseCase(any())).thenAnswer(
-          (_) async => Right(meEntity),
-        );
+        when(
+          () => getCurrentUserUseCase(any()),
+        ).thenAnswer((_) async => Right(meEntity));
         return authBloc;
       },
       act: (bloc) => bloc.add(GetCurrentUserRequested()),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<GetCurrentUserSuccess>(),
-      ],
+      expect: () => [isA<AuthLoading>(), isA<GetCurrentUserSuccess>()],
     );
 
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthFailure] on failure',
       build: () {
-        when(() => getCurrentUserUseCase(any())).thenAnswer(
-          (_) async => Left(ServerFailure('Failed to load user')),
-        );
+        when(
+          () => getCurrentUserUseCase(any()),
+        ).thenAnswer((_) async => Left(ServerFailure('Failed to load user')));
         return authBloc;
       },
       act: (bloc) => bloc.add(GetCurrentUserRequested()),
-      expect: () => [
-        isA<AuthLoading>(),
-        isA<AuthFailure>(),
-      ],
+      expect: () => [isA<AuthLoading>(), isA<AuthFailure>()],
     );
   });
 }

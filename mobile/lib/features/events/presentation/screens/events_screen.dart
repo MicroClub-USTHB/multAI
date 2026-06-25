@@ -195,9 +195,7 @@ class _EventsScreenState extends State<EventsScreen> {
       decoration: BoxDecoration(
         color: AppThemeColors.gold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
-        border: Border.all(
-          color: AppThemeColors.gold.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: AppThemeColors.gold.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

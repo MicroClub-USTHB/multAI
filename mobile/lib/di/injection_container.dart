@@ -108,13 +108,9 @@ Future<void> init() async {
     ),
   );
 
-  sl.registerLazySingleton(
-    () => ApiClient(networkInfo: sl<NetworkInfo>()),
-  );
+  sl.registerLazySingleton(() => ApiClient(networkInfo: sl<NetworkInfo>()));
 
-  sl.registerLazySingleton<DioClient>(
-    () => DioClient(),
-  );
+  sl.registerLazySingleton<DioClient>(() => DioClient());
   // ── Onboarding ─────────────────────────────────────────────────────────────
   sl.registerFactory<SplashBloc>(
     () => SplashBloc(
@@ -300,9 +296,7 @@ Future<void> init() async {
   );
 
   // Notification Navigation Service
-  sl.registerLazySingleton(
-    () => NotificationNavigationService(),
-  );
+  sl.registerLazySingleton(() => NotificationNavigationService());
 
   // Push Notification Service
   sl.registerLazySingleton(
@@ -350,9 +344,7 @@ Future<void> init() async {
     ),
   );
   // Cache Service
-  sl.registerLazySingleton(
-    () => PhotoCacheService(),
-  );
+  sl.registerLazySingleton(() => PhotoCacheService());
 
   // Gallery Remote DataSource
   sl.registerLazySingleton<PhotoRemoteDataSource>(

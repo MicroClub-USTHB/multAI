@@ -47,7 +47,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class PushNotificationService {
-  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  final FirebaseMessaging _fcm;
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
@@ -61,9 +61,11 @@ class PushNotificationService {
     required RegisterPushTokenUseCase registerToken,
     required RevokePushTokenUsecase revokeToken,
     required NotificationNavigationService navigationService,
+    FirebaseMessaging? fcm,
   }) : _registerToken = registerToken,
        _revokeToken = revokeToken,
-       _navigationService = navigationService;
+       _navigationService = navigationService,
+       _fcm = fcm ?? FirebaseMessaging.instance;
 
   Future<void> init() async {
     if (_initialized) return;
@@ -177,9 +179,7 @@ class PushNotificationService {
       onDidReceiveNotificationResponse: (details) {
         final payload = details.payload;
         if (payload != null) {
-          _navigationService.handleDeepLink(
-            Uri.parse('/$payload'),
-          );
+          _navigationService.handleDeepLink(Uri.parse('/$payload'));
         }
       },
     );

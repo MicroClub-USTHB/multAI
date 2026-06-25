@@ -33,16 +33,18 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   }
 
   void _listenToConnectivity() {
-    _connectivitySubscription = _networkInfo.onConnectivityChanged.listen(
-      (isConnected) {
-        if (isConnected && state is EventsLoaded && (state as EventsLoaded).isOffline) {
-          add(GetUserEventsRequested());
-        }
-        if (isConnected && state is EventsFailure) {
-          add(GetUserEventsRequested());
-        }
-      },
-    );
+    _connectivitySubscription = _networkInfo.onConnectivityChanged.listen((
+      isConnected,
+    ) {
+      if (isConnected &&
+          state is EventsLoaded &&
+          (state as EventsLoaded).isOffline) {
+        add(GetUserEventsRequested());
+      }
+      if (isConnected && state is EventsFailure) {
+        add(GetUserEventsRequested());
+      }
+    });
   }
 
   @override
@@ -57,38 +59,51 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   ) async {
     if (state is EventsLoaded) {
       final previous = state as EventsLoaded;
-      emit(EventsLoaded(
-        activeEvents: previous.activeEvents,
-        archivedEvents: previous.archivedEvents,
-        isOffline: previous.isOffline,
-        isRefreshing: true,
-      ));
+      emit(
+        EventsLoaded(
+          activeEvents: previous.activeEvents,
+          archivedEvents: previous.archivedEvents,
+          isOffline: previous.isOffline,
+          isRefreshing: true,
+        ),
+      );
     } else {
       emit(EventsLoading());
     }
     final result = await _getUserEventsUseCase(NoParams());
-    result.fold((failure) {
-      _failureHandler.logFailure(failure, 'EventsBloc');
-      if (state is EventsLoaded) {
-        final previous = state as EventsLoaded;
-        emit(EventsLoaded(
-          activeEvents: previous.activeEvents,
-          archivedEvents: previous.archivedEvents,
-          isOffline: true,
-          isRefreshing: false,
-        ));
-      } else {
-        emit(EventsFailure(message: _failureHandler.getUserFriendlyMessage(failure)));
-      }
-    }, (events) {
-      final active = events.where((e) => e.status != 'archived').toList();
-      final archived = events.where((e) => e.status == 'archived').toList();
-      emit(EventsLoaded(
-        activeEvents: active,
-        archivedEvents: archived,
-        isRefreshing: false,
-      ));
-    });
+    result.fold(
+      (failure) {
+        _failureHandler.logFailure(failure, 'EventsBloc');
+        if (state is EventsLoaded) {
+          final previous = state as EventsLoaded;
+          emit(
+            EventsLoaded(
+              activeEvents: previous.activeEvents,
+              archivedEvents: previous.archivedEvents,
+              isOffline: true,
+              isRefreshing: false,
+            ),
+          );
+        } else {
+          emit(
+            EventsFailure(
+              message: _failureHandler.getUserFriendlyMessage(failure),
+            ),
+          );
+        }
+      },
+      (events) {
+        final active = events.where((e) => e.status != 'archived').toList();
+        final archived = events.where((e) => e.status == 'archived').toList();
+        emit(
+          EventsLoaded(
+            activeEvents: active,
+            archivedEvents: archived,
+            isRefreshing: false,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _onJoinEvent(
@@ -102,7 +117,11 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     result.fold(
       (failure) {
         _failureHandler.logFailure(failure, 'EventsBloc');
-        emit(EventsFailure(message: _failureHandler.getUserFriendlyMessage(failure)));
+        emit(
+          EventsFailure(
+            message: _failureHandler.getUserFriendlyMessage(failure),
+          ),
+        );
       },
       (_) {
         emit(JoinEventSuccess());
@@ -117,37 +136,50 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
   ) async {
     if (state is EventsLoaded) {
       final previous = state as EventsLoaded;
-      emit(EventsLoaded(
-        activeEvents: previous.activeEvents,
-        archivedEvents: previous.archivedEvents,
-        isOffline: previous.isOffline,
-        isRefreshing: true,
-      ));
+      emit(
+        EventsLoaded(
+          activeEvents: previous.activeEvents,
+          archivedEvents: previous.archivedEvents,
+          isOffline: previous.isOffline,
+          isRefreshing: true,
+        ),
+      );
     } else {
       emit(EventsLoading());
     }
     final result = await _getUserEventsUseCase(NoParams());
-    result.fold((failure) {
-      _failureHandler.logFailure(failure, 'EventsBloc');
-      if (state is EventsLoaded) {
-        final previous = state as EventsLoaded;
-        emit(EventsLoaded(
-          activeEvents: previous.activeEvents,
-          archivedEvents: previous.archivedEvents,
-          isOffline: true,
-          isRefreshing: false,
-        ));
-      } else {
-        emit(EventsFailure(message: _failureHandler.getUserFriendlyMessage(failure)));
-      }
-    }, (events) {
-      final active = events.where((e) => e.status != 'archived').toList();
-      final archived = events.where((e) => e.status == 'archived').toList();
-      emit(EventsLoaded(
-        activeEvents: active,
-        archivedEvents: archived,
-        isRefreshing: false,
-      ));
-    });
+    result.fold(
+      (failure) {
+        _failureHandler.logFailure(failure, 'EventsBloc');
+        if (state is EventsLoaded) {
+          final previous = state as EventsLoaded;
+          emit(
+            EventsLoaded(
+              activeEvents: previous.activeEvents,
+              archivedEvents: previous.archivedEvents,
+              isOffline: true,
+              isRefreshing: false,
+            ),
+          );
+        } else {
+          emit(
+            EventsFailure(
+              message: _failureHandler.getUserFriendlyMessage(failure),
+            ),
+          );
+        }
+      },
+      (events) {
+        final active = events.where((e) => e.status != 'archived').toList();
+        final archived = events.where((e) => e.status == 'archived').toList();
+        emit(
+          EventsLoaded(
+            activeEvents: active,
+            archivedEvents: archived,
+            isRefreshing: false,
+          ),
+        );
+      },
+    );
   }
 }

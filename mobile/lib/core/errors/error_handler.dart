@@ -52,10 +52,7 @@ class ErrorHandler {
       );
   }
 
-  void showSuccess(
-    BuildContext context,
-    String message,
-  ) {
+  void showSuccess(BuildContext context, String message) {
     _logger.info('UI', 'Success: $message');
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()

@@ -6,7 +6,10 @@ import '../entities/user_entity.dart';
 abstract class AuthRepository {
   Future<Either<Failure, String?>> getToken();
   Future<Either<Failure, void>> register(LoginParams params);
-  Future<Either<Failure, AuthEntity>> verifyRegister(LoginParams params, String otp);
+  Future<Either<Failure, AuthEntity>> verifyRegister(
+    LoginParams params,
+    String otp,
+  );
   Future<Either<Failure, AuthEntity>> login(LoginParams params);
   Future<Either<Failure, AuthEntity>> refreshToken(String refreshToken);
   Future<Either<Failure, void>> logout();

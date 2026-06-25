@@ -38,13 +38,14 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     emit(NotificationLoading());
 
     final result = await _getNotifications(NoParams());
-    result.fold(
-      (failure) {
-        _failureHandler.logFailure(failure, 'NotificationBloc');
-        emit(NotificationError(message: _failureHandler.getUserFriendlyMessage(failure)));
-      },
-      (list) => emit(NotificationLoaded(notifications: list)),
-    );
+    result.fold((failure) {
+      _failureHandler.logFailure(failure, 'NotificationBloc');
+      emit(
+        NotificationError(
+          message: _failureHandler.getUserFriendlyMessage(failure),
+        ),
+      );
+    }, (list) => emit(NotificationLoaded(notifications: list)));
   }
 
   Future<void> _onMarkRead(
@@ -69,7 +70,11 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           }).toList();
           emit(NotificationLoaded(notifications: updated));
         } else {
-          emit(NotificationError(message: _failureHandler.getUserFriendlyMessage(failure)));
+          emit(
+            NotificationError(
+              message: _failureHandler.getUserFriendlyMessage(failure),
+            ),
+          );
         }
       },
       (updated) {

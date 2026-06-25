@@ -52,9 +52,7 @@ void main() async {
     SecureLogger.warning('App', 'Using non-HTTPS base URL');
   }
 
-  sessionManager = SessionManager(
-    timeoutDuration: const Duration(minutes: 15),
-  );
+  sessionManager = SessionManager(timeoutDuration: const Duration(minutes: 15));
 
   di.registerSessionManager(sessionManager);
 
@@ -74,9 +72,7 @@ void main() async {
 }
 
 void _setupGlobalErrorHandlers() {
-  final errorHandler = ErrorHandler(
-    errorMapper: const ErrorMapper(),
-  );
+  final errorHandler = ErrorHandler(errorMapper: const ErrorMapper());
 
   FlutterError.onError = (details) {
     final exception = errorHandler.wrapException(
@@ -159,9 +155,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       providers: [
         BlocProvider<AuthBloc>(create: (_) => di.sl<AuthBloc>()),
         BlocProvider<AccountBloc>(create: (_) => di.sl<AccountBloc>()),
-        BlocProvider<EventsBloc>(
-          create: (_) => di.sl<EventsBloc>(),
-        ),
+        BlocProvider<EventsBloc>(create: (_) => di.sl<EventsBloc>()),
         BlocProvider<NotificationBloc>(
           create: (_) => di.sl<NotificationBloc>(),
         ),

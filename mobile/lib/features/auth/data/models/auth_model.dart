@@ -37,10 +37,7 @@ class RegisterVerifyRequestModel extends AuthRequestModel {
   });
 
   @override
-  Map<String, dynamic> toJson() => {
-    ...super.toJson(),
-    'otp': otp,
-  };
+  Map<String, dynamic> toJson() => {...super.toJson(), 'otp': otp};
 }
 
 class AuthResponseModel extends AuthEntity {

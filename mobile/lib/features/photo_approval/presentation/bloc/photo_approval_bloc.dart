@@ -39,7 +39,11 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
     result.fold(
       (failure) {
         _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
-        emit(PhotoApprovalError(message: _failureHandler.getUserFriendlyMessage(failure)));
+        emit(
+          PhotoApprovalError(
+            message: _failureHandler.getUserFriendlyMessage(failure),
+          ),
+        );
       },
       (approvals) {
         final pending = approvals.where((a) => a.decision.isPending).toList();
@@ -69,7 +73,11 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
     result.fold(
       (failure) {
         _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
-        emit(PhotoApprovalError(message: _failureHandler.getUserFriendlyMessage(failure)));
+        emit(
+          PhotoApprovalError(
+            message: _failureHandler.getUserFriendlyMessage(failure),
+          ),
+        );
       },
       (photoStatus) {
         emit(
@@ -97,7 +105,11 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
     result.fold(
       (failure) {
         _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
-        emit(PhotoApprovalError(message: _failureHandler.getUserFriendlyMessage(failure)));
+        emit(
+          PhotoApprovalError(
+            message: _failureHandler.getUserFriendlyMessage(failure),
+          ),
+        );
       },
       (photoStatus) {
         emit(

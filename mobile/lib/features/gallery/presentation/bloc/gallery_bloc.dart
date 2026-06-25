@@ -6,7 +6,6 @@ import '../../domain/usecases/get_my_photos_usecase.dart';
 import '../../domain/usecases/get_event_photos_usecase.dart';
 import '../../domain/usecases/get_photo_image_usecase.dart';
 
-
 part 'gallery_event.dart';
 part 'gallery_state.dart';
 
@@ -43,7 +42,9 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     );
 
     result.fold(
-      (failure) => emit(GalleryError(message: _failureHandler.getUserFriendlyMessage(failure))),
+      (failure) => emit(
+        GalleryError(message: _failureHandler.getUserFriendlyMessage(failure)),
+      ),
       (photos) {
         emit(GalleryLoaded(allPhotos: photos));
         for (final photo in photos.take(20)) {
@@ -69,7 +70,9 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     );
 
     result.fold(
-      (failure) => emit(GalleryError(message: _failureHandler.getUserFriendlyMessage(failure))),
+      (failure) => emit(
+        GalleryError(message: _failureHandler.getUserFriendlyMessage(failure)),
+      ),
       (data) {
         emit(current.copyWith(eventPhotos: data.items, eventTotal: data.total));
         for (final photo in data.items.take(20)) {
@@ -92,14 +95,11 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
       GetPhotoImageParams(photoId: event.photoId),
     );
 
-    result.fold(
-      (_) {},
-      (localPath) {
-        final updated = Map<String, String>.from(current.cachedPaths)
-          ..[event.photoId] = localPath;
-        emit(current.copyWith(cachedPaths: updated));
-      },
-    );
+    result.fold((_) {}, (localPath) {
+      final updated = Map<String, String>.from(current.cachedPaths)
+        ..[event.photoId] = localPath;
+      emit(current.copyWith(cachedPaths: updated));
+    });
   }
 
   Future<void> _onRefresh(

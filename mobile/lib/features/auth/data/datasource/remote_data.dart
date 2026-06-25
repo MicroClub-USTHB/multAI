@@ -22,14 +22,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> register(AuthRequestModel request) async {
-    await apiClient.postVoid(
-      EndPoints.register,
-      body: request.toJson(),
-    );
+    await apiClient.postVoid(EndPoints.register, body: request.toJson());
   }
 
   @override
-  Future<AuthResponseModel> verifyRegister(RegisterVerifyRequestModel request) async {
+  Future<AuthResponseModel> verifyRegister(
+    RegisterVerifyRequestModel request,
+  ) async {
     final json = await apiClient.post(
       EndPoints.registerVerify,
       body: request.toJson(),
@@ -39,10 +38,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<AuthResponseModel> login(AuthRequestModel request) async {
-    final json = await apiClient.post(
-      EndPoints.login,
-      body: request.toJson(),
-    );
+    final json = await apiClient.post(EndPoints.login, body: request.toJson());
     return AuthResponseModel.fromJson(json);
   }
 

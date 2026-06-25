@@ -15,15 +15,16 @@ void main() {
   late MockAuthBloc mockAuthBloc;
 
   setUpAll(() {
-    registerFallbackValue(SendOtpRequested(
-      email: 'test@test.com',
-      password: 'Password1!',
-    ));
-    registerFallbackValue(VerifyOtpRequested(
-      email: 'test@test.com',
-      password: 'Password1!',
-      otp: '123456',
-    ));
+    registerFallbackValue(
+      SendOtpRequested(email: 'test@test.com', password: 'Password1!'),
+    );
+    registerFallbackValue(
+      VerifyOtpRequested(
+        email: 'test@test.com',
+        password: 'Password1!',
+        otp: '123456',
+      ),
+    );
   });
 
   setUp(() async {
@@ -44,8 +45,9 @@ void main() {
     );
   }
 
-  testWidgets('renders email, password, confirm password fields initially',
-      (WidgetTester tester) async {
+  testWidgets('renders email, password, confirm password fields initially', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(buildTestWidget());
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
@@ -56,8 +58,9 @@ void main() {
     expect(find.text('Sign Up'), findsOneWidget);
   });
 
-  testWidgets('shows OTP input when AuthOtpSent state is emitted',
-      (WidgetTester tester) async {
+  testWidgets('shows OTP input when AuthOtpSent state is emitted', (
+    WidgetTester tester,
+  ) async {
     whenListen(
       mockAuthBloc,
       Stream.fromIterable([AuthOtpSent(email: 'test@test.com')]),
@@ -74,8 +77,9 @@ void main() {
     expect(find.text('Go back'), findsOneWidget);
   });
 
-  testWidgets('shows loading indicator when AuthLoading state is emitted',
-      (WidgetTester tester) async {
+  testWidgets('shows loading indicator when AuthLoading state is emitted', (
+    WidgetTester tester,
+  ) async {
     whenListen(
       mockAuthBloc,
       Stream.fromIterable([AuthLoading()]),
@@ -89,8 +93,9 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsWidgets);
   });
 
-  testWidgets('sends SendOtpRequested when Sign Up button is tapped',
-      (WidgetTester tester) async {
+  testWidgets('sends SendOtpRequested when Sign Up button is tapped', (
+    WidgetTester tester,
+  ) async {
     when(() => mockAuthBloc.state).thenReturn(AuthInitial());
 
     await tester.pumpWidget(buildTestWidget());
@@ -106,8 +111,9 @@ void main() {
     verify(() => mockAuthBloc.add(any<SendOtpRequested>())).called(1);
   });
 
-  testWidgets('sends VerifyOtpRequested when Verify OTP is tapped',
-      (WidgetTester tester) async {
+  testWidgets('sends VerifyOtpRequested when Verify OTP is tapped', (
+    WidgetTester tester,
+  ) async {
     whenListen(
       mockAuthBloc,
       Stream.fromIterable([AuthOtpSent(email: 'test@test.com')]),

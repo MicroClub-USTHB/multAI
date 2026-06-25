@@ -18,10 +18,7 @@ class EventsLocalDataSourceImpl implements EventsLocalDataSource {
   Future<void> cacheEvents(List<EventModel> events) async {
     final jsonList = events.map((e) => e.toJson()).toList();
     final raw = jsonEncode(jsonList);
-    await localStorage.setSecureString(
-      StorageKeys.cachedEvents,
-      raw,
-    );
+    await localStorage.setSecureString(StorageKeys.cachedEvents, raw);
   }
 
   @override

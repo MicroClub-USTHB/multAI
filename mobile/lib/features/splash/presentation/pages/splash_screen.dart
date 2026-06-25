@@ -52,15 +52,13 @@ class _SplashScreenState extends State<SplashScreen>
         curve: const Interval(0.3, 0.7, curve: Curves.easeIn),
       ),
     );
-    _progressSlide = Tween<Offset>(
-      begin: const Offset(0, 0.15),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.3, 0.7, curve: Curves.easeOutCubic),
-      ),
-    );
+    _progressSlide =
+        Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.3, 0.7, curve: Curves.easeOutCubic),
+          ),
+        );
     _footerFade = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
@@ -217,9 +215,8 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: AppThemeMetrics.spacingXl),
               ElevatedButton.icon(
-                onPressed: () => context.read<SplashBloc>().add(
-                  const RetryConnection(),
-                ),
+                onPressed: () =>
+                    context.read<SplashBloc>().add(const RetryConnection()),
                 icon: const Icon(Icons.refresh),
                 label: const Text('Retry'),
                 style: ElevatedButton.styleFrom(

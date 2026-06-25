@@ -16,10 +16,7 @@ class AccountLocalDataSourceImpl implements AccountLocalDataSource {
   @override
   Future<void> cacheAccountData(AccountModel account) async {
     final raw = jsonEncode(account.toJson());
-    await localStorage.setSecureString(
-      StorageKeys.cachedAccount,
-      raw,
-    );
+    await localStorage.setSecureString(StorageKeys.cachedAccount, raw);
   }
 
   @override

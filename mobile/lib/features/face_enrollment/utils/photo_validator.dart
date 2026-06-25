@@ -32,7 +32,9 @@ class PhotoProcessor {
       final ext = p.extension(filePath).replaceFirst('.', '').toLowerCase();
       if (!_allowedExtensions.contains(ext)) {
         return const Left(
-          InvalidFileFormatFailure('Invalid format. Use JPG, PNG, HEIC, or WEBP.'),
+          InvalidFileFormatFailure(
+            'Invalid format. Use JPG, PNG, HEIC, or WEBP.',
+          ),
         );
       }
 
@@ -41,9 +43,7 @@ class PhotoProcessor {
       final int initialSize = await file.length();
       if (initialSize > _maxFileSizeBytes * 2) {
         // Allow some headroom before compression
-        return const Left(
-          FileTooLargeFailure('Original image is too large.'),
-        );
+        return const Left(FileTooLargeFailure('Original image is too large.'));
       }
 
       // 4. Transform: Compression
