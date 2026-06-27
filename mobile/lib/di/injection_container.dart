@@ -14,6 +14,7 @@ import '../core/network/api_client.dart';
 import '../core/network/connectivity_service.dart';
 import '../core/network/dio_client.dart';
 import '../core/storage/app_local_storage.dart';
+import '../core/errors/failure_handler.dart';
 
 // Onboarding
 import '../features/onboarding/data/repositories/onboarding_repository_impl.dart';
@@ -124,6 +125,10 @@ Future<void> init() async {
     ),
   );
 
+  sl.registerLazySingleton<FailureHandler>(
+    () => FailureHandler(),
+  );
+
   // ── Onboarding ─────────────────────────────────────────────────────────────
   sl.registerFactory<SplashBloc>(
     () => SplashBloc(
@@ -220,6 +225,7 @@ Future<void> init() async {
     () => FaceEnrollmentBloc(
       uploadFacePhotos: sl<UploadFacePhotosUseCase>(),
       saveEnrollmentDone: sl<SaveEnrollmentDoneUseCase>(),
+      failureHandler: sl<FailureHandler>(),
     ),
   );
 
