@@ -92,6 +92,63 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
     });
   }
 
+  void _showPrivacySheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppThemeColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color:
+                          AppThemeColors.primaryAccent.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.lock_outline,
+                      size: 22,
+                      color: AppThemeColors.primaryAccent,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Your data is protected',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppThemeColors.primaryText,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Biometric data is encrypted end-to-end. '
+                'We never share your photos with third parties. '
+                'Your face data is stored securely and used only '
+                'for identity verification.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppThemeColors.secondaryText,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<FaceEnrollmentBloc, FaceEnrollmentState>(
@@ -101,61 +158,86 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
           return const _SuccessScreen();
         }
 
+        final type = _pageTypes[_currentPage];
+        final currentPhoto = state.photos[type];
+        final isOptional = _currentPage >= FacePhotoType.required.length;
+        final allRequiredDone = state.canSubmit;
+        final isLastPage = _currentPage == _pageTypes.length - 1;
+        final canGoNext = currentPhoto != null || isOptional;
+
         return Scaffold(
           backgroundColor: AppThemeColors.background,
           appBar: _AppBar(),
           body: Stack(
             children: [
-              SafeArea(
-                child: Column(
-                  children: [
-                    _ProgressHeader(
-                      state: state,
-                      currentStep: _currentPage,
-                    ),
-                    Expanded(
-                      child: AbsorbPointer(
-                        absorbing: state.isSubmitting,
-                        child: PageView.builder(
-                          controller: _pageController,
-                          onPageChanged: _onPageChanged,
-                          itemCount: _pageTypes.length,
-                          itemBuilder: (context, index) => RepaintBoundary(
-                            key: ValueKey('step_$index'),
-                            child: TweenAnimationBuilder<double>(
-                              key: ValueKey('enter_$index'),
-                              tween: Tween(begin: 0.0, end: 1.0),
-                              duration: AppThemeMetrics.durationMedium,
-                              curve: Curves.easeOut,
-                              builder: (context, value, child) {
-                                return Opacity(
-                                  opacity: value,
-                                  child: Transform.translate(
-                                    offset: Offset(0, 20 * (1 - value)),
-                                    child: child,
-                                  ),
-                                );
-                              },
-                              child: _EnrollmentStepPage(
+              Column(
+                children: [
+                  // Progress header (thin)
+                  _ProgressHeader(
+                    state: state,
+                    currentStep: _currentPage,
+                  ),
+
+                  // Hero content area
+                  Expanded(
+                    child: AbsorbPointer(
+                      absorbing: state.isSubmitting,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        onPageChanged: _onPageChanged,
+                        itemCount: _pageTypes.length,
+                        itemBuilder: (context, index) => RepaintBoundary(
+                          key: ValueKey('step_$index'),
+                          child: TweenAnimationBuilder<double>(
+                            key: ValueKey('enter_$index'),
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration: AppThemeMetrics.durationMedium,
+                            curve: Curves.easeOut,
+                            builder: (context, value, child) {
+                              return Opacity(
+                                opacity: value,
+                                child: Transform.translate(
+                                  offset: Offset(0, 20 * (1 - value)),
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: _StepPage(
                               type: _pageTypes[index],
-                              index: index,
-                              totalPages: _pageTypes.length,
-                              isOptional:
-                                  index >= FacePhotoType.required.length,
                               state: state,
-                              onPrevious: index > 0 ? _goPrevious : null,
-                              onNext: _goNext,
-                              onSubmit: () => context
-                                  .read<FaceEnrollmentBloc>()
-                                  .add(EnrollmentSubmitted()),
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  ],
-                ),
+
+                  // Privacy info bar
+                  _PrivacyBar(
+                    onTap: () => _showPrivacySheet(context),
+                  ),
+
+                  // Fixed bottom navigation
+                  StepNavigation(
+                    canGoPrevious: _currentPage > 0,
+                    canGoNext: canGoNext,
+                    isLastPage: isLastPage,
+                    isOptional: isOptional,
+                    allRequiredDone: allRequiredDone,
+                    isSubmitting: state.isSubmitting,
+                    onPrevious: _currentPage > 0 ? _goPrevious : null,
+                    onNext: canGoNext ? _goNext : null,
+                    onSkipOptional:
+                        isOptional && allRequiredDone
+                            ? () => context
+                                .read<FaceEnrollmentBloc>()
+                                .add(EnrollmentSubmitted())
+                            : null,
+                    onSubmit: () => context
+                        .read<FaceEnrollmentBloc>()
+                        .add(EnrollmentSubmitted()),
+                  ),
+                ],
               ),
               if (state.isSubmitting) const _LoadingOverlay(),
             ],
@@ -180,9 +262,11 @@ class _ProgressHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.hPadding(),
-        vertical: context.heightCalculated(8),
+      padding: EdgeInsets.only(
+        left: context.hPadding(),
+        right: context.hPadding(),
+        top: 12,
+        bottom: 8,
       ),
       child: EnrollmentProgress(
         currentStep: currentStep,
@@ -194,27 +278,15 @@ class _ProgressHeader extends StatelessWidget {
   }
 }
 
-// ── Enrollment Step Page ──────────────────────────────────────────────────────
+// ── Step Page ────────────────────────────────────────────────────────────────
 
-class _EnrollmentStepPage extends StatelessWidget {
+class _StepPage extends StatelessWidget {
   final FacePhotoType type;
-  final int index;
-  final int totalPages;
-  final bool isOptional;
   final FaceEnrollmentState state;
-  final VoidCallback? onPrevious;
-  final VoidCallback? onNext;
-  final VoidCallback? onSubmit;
 
-  const _EnrollmentStepPage({
+  const _StepPage({
     required this.type,
-    required this.index,
-    required this.totalPages,
-    required this.isOptional,
     required this.state,
-    this.onPrevious,
-    this.onNext,
-    this.onSubmit,
   });
 
   @override
@@ -223,31 +295,27 @@ class _EnrollmentStepPage extends StatelessWidget {
     final currentPhoto = state.photos[type];
     final currentError = state.photoErrors[type];
     final isLoading = state.loadingPhotoTypes.contains(type);
-    final allRequiredDone = state.canSubmit;
-    final isLastPage = index == totalPages - 1;
-    final canGoPrevious = index > 0;
-    final canGoNext = currentPhoto != null || isOptional;
 
-    return SingleChildScrollView(
+    return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: context.hPadding(),
-        vertical: context.heightCalculated(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const SizedBox(height: 4),
           // Step title
           Semantics(
             header: true,
             child: Text(
               type.label,
-              style: tt.headlineMedium?.copyWith(
+              style: tt.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppThemeColors.primaryText,
               ),
             ),
           ),
-          SizedBox(height: context.heightCalculated(4)),
+          const SizedBox(height: 4),
           // Description
           Text(
             _description,
@@ -256,42 +324,29 @@ class _EnrollmentStepPage extends StatelessWidget {
                   .theme.colorScheme.onSurface
                   .withValues(alpha: 0.7),
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          SizedBox(height: context.heightCalculated(16)),
-          // Photo slot
-          _PhotoSlotWidget(
-            type: type,
-            filePath: currentPhoto,
-            isLoading: isLoading,
-            error: currentError,
-            isOptional: isOptional,
+          const SizedBox(height: 12),
+          // Photo hero — takes all remaining space
+          Expanded(
+            child: PhotoSlot(
+              type: type,
+              filePath: currentPhoto,
+              isLoading: isLoading,
+              error: currentError,
+              onTap: () => _pickPhoto(context, type),
+              onDelete: currentPhoto != null
+                  ? () => context
+                      .read<FaceEnrollmentBloc>()
+                      .add(PhotoRemoved(type: type))
+                  : null,
+            ),
           ),
-          SizedBox(height: context.heightCalculated(16)),
-          // Instructions
-          StepInstructions(
-            type: type,
-            isLastOfRequired: !isOptional && index == FacePhotoType.required.length - 1,
-          ),
-          SizedBox(height: context.heightCalculated(20)),
-          // Privacy card
-          _PrivacyCard(),
-          SizedBox(height: context.heightCalculated(20)),
-          // Navigation
-          StepNavigation(
-            canGoPrevious: canGoPrevious,
-            canGoNext: canGoNext,
-            isLastPage: isLastPage,
-            isOptional: isOptional,
-            allRequiredDone: allRequiredDone,
-            isSubmitting: state.isSubmitting,
-            onPrevious: canGoPrevious ? onPrevious : null,
-            onNext: canGoNext ? onNext : null,
-            onSkipOptional: isOptional && allRequiredDone
-                ? onSubmit
-                : null,
-            onSubmit: onSubmit,
-          ),
-          SizedBox(height: context.heightCalculated(24)),
+          const SizedBox(height: 12),
+          // Instructions (compact)
+          StepInstructions(type: type),
+          const SizedBox(height: 8),
         ],
       ),
     );
@@ -300,51 +355,54 @@ class _EnrollmentStepPage extends StatelessWidget {
   String get _description {
     switch (type) {
       case FacePhotoType.frontal:
-        return 'Take a clear photo of your face looking directly at the camera. This will be your primary identification photo.';
+        return 'Look directly at the camera for your primary identification photo.';
       case FacePhotoType.leftProfile:
-        return 'Turn your head to the left so we can capture your left profile. Make sure your face is fully visible.';
+        return 'Turn your head to the left so we can capture your left profile.';
       case FacePhotoType.rightProfile:
-        return 'Turn your head to the right to complete your profile set. Keep a natural, relaxed posture.';
+        return 'Turn your head to the right to complete your profile set.';
       case FacePhotoType.extra1:
-        return 'Optional: Add an extra photo from a different angle to improve recognition accuracy.';
+        return 'Add an extra photo from a different angle (optional).';
       case FacePhotoType.extra2:
-        return 'Optional: One more photo from another angle helps our AI recognize you more reliably.';
+        return 'One more photo from another angle (optional).';
     }
   }
 }
 
-// ── Photo Slot Widget ─────────────────────────────────────────────────────────
+// ── Privacy Bar ───────────────────────────────────────────────────────────────
 
-class _PhotoSlotWidget extends StatelessWidget {
-  final FacePhotoType type;
-  final String? filePath;
-  final bool isLoading;
-  final String? error;
-  final bool isOptional;
+class _PrivacyBar extends StatelessWidget {
+  final VoidCallback onTap;
 
-  const _PhotoSlotWidget({
-    required this.type,
-    this.filePath,
-    required this.isLoading,
-    this.error,
-    this.isOptional = false,
-  });
+  const _PrivacyBar({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return PhotoSlot(
-      type: type,
-      filePath: filePath,
-      isLoading: isLoading,
-      error: error,
-      isOptional: isOptional,
-      height: 280,
-      onTap: () => _pickPhoto(context, type),
-      onDelete: filePath != null
-          ? () => context
-                .read<FaceEnrollmentBloc>()
-                .add(PhotoRemoved(type: type))
-          : null,
+    final tt = context.textTheme;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 6,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.lock_outline,
+              size: 12,
+              color: AppThemeColors.secondaryText.withValues(alpha: 0.5),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'Encrypted & protected',
+              style: tt.labelSmall?.copyWith(
+                color: AppThemeColors.secondaryText.withValues(alpha: 0.5),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -376,81 +434,13 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
         header: true,
         child: Text(
           'Face Enrollment',
-          style: context.textTheme.headlineSmall?.copyWith(
+          style: context.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: AppThemeColors.primaryText,
           ),
         ),
       ),
       centerTitle: true,
-    );
-  }
-}
-
-// ── Privacy Card ────────────────────────────────────────────────────────────
-
-class _PrivacyCard extends StatelessWidget {
-  const _PrivacyCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = context.textTheme;
-    final cs = context.theme.colorScheme;
-
-    return Semantics(
-      label:
-          'Privacy information. Your biometric data is encrypted and secured.',
-      child: Container(
-        padding: EdgeInsets.all(context.widthCalculated(16)),
-        decoration: BoxDecoration(
-          color: AppThemeColors.surfaceHigh.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
-          border: Border.all(
-            color: AppThemeColors.inputBorder.withValues(alpha: 0.2),
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.all(context.widthCalculated(8)),
-              decoration: BoxDecoration(
-                color: AppThemeColors.primaryAccent.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
-              ),
-              child: Icon(
-                Icons.lock_outline,
-                size: context.iconSize(),
-                color: AppThemeColors.primaryAccent,
-              ),
-            ),
-            SizedBox(width: context.widthCalculated(12)),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Your data is protected',
-                    style: tt.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppThemeColors.primaryText,
-                    ),
-                  ),
-                  SizedBox(height: context.heightCalculated(4)),
-                  Text(
-                    'Biometric data is encrypted end-to-end. '
-                    'We never share your photos with third parties.',
-                    style: tt.labelSmall?.copyWith(
-                      color: cs.onSurface.withValues(alpha: 0.6),
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -575,7 +565,7 @@ class _SuccessScreenState extends State<_SuccessScreen>
     );
     _scaleAnim = CurvedAnimation(
       parent: _controller,
-      curve: Curves.elasticOut,
+      curve: Curves.easeOut,
     );
     _fadeAnim = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(

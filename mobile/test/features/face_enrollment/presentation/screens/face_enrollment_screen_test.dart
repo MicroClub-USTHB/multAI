@@ -34,9 +34,9 @@ extension on WidgetTester {
   Future<void> tapNext() => scrollAndTap(this, find.text('Next'));
   Future<void> tapPrevious() => scrollAndTap(this, find.text('Previous'));
   Future<void> tapSkipOptional() =>
-      scrollAndTap(this, find.text('Skip Optional Photos'));
+      scrollAndTap(this, find.text('Skip'));
   Future<void> tapSubmit() =>
-      scrollAndTap(this, find.text('Complete Enrollment'));
+      scrollAndTap(this, find.text('Complete'));
 }
 
 void main() {
@@ -60,7 +60,6 @@ void main() {
       await tester.pumpWidget(createTestWidget(mockBloc));
       await tester.pump();
 
-      expect(find.text('Identity Verification'), findsOneWidget);
       expect(find.textContaining('Step 1 of 5'), findsOneWidget);
     });
 
@@ -264,9 +263,9 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      await tester.ensureVisible(find.text('Complete Enrollment'));
+      await tester.ensureVisible(find.text('Complete'));
       await tester.pump();
-      expect(find.text('Complete Enrollment'), findsOneWidget);
+      expect(find.text('Complete'), findsOneWidget);
     });
   });
 }

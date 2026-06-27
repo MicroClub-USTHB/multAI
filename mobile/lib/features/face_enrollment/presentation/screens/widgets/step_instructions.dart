@@ -1,98 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/extensions/context_extensions.dart';
-import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
-import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/features/face_enrollment/domain/entities/face_photo_entity.dart';
 
-class StepInstructions extends StatelessWidget {
+class StepInstructions extends StatefulWidget {
   final FacePhotoType type;
-  final bool isLastOfRequired;
 
-  const StepInstructions({
-    super.key,
-    required this.type,
-    this.isLastOfRequired = false,
-  });
+  const StepInstructions({super.key, required this.type});
+
+  @override
+  State<StepInstructions> createState() => _StepInstructionsState();
+}
+
+class _StepInstructionsState extends State<StepInstructions> {
+  bool _showAll = false;
 
   @override
   Widget build(BuildContext context) {
-    final instructions = _instructionsFor(type);
+    final instructions = _instructionsFor(widget.type);
+    final displayTips = _showAll ? instructions : instructions.take(2).toList();
 
-    return Semantics(
-      label: 'Photo instructions for ${type.label}',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (isLastOfRequired) ...[
-            SizedBox(height: context.heightCalculated(4)),
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.widthCalculated(12),
-                vertical: context.heightCalculated(8),
-              ),
-              decoration: BoxDecoration(
-                color: AppThemeColors.success.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
-                border: Border.all(
-                  color: AppThemeColors.success.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.check_circle,
-                    size: context.iconSize() * 0.9,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ...displayTips.map(
+          (tip) => Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 3),
+                  child: Icon(
+                    Icons.check_circle_outline,
+                    size: 16,
                     color: AppThemeColors.success,
                   ),
-                  SizedBox(width: context.widthCalculated(8)),
-                  Expanded(
-                    child: Text(
-                      'All required photos are complete',
-                      style: context.textTheme.labelMedium?.copyWith(
-                        color: AppThemeColors.success,
-                        fontWeight: FontWeight.w600,
-                      ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    tip,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: AppThemeColors.secondaryText,
+                      height: 1.3,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-          ...instructions.map(
-            (inst) => Padding(
-              padding: EdgeInsets.only(
-                top: context.heightCalculated(6),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                      top: context.heightCalculated(3),
-                    ),
-                    child: Icon(
-                      Icons.check_circle_outline,
-                      size: context.iconSize() * 0.7,
-                      color: AppThemeColors.success,
-                    ),
-                  ),
-                  SizedBox(width: context.widthCalculated(8)),
-                  Expanded(
-                    child: Text(
-                      inst,
-                      style: context.textTheme.labelMedium?.copyWith(
-                        color: AppThemeColors.secondaryText,
-                        height: 1.3,
-                      ),
-                    ),
-                  ),
-                ],
+          ),
+        ),
+        if (instructions.length > 2)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: GestureDetector(
+              onTap: () => setState(() => _showAll = !_showAll),
+              child: Text(
+                _showAll
+                    ? 'Show less tips'
+                    : 'Show ${instructions.length - 2} more tips',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: AppThemeColors.primaryAccent,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 

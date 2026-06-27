@@ -34,186 +34,205 @@ class StepNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
+    final showSubmit = isLastPage;
+    final canSubmit = allRequiredDone && !isSubmitting;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Skip optional
-        if (isOptional && onSkipOptional != null)
-          Padding(
-            padding: EdgeInsets.only(
-              bottom: context.heightCalculated(12),
-            ),
-            child: Semantics(
-              label: 'Skip optional photos',
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.hPadding(),
+        vertical: 12,
+      ),
+      decoration: BoxDecoration(
+        color: AppThemeColors.background,
+        border: Border(
+          top: BorderSide(
+            color: AppThemeColors.divider.withValues(alpha: 0.3),
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            // Previous
+            Semantics(
+              label: 'Previous step',
               button: true,
-              child: SizedBox(
-                height: 44,
+              child: AnimatedOpacity(
+                opacity: canGoPrevious ? 1.0 : 0.0,
+                duration: AppThemeMetrics.durationFast,
                 child: TextButton(
-                  onPressed: isSubmitting ? null : onSkipOptional,
-                  child: Text(
-                    'Skip Optional Photos',
-                    style: tt.labelLarge?.copyWith(
-                      color: cs.onSurface.withValues(alpha: 0.6),
-                      decoration: TextDecoration.underline,
+                  onPressed: canGoPrevious && !isSubmitting
+                      ? onPrevious
+                      : null,
+                  child: Text('Previous'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: cs.onSurface.withValues(alpha: 0.7),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
                     ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ),
               ),
             ),
-          ),
 
-        // Submit button
-        if (isLastPage || (allRequiredDone && isOptional))
-          Semantics(
-            label: isSubmitting
-                ? 'Submitting enrollment'
-                : allRequiredDone
-                    ? 'Complete enrollment'
-                    : 'Upload required photos first',
-            button: true,
-            child: SizedBox(
-              width: double.infinity,
-              height: context.heightCalculated(54),
-              child: ElevatedButton(
-                onPressed:
-                    allRequiredDone && !isSubmitting ? onSubmit : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: allRequiredDone
-                      ? AppThemeColors.primaryAccent
-                      : AppThemeColors.enrollDisabled,
-                  foregroundColor:
-                      allRequiredDone ? Colors.black : Colors.white,
-                  disabledBackgroundColor: AppThemeColors.enrollDisabled,
-                  disabledForegroundColor:
-                      Colors.white.withValues(alpha: 0.6),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppThemeMetrics.radiusMd),
-                  ),
-                  elevation: allRequiredDone ? 1 : 0,
-                ),
-                child: AnimatedSwitcher(
-                  duration: AppThemeMetrics.durationFast,
-                  child: isSubmitting
-                      ? Row(
-                          key: const ValueKey('submitting'),
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              height: context.heightCalculated(20),
-                              width: context.heightCalculated(20),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                color: cs.onPrimary,
-                              ),
-                            ),
-                            SizedBox(
-                                width: context.widthCalculated(10)),
-                            Text(
-                              'Uploading...',
-                              style: tt.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        )
-                      : Row(
-                          key: const ValueKey('submit'),
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              allRequiredDone
-                                  ? 'Complete Enrollment'
-                                  : 'Upload Required Photos',
-                              style: tt.titleLarge?.copyWith(
-                                color: allRequiredDone
-                                    ? Colors.black
-                                    : Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            if (allRequiredDone) ...[
-                              SizedBox(
-                                  width: context.widthCalculated(6)),
-                              Icon(
-                                Icons.arrow_forward,
-                                color: Colors.black,
-                                size: context.iconSize(),
-                              ),
-                            ],
-                          ],
-                        ),
-                ),
-              ),
-            ),
-          ),
+            const Spacer(),
 
-        // Previous / Next row
-        if (!isLastPage)
-          Padding(
-            padding: EdgeInsets.only(
-              top: context.heightCalculated(isOptional ? 4 : 12),
-            ),
-            child: Row(
-              children: [
-                // Previous
-                Semantics(
-                  label: 'Previous step',
+            // Skip optional
+            if (isOptional && allRequiredDone && !isLastPage && onSkipOptional != null)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Semantics(
+                  label: 'Skip optional photos',
                   button: true,
-                  child: AnimatedOpacity(
-                    opacity: canGoPrevious ? 1.0 : 0.0,
-                    duration: AppThemeMetrics.durationFast,
-                    child: SizedBox(
-                      height: 44,
-                      child: TextButton.icon(
-                        onPressed:
-                            canGoPrevious && !isSubmitting ? onPrevious : null,
-                        icon: Icon(
-                          Icons.arrow_back,
-                          size: context.iconSize() * 0.9,
-                        ),
-                        label: Text(
-                          'Previous',
-                          style: tt.labelLarge,
-                        ),
+                  child: TextButton(
+                    onPressed: isSubmitting ? null : onSkipOptional,
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 10,
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'Skip',
+                      style: tt.labelMedium?.copyWith(
+                        color: cs.onSurface.withValues(alpha: 0.5),
+                        decoration: TextDecoration.underline,
                       ),
                     ),
                   ),
                 ),
-                const Spacer(),
-                // Next
-                Semantics(
-                  label: isOptional
-                      ? 'Skip to next step'
-                      : 'Next step',
-                  button: true,
-                  child: SizedBox(
-                    height: 44,
-                    child: TextButton.icon(
-                      onPressed:
-                          canGoNext && !isSubmitting ? onNext : null,
-                      iconAlignment: IconAlignment.end,
-                      icon: Icon(
-                        Icons.arrow_forward,
-                        size: context.iconSize() * 0.9,
-                      ),
-                      label: Text(
-                        'Next',
-                        style: tt.labelLarge?.copyWith(
-                          color: canGoNext
+              ),
+
+            // Next / Submit
+            Semantics(
+              label: showSubmit
+                  ? (canSubmit
+                      ? 'Complete enrollment'
+                      : 'Upload required photos first')
+                  : 'Next step',
+              button: true,
+              child: AnimatedContainer(
+                duration: AppThemeMetrics.durationFast,
+                curve: AppThemeMetrics.curveStandard,
+                child: showSubmit
+                    ? ElevatedButton(
+                        onPressed: canSubmit ? onSubmit : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: canSubmit
                               ? AppThemeColors.primaryAccent
-                              : cs.onSurface.withValues(alpha: 0.38),
+                              : AppThemeColors.enrollDisabled,
+                          foregroundColor:
+                              canSubmit ? Colors.black : Colors.white,
+                          disabledBackgroundColor:
+                              AppThemeColors.enrollDisabled,
+                          disabledForegroundColor:
+                              Colors.white.withValues(alpha: 0.6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppThemeMetrics.radiusMd,
+                            ),
+                          ),
+                          elevation: canSubmit ? 1 : 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: isSubmitting
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: cs.onPrimary,
+                                ),
+                              )
+                            : Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    canSubmit
+                                        ? 'Complete'
+                                        : 'Upload Required',
+                                    style: tt.labelLarge?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: canSubmit
+                                          ? Colors.black
+                                          : Colors.white,
+                                    ),
+                                  ),
+                                  if (canSubmit) ...[
+                                    const SizedBox(width: 6),
+                                    Icon(
+                                      Icons.arrow_forward,
+                                      color: Colors.black,
+                                      size: context.iconSize() * 0.8,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                      )
+                    : ElevatedButton(
+                        onPressed: canGoNext && !isSubmitting
+                            ? onNext
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: canGoNext
+                              ? AppThemeColors.primaryAccent
+                              : AppThemeColors.enrollDisabled,
+                          foregroundColor:
+                              canGoNext ? Colors.black : Colors.white,
+                          disabledBackgroundColor:
+                              AppThemeColors.enrollDisabled,
+                          disabledForegroundColor:
+                              Colors.white.withValues(alpha: 0.6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppThemeMetrics.radiusMd,
+                            ),
+                          ),
+                          elevation: canGoNext ? 1 : 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Next',
+                              style: tt.labelLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color:
+                                    canGoNext ? Colors.black : Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Icon(
+                              Icons.arrow_forward,
+                              color:
+                                  canGoNext ? Colors.black : Colors.white,
+                              size: context.iconSize() * 0.8,
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-      ],
+          ],
+        ),
+      ),
     );
   }
 }

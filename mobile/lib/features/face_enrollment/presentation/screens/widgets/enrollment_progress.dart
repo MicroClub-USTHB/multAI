@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/extensions/context_extensions.dart';
-import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 
@@ -35,12 +33,12 @@ class _EnrollmentProgressState extends State<EnrollmentProgress> {
     }
   }
 
-  double get _progress => widget.totalSteps > 0 ? (widget.currentStep + 1) / widget.totalSteps : 0.0;
-  bool get _allRequiredDone => widget.completedRequired >= widget.totalRequired;
+  double get _progress =>
+      widget.totalSteps > 0 ? (widget.currentStep + 1) / widget.totalSteps : 0.0;
 
   @override
   Widget build(BuildContext context) {
-    final tt = context.textTheme;
+    final tt = Theme.of(context).textTheme;
 
     return Semantics(
       label: 'Step ${widget.currentStep + 1} of ${widget.totalSteps}',
@@ -48,61 +46,15 @@ class _EnrollmentProgressState extends State<EnrollmentProgress> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Title row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Semantics(
-                header: true,
-                child: Text(
-                  'Identity Verification',
-                  style: tt.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppThemeColors.secondaryText,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-              if (_allRequiredDone)
-                Semantics(
-                  label: 'All required photos complete',
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        size: context.iconSize() * 0.7,
-                        color: AppThemeColors.success,
-                      ),
-                      SizedBox(width: context.widthCalculated(4)),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: context.heightCalculated(4)),
-          // Step counter
-          AnimatedSwitcher(
-            duration: AppThemeMetrics.durationMedium,
-              transitionBuilder: (child, animation) => FadeTransition(
-              opacity: animation,
-              child: SizeTransition(
-                sizeFactor: animation,
-                alignment: const Alignment(-1, 0),
-                child: child,
-              ),
-            ),
-            child: Text(
-              'Step ${widget.currentStep + 1} of ${widget.totalSteps}',
-              key: ValueKey('step_${widget.currentStep}'),
-              style: tt.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppThemeColors.primaryText,
-              ),
+          Text(
+            'Step ${widget.currentStep + 1} of ${widget.totalSteps}',
+            key: ValueKey('step_${widget.currentStep}'),
+            style: tt.labelLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppThemeColors.secondaryText,
             ),
           ),
-          SizedBox(height: context.heightCalculated(8)),
-          // Progress bar
+          const SizedBox(height: 8),
           ClipRRect(
             borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
             child: Semantics(
@@ -115,10 +67,8 @@ class _EnrollmentProgressState extends State<EnrollmentProgress> {
                   return LinearProgressIndicator(
                     value: value,
                     backgroundColor: AppThemeColors.inputBorder,
-                    color: _allRequiredDone
-                        ? AppThemeColors.success
-                        : AppThemeColors.primaryAccent,
-                    minHeight: context.heightCalculated(6),
+                    color: AppThemeColors.primaryAccent,
+                    minHeight: 4,
                   );
                 },
               ),
