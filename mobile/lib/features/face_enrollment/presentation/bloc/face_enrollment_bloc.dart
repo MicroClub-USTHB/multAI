@@ -82,9 +82,11 @@ class FaceEnrollmentBloc
       await result.fold(
         (failure) async {
           _failureHandler.logFailure(failure, 'FaceEnrollmentBloc');
-          emit(FaceEnrollmentFailure(
-            message: _failureHandler.getUserFriendlyMessage(failure),
-          ));
+          emit(
+            FaceEnrollmentFailure(
+              message: _failureHandler.getUserFriendlyMessage(failure),
+            ),
+          );
         },
         (_) async {
           await _saveEnrollmentDone();
@@ -96,11 +98,13 @@ class FaceEnrollmentBloc
         UnknownFailure('Enrollment failed'),
         'FaceEnrollmentBloc',
       );
-      emit(FaceEnrollmentFailure(
-        message: _failureHandler.getUserFriendlyMessage(
-          const UnknownFailure('Enrollment failed'),
+      emit(
+        FaceEnrollmentFailure(
+          message: _failureHandler.getUserFriendlyMessage(
+            const UnknownFailure('Enrollment failed'),
+          ),
         ),
-      ));
+      );
     }
   }
 }

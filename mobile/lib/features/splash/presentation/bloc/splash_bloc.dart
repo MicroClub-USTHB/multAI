@@ -43,9 +43,11 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       final isCompromised = await DeviceSecurity.isDeviceCompromised();
       if (isCompromised) {
         SecureLogger.warning('SplashBloc', 'Device is rooted/jailbroken');
-        emit(const SplashSecurityWarning(
-          message: 'This app cannot run on rooted or jailbroken devices.',
-        ));
+        emit(
+          const SplashSecurityWarning(
+            message: 'This app cannot run on rooted or jailbroken devices.',
+          ),
+        );
         return;
       }
 

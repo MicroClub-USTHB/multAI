@@ -18,8 +18,8 @@ class DioClient {
     this.onUnauthorized,
     Duration connectTimeout = const Duration(seconds: 15),
     Duration receiveTimeout = const Duration(seconds: 15),
-  })  : _authInterceptor = DioClientAuth(),
-        _errorInterceptor = DioClientError() {
+  }) : _authInterceptor = DioClientAuth(),
+       _errorInterceptor = DioClientError() {
     _dio = Dio(
       BaseOptions(
         baseUrl: AppConfig.baseUrl,
@@ -92,11 +92,8 @@ class DioClient {
     bool requiresAuth = true,
   }) async {
     return _executeWithAuth(
-      () => _dio.put(
-        endpoint,
-        data: data,
-        options: _buildOptions(requiresAuth),
-      ),
+      () =>
+          _dio.put(endpoint, data: data, options: _buildOptions(requiresAuth)),
       requiresAuth,
     );
   }
@@ -106,10 +103,7 @@ class DioClient {
     bool requiresAuth = true,
   }) async {
     return _executeWithAuth(
-      () => _dio.delete(
-        endpoint,
-        options: _buildOptions(requiresAuth),
-      ),
+      () => _dio.delete(endpoint, options: _buildOptions(requiresAuth)),
       requiresAuth,
     );
   }
@@ -178,7 +172,9 @@ class DioClient {
           } catch (_) {}
         }
         onUnauthorized?.call();
-        throw const UnauthorizedFailure('Session expired. Please log in again.');
+        throw const UnauthorizedFailure(
+          'Session expired. Please log in again.',
+        );
       }
       throw _convertDioException(e);
     }
@@ -197,10 +193,7 @@ class DioClient {
         if (statusCode == 429) {
           return const RateLimitFailure('Too many requests');
         }
-        return ServerFailure(
-          _parseDioError(e),
-          statusCode,
-        );
+        return ServerFailure(_parseDioError(e), statusCode);
       case DioExceptionType.cancel:
         return const CancelledFailure();
       case DioExceptionType.badCertificate:
@@ -235,28 +228,19 @@ class DioClient {
 
 class DioClientAuth extends Interceptor {
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     handler.next(options);
   }
 
   @override
-  void onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     handler.next(err);
   }
 }
 
 class DioClientError extends Interceptor {
   @override
-  void onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     handler.next(err);
   }
 }

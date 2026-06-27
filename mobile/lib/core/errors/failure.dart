@@ -46,13 +46,15 @@ class ServerFailure extends Failure {
   final int? statusCode;
   final String? requestId;
 
-  const ServerFailure([super.message = 'Server error', this.statusCode, this.requestId]);
+  const ServerFailure([
+    super.message = 'Server error',
+    this.statusCode,
+    this.requestId,
+  ]);
 
   @override
-  AppException get appException => ServerException(
-    message: message,
-    statusCode: statusCode,
-  );
+  AppException get appException =>
+      ServerException(message: message, statusCode: statusCode);
 }
 
 class CacheFailure extends Failure {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class SplashFooter extends StatelessWidget {
@@ -6,33 +7,13 @@ class SplashFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Expanded(
-          child: Divider(
-            color: AppThemeColors.divider,
-            thickness: 1,
-            indent: 28,
-            endIndent: 8,
-          ),
-        ),
-        Text(
-          'SECURE NEURAL PROCESSING',
-          style: TextStyle(
-            letterSpacing: 3,
-            fontSize: 10,
-            color: AppThemeColors.dividerText,
-          ),
-        ),
-        const Expanded(
-          child: Divider(
-            color: AppThemeColors.divider,
-            thickness: 1,
-            indent: 8,
-            endIndent: 28,
-          ),
-        ),
-      ],
+    return Text(
+      'by Micro Club',
+      textAlign: TextAlign.center,
+      style: context.textTheme.labelMedium?.copyWith(
+        color: AppThemeColors.hintText,
+        letterSpacing: 1.5,
+      ),
     );
   }
 }

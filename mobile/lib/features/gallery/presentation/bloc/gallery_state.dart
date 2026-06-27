@@ -10,7 +10,6 @@ class GalleryLoaded extends GalleryState {
   final List<PhotoEntity> allPhotos;
   final List<PhotoEntity> eventPhotos;
   final int eventTotal;
-  // photoId → local file path
   final Map<String, String> cachedPaths;
 
   GalleryLoaded({
@@ -33,6 +32,12 @@ class GalleryLoaded extends GalleryState {
       cachedPaths: cachedPaths ?? this.cachedPaths,
     );
   }
+}
+
+class GalleryOffline extends GalleryState {
+  final List<PhotoEntity> cachedPhotos;
+
+  GalleryOffline({this.cachedPhotos = const []});
 }
 
 class GalleryError extends GalleryState {

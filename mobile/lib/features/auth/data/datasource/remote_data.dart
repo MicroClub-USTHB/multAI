@@ -11,8 +11,6 @@ abstract class AuthRemoteDataSource {
   Future<void> logout();
   Future<void> revokeDevice(String deviceId);
   Future<MeResponseModel> getMe();
-  Future<void> updateDeviceToken(String deviceId, String pushToken);
-  Future<void> inactivateDevice(String deviceId);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -24,14 +22,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> register(AuthRequestModel request) async {
-    await apiClient.postVoid(
-      EndPoints.register,
-      body: request.toJson(),
-    );
+    await apiClient.postVoid(EndPoints.register, body: request.toJson());
   }
 
   @override
-  Future<AuthResponseModel> verifyRegister(RegisterVerifyRequestModel request) async {
+  Future<AuthResponseModel> verifyRegister(
+    RegisterVerifyRequestModel request,
+  ) async {
     final json = await apiClient.post(
       EndPoints.registerVerify,
       body: request.toJson(),
@@ -41,10 +38,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<AuthResponseModel> login(AuthRequestModel request) async {
-    final json = await apiClient.post(
-      EndPoints.login,
-      body: request.toJson(),
-    );
+    final json = await apiClient.post(EndPoints.login, body: request.toJson());
     return AuthResponseModel.fromJson(json);
   }
 
@@ -66,24 +60,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<void> revokeDevice(String deviceId) async {
     await apiClient.postVoid(
       '${EndPoints.revokeDevice}?device_id=$deviceId',
-      requiresAuth: true,
-    );
-  }
-
-  @override
-  Future<void> updateDeviceToken(String deviceId, String pushToken) async {
-    await apiClient.postVoid(
-      EndPoints.updateDeviceToken,
-      body: {'device_id': deviceId, 'push_token': pushToken},
-      requiresAuth: true,
-    );
-  }
-
-  @override
-  Future<void> inactivateDevice(String deviceId) async {
-    await apiClient.postVoid(
-      EndPoints.inactivateDevice,
-      body: {'device_id': deviceId},
       requiresAuth: true,
     );
   }

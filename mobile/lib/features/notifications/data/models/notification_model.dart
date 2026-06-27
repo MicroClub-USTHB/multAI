@@ -12,21 +12,35 @@ class NotificationModel extends NotificationEntity {
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     Map<String, dynamic> payloadMap = {};
-    final rawPayload = json['payload'];
-    if (rawPayload is String) {
-      payloadMap = jsonDecode(rawPayload) as Map<String, dynamic>;
-    } else if (rawPayload is Map<String, dynamic>) {
-      payloadMap = rawPayload;
+    try {
+      final rawPayload = json['payload'];
+      if (rawPayload is String) {
+        final decoded = jsonDecode(rawPayload);
+        if (decoded is Map<String, dynamic>) {
+          payloadMap = decoded;
+        }
+      } else if (rawPayload is Map<String, dynamic>) {
+        payloadMap = rawPayload;
+      }
+    } catch (_) {
+      payloadMap = {};
+    }
+
+    DateTime parseDate(dynamic value, {DateTime? fallback}) {
+      if (value == null || value is! String) return fallback ?? DateTime.now();
+      try {
+        return DateTime.parse(value);
+      } catch (_) {
+        return fallback ?? DateTime.now();
+      }
     }
 
     return NotificationModel(
-      id: json['id'] as String,
+      id: (json['id'] as String?) ?? '',
       type: NotificationTypeX.fromString(json['type'] as String? ?? ''),
       payload: payloadMap,
-      readAt: json['read_at'] != null
-          ? DateTime.parse(json['read_at'] as String)
-          : null,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      readAt: parseDate(json['read_at'], fallback: null),
+      createdAt: parseDate(json['created_at']),
     );
   }
 

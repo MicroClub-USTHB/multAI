@@ -2,24 +2,86 @@ import 'package:flutter/foundation.dart';
 import 'app_exception.dart';
 
 abstract class Logger {
-  void debug(String tag, String message, [Object? error, StackTrace? stackTrace]);
-  void info(String tag, String message, [Object? error, StackTrace? stackTrace]);
-  void warning(String tag, String message, [Object? error, StackTrace? stackTrace]);
-  void error(String tag, String message, [Object? error, StackTrace? stackTrace]);
+  void debug(
+    String tag,
+    String message, [
+    Object? error,
+    StackTrace? stackTrace,
+  ]);
+  void info(
+    String tag,
+    String message, [
+    Object? error,
+    StackTrace? stackTrace,
+  ]);
+  void warning(
+    String tag,
+    String message, [
+    Object? error,
+    StackTrace? stackTrace,
+  ]);
+  void error(
+    String tag,
+    String message, [
+    Object? error,
+    StackTrace? stackTrace,
+  ]);
 
   void logException(String tag, AppException exception);
 
   factory Logger.create() => _ConsoleLogger();
 
-  static void Function(String tag, String message, Object? error, StackTrace? stackTrace)? onDebug;
-  static void Function(String tag, String message, Object? error, StackTrace? stackTrace)? onInfo;
-  static void Function(String tag, String message, Object? error, StackTrace? stackTrace)? onWarning;
-  static void Function(String tag, String message, Object? error, StackTrace? stackTrace)? onError;
+  static void Function(
+    String tag,
+    String message,
+    Object? error,
+    StackTrace? stackTrace,
+  )?
+  onDebug;
+  static void Function(
+    String tag,
+    String message,
+    Object? error,
+    StackTrace? stackTrace,
+  )?
+  onInfo;
+  static void Function(
+    String tag,
+    String message,
+    Object? error,
+    StackTrace? stackTrace,
+  )?
+  onWarning;
+  static void Function(
+    String tag,
+    String message,
+    Object? error,
+    StackTrace? stackTrace,
+  )?
+  onError;
 
   // Integration points for external services
-  static void Function(String tag, String message, Object? error, StackTrace? stackTrace)? firebaseCrashlytics;
-  static void Function(String tag, String message, Object? error, StackTrace? stackTrace)? sentry;
-  static void Function(String tag, String message, Object? error, StackTrace? stackTrace)? customAnalytics;
+  static void Function(
+    String tag,
+    String message,
+    Object? error,
+    StackTrace? stackTrace,
+  )?
+  firebaseCrashlytics;
+  static void Function(
+    String tag,
+    String message,
+    Object? error,
+    StackTrace? stackTrace,
+  )?
+  sentry;
+  static void Function(
+    String tag,
+    String message,
+    Object? error,
+    StackTrace? stackTrace,
+  )?
+  customAnalytics;
 }
 
 class _ConsoleLogger implements Logger {
@@ -53,7 +115,12 @@ class _ConsoleLogger implements Logger {
   }
 
   @override
-  void debug(String tag, String message, [Object? error, StackTrace? stackTrace]) {
+  void debug(
+    String tag,
+    String message, [
+    Object? error,
+    StackTrace? stackTrace,
+  ]) {
     if (!kDebugMode) return;
     final sanitized = _sanitize(message);
     debugPrint('[Logger][$tag][DEBUG] $sanitized');
@@ -64,21 +131,36 @@ class _ConsoleLogger implements Logger {
   }
 
   @override
-  void info(String tag, String message, [Object? error, StackTrace? stackTrace]) {
+  void info(
+    String tag,
+    String message, [
+    Object? error,
+    StackTrace? stackTrace,
+  ]) {
     final sanitized = _sanitize(message);
     debugPrint('[Logger][$tag][INFO] $sanitized');
     _invokeCallbacks(Logger.onInfo, tag, message, error, stackTrace);
   }
 
   @override
-  void warning(String tag, String message, [Object? error, StackTrace? stackTrace]) {
+  void warning(
+    String tag,
+    String message, [
+    Object? error,
+    StackTrace? stackTrace,
+  ]) {
     final sanitized = _sanitize(message);
     debugPrint('[Logger][$tag][WARNING] $sanitized');
     _invokeCallbacks(Logger.onWarning, tag, message, error, stackTrace);
   }
 
   @override
-  void error(String tag, String message, [Object? error, StackTrace? stackTrace]) {
+  void error(
+    String tag,
+    String message, [
+    Object? error,
+    StackTrace? stackTrace,
+  ]) {
     final sanitized = _sanitize(message);
     debugPrint('[Logger][$tag][ERROR] $sanitized');
     if (error != null && kDebugMode) {
@@ -100,7 +182,13 @@ class _ConsoleLogger implements Logger {
   }
 
   void _invokeCallbacks(
-    void Function(String tag, String message, Object? error, StackTrace? stackTrace)? callback,
+    void Function(
+      String tag,
+      String message,
+      Object? error,
+      StackTrace? stackTrace,
+    )?
+    callback,
     String tag,
     String message,
     Object? error,

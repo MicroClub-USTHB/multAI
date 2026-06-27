@@ -19,7 +19,9 @@ class FaceEnrollmentRemoteDataSourceImpl
   @override
   Future<void> uploadFacePhotos(List<FacePhotoModel> photos) async {
     for (final photo in photos) {
-      final validation = await PhotoProcessor.processAndValidate(photo.filePath);
+      final validation = await PhotoProcessor.processAndValidate(
+        photo.filePath,
+      );
       validation.fold((failure) => throw failure, (_) {});
     }
 

@@ -55,12 +55,18 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   }
 
   List<NotificationModel> _parseList(Map<String, dynamic> json) {
-    final list =
-        json['items'] as List<dynamic>? ??
-        json['notifications'] as List<dynamic>? ??
-        [];
+    final raw = json['items'] ?? json['notifications'];
+    final list = (raw is List<dynamic>) ? raw : <dynamic>[];
     return list
-        .map((e) => NotificationModel.fromJson(e as Map<String, dynamic>))
+        .map((e) {
+          if (e is! Map<String, dynamic>) return null;
+          try {
+            return NotificationModel.fromJson(e);
+          } catch (_) {
+            return null;
+          }
+        })
+        .whereType<NotificationModel>()
         .toList();
   }
 }

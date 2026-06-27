@@ -33,9 +33,7 @@ class PasswordField extends StatelessWidget {
         hintText: hintText,
         suffixIcon: IconButton(
           icon: Icon(
-            obscure
-                ? Icons.visibility_outlined
-                : Icons.visibility_off_outlined,
+            obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
             color: AppThemeColors.neutral300,
             size: 20,
           ),
