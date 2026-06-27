@@ -417,19 +417,10 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = context.theme.colorScheme;
-
     return AppBar(
       backgroundColor: AppThemeColors.background,
       elevation: 0,
-      leading: Semantics(
-        label: 'Back',
-        button: true,
-        child: IconButton(
-          icon: Icon(Icons.arrow_back, color: cs.onSurface),
-          onPressed: () => context.pop(),
-        ),
-      ),
+      automaticallyImplyLeading: false,
       title: Semantics(
         header: true,
         child: Text(

@@ -65,7 +65,6 @@ class StepNavigation extends StatelessWidget {
                   onPressed: canGoPrevious && !isSubmitting
                       ? onPrevious
                       : null,
-                  child: Text('Previous'),
                   style: TextButton.styleFrom(
                     foregroundColor: cs.onSurface.withValues(alpha: 0.7),
                     padding: const EdgeInsets.symmetric(
@@ -75,6 +74,7 @@ class StepNavigation extends StatelessWidget {
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
+                  child: Text('Previous'),
                 ),
               ),
             ),
