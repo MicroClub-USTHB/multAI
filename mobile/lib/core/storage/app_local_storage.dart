@@ -58,7 +58,7 @@ class SecureStorageOnly implements LocalStorage {
   final FlutterSecureStorage _secureStorage;
 
   SecureStorageOnly({FlutterSecureStorage? secureStorage})
-      : _secureStorage = secureStorage ?? FlutterSecureStorage();
+    : _secureStorage = secureStorage ?? FlutterSecureStorage();
 
   @override
   Future<void> setBool(String key, bool value) =>

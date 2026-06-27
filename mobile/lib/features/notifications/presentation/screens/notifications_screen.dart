@@ -10,8 +10,24 @@ import '../bloc/notifications_bloc.dart';
 import '../../domain/entities/notification_entity.dart';
 import '../widgets/notification_card.dart';
 
-class NotificationsScreen extends StatelessWidget {
+class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
+
+  @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  bool _initialLoad = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialLoad) {
+      _initialLoad = false;
+      context.read<NotificationBloc>().add(LoadNotifications());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,12 +79,7 @@ class NotificationsScreen extends StatelessWidget {
   Widget _buildBody(BuildContext context, NotificationState state) {
     final cs = context.theme.colorScheme;
 
-    if (state is NotificationInitial) {
-      context.read<NotificationBloc>().add(LoadNotifications());
-      return Center(child: CircularProgressIndicator(color: cs.primary));
-    }
-
-    if (state is NotificationLoading) {
+    if (state is NotificationInitial || state is NotificationLoading) {
       return Center(child: CircularProgressIndicator(color: cs.primary));
     }
 
@@ -96,32 +107,39 @@ class NotificationsScreen extends StatelessWidget {
       );
     }
 
+    if (state is NotificationOffline) {
+      return _buildOffline(context);
+    }
+
+    if (state is NotificationError) {
+      return _buildError(context, state.message);
+    }
+
     return const SizedBox.shrink();
   }
 
-  // ── Handle tap based on notification type ─────────────────────────────────
   void _onNotificationTap(
     BuildContext context,
     NotificationEntity notification,
   ) {
-    // mark as read
     if (!notification.isRead) {
       context.read<NotificationBloc>().add(
         MarkNotificationRead(notificationIds: [notification.id]),
       );
     }
 
-    // navigate based on type
     switch (notification.type) {
       case NotificationType.photoApproval:
-        context.push(AppRoutes.photoApproval);
-        break;
+        final photoId = notification.payload['photo_id'];
+        if (photoId != null) {
+          context.push('${AppRoutes.photoApproval}?photoId=$photoId');
+        } else {
+          context.push(AppRoutes.photoApproval);
+        }
       case NotificationType.photoDistributed:
         context.push(AppRoutes.gallery);
-        break;
       case NotificationType.eventInvite:
         context.push(AppRoutes.events);
-        break;
       case NotificationType.system:
       case NotificationType.unknown:
         break;
@@ -153,6 +171,93 @@ class NotificationsScreen extends StatelessWidget {
             style: tt.bodySmall?.copyWith(color: AppThemeColors.hintText),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildOffline(BuildContext context) {
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: context.hPadding()),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.wifi_off_rounded,
+              size: context.iconSize() * 3,
+              color: AppThemeColors.secondaryText.withValues(alpha: 0.4),
+            ),
+            SizedBox(height: context.heightCalculated(16)),
+            Text(
+              'No internet connection',
+              style: tt.titleMedium?.copyWith(
+                color: AppThemeColors.secondaryText,
+              ),
+            ),
+            SizedBox(height: context.heightCalculated(8)),
+            Text(
+              'Pull down to retry when connected',
+              style: tt.bodySmall?.copyWith(color: AppThemeColors.hintText),
+            ),
+            SizedBox(height: context.heightCalculated(24)),
+            FilledButton.tonal(
+              onPressed: () =>
+                  context.read<NotificationBloc>().add(LoadNotifications()),
+              style: FilledButton.styleFrom(
+                backgroundColor: cs.primaryContainer,
+              ),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildError(BuildContext context, String message) {
+    final tt = context.textTheme;
+    final cs = context.theme.colorScheme;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: context.hPadding()),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: context.iconSize() * 3,
+              color: AppThemeColors.error.withValues(alpha: 0.6),
+            ),
+            SizedBox(height: context.heightCalculated(16)),
+            Text(
+              'Something went wrong',
+              style: tt.titleMedium?.copyWith(
+                color: AppThemeColors.primaryText,
+              ),
+            ),
+            SizedBox(height: context.heightCalculated(8)),
+            Text(
+              message,
+              style: tt.bodySmall?.copyWith(
+                color: AppThemeColors.secondaryText,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: context.heightCalculated(24)),
+            FilledButton.tonal(
+              onPressed: () =>
+                  context.read<NotificationBloc>().add(LoadNotifications()),
+              style: FilledButton.styleFrom(
+                backgroundColor: cs.primaryContainer,
+              ),
+              child: const Text('Try Again'),
+            ),
+          ],
+        ),
       ),
     );
   }

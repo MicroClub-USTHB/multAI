@@ -60,10 +60,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     controller: _pageController,
                     onPageChanged: (i) => setState(() => _currentPage = i),
                     itemCount: slides.length,
-                    itemBuilder: (_, i) => OnboardingCard(
-                      slide: slides[i],
-                      slideIndex: i,
-                    ),
+                    itemBuilder: (_, i) =>
+                        OnboardingCard(slide: slides[i], slideIndex: i),
                   ),
 
                   // Skip button — top right
@@ -79,9 +77,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           opacity: isLast ? 0 : 1,
                           duration: const Duration(milliseconds: 200),
                           child: GestureDetector(
-                            onTap: () => ctx
-                                .read<OnboardingBloc>()
-                                .add(CompleteOnboarding()),
+                            onTap: () => ctx.read<OnboardingBloc>().add(
+                              CompleteOnboarding(),
+                            ),
                             child: Text(
                               'Skip',
                               style: context.textTheme.labelLarge?.copyWith(

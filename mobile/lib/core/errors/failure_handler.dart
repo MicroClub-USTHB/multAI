@@ -40,6 +40,10 @@ class FailureHandler {
     Failure failure, {
     bool Function()? onUnauthorized,
   }) {
-    errorHandler.handleException(source, failure.appException, onUnauthorized: onUnauthorized);
+    errorHandler.handleException(
+      source,
+      failure.appException,
+      onUnauthorized: onUnauthorized,
+    );
   }
 }

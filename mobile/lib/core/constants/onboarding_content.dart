@@ -25,13 +25,11 @@ const List<OnboardingSlide> onboardingSlides = [
     image: AppImages.onboarding2,
     secondImage: AppImages.onboarding3,
     title: 'Found\nautomatically.',
-    description:
-        'Our AI finds your face across every photo from every event.',
+    description: 'Our AI finds your face across every photo from every event.',
   ),
   OnboardingSlide(
     image: AppImages.onboarding3,
     title: 'Keep your\nmoments.',
-    description:
-        'View, approve and download your photos whenever you want.',
+    description: 'View, approve and download your photos whenever you want.',
   ),
 ];

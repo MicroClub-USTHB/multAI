@@ -75,9 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Photo circle composition
-                          _LoginPhotoComposition(
-                            height: screenHeight * 0.35,
-                          ),
+                          _LoginPhotoComposition(height: screenHeight * 0.35),
 
                           Padding(
                             padding: const EdgeInsets.fromLTRB(28, 28, 28, 0),

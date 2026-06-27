@@ -20,6 +20,12 @@ class EventsLoaded extends EventsState {
   });
 }
 
+class EventsOffline extends EventsState {
+  final List<EventEntity> cachedEvents;
+
+  EventsOffline({this.cachedEvents = const []});
+}
+
 class JoinEventSuccess extends EventsState {}
 
 class EventsFailure extends EventsState {

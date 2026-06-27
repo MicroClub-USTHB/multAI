@@ -73,4 +73,8 @@ class DeviceUtils {
       deviceId: '',
     );
   }
+
+  static Future<void> clearDeviceId() async {
+    await _storage.delete(key: StorageKeys.deviceId);
+  }
 }

@@ -18,14 +18,13 @@ class EventsRepositoryImpl implements EventRepository {
   Future<Either<Failure, List<EventEntity>>> getUserEvents() async {
     try {
       final models = await remoteDataSource.getUserEvents();
-      await localDataSource.cacheEvents(models);
-      return Right(models.map((m) => m.toEntity()).toList());
-    } on Failure {
+      final entities = models.map((m) => m.toEntity()).toList();
+      await localDataSource.cacheEvents(entities);
+      return Right(entities);
+    } on Failure catch (f) {
       final cached = await localDataSource.getCachedEvents();
-      if (cached != null && cached.isNotEmpty) {
-        return Right(cached.map((m) => m.toEntity()).toList());
-      }
-      return Left(const NetworkFailure('No internet connection'));
+      if (cached != null && cached.isNotEmpty) return Right(cached);
+      return Left(f);
     } catch (e) {
       return Left(const UnknownFailure('Failed to load events'));
     }

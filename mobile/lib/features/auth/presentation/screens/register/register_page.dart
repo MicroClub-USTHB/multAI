@@ -92,9 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _RegisterPhotoComposition(
-                            isOtpStep: isOtpStep,
-                          ),
+                          _RegisterPhotoComposition(isOtpStep: isOtpStep),
                           isOtpStep
                               ? _OtpFormContent(
                                   email: _emailController.text.trim(),

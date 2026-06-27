@@ -11,6 +11,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../core/network/network_info.dart';
 import '../core/network/api_client.dart';
+import '../core/network/connectivity_service.dart';
 import '../core/network/dio_client.dart';
 import '../core/storage/app_local_storage.dart';
 import '../core/errors/failure_handler.dart';
@@ -52,15 +53,19 @@ import '../features/account/domain/repositories/account_repository.dart';
 import '../features/account/domain/usecases/get_account_data_usecase.dart';
 import '../features/account/presentation/bloc/account_bloc.dart';
 //  ── Notifications ───────────────────────────────────────────────────────────
+import '../features/notifications/data/datasources/notifications_local_datasource.dart';
 import '../features/notifications/data/datasources/notifications_remote_datasource.dart';
 import '../features/notifications/data/repositories/notifications_repository_impl.dart';
 import '../features/notifications/domain/repositories/notifications_repository.dart';
 import '../features/notifications/domain/usecases/get_notifications_usecase.dart';
 import '../features/notifications/domain/usecases/mark_as_read_usecase.dart';
+import '../features/notifications/domain/usecases/register_device_token_usecase.dart';
 import '../features/notifications/domain/usecases/register_push_token_usecase.dart';
+import '../features/notifications/domain/usecases/revoke_device_token_usecase.dart';
 import '../features/notifications/domain/usecases/revoke_push_token_usecase.dart';
 import '../features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../features/notifications/services/push_notification_service.dart';
+import '../features/notifications/services/notification_navigation_service.dart';
 // Photo Approval ─────────────────────────────────────────────
 import '../features/photo_approval/presentation/bloc/photo_approval_bloc.dart';
 import '../features/photo_approval/data/datasources/photo_approval_remote_datasource.dart';
@@ -79,6 +84,7 @@ import '../features/events/presentation/bloc/events_bloc.dart';
 // gallery
 import '../features/gallery/presentation/bloc/gallery_bloc.dart';
 import '../features/gallery/data/cache/photo_cache_service.dart';
+import '../features/gallery/data/datasources/photo_local_datasource.dart';
 import '../features/gallery/data/datasources/photo_remote_datasource.dart';
 import '../features/gallery/data/repositories/photo_repository_impl.dart';
 import '../features/gallery/domain/usecases/get_photo_image_usecase.dart';
@@ -108,17 +114,21 @@ Future<void> init() async {
     ),
   );
 
-  sl.registerLazySingleton(
-    () => ApiClient(networkInfo: sl<NetworkInfo>()),
-  );
+  sl.registerLazySingleton(() => ApiClient(networkInfo: sl<NetworkInfo>()));
 
-  sl.registerLazySingleton<DioClient>(
-    () => DioClient(),
+  sl.registerLazySingleton<DioClient>(() => DioClient());
+
+  sl.registerLazySingleton<ConnectivityService>(
+    () => ConnectivityService(
+      connectivity: sl<Connectivity>(),
+      connectionChecker: sl<InternetConnection>(),
+    ),
   );
 
   sl.registerLazySingleton<FailureHandler>(
     () => FailureHandler(),
   );
+
   // ── Onboarding ─────────────────────────────────────────────────────────────
   sl.registerFactory<SplashBloc>(
     () => SplashBloc(
@@ -178,6 +188,7 @@ Future<void> init() async {
       refreshTokenUseCase: sl<RefreshTokenUseCase>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
       checkEnrollmentDone: sl<CheckEnrollmentDoneUseCase>(),
+      pushNotificationService: sl<PushNotificationService>(),
     ),
   );
 
@@ -243,14 +254,14 @@ Future<void> init() async {
     () => AccountBloc(
       getAccountData: sl<GetAccountDataUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
+      pushNotificationService: sl<PushNotificationService>(),
     ),
   );
 
-  // ── Events Data Source ──────────────────────────────────────────────────────
+  // ── Events Data Sources ────────────────────────────────────────────────────
   sl.registerLazySingleton<EventsRemoteDataSource>(
     () => EventsRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
-
   sl.registerLazySingleton<EventsLocalDataSource>(
     () => EventsLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
   );
@@ -272,18 +283,22 @@ Future<void> init() async {
     () => EventsBloc(
       getUserEventsUseCase: sl<GetUserEventsUseCase>(),
       joinEventUseCase: sl<JoinEventUseCase>(),
-      networkInfo: sl<NetworkInfo>(),
+      connectivityService: sl<ConnectivityService>(),
     ),
   );
-  // Notification Remote DataSource
+  // Notification Data Sources
   sl.registerLazySingleton<NotificationRemoteDataSource>(
     () => NotificationRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+  sl.registerLazySingleton<NotificationsLocalDataSource>(
+    () => NotificationsLocalDataSource(localStorage: sl<AppLocalStorage>()),
   );
 
   // Notification Repository
   sl.registerLazySingleton<NotificationsRepository>(
     () => NotificationRepositoryImpl(
       remoteDataSource: sl<NotificationRemoteDataSource>(),
+      localDataSource: sl<NotificationsLocalDataSource>(),
     ),
   );
 
@@ -302,12 +317,24 @@ Future<void> init() async {
     () => RevokePushTokenUsecase(sl<NotificationsRepository>()),
   );
 
+  // Notification Navigation Service
+  sl.registerLazySingleton(() => NotificationNavigationService());
+
   // Push Notification Service
   sl.registerLazySingleton(
     () => PushNotificationService(
       registerToken: sl<RegisterPushTokenUseCase>(),
       revokeToken: sl<RevokePushTokenUsecase>(),
+      navigationService: sl<NotificationNavigationService>(),
     ),
+  );
+
+  // Device Token Use Cases
+  sl.registerLazySingleton(
+    () => RegisterDeviceTokenUseCase(sl<PushNotificationService>()),
+  );
+  sl.registerLazySingleton(
+    () => RevokeDeviceTokenUseCase(sl<PushNotificationService>()),
   );
 
   // Notification BLoC
@@ -316,6 +343,8 @@ Future<void> init() async {
       getNotifications: sl<GetNotificationsUsecase>(),
       markAsRead: sl<MarkAsReadUsecase>(),
       registerPushToken: sl<RegisterPushTokenUseCase>(),
+      connectivityService: sl<ConnectivityService>(),
+      pushNotificationService: sl<PushNotificationService>(),
     ),
   );
 
@@ -347,13 +376,14 @@ Future<void> init() async {
     ),
   );
   // Cache Service
-  sl.registerLazySingleton(
-    () => PhotoCacheService(),
-  );
+  sl.registerLazySingleton(() => PhotoCacheService());
 
   // Gallery Remote DataSource
   sl.registerLazySingleton<PhotoRemoteDataSource>(
     () => PhotoRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+  sl.registerLazySingleton<PhotoLocalDataSource>(
+    () => PhotoLocalDataSource(localStorage: sl<AppLocalStorage>()),
   );
 
   // Gallery Repository
@@ -361,6 +391,7 @@ Future<void> init() async {
     () => PhotoRepositoryImpl(
       remoteDataSource: sl<PhotoRemoteDataSource>(),
       cacheService: sl<PhotoCacheService>(),
+      localDataSource: sl<PhotoLocalDataSource>(),
     ),
   );
 
@@ -375,6 +406,10 @@ Future<void> init() async {
       getMyPhotos: sl<GetMyPhotosUseCase>(),
       getEventPhotos: sl<GetEventPhotosUseCase>(),
       getPhotoImage: sl<GetPhotoImageUseCase>(),
+      connectivityService: sl<ConnectivityService>(),
     ),
   );
+
+  // ── Initialize ConnectivityService ─────────────────────────────────────────
+  await sl<ConnectivityService>().init();
 }

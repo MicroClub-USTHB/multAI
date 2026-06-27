@@ -11,8 +11,8 @@ class SessionManager {
   SessionManager({
     Duration timeoutDuration = const Duration(minutes: 15),
     void Function()? onSessionExpired,
-  })  : _timeoutDuration = timeoutDuration,
-        _onSessionExpired = onSessionExpired;
+  }) : _timeoutDuration = timeoutDuration,
+       _onSessionExpired = onSessionExpired;
 
   bool get isAuthenticated => _isAuthenticated;
   DateTime get lastActivity => _lastActivity;

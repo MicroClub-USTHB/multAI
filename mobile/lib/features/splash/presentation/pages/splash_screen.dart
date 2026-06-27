@@ -52,15 +52,13 @@ class _SplashScreenState extends State<SplashScreen>
         curve: const Interval(0.3, 0.7, curve: Curves.easeIn),
       ),
     );
-    _progressSlide = Tween<Offset>(
-      begin: const Offset(0, 0.15),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.3, 0.7, curve: Curves.easeOutCubic),
-      ),
-    );
+    _progressSlide =
+        Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.3, 0.7, curve: Curves.easeOutCubic),
+          ),
+        );
     _footerFade = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
@@ -115,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen>
                             child: const SplashLogo(),
                           ),
                         ),
-                        const Spacer(flex: 1),
+                        const Spacer(flex: 2),
                         FadeTransition(
                           opacity: _progressFade,
                           child: SlideTransition(
@@ -198,7 +196,7 @@ class _SplashScreenState extends State<SplashScreen>
               Icon(
                 Icons.wifi_off_rounded,
                 size: 80,
-                color: AppThemeColors.gold.withValues(alpha: 0.7),
+                color: AppThemeColors.primaryAccent.withValues(alpha: 0.7),
               ),
               const SizedBox(height: AppThemeMetrics.spacingLg),
               Text(
@@ -217,14 +215,13 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: AppThemeMetrics.spacingXl),
               ElevatedButton.icon(
-                onPressed: () => context.read<SplashBloc>().add(
-                  const RetryConnection(),
-                ),
+                onPressed: () =>
+                    context.read<SplashBloc>().add(const RetryConnection()),
                 icon: const Icon(Icons.refresh),
                 label: const Text('Retry'),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: AppThemeColors.primaryText,
-                  backgroundColor: AppThemeColors.gold,
+                  backgroundColor: AppThemeColors.primaryAccent,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppThemeMetrics.spacingXl,
                     vertical: AppThemeMetrics.spacingMd,
@@ -249,9 +246,9 @@ class _SplashScreenState extends State<SplashScreen>
         decoration: BoxDecoration(
           gradient: RadialGradient(
             center: alignment,
-            radius: 0.5,
+            radius: 0.6,
             colors: [
-              AppThemeColors.gold.withValues(alpha: 0.15),
+              AppThemeColors.primaryAccent.withValues(alpha: 0.10),
               Colors.transparent,
             ],
           ),

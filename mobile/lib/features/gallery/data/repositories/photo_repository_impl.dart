@@ -4,15 +4,18 @@ import '../../../../core/errors/failure.dart';
 import '../../domain/entities/photo_entity.dart';
 import '../../domain/repositories/photo_repository.dart';
 import '../cache/photo_cache_service.dart';
+import '../datasources/photo_local_datasource.dart';
 import '../datasources/photo_remote_datasource.dart';
 
 class PhotoRepositoryImpl implements PhotoRepository {
   final PhotoRemoteDataSource remoteDataSource;
   final PhotoCacheService cacheService;
+  final PhotoLocalDataSource localDataSource;
 
   PhotoRepositoryImpl({
     required this.remoteDataSource,
     required this.cacheService,
+    required this.localDataSource,
   });
 
   @override
@@ -29,7 +32,12 @@ class PhotoRepositoryImpl implements PhotoRepository {
         limit: limit,
         offset: offset,
       );
+      await localDataSource.cacheAllPhotos(models);
       return Right(models);
+    } on NetworkFailure catch (_) {
+      final cached = localDataSource.getCachedAllPhotos();
+      if (cached != null && cached.isNotEmpty) return Right(cached);
+      return Left(const NetworkFailure('No internet connection'));
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
@@ -52,7 +60,16 @@ class PhotoRepositoryImpl implements PhotoRepository {
         limit: limit,
         offset: offset,
       );
-      return Right(result);
+      await localDataSource.cacheEventPhotos(
+        eventId,
+        result.items,
+        result.total,
+      );
+      return Right((items: result.items, total: result.total));
+    } on NetworkFailure catch (_) {
+      final cached = localDataSource.getCachedEventPhotos(eventId);
+      if (cached != null && cached.items.isNotEmpty) return Right(cached);
+      return Left(const NetworkFailure('No internet connection'));
     } on Failure catch (f) {
       return Left(f);
     } catch (e) {
@@ -67,6 +84,7 @@ class PhotoRepositoryImpl implements PhotoRepository {
       if (cached != null) return Right(cached);
 
       final bytes = await remoteDataSource.getPhotoImageBytes(photoId);
+
       final localPath = await cacheService.saveToCache(photoId, bytes);
 
       return Right(localPath);
