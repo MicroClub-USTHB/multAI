@@ -196,7 +196,7 @@ class _SplashScreenState extends State<SplashScreen>
               Icon(
                 Icons.wifi_off_rounded,
                 size: 80,
-                color: AppThemeColors.gold.withValues(alpha: 0.7),
+                color: AppThemeColors.primaryAccent.withValues(alpha: 0.7),
               ),
               const SizedBox(height: AppThemeMetrics.spacingLg),
               Text(
@@ -221,7 +221,7 @@ class _SplashScreenState extends State<SplashScreen>
                 label: const Text('Retry'),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: AppThemeColors.primaryText,
-                  backgroundColor: AppThemeColors.gold,
+                  backgroundColor: AppThemeColors.primaryAccent,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppThemeMetrics.spacingXl,
                     vertical: AppThemeMetrics.spacingMd,

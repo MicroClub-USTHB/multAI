@@ -58,14 +58,22 @@ abstract class AppThemeColors {
   static const Color subtitleText = neutral200;
 
   // Brand accent moments (splash, onboarding). Kept on the indigo accent.
-  static const Color gold = primaryAccent;
   static const Color dividerText = neutral300;
   static const Color divider = neutral700;
   static const Color gradientOverlay = Color(0x336E56F8);
 
-  // Indigo gradient stops for premium buttons and headers.
-  static const Color gradientGoldStart = Color(0xFF8B78FF);
-  static const Color gradientGoldEnd = Color(0xFF5B44E0);
+  // Gradient stops for premium buttons and headers.
+  static const Color gradientAccentStart = Color(0xFF8B78FF);
+  static const Color gradientAccentEnd = Color(0xFF5B44E0);
+
+  @Deprecated('Use primaryAccent instead')
+  static const Color gold = primaryAccent;
+
+  @Deprecated('Use gradientAccentStart instead')
+  static const Color gradientGoldStart = gradientAccentStart;
+
+  @Deprecated('Use gradientAccentEnd instead')
+  static const Color gradientGoldEnd = gradientAccentEnd;
 
   // Neutral scrim for image-behind-text treatments (fades photos into the base).
   static const Color scrim = Color(0xCC08080B);

@@ -44,7 +44,8 @@ abstract class AppTheme {
   static const Color secondaryTextColor = AppThemeColors.secondaryText;
   static const Color hintTextColor = AppThemeColors.hintText;
   static const Color subtitleTextColor = AppThemeColors.subtitleText;
-  static const Color goldColor = AppThemeColors.gold;
+  @Deprecated('Use primaryAccent instead')
+  static const Color goldColor = AppThemeColors.primaryAccent;
   static const Color dividerTextColor = AppThemeColors.dividerText;
   static const Color dividerColor = AppThemeColors.divider;
   static const Color gradientOverlayColor = AppThemeColors.gradientOverlay;

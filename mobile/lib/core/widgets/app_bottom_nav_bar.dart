@@ -36,8 +36,9 @@ class AppBottomNavBar extends StatelessWidget {
               if (data.item == NavItem.notifications) {
                 return BlocBuilder<NotificationBloc, NotificationState>(
                   builder: (context, state) {
-                    final unread =
-                        state is NotificationLoaded ? state.unreadCount : 0;
+                    final unread = state is NotificationLoaded
+                        ? state.unreadCount
+                        : 0;
                     return _NavBarItem(
                       icon: data.icon,
                       label: data.label,
@@ -107,8 +108,9 @@ class _NavBarItem extends StatelessWidget {
                     color: isSelected
                         ? AppThemeColors.primaryAccent.withValues(alpha: 0.14)
                         : Colors.transparent,
-                    borderRadius:
-                        BorderRadius.circular(AppThemeMetrics.radiusPill),
+                    borderRadius: BorderRadius.circular(
+                      AppThemeMetrics.radiusPill,
+                    ),
                   ),
                   child: Icon(icon, color: color, size: AppThemeMetrics.iconMd),
                 ),

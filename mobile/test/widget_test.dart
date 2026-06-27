@@ -35,9 +35,9 @@ void main() {
 
   testWidgets('boots to the onboarding screen', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp(enableDeepLinks: false));
-    // Let the splash delay elapse and the router settle onto onboarding.
-    // Avoid pumpAndSettle: the splash loader is an indeterminate progress bar
-    // that never "settles".
+    // Wait for the splash 1.5 s bloc delay, 2.5 s animations, and routing.
+    // pumpAndSettle is not used because the indeterminate progress bar never
+    // settles.
     for (var i = 0; i < 6; i++) {
       await tester.pump(const Duration(seconds: 1));
     }

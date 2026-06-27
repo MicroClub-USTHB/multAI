@@ -93,8 +93,9 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsWidgets);
   });
 
-  testWidgets('sends SendOtpRequested when Continue button is tapped',
-      (WidgetTester tester) async {
+  testWidgets('sends SendOtpRequested when Continue button is tapped', (
+    WidgetTester tester,
+  ) async {
     when(() => mockAuthBloc.state).thenReturn(AuthInitial());
 
     await tester.pumpWidget(buildTestWidget());
@@ -111,8 +112,9 @@ void main() {
     verify(() => mockAuthBloc.add(any<SendOtpRequested>())).called(1);
   });
 
-  testWidgets('sends VerifyOtpRequested when Verify is tapped',
-      (WidgetTester tester) async {
+  testWidgets('sends VerifyOtpRequested when Verify is tapped', (
+    WidgetTester tester,
+  ) async {
     whenListen(
       mockAuthBloc,
       Stream.fromIterable([AuthOtpSent(email: 'test@test.com')]),
