@@ -45,8 +45,12 @@ class _GalleryScreenState extends State<GalleryScreen>
         }
       },
       builder: (context, state) {
-        final allPhotos = state is GalleryLoaded ? state.allPhotos : <PhotoEntity>[];
-        final eventPhotos = state is GalleryLoaded ? state.eventPhotos : <PhotoEntity>[];
+        final allPhotos = state is GalleryLoaded
+            ? state.allPhotos
+            : <PhotoEntity>[];
+        final eventPhotos = state is GalleryLoaded
+            ? state.eventPhotos
+            : <PhotoEntity>[];
         final cachedPaths = state is GalleryLoaded
             ? state.cachedPaths
             : <String, String>{};

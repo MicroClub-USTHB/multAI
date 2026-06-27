@@ -24,8 +24,14 @@ class AuthRepositoryImpl implements AuthRepository {
 
   Future<void> _persistTokens(AuthEntity result) async {
     apiClient.setAccessToken(result.accessToken);
-    await localStorage.setSecureString(StorageKeys.accessToken, result.accessToken);
-    await localStorage.setSecureString(StorageKeys.refreshToken, result.refreshToken);
+    await localStorage.setSecureString(
+      StorageKeys.accessToken,
+      result.accessToken,
+    );
+    await localStorage.setSecureString(
+      StorageKeys.refreshToken,
+      result.refreshToken,
+    );
   }
 
   Future<void> _clearTokens() async {
@@ -35,7 +41,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   Future<String?> _loadAccessToken() async {
-    final secureToken = await localStorage.getSecureString(StorageKeys.accessToken);
+    final secureToken = await localStorage.getSecureString(
+      StorageKeys.accessToken,
+    );
     if (secureToken != null && secureToken.isNotEmpty) return secureToken;
     return null;
   }
@@ -104,7 +112,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthEntity>> verifyRegister(LoginParams params, String otp) async {
+  Future<Either<Failure, AuthEntity>> verifyRegister(
+    LoginParams params,
+    String otp,
+  ) async {
     return _authenticate(
       () => remoteDataSource.verifyRegister(
         RegisterVerifyRequestModel(
@@ -152,7 +163,9 @@ class AuthRepositoryImpl implements AuthRepository {
         'AuthRepository',
       );
       await _clearTokens();
-      return Left(const UnauthorizedFailure('Session expired. Please sign in again.'));
+      return Left(
+        const UnauthorizedFailure('Session expired. Please sign in again.'),
+      );
     }
   }
 

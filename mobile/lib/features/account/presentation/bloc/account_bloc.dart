@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/failure_handler.dart';
+import '../../../../features/notifications/services/push_notification_service.dart';
+import '../../../../features/auth/utils/device_utils.dart';
 import '../../domain/usecases/get_account_data_usecase.dart';
 import '../../../auth/domain/usecases/logout_usecase.dart';
 import '../../../../core/usecase/usecase.dart';
@@ -11,14 +13,17 @@ part 'account_state.dart';
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final GetAccountDataUseCase _getAccountData;
   final LogoutUseCase _logoutUseCase;
+  final PushNotificationService _pushNotificationService;
   final FailureHandler _failureHandler;
 
   AccountBloc({
     required GetAccountDataUseCase getAccountData,
     required LogoutUseCase logoutUseCase,
+    required PushNotificationService pushNotificationService,
     FailureHandler? failureHandler,
   }) : _getAccountData = getAccountData,
        _logoutUseCase = logoutUseCase,
+       _pushNotificationService = pushNotificationService,
        _failureHandler = failureHandler ?? FailureHandler.instance,
        super(AccountInitial()) {
     on<LoadAccountData>(_onLoadAccountData);
@@ -37,7 +42,11 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     result.fold(
       (failure) {
         _failureHandler.logFailure(failure, 'AccountBloc');
-        emit(AccountError(message: _failureHandler.getUserFriendlyMessage(failure)));
+        emit(
+          AccountError(
+            message: _failureHandler.getUserFriendlyMessage(failure),
+          ),
+        );
       },
       (account) => emit(
         AccountLoaded(
@@ -55,14 +64,15 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   ) async {
     emit(AccountLoading());
 
+    await _pushNotificationService.revokeToken();
     final result = await _logoutUseCase(NoParams());
+    await DeviceUtils.clearDeviceId();
 
-    result.fold(
-      (failure) {
-        _failureHandler.logFailure(failure, 'AccountBloc');
-        emit(AccountError(message: _failureHandler.getUserFriendlyMessage(failure)));
-      },
-      (_) => emit(AccountLoggedOut()),
-    );
+    result.fold((failure) {
+      _failureHandler.logFailure(failure, 'AccountBloc');
+      emit(
+        AccountError(message: _failureHandler.getUserFriendlyMessage(failure)),
+      );
+    }, (_) => emit(AccountLoggedOut()));
   }
 }

@@ -42,7 +42,11 @@ class SignInButton extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Icon(Icons.arrow_forward_rounded, color: cs.onPrimary, size: 18),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: cs.onPrimary,
+                    size: 18,
+                  ),
                 ],
               ),
       ),

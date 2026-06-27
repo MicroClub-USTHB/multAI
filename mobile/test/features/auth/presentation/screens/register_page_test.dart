@@ -15,15 +15,16 @@ void main() {
   late MockAuthBloc mockAuthBloc;
 
   setUpAll(() {
-    registerFallbackValue(SendOtpRequested(
-      email: 'test@test.com',
-      password: 'Password1!',
-    ));
-    registerFallbackValue(VerifyOtpRequested(
-      email: 'test@test.com',
-      password: 'Password1!',
-      otp: '123456',
-    ));
+    registerFallbackValue(
+      SendOtpRequested(email: 'test@test.com', password: 'Password1!'),
+    );
+    registerFallbackValue(
+      VerifyOtpRequested(
+        email: 'test@test.com',
+        password: 'Password1!',
+        otp: '123456',
+      ),
+    );
   });
 
   setUp(() async {
@@ -44,8 +45,9 @@ void main() {
     );
   }
 
-  testWidgets('renders email, password, confirm password fields initially',
-      (WidgetTester tester) async {
+  testWidgets('renders email, password, confirm password fields initially', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(buildTestWidget());
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
@@ -53,11 +55,12 @@ void main() {
     expect(find.text('Email'), findsOneWidget);
     expect(find.text('Password'), findsOneWidget);
     expect(find.text('Confirm Password'), findsOneWidget);
-    expect(find.text('Sign Up'), findsOneWidget);
+    expect(find.text('Continue'), findsOneWidget);
   });
 
-  testWidgets('shows OTP input when AuthOtpSent state is emitted',
-      (WidgetTester tester) async {
+  testWidgets('shows OTP input when AuthOtpSent state is emitted', (
+    WidgetTester tester,
+  ) async {
     whenListen(
       mockAuthBloc,
       Stream.fromIterable([AuthOtpSent(email: 'test@test.com')]),
@@ -68,14 +71,15 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('Enter OTP'), findsOneWidget);
-    expect(find.text('Verify OTP'), findsOneWidget);
-    expect(find.text('Resend OTP'), findsOneWidget);
+    expect(find.text('Check your email.'), findsOneWidget);
+    expect(find.text('Verify'), findsOneWidget);
+    expect(find.text('Resend code'), findsOneWidget);
     expect(find.text('Go back'), findsOneWidget);
   });
 
-  testWidgets('shows loading indicator when AuthLoading state is emitted',
-      (WidgetTester tester) async {
+  testWidgets('shows loading indicator when AuthLoading state is emitted', (
+    WidgetTester tester,
+  ) async {
     whenListen(
       mockAuthBloc,
       Stream.fromIterable([AuthLoading()]),
@@ -89,8 +93,9 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsWidgets);
   });
 
-  testWidgets('sends SendOtpRequested when Sign Up button is tapped',
-      (WidgetTester tester) async {
+  testWidgets('sends SendOtpRequested when Sign Up button is tapped', (
+    WidgetTester tester,
+  ) async {
     when(() => mockAuthBloc.state).thenReturn(AuthInitial());
 
     await tester.pumpWidget(buildTestWidget());
@@ -100,14 +105,17 @@ void main() {
     await tester.enterText(find.byType(TextFormField).at(1), 'Password1!');
     await tester.enterText(find.byType(TextFormField).at(2), 'Password1!');
 
-    await tester.tap(find.text('Sign Up'));
+    await tester.ensureVisible(find.text('Continue'));
+    await tester.pump();
+    await tester.tap(find.text('Continue'));
     await tester.pump();
 
     verify(() => mockAuthBloc.add(any<SendOtpRequested>())).called(1);
   });
 
-  testWidgets('sends VerifyOtpRequested when Verify OTP is tapped',
-      (WidgetTester tester) async {
+  testWidgets('sends VerifyOtpRequested when Verify OTP is tapped', (
+    WidgetTester tester,
+  ) async {
     whenListen(
       mockAuthBloc,
       Stream.fromIterable([AuthOtpSent(email: 'test@test.com')]),
@@ -120,7 +128,7 @@ void main() {
 
     await tester.enterText(find.byType(TextFormField).first, '123456');
 
-    await tester.tap(find.text('Verify OTP'));
+    await tester.tap(find.text('Verify'));
     await tester.pump();
 
     verify(() => mockAuthBloc.add(any<VerifyOtpRequested>())).called(1);

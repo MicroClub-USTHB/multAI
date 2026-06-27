@@ -99,12 +99,12 @@ class PhotoSlot extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2.5),
                   )
                 : _hasPhoto
-                    ? _FilledSlot(
-                        filePath: filePath!,
-                        isPrimary: type.isPrimary,
-                        onDelete: onDelete,
-                      )
-                    : _EmptySlot(isOptional: isOptional),
+                ? _FilledSlot(
+                    filePath: filePath!,
+                    isPrimary: type.isPrimary,
+                    onDelete: onDelete,
+                  )
+                : _EmptySlot(isOptional: isOptional),
           ),
         ),
         SizedBox(height: context.heightCalculated(6)),

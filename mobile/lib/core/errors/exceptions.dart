@@ -58,9 +58,7 @@ class CacheException implements Exception {
   const CacheException({this.message = 'Cache Error'});
 
   app.AppException toAppException({String? requestId, String? provider}) {
-    return app.CacheException(
-      message: message,
-    );
+    return app.CacheException(message: message);
   }
 
   @override

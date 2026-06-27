@@ -14,6 +14,12 @@ class NotificationLoaded extends NotificationState {
     : unreadCount = notifications.where((n) => !n.isRead).length;
 }
 
+class NotificationOffline extends NotificationState {
+  final List<NotificationEntity> cachedNotifications;
+
+  NotificationOffline({this.cachedNotifications = const []});
+}
+
 class NotificationError extends NotificationState {
   final String message;
   NotificationError({required this.message});

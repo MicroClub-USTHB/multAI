@@ -9,7 +9,8 @@ class MarkAsReadParams {
   const MarkAsReadParams({required this.notificationId});
 }
 
-class MarkAsReadUsecase extends UseCase<void, MarkAsReadParams> {
+class MarkAsReadUsecase
+    extends UseCase<List<NotificationEntity>, MarkAsReadParams> {
   final NotificationsRepository repository;
   MarkAsReadUsecase(this.repository);
   @override

@@ -95,8 +95,7 @@ abstract class AppTheme {
   static const Duration durationSlow = AppThemeMetrics.durationSlow;
   static const Curve curveStandard = AppThemeMetrics.curveStandard;
   static const Curve curveEmphasized = AppThemeMetrics.curveEmphasized;
-  static const double largeScreenMinWidth =
-      AppThemeMetrics.largeScreenMinWidth;
+  static const double largeScreenMinWidth = AppThemeMetrics.largeScreenMinWidth;
   static const double activeCardAspectWidth =
       AppThemeMetrics.activeCardAspectWidth;
   static const double activeCardBreakpoint =

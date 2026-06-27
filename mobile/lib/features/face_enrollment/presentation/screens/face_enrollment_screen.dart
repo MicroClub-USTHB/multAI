@@ -59,10 +59,7 @@ class FaceEnrollmentScreen extends StatelessWidget {
     if (source == null || !context.mounted) return;
 
     final picker = ImagePicker();
-    final picked = await picker.pickImage(
-      source: source,
-      imageQuality: 90,
-    );
+    final picked = await picker.pickImage(source: source, imageQuality: 90);
 
     if (picked == null || !context.mounted) return;
 

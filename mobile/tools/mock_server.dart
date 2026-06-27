@@ -22,8 +22,14 @@ void handleRequest(HttpRequest request) {
 
   if (method == 'OPTIONS') {
     request.response.headers.set('Access-Control-Allow-Origin', '*');
-    request.response.headers.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-    request.response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    request.response.headers.set(
+      'Access-Control-Allow-Methods',
+      'POST, GET, OPTIONS',
+    );
+    request.response.headers.set(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization',
+    );
     request.response.statusCode = 204;
     request.response.close();
     return;
@@ -75,8 +81,10 @@ Future<void> handleVerifyRegister(HttpRequest request) async {
   }
 
   final response = {
-    'access_token': 'mock_access_token_${DateTime.now().millisecondsSinceEpoch}',
-    'refresh_token': 'mock_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
+    'access_token':
+        'mock_access_token_${DateTime.now().millisecondsSinceEpoch}',
+    'refresh_token':
+        'mock_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
     'session_id': 'mock_session_id_${DateTime.now().millisecondsSinceEpoch}',
     'expires_in': 3600,
     'user_id': 'mock_user_id_${DateTime.now().millisecondsSinceEpoch}',
@@ -94,8 +102,10 @@ Future<void> handleLogin(HttpRequest request) async {
   print('  Body: ${jsonEncode(body)}');
 
   final response = {
-    'access_token': 'mock_access_token_${DateTime.now().millisecondsSinceEpoch}',
-    'refresh_token': 'mock_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
+    'access_token':
+        'mock_access_token_${DateTime.now().millisecondsSinceEpoch}',
+    'refresh_token':
+        'mock_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
     'session_id': 'mock_session_id_${DateTime.now().millisecondsSinceEpoch}',
     'expires_in': 3600,
     'user_id': 'mock_user_id_${DateTime.now().millisecondsSinceEpoch}',
