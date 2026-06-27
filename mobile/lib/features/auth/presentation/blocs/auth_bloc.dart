@@ -173,9 +173,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _refreshTokenUseCase(
         RefreshTokenParams(refreshToken: event.refreshToken),
       );
-      result.fold(
-        (failure) => _emitFailure(emit, failure),
-        (auth) => _emitAuthenticatedState(auth, emit),
+      await result.fold(
+        (failure) async => _emitFailure(emit, failure),
+        (auth) async => _emitAuthenticatedState(auth, emit),
       );
     } catch (e, s) {
       _logger.error('AuthBloc', 'Token refresh failed', e, s);

@@ -1,8 +1,9 @@
+import 'dart:io';
+import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:bloc_test/bloc_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:multai_mobile/core/errors/failure.dart';
@@ -277,6 +278,45 @@ void main() {
           bloc.add(LoginRequested(email: 'wrong@test.com', password: 'bad')),
       expect: () => [isA<AuthLoading>(), isA<AuthFailure>()],
     );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [AuthLoading, AuthFailure] on network error',
+      build: () {
+        when(() => loginUseCase(any())).thenAnswer(
+          (_) async => Left(NetworkFailure('No internet connection')),
+        );
+        return authBloc;
+      },
+      act: (bloc) => bloc.add(
+        LoginRequested(email: 'test@test.com', password: 'Password1!'),
+      ),
+      expect: () => [isA<AuthLoading>(), isA<AuthFailure>()],
+    );
+
+    test('sequential execution processes both logins', () async {
+      int callCount = 0;
+      when(() => loginUseCase(any())).thenAnswer((_) async {
+        callCount++;
+        await Future.delayed(const Duration(milliseconds: 50));
+        return Right(authEntity);
+      });
+      when(
+        () => checkEnrollmentDoneUseCase.call(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => pushNotificationService.registerCurrentToken(),
+      ).thenAnswer((_) async {});
+
+      authBloc.add(
+        LoginRequested(email: 'test@test.com', password: 'Password1!'),
+      );
+      authBloc.add(
+        LoginRequested(email: 'test@test.com', password: 'Password2!'),
+      );
+
+      await Future.delayed(const Duration(milliseconds: 200));
+      expect(callCount, 2);
+    });
   });
 
   group('LogoutRequested', () {
@@ -300,18 +340,14 @@ void main() {
   });
 
   group('GetCurrentUserRequested', () {
-    final meEntity = MeEntity(
-      id: '1',
-      email: 'test@test.com',
-      devices: const [],
-    );
-
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, GetCurrentUserSuccess] on success',
       build: () {
-        when(
-          () => getCurrentUserUseCase(any()),
-        ).thenAnswer((_) async => Right(meEntity));
+        when(() => getCurrentUserUseCase(any())).thenAnswer(
+          (_) async => Right(
+            MeEntity(id: '1', email: 'test@test.com', devices: const []),
+          ),
+        );
         return authBloc;
       },
       act: (bloc) => bloc.add(GetCurrentUserRequested()),
@@ -329,5 +365,35 @@ void main() {
       act: (bloc) => bloc.add(GetCurrentUserRequested()),
       expect: () => [isA<AuthLoading>(), isA<AuthFailure>()],
     );
+  });
+
+  group('AuthBloc - Error sanitization', () {
+    test('sanitizes SocketException to user-friendly message', () async {
+      when(
+        () => loginUseCase(any()),
+      ).thenThrow(const SocketException('Connection refused'));
+
+      final expected = [isA<AuthLoading>(), isA<AuthFailure>()];
+
+      expect(authBloc.stream, emitsInOrder(expected));
+
+      authBloc.add(
+        LoginRequested(email: 'test@test.com', password: 'Password1!'),
+      );
+    });
+
+    test('sanitizes generic exception to safe message', () async {
+      when(
+        () => loginUseCase(any()),
+      ).thenThrow(Exception('Some internal error details'));
+
+      final expected = [isA<AuthLoading>(), isA<AuthFailure>()];
+
+      expect(authBloc.stream, emitsInOrder(expected));
+
+      authBloc.add(
+        LoginRequested(email: 'test@test.com', password: 'Password1!'),
+      );
+    });
   });
 }

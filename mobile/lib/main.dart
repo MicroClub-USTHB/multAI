@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'core/errors/error_handler.dart';
 import 'core/errors/error_mapper.dart';
 import 'core/router/app_router.dart';
@@ -26,6 +26,12 @@ late final SessionManager sessionManager;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase initialization skipped: $e');
+  }
 
   if (DeviceSecurity.isDebugMode()) {
     SecureLogger.warning('App', 'Running in debug mode');
@@ -62,8 +68,7 @@ void main() async {
 
   await di.init();
 
-  await Firebase.initializeApp();
-
+  // Wire push notification lifecycle
   final pushService = di.sl<PushNotificationService>();
   await pushService.init();
   di.sl<NotificationNavigationService>().init(appRouter);
@@ -157,7 +162,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         BlocProvider<AccountBloc>(create: (_) => di.sl<AccountBloc>()),
         BlocProvider<EventsBloc>(create: (_) => di.sl<EventsBloc>()),
         BlocProvider<NotificationBloc>(
-          create: (_) => di.sl<NotificationBloc>(),
+          create: (_) => di.sl<NotificationBloc>()..add(LoadNotifications()),
         ),
         BlocProvider<GalleryBloc>(create: (_) => di.sl<GalleryBloc>()),
       ],

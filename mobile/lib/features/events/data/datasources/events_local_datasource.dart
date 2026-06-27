@@ -1,38 +1,54 @@
 import 'dart:convert';
-import '../../../../core/constants/storage_keys.dart';
 import '../../../../core/storage/app_local_storage.dart';
-import '../models/event_model.dart';
+import '../../domain/entities/event_entity.dart';
 
 abstract class EventsLocalDataSource {
-  Future<void> cacheEvents(List<EventModel> events);
-  Future<List<EventModel>?> getCachedEvents();
+  Future<void> cacheEvents(List<EventEntity> events);
+  Future<List<EventEntity>?> getCachedEvents();
   Future<void> clearCache();
 }
 
 class EventsLocalDataSourceImpl implements EventsLocalDataSource {
-  final LocalStorage localStorage;
+  final AppLocalStorage localStorage;
 
   EventsLocalDataSourceImpl({required this.localStorage});
 
+  static const _cacheKey = 'cached_events';
+
   @override
-  Future<void> cacheEvents(List<EventModel> events) async {
-    final jsonList = events.map((e) => e.toJson()).toList();
-    final raw = jsonEncode(jsonList);
-    await localStorage.setSecureString(StorageKeys.cachedEvents, raw);
+  Future<void> cacheEvents(List<EventEntity> events) async {
+    final jsonList = events
+        .map(
+          (e) => <String, dynamic>{
+            'id': e.id,
+            'name': e.name,
+            'event_date': e.eventDate.toIso8601String(),
+            'status': e.status,
+            'joined_at': e.joinedAt.toIso8601String(),
+          },
+        )
+        .toList();
+    await localStorage.setString(_cacheKey, jsonEncode({'events': jsonList}));
   }
 
   @override
-  Future<List<EventModel>?> getCachedEvents() async {
-    final encrypted = await localStorage.getSecureString(
-      StorageKeys.cachedEvents,
-    );
-    if (encrypted == null || encrypted.isEmpty) return null;
-
+  Future<List<EventEntity>?> getCachedEvents() async {
+    final raw = localStorage.getString(_cacheKey);
+    if (raw == null || raw.isEmpty) return null;
     try {
-      final List<dynamic> items = jsonDecode(encrypted) as List<dynamic>;
-      return items
-          .map((e) => EventModel.fromJson(e as Map<String, dynamic>))
-          .toList();
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      final list = json['events'] as List<dynamic>?;
+      if (list == null || list.isEmpty) return null;
+      return list.map((e) {
+        final map = e as Map<String, dynamic>;
+        return EventEntity(
+          id: map['id'] as String,
+          name: map['name'] as String,
+          eventDate: DateTime.parse(map['event_date'] as String),
+          status: map['status'] as String,
+          joinedAt: DateTime.parse(map['joined_at'] as String),
+        );
+      }).toList();
     } catch (_) {
       return null;
     }
@@ -40,6 +56,6 @@ class EventsLocalDataSourceImpl implements EventsLocalDataSource {
 
   @override
   Future<void> clearCache() async {
-    await localStorage.removeSecure(StorageKeys.cachedEvents);
+    await localStorage.remove(_cacheKey);
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -50,6 +51,8 @@ class ApiClient {
     return headers;
   }
 
+  static const _requestTimeout = Duration(seconds: 30);
+
   Future<void> checkConnection() async {
     if (!await _networkInfo.isConnected) {
       throw const NetworkFailure();
@@ -58,11 +61,14 @@ class ApiClient {
 
   Future<dynamic> get(String endpoint) async {
     await checkConnection();
-    final response = await _client.get(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: await _getHeaders(),
-    );
-    return _handleResponse(response);
+    try {
+      final response = await _client
+          .get(Uri.parse('$baseUrl$endpoint'), headers: await _getHeaders())
+          .timeout(_requestTimeout);
+      return _handleResponse(response);
+    } on TimeoutException {
+      throw const NetworkFailure('Request timed out');
+    }
   }
 
   Future<dynamic> post(
@@ -71,12 +77,18 @@ class ApiClient {
     bool requiresAuth = false,
   }) async {
     await checkConnection();
-    final response = await _client.post(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: await _getHeaders(requiresAuth: requiresAuth),
-      body: body != null ? jsonEncode(body) : null,
-    );
-    return _handleResponse(response);
+    try {
+      final response = await _client
+          .post(
+            Uri.parse('$baseUrl$endpoint'),
+            headers: await _getHeaders(requiresAuth: requiresAuth),
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(_requestTimeout);
+      return _handleResponse(response);
+    } on TimeoutException {
+      throw const NetworkFailure('Request timed out');
+    }
   }
 
   Future<void> postVoid(
@@ -85,21 +97,30 @@ class ApiClient {
     bool requiresAuth = false,
   }) async {
     await checkConnection();
-    final response = await _client.post(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: await _getHeaders(requiresAuth: requiresAuth),
-      body: body != null ? jsonEncode(body) : null,
-    );
-    _handleVoidResponse(response);
+    try {
+      final response = await _client
+          .post(
+            Uri.parse('$baseUrl$endpoint'),
+            headers: await _getHeaders(requiresAuth: requiresAuth),
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(_requestTimeout);
+      _handleVoidResponse(response);
+    } on TimeoutException {
+      throw const NetworkFailure('Request timed out');
+    }
   }
 
   Future<void> delete(String endpoint) async {
     await checkConnection();
-    final response = await _client.delete(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: await _getHeaders(),
-    );
-    _handleVoidResponse(response);
+    try {
+      final response = await _client
+          .delete(Uri.parse('$baseUrl$endpoint'), headers: await _getHeaders())
+          .timeout(_requestTimeout);
+      _handleVoidResponse(response);
+    } on TimeoutException {
+      throw const NetworkFailure('Request timed out');
+    }
   }
 
   void _handleVoidResponse(http.Response response) {
@@ -143,7 +164,7 @@ class ApiClient {
       );
     }
 
-    final streamedResponse = await request.send();
+    final streamedResponse = await request.send().timeout(_requestTimeout);
     final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 401) {

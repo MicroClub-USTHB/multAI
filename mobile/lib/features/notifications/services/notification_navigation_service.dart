@@ -33,6 +33,26 @@ class NotificationNavigationService {
     }
   }
 
+  void handleDataTap(Map<String, String> data) {
+    if (_router == null) return;
+
+    final type = data['type'];
+    switch (type) {
+      case 'photo_approval':
+        final photoId = data['photo_id'];
+        if (photoId != null) {
+          _router!.push('${AppRoutes.photoApproval}?photoId=$photoId');
+        } else {
+          _router!.push(AppRoutes.photoApproval);
+        }
+      case 'face_match':
+      case 'photo_distributed':
+        _router!.push(AppRoutes.gallery);
+      case 'event_invite':
+        _router!.push(AppRoutes.events);
+    }
+  }
+
   void handleDeepLink(Uri uri) {
     if (_router == null) return;
 

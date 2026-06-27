@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/failure_handler.dart';
-import '../../../../core/network/network_info.dart';
+import '../../../../core/network/connectivity_service.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../domain/entities/event_entity.dart';
 import '../../domain/usecases/get_events_usecase.dart';
@@ -12,36 +13,27 @@ part 'events_state.dart';
 class EventsBloc extends Bloc<EventsEvent, EventsState> {
   final GetUserEventsUseCase _getUserEventsUseCase;
   final JoinEventUseCase _joinEventUseCase;
-  final NetworkInfo _networkInfo;
+  final ConnectivityService _connectivityService;
   final FailureHandler _failureHandler;
-  StreamSubscription<bool>? _connectivitySubscription;
+  StreamSubscription<bool>? _connectivitySub;
 
   EventsBloc({
     required GetUserEventsUseCase getUserEventsUseCase,
     required JoinEventUseCase joinEventUseCase,
-    required NetworkInfo networkInfo,
+    required ConnectivityService connectivityService,
     FailureHandler? failureHandler,
   }) : _getUserEventsUseCase = getUserEventsUseCase,
        _joinEventUseCase = joinEventUseCase,
-       _networkInfo = networkInfo,
+       _connectivityService = connectivityService,
        _failureHandler = failureHandler ?? FailureHandler.instance,
        super(EventsInitial()) {
     on<GetUserEventsRequested>(_onGetUserEvents);
     on<JoinEventRequested>(_onJoinEvent);
     on<EventsRetryRequested>(_onEventsRetry);
-    _listenToConnectivity();
-  }
-
-  void _listenToConnectivity() {
-    _connectivitySubscription = _networkInfo.onConnectivityChanged.listen((
-      isConnected,
-    ) {
-      if (isConnected &&
-          state is EventsLoaded &&
-          (state as EventsLoaded).isOffline) {
-        add(GetUserEventsRequested());
-      }
-      if (isConnected && state is EventsFailure) {
+    _connectivitySub = _connectivityService.onStatusChanged.listen((online) {
+      if (!online) return;
+      if (state is EventsFailure ||
+          (state is EventsLoaded && (state as EventsLoaded).isOffline)) {
         add(GetUserEventsRequested());
       }
     });
@@ -49,7 +41,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
 
   @override
   Future<void> close() {
-    _connectivitySubscription?.cancel();
+    _connectivitySub?.cancel();
     return super.close();
   }
 
@@ -73,6 +65,10 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     final result = await _getUserEventsUseCase(NoParams());
     result.fold(
       (failure) {
+        if (failure is NetworkFailure) {
+          emit(EventsOffline());
+          return;
+        }
         _failureHandler.logFailure(failure, 'EventsBloc');
         if (state is EventsLoaded) {
           final previous = state as EventsLoaded;
@@ -99,6 +95,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
           EventsLoaded(
             activeEvents: active,
             archivedEvents: archived,
+            isOffline: !_connectivityService.isConnected,
             isRefreshing: false,
           ),
         );
@@ -150,6 +147,10 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     final result = await _getUserEventsUseCase(NoParams());
     result.fold(
       (failure) {
+        if (failure is NetworkFailure) {
+          emit(EventsOffline());
+          return;
+        }
         _failureHandler.logFailure(failure, 'EventsBloc');
         if (state is EventsLoaded) {
           final previous = state as EventsLoaded;
@@ -176,6 +177,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
           EventsLoaded(
             activeEvents: active,
             archivedEvents: archived,
+            isOffline: !_connectivityService.isConnected,
             isRefreshing: false,
           ),
         );

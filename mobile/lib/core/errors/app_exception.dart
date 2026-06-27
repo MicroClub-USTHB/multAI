@@ -20,8 +20,9 @@ abstract class AppException implements Exception {
     if (statusCode != null) buffer.writeln('StatusCode: $statusCode');
     if (requestId != null) buffer.writeln('RequestId: $requestId');
     if (provider != null) buffer.writeln('Provider: $provider');
-    if (stackTrace != null)
+    if (stackTrace != null) {
       buffer.writeln('StackTrace: ${stackTrace.toString()}');
+    }
     return buffer.toString();
   }
 }

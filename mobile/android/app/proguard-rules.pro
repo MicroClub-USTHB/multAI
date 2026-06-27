@@ -1,37 +1,21 @@
-# Flutter specific
--keep class io.flutter.app.** { *; }
--keep class io.flutter.plugin.**  { *; }
--keep class io.flutter.util.**  { *; }
--keep class io.flutter.view.**  { *; }
--keep class io.flutter.**  { *; }
--keep class io.flutter.plugins.**  { *; }
+# Flutter engine and plugin infrastructure
+-keep class io.flutter.** { *; }
 
-# Keep FlutterSecureStorage
+# flutter_secure_storage
 -keep class com.it_nomads.fluttersecurestorage.** { *; }
 
-# Keep google_sign_in
+# google_sign_in
 -keep class com.google.android.gms.** { *; }
--keep class com.google.firebase.** { *; }
 
-# Keep Firebase
+# Models used with json_serializable
+-keep class com.example.multai_mobile.** { *; }
+
+# Annotations used at runtime by Flutter plugins
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 
-# Keep Dio
--keep class com.android.org.conscrypt.** { *; }
--keep class org.apache.harmony.xnet.provider.jsse.** { *; }
-
-# Keep models used with json_serializable
--keep class com.example.multai_mobile.** { *; }
-
-# Obfuscation settings
--optimizationpasses 5
--dontusemixedcaseclassnames
--dontskipnonpubliclibraryclasses
--verbose
--optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
-
-# Play Core (referenced by Flutter embedding but not needed without split APKs)
+# Play Core — referenced by Flutter's PlayStoreDeferredComponentManager
+# but not directly used by the app
 -dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication
 -dontwarn com.google.android.play.core.splitinstall.SplitInstallException
 -dontwarn com.google.android.play.core.splitinstall.SplitInstallManager
@@ -44,7 +28,7 @@
 -dontwarn com.google.android.play.core.tasks.OnSuccessListener
 -dontwarn com.google.android.play.core.tasks.Task
 
-# Remove logging in release
+# Remove logging in release (keeps errors)
 -assumenosideeffects class android.util.Log {
     public static boolean isLoggable(java.lang.String, int);
     public static int v(...);

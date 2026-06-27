@@ -16,6 +16,12 @@ class MarkSingleNotificationRead extends NotificationEvent {
 
 class MarkAllNotificationsRead extends NotificationEvent {}
 
+class PushTokenReceived extends NotificationEvent {
+  final String deviceId;
+  final String token;
+  PushTokenReceived({required this.deviceId, required this.token});
+}
+
 class PushNotificationReceived extends NotificationEvent {
   final String title;
   final String body;
