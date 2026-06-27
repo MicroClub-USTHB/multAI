@@ -18,7 +18,7 @@ import '../../features/photo_approval/presentation/screens/photo_approval_page.d
 import 'app_routes.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppRoutes.events,
+  initialLocation: AppRoutes.faceEnrollment,
   routes: [
     // ── Splash Screen (initial route) ───────────────────────────────────────
     GoRoute(
