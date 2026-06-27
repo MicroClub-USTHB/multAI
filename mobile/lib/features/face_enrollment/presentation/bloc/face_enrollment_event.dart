@@ -25,3 +25,5 @@ class PhotoRemoved extends FaceEnrollmentEvent {
 }
 
 class EnrollmentSubmitted extends FaceEnrollmentEvent {}
+
+class ResetEnrollment extends FaceEnrollmentEvent {}

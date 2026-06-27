@@ -1,8 +1,8 @@
 import 'dart:io';
+
 import '../../../../core/errors/failure.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/face_photo_model.dart';
-import '../../utils/photo_validator.dart';
 import '../../../../core/constants/end_points.dart';
 
 abstract class FaceEnrollmentRemoteDataSource {
@@ -18,18 +18,13 @@ class FaceEnrollmentRemoteDataSourceImpl
 
   @override
   Future<void> uploadFacePhotos(List<FacePhotoModel> photos) async {
-    for (final photo in photos) {
-      final validation = await PhotoProcessor.processAndValidate(photo.filePath);
-      validation.fold((failure) => throw failure, (_) {});
-    }
-
     int attempt = 0;
     while (attempt < _maxRetries) {
       try {
         await apiClient.postMultipart(
           EndPoints.faceEnrollment,
           files: photos.map((p) => File(p.filePath)).toList(),
-          fieldNames: List.filled(photos.length, 'files'),
+          fieldNames: photos.map((p) => p.fieldName).toList(),
           requiresAuth: true,
         );
         return;
