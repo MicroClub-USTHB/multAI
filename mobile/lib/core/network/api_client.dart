@@ -148,13 +148,8 @@ class ApiClient {
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
 
-    if (response.statusCode == 401) {
-      throw const UnauthorizedFailure('Session expired. Please log in again.');
-    }
-
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      throw ServerFailure('Failed to upload photos. Please try again.', response.statusCode);
-    }
+    if (response.statusCode == 200 || response.statusCode == 201) return;
+    _throwForStatus(response);
   }
 
   String _mimeTypeFromExtension(String ext) {
