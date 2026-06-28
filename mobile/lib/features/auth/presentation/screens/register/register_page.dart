@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -28,6 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+  String? _pendingToken;
 
   @override
   void dispose() {
@@ -70,6 +72,10 @@ class _RegisterPageState extends State<RegisterPage> {
           context.go(AppRoutes.events);
         } else if (state is AuthNeedsFaceEnrollment) {
           context.go(AppRoutes.faceEnrollment);
+        } else if (state is AuthOtpSent) {
+          setState(() => _pendingToken = state.pendingToken);
+        } else if (state is ResendOtpSuccess) {
+          setState(() => _pendingToken = state.pendingToken);
         }
         if (state is AuthFailure) {
           context.showErrorSnackBar(state.message);
@@ -96,10 +102,17 @@ class _RegisterPageState extends State<RegisterPage> {
                           isOtpStep
                               ? _OtpFormContent(
                                   email: _emailController.text.trim(),
+                                  pendingToken: _pendingToken,
                                   otpController: _otpController,
                                   isLoading: isLoading,
                                   onVerify: _onVerifyOtpPressed,
-                                  onResend: _onSendOtpPressed,
+                                  onResend: (pendingToken) => context
+                                      .read<AuthBloc>()
+                                      .add(
+                                        ResendOtpRequested(
+                                          pendingToken: pendingToken,
+                                        ),
+                                      ),
                                 )
                               : _RegisterFormContent(
                                   emailController: _emailController,
@@ -355,15 +368,17 @@ class _RegisterFormContent extends StatelessWidget {
 
 // ── OTP step (step 2) ──────────────────────────────────────────────────────────
 
-class _OtpFormContent extends StatelessWidget {
+class _OtpFormContent extends StatefulWidget {
   final String email;
+  final String? pendingToken;
   final TextEditingController otpController;
   final bool isLoading;
   final VoidCallback onVerify;
-  final VoidCallback onResend;
+  final void Function(String pendingToken) onResend;
 
   const _OtpFormContent({
     required this.email,
+    required this.pendingToken,
     required this.otpController,
     required this.isLoading,
     required this.onVerify,
@@ -371,9 +386,44 @@ class _OtpFormContent extends StatelessWidget {
   });
 
   @override
+  State<_OtpFormContent> createState() => _OtpFormContentState();
+}
+
+class _OtpFormContentState extends State<_OtpFormContent> {
+  int _countdown = 0;
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startCountdown() {
+    _timer?.cancel();
+    setState(() => _countdown = 60);
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_countdown <= 1) {
+        timer.cancel();
+        setState(() => _countdown = 0);
+      } else {
+        setState(() => _countdown = _countdown - 1);
+      }
+    });
+  }
+
+  void _onResendPressed() {
+    final token = widget.pendingToken;
+    if (token == null || token.isEmpty || _countdown > 0) return;
+    widget.onResend(token);
+    _startCountdown();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
+    final canResend = _countdown == 0 && widget.pendingToken != null;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(28, 28, 28, 0),
@@ -408,7 +458,7 @@ class _OtpFormContent extends StatelessWidget {
               children: [
                 const TextSpan(text: 'We sent a 6-digit code to '),
                 TextSpan(
-                  text: email,
+                  text: widget.email,
                   style: TextStyle(
                     color: AppThemeColors.gold,
                     fontWeight: FontWeight.w600,
@@ -421,7 +471,7 @@ class _OtpFormContent extends StatelessWidget {
 
           // OTP input — centered, spaced digits
           TextFormField(
-            controller: otpController,
+            controller: widget.otpController,
             keyboardType: TextInputType.number,
             maxLength: 6,
             textAlign: TextAlign.center,
@@ -460,8 +510,8 @@ class _OtpFormContent extends StatelessWidget {
             height: 52,
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: isLoading ? null : onVerify,
-              child: isLoading
+              onPressed: widget.isLoading ? null : widget.onVerify,
+              child: widget.isLoading
                   ? SizedBox(
                       height: 20,
                       width: 20,
@@ -493,14 +543,19 @@ class _OtpFormContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Resend link
+          // Resend link with countdown
           Center(
             child: TextButton(
-              onPressed: isLoading ? null : onResend,
+              onPressed:
+                  widget.isLoading || !canResend ? null : _onResendPressed,
               child: Text(
-                'Resend code',
+                _countdown > 0
+                    ? 'Resend code (${_countdown}s)'
+                    : 'Resend code',
                 style: tt.bodySmall?.copyWith(
-                  color: AppThemeColors.gold,
+                  color: canResend
+                      ? AppThemeColors.gold
+                      : AppThemeColors.neutral300,
                   fontWeight: FontWeight.w600,
                 ),
               ),
