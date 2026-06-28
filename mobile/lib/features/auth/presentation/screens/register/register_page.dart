@@ -8,7 +8,7 @@ import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
-import '../../../../../core/validators/validators.dart';
+import '../../../../../core/utils/validators.dart';
 import '../../blocs/auth_bloc.dart';
 import '../login/widgets/email_field.dart';
 import '../login/widgets/password_field.dart';
@@ -304,8 +304,11 @@ class _RegisterFormContent extends StatelessWidget {
             obscure: obscurePassword,
             onToggle: onTogglePassword,
             onSubmit: () {},
+            validator: Validators.password,
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 8),
+          _PasswordStrengthIndicator(controller: passwordController),
+          const SizedBox(height: 10),
 
           Text(
             'Confirm Password',
@@ -317,9 +320,9 @@ class _RegisterFormContent extends StatelessWidget {
             obscure: obscureConfirm,
             onToggle: onToggleConfirm,
             onSubmit: onSubmit,
-            validator: (v) => AppValidators.validateConfirmPassword(
+            validator: (v) => Validators.confirmPassword(
               v,
-              password: passwordController.text,
+              passwordController.text,
             ),
           ),
           const SizedBox(height: 32),
@@ -564,6 +567,87 @@ class _OtpFormContentState extends State<_OtpFormContent> {
           const SizedBox(height: 24),
         ],
       ),
+    );
+  }
+}
+
+// ── Password strength indicator ─────────────────────────────────────────────────
+
+class _PasswordStrengthIndicator extends StatefulWidget {
+  final TextEditingController controller;
+  const _PasswordStrengthIndicator({required this.controller});
+
+  @override
+  State<_PasswordStrengthIndicator> createState() =>
+      _PasswordStrengthIndicatorState();
+}
+
+class _PasswordStrengthIndicatorState
+    extends State<_PasswordStrengthIndicator> {
+  int _strength = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onPasswordChanged);
+    _onPasswordChanged();
+  }
+
+  @override
+  void didUpdateWidget(_PasswordStrengthIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_onPasswordChanged);
+      widget.controller.addListener(_onPasswordChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onPasswordChanged);
+    super.dispose();
+  }
+
+  void _onPasswordChanged() {
+    final p = widget.controller.text;
+    int count = 0;
+    if (p.length >= 8) count++;
+    if (p.contains(RegExp(r'[A-Z]'))) count++;
+    if (p.contains(RegExp(r'[a-z]'))) count++;
+    if (p.contains(RegExp(r'[0-9]'))) count++;
+    if (p.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) count++;
+    if (count != _strength) setState(() => _strength = count);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = [
+      AppThemeColors.error,
+      AppThemeColors.warning,
+      AppThemeColors.gold,
+      AppThemeColors.success,
+    ];
+    final segments = _strength == 0 ? 1 : _strength > 4 ? 4 : _strength;
+    final activeColor = _strength == 0
+        ? AppThemeColors.neutral300.withValues(alpha: 0.3)
+        : colors[(_strength - 1).clamp(0, 3)];
+
+    return Row(
+      children: List.generate(4, (i) {
+        final isActive = i < segments;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(right: i < 3 ? 4 : 0),
+            child: Container(
+              height: 3,
+              decoration: BoxDecoration(
+                color: isActive ? activeColor : AppThemeColors.neutral300.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(1.5),
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }
