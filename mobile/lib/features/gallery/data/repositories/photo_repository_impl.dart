@@ -19,6 +19,12 @@ class PhotoRepositoryImpl implements PhotoRepository {
   });
 
   @override
+  Future<void> clearImageCache() => cacheService.clearCache();
+
+  @override
+  Future<CacheStats> getCacheStats() => cacheService.getStats();
+
+  @override
   Future<Either<Failure, List<PhotoEntity>>> getMyPhotos({
     String? eventId,
     String sort = 'desc',

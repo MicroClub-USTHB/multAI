@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failure.dart';
 import '../entities/photo_entity.dart';
+import '../../data/cache/photo_cache_service.dart';
 
 abstract class PhotoRepository {
   Future<Either<Failure, List<PhotoEntity>>> getMyPhotos({
@@ -19,4 +20,8 @@ abstract class PhotoRepository {
   });
 
   Future<Either<Failure, String>> getPhotoImage(String photoId);
+
+  Future<void> clearImageCache();
+
+  Future<CacheStats> getCacheStats();
 }
