@@ -118,6 +118,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => ApiClient(
     networkInfo: sl<NetworkInfo>(),
     localStorage: sl<AppLocalStorage>(),
+    onUnauthorized: () => sl<AuthBloc>().add(LogoutRequested()),
   ));
 
   sl.registerLazySingleton<DioClient>(() => DioClient());
@@ -184,7 +185,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => IsUserLoggedIn(sl<AuthRepository>()));
 
   // ── Auth BLoC ───────────────────────────────────────────────────────────────
-  sl.registerFactory<AuthBloc>(
+  sl.registerLazySingleton<AuthBloc>(
     () => AuthBloc(
       loginUseCase: sl<LoginUseCase>(),
       registerUseCase: sl<RegisterUseCase>(),
