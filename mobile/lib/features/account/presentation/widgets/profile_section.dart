@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
@@ -29,6 +30,8 @@ class ProfileSection extends StatelessWidget {
         children: [
           // ── Avatar with amber border ───────────────────────────────────
           Container(
+            width: context.widthCalculated(104),
+            height: context.widthCalculated(104),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
@@ -36,20 +39,39 @@ class ProfileSection extends StatelessWidget {
                 width: context.widthCalculated(3),
               ),
             ),
-            child: CircleAvatar(
-              radius: context.widthCalculated(52),
-              backgroundColor: AppThemeColors.surface,
-              backgroundImage: avatarUrl != null
-                  ? NetworkImage(avatarUrl!)
-                  : null,
-              child: avatarUrl == null
-                  ? Icon(
+            child: avatarUrl != null
+                ? ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: avatarUrl!,
+                      fit: BoxFit.cover,
+                      memCacheWidth: 120,
+                      memCacheHeight: 120,
+                      placeholder: (_, _) => Center(
+                        child: SizedBox(
+                          width: context.widthCalculated(24),
+                          height: context.widthCalculated(24),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: cs.primary,
+                          ),
+                        ),
+                      ),
+                      errorWidget: (_, _, _) => Icon(
+                        Icons.person,
+                        size: context.widthCalculated(48),
+                        color: AppThemeColors.secondaryText,
+                      ),
+                    ),
+                  )
+                : CircleAvatar(
+                    radius: context.widthCalculated(52),
+                    backgroundColor: AppThemeColors.surface,
+                    child: Icon(
                       Icons.person,
                       size: context.widthCalculated(48),
                       color: AppThemeColors.secondaryText,
-                    )
-                  : null,
-            ),
+                    ),
+                  ),
           ),
           SizedBox(height: context.heightCalculated(16)),
 

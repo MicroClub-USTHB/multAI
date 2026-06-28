@@ -8,16 +8,26 @@ class PhotoGridItem extends StatelessWidget {
   final String photoId;
   final String? localPath;
   final VoidCallback? onTap;
+  final double? gridItemSize;
 
   const PhotoGridItem({
     super.key,
     required this.photoId,
     this.localPath,
     this.onTap,
+    this.gridItemSize,
   });
+
+  int _decodeSize(BuildContext context) {
+    final size = gridItemSize ?? 160.0;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+    return (size * pixelRatio * 1.25).ceil();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final decodeSize = _decodeSize(context);
+
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -26,6 +36,8 @@ class PhotoGridItem extends StatelessWidget {
             ? Image.file(
                 File(localPath!),
                 fit: BoxFit.cover,
+                cacheWidth: decodeSize,
+                cacheHeight: decodeSize,
                 errorBuilder: (context, error, stackTrace) =>
                     _placeholder(context),
               )
