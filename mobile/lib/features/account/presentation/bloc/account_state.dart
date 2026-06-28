@@ -20,3 +20,12 @@ class AccountError extends AccountState {
 }
 
 class AccountLoggedOut extends AccountState {}
+
+class AccountCacheClearing extends AccountState {}
+
+class AccountCacheCleared extends AccountState {
+  final String storageFreed;
+  final int filesRemoved;
+
+  AccountCacheCleared({required this.storageFreed, required this.filesRemoved});
+}

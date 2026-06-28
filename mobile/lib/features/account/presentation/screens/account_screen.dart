@@ -17,6 +17,35 @@ import '../widgets/logout_button.dart';
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
+  void _confirmClearCache(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Clear Image Cache'),
+        content: const Text(
+          'This will remove all cached photos from your device. '
+          'Images will need to be re-downloaded when viewed again.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<AccountBloc>().add(ClearImageCacheRequested());
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: context.theme.colorScheme.error,
+            ),
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AccountBloc, AccountState>(
@@ -26,6 +55,11 @@ class AccountScreen extends StatelessWidget {
         }
         if (state is AccountError) {
           context.showErrorSnackBar(state.message);
+        }
+        if (state is AccountCacheCleared) {
+          context.showSuccessSnackBar(
+            'Freed ${state.storageFreed} (${state.filesRemoved} files)',
+          );
         }
       },
       builder: (context, state) {
@@ -39,10 +73,22 @@ class AccountScreen extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, AccountState state) {
-    if (state is AccountLoading) {
+    if (state is AccountLoading || state is AccountCacheClearing) {
       return Center(
-        child: CircularProgressIndicator(
-          color: context.theme.colorScheme.primary,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(
+              color: context.theme.colorScheme.primary,
+            ),
+            if (state is AccountCacheClearing) ...[
+              const SizedBox(height: 16),
+              Text(
+                'Clearing cache...',
+                style: context.textTheme.bodyMedium,
+              ),
+            ],
+          ],
         ),
       );
     }
@@ -110,6 +156,12 @@ class AccountScreen extends StatelessWidget {
                 title: 'Account Data',
                 subtitle: 'Export or manage your personal data',
                 onTap: () {},
+              ),
+              SettingItemData(
+                icon: Icons.cleaning_services_outlined,
+                title: 'Clear Image Cache',
+                subtitle: 'Free up storage space',
+                onTap: () => _confirmClearCache(context),
               ),
             ],
           ),

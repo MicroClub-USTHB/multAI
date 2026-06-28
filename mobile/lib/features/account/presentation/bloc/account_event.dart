@@ -5,3 +5,5 @@ abstract class AccountEvent {}
 class LoadAccountData extends AccountEvent {}
 
 class LogoutRequested extends AccountEvent {}
+
+class ClearImageCacheRequested extends AccountEvent {}

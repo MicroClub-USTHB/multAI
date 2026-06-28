@@ -52,7 +52,7 @@ import '../features/account/data/datasources/account_remote_datasource.dart';
 import '../features/account/data/repositories/account_repository_impl.dart';
 import '../features/account/domain/repositories/account_repository.dart';
 import '../features/account/domain/usecases/get_account_data_usecase.dart';
-import '../features/account/presentation/bloc/account_bloc.dart';
+import '../features/account/presentation/bloc/account_bloc.dart' hide LogoutRequested;
 //  ── Notifications ───────────────────────────────────────────────────────────
 import '../features/notifications/data/datasources/notifications_local_datasource.dart';
 import '../features/notifications/data/datasources/notifications_remote_datasource.dart';
@@ -115,11 +115,14 @@ Future<void> init() async {
     ),
   );
 
-  sl.registerLazySingleton(() => ApiClient(
-    networkInfo: sl<NetworkInfo>(),
-    localStorage: sl<AppLocalStorage>(),
-    onUnauthorized: () => sl<AuthBloc>().add(LogoutRequested()),
-  ));
+  sl.registerLazySingleton<ApiClient>(() {
+    final client = ApiClient(
+      networkInfo: sl<NetworkInfo>(),
+      localStorage: sl<AppLocalStorage>(),
+    );
+    client.onUnauthorized = () => sl<AuthBloc>().add(LogoutRequested());
+    return client;
+  });
 
   sl.registerLazySingleton<DioClient>(() => DioClient());
 
@@ -262,6 +265,7 @@ Future<void> init() async {
       getAccountData: sl<GetAccountDataUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
       pushNotificationService: sl<PushNotificationService>(),
+      photoCacheService: sl<PhotoCacheService>(),
     ),
   );
 
