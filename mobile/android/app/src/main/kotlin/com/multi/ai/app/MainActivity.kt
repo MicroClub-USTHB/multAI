@@ -1,4 +1,4 @@
-package com.example.multai_mobile
+package com.multi.ai.app
 
 import android.content.pm.ApplicationInfo
 import android.os.Bundle

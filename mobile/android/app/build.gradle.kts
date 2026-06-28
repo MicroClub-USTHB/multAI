@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.multai_mobile"
+    namespace = "com.multi.ai.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.multai_mobile"
+        applicationId = "com.multi.ai.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -45,5 +45,11 @@ flutter {
 }
 
 dependencies {
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.15.0"))
+
+    // Firebase products (versions managed by BoM)
+    implementation("com.google.firebase:firebase-analytics")
+
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
