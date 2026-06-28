@@ -114,7 +114,10 @@ Future<void> init() async {
     ),
   );
 
-  sl.registerLazySingleton(() => ApiClient(networkInfo: sl<NetworkInfo>()));
+  sl.registerLazySingleton(() => ApiClient(
+    networkInfo: sl<NetworkInfo>(),
+    localStorage: sl<AppLocalStorage>(),
+  ));
 
   sl.registerLazySingleton<DioClient>(() => DioClient());
 
