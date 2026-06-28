@@ -69,11 +69,9 @@ class ApiClient {
   }
 
   Future<dynamic> get(String endpoint) async {
+    final headers = await _getHeaders();
     return _executeWithAuth(
-      () => _client.get(
-        Uri.parse('$baseUrl$endpoint'),
-        headers: await _getHeaders(),
-      ),
+      () => _client.get(Uri.parse('$baseUrl$endpoint'), headers: headers),
     );
   }
 
@@ -82,11 +80,13 @@ class ApiClient {
     Map<String, dynamic>? body,
     bool requiresAuth = false,
   }) async {
+    final headers = await _getHeaders(requiresAuth: requiresAuth);
+    final requestBody = body != null ? jsonEncode(body) : null;
     return _executeWithAuth(
       () => _client.post(
         Uri.parse('$baseUrl$endpoint'),
-        headers: await _getHeaders(requiresAuth: requiresAuth),
-        body: body != null ? jsonEncode(body) : null,
+        headers: headers,
+        body: requestBody,
       ),
     );
   }
@@ -96,21 +96,21 @@ class ApiClient {
     Map<String, dynamic>? body,
     bool requiresAuth = false,
   }) async {
+    final headers = await _getHeaders(requiresAuth: requiresAuth);
+    final requestBody = body != null ? jsonEncode(body) : null;
     await _executeWithAuthVoid(
       () => _client.post(
         Uri.parse('$baseUrl$endpoint'),
-        headers: await _getHeaders(requiresAuth: requiresAuth),
-        body: body != null ? jsonEncode(body) : null,
+        headers: headers,
+        body: requestBody,
       ),
     );
   }
 
   Future<void> delete(String endpoint) async {
+    final headers = await _getHeaders();
     await _executeWithAuthVoid(
-      () => _client.delete(
-        Uri.parse('$baseUrl$endpoint'),
-        headers: await _getHeaders(),
-      ),
+      () => _client.delete(Uri.parse('$baseUrl$endpoint'), headers: headers),
     );
   }
 
@@ -177,11 +177,9 @@ class ApiClient {
   }
 
   Future<Uint8List> getBytes(String url) async {
+    final headers = await _getHeaders();
     final response = await _executeWithAuthRaw(
-      () => _client.get(
-        Uri.parse('$baseUrl$url'),
-        headers: await _getHeaders(),
-      ),
+      () => _client.get(Uri.parse('$baseUrl$url'), headers: headers),
     );
     if (response.statusCode == 200) return response.bodyBytes;
     throw ServerFailure(
@@ -257,9 +255,10 @@ class ApiClient {
   }
 
   Future<bool> _tryRefreshToken() async {
-    if (_localStorage == null) return false;
+    final storage = _localStorage;
+    if (storage == null) return false;
     try {
-      final refreshToken = await _localStorage!.getSecureString(
+      final refreshToken = await storage.getSecureString(
         StorageKeys.refreshToken,
       );
       if (refreshToken == null || refreshToken.isEmpty) return false;
@@ -274,21 +273,22 @@ class ApiClient {
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
-        _accessToken = json['access_token'] as String?;
+        final newAccessToken = json['access_token'] as String?;
         final newRefreshToken = json['refresh_token'] as String?;
-        if (_accessToken != null) {
-          await _localStorage!.setSecureString(
+        if (newAccessToken != null) {
+          _accessToken = newAccessToken;
+          await storage.setSecureString(
             StorageKeys.accessToken,
-            _accessToken!,
+            newAccessToken,
           );
         }
         if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
-          await _localStorage!.setSecureString(
+          await storage.setSecureString(
             StorageKeys.refreshToken,
             newRefreshToken,
           );
         }
-        return _accessToken != null;
+        return newAccessToken != null;
       }
       return false;
     } catch (_) {

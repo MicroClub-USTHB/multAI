@@ -16,6 +16,7 @@ import 'package:multai_mobile/features/auth/domain/usecases/login_usecase.dart';
 import 'package:multai_mobile/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:multai_mobile/features/auth/domain/usecases/refresh_token_usecase.dart';
 import 'package:multai_mobile/features/auth/domain/usecases/register_usecase.dart';
+import 'package:multai_mobile/features/auth/domain/usecases/resend_otp_usecase.dart';
 import 'package:multai_mobile/features/auth/domain/usecases/verify_register_usecase.dart';
 import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:multai_mobile/features/face_enrollment/domain/usecases/check_enrollment_done_usecase.dart';
@@ -36,6 +37,8 @@ class MockGetCurrentUserUseCase extends Mock implements GetCurrentUserUseCase {}
 class MockCheckEnrollmentDoneUseCase extends Mock
     implements CheckEnrollmentDoneUseCase {}
 
+class MockResendOtpUseCase extends Mock implements ResendOtpUseCase {}
+
 class MockPushNotificationService extends Mock
     implements PushNotificationService {}
 
@@ -43,6 +46,7 @@ void main() {
   late MockRegisterUseCase registerUseCase;
   late MockVerifyRegisterUseCase verifyRegisterUseCase;
   late MockLoginUseCase loginUseCase;
+  late MockResendOtpUseCase resendOtpUseCase;
   late MockLogoutUseCase logoutUseCase;
   late MockRefreshTokenUseCase refreshTokenUseCase;
   late MockGetCurrentUserUseCase getCurrentUserUseCase;
@@ -84,6 +88,7 @@ void main() {
     registerUseCase = MockRegisterUseCase();
     verifyRegisterUseCase = MockVerifyRegisterUseCase();
     loginUseCase = MockLoginUseCase();
+    resendOtpUseCase = MockResendOtpUseCase();
     logoutUseCase = MockLogoutUseCase();
     refreshTokenUseCase = MockRefreshTokenUseCase();
     getCurrentUserUseCase = MockGetCurrentUserUseCase();
@@ -97,6 +102,7 @@ void main() {
     authBloc = AuthBloc(
       loginUseCase: loginUseCase,
       registerUseCase: registerUseCase,
+      resendOtpUseCase: resendOtpUseCase,
       verifyRegisterUseCase: verifyRegisterUseCase,
       logoutUseCase: logoutUseCase,
       refreshTokenUseCase: refreshTokenUseCase,
@@ -116,7 +122,7 @@ void main() {
       build: () {
         when(
           () => registerUseCase(any()),
-        ).thenAnswer((_) async => const Right(null));
+        ).thenAnswer((_) async => const Right('pending-token'));
         return authBloc;
       },
       act: (bloc) => bloc.add(

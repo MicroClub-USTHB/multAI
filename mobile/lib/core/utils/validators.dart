@@ -7,8 +7,9 @@ class Validators {
     if (!value.contains(RegExp(r'[A-Z]'))) return 'Au moins une majuscule';
     if (!value.contains(RegExp(r'[a-z]'))) return 'Au moins une minuscule';
     if (!value.contains(RegExp(r'[0-9]'))) return 'Au moins un chiffre';
-    if (!value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]')))
+    if (!value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
       return 'Au moins un caractère spécial';
+    }
     return null;
   }
 
