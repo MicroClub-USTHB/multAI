@@ -1,29 +1,22 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"multai-mobile","appId":"1:653019524265:android:78ee94f323c92d5beb4db8","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"multai-mobile","configurations":{"android":"1:653019524265:android:78ee94f323c92d5beb4db8","ios":"1:653019524265:ios:c6813f04f8bf1abbeb4db8"}}}}}}{
-    "project_info": {
-        "project_number": "41046984406",
-        "project_id": "multiai-mobile",
-        "storage_bucket": "multiai-mobile.firebasestorage.app"
-    },
-    "client": [
-        {
-            "client_info": {
-                "mobilesdk_app_id": "1:41046984406:android:868f8f16bb894b21356b77",
-                "android_client_info": {
-                    "package_name": "com.multi.ai.app"
-                }
-            },
-            "oauth_client": [],
-            "api_key": [
-                {
-                    "current_key": "AIzaSyAnf_MkljkncmHViDgx7PWTwHrtHnfNRdA"
-                }
-            ],
-            "services": {
-                "appinvite_service": {
-                    "other_platform_oauth_client": []
-                }
-            }
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "multai-mobile",
+          "appId": "1:653019524265:android:78ee94f323c92d5beb4db8",
+          "fileOutput": "android/app/google-services.json"
         }
-    ],
-    "configuration_version": "1"
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "multai-mobile",
+          "configurations": {
+            "android": "1:653019524265:android:78ee94f323c92d5beb4db8",
+            "ios": "1:653019524265:ios:c6813f04f8bf1abbeb4db8"
+          }
+        }
+      }
+    }
+  }
 }
