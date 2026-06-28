@@ -177,14 +177,17 @@ class ApiClient {
   }
 
   Future<Uint8List> getBytes(String url) async {
-    final response = await _executeWithAuth(
+    final response = await _executeWithAuthRaw(
       () => _client.get(
         Uri.parse('$baseUrl$url'),
         headers: await _getHeaders(),
       ),
     );
-    if (response is http.Response) return response.bodyBytes;
-    throw const ServerFailure('Failed to fetch image bytes');
+    if (response.statusCode == 200) return response.bodyBytes;
+    throw ServerFailure(
+      'Failed to fetch bytes: ${response.statusCode}',
+      response.statusCode,
+    );
   }
 
   Future<dynamic> _executeWithAuth(
@@ -224,6 +227,33 @@ class ApiClient {
     } on TimeoutException {
       throw const NetworkFailure('Request timed out');
     }
+  }
+
+  Future<http.Response> _executeWithAuthRaw(
+    Future<http.Response> Function() request,
+  ) async {
+    await checkConnection();
+    try {
+      final response = await request().timeout(_requestTimeout);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response;
+      }
+      _throwForStatus(response);
+    } on UnauthorizedFailure {
+      if (await _tryRefreshToken()) {
+        final response = await request().timeout(_requestTimeout);
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          return response;
+        }
+        _throwForStatus(response);
+      }
+      onUnauthorized?.call();
+      rethrow;
+    } on TimeoutException {
+      throw const NetworkFailure('Request timed out');
+    }
+    // unreachable, keep compiler happy
+    throw const UnknownFailure('Unexpected error');
   }
 
   Future<bool> _tryRefreshToken() async {
