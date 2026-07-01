@@ -24,6 +24,18 @@ class DeviceUtils {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
 
   static Future<DeviceData> getDeviceData() async {
+    // TEST OVERRIDE: set via --dart-define flags (remove when done testing)
+    const testDeviceId = String.fromEnvironment('TEST_DEVICE_ID');
+    const testDeviceName = String.fromEnvironment('TEST_DEVICE_NAME');
+    const testDeviceType = String.fromEnvironment('TEST_DEVICE_TYPE');
+    if (testDeviceId.isNotEmpty && testDeviceName.isNotEmpty && testDeviceType.isNotEmpty) {
+      return DeviceData(
+        deviceName: testDeviceName,
+        deviceType: testDeviceType,
+        deviceId: testDeviceId,
+      );
+    }
+
     final storedDeviceId = await _storage.read(key: StorageKeys.deviceId);
 
     final currentData = await _buildCurrentDeviceData();
