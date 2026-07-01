@@ -1,9 +1,51 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { ClientOnly, createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { z } from 'zod';
+
+import Logo from '@/components/Logo';
+import { LoginForm } from '@/features/common/auth/components/LoginForm';
+import { getAuthRedirectPath } from '@/features/common/auth/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { LoadingPage } from '@/shared/ui/loading';
+
+const loginSearchSchema = z.object({
+  redirect: z.string().optional(),
+});
 
 export const Route = createFileRoute('/auth/login')({
   component: RouteComponent,
+  validateSearch: loginSearchSchema,
 });
 
 function RouteComponent() {
-  return <div>Hello "/auth/login"!</div>;
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
+  const safeRedirect = getAuthRedirectPath({
+    redirect,
+    role: user?.role,
+  });
+
+  useEffect(() => {
+    if (isLoading || !isAuthenticated) {
+      return;
+    }
+
+    navigate({ to: safeRedirect, replace: true });
+  }, [isAuthenticated, isLoading, navigate, safeRedirect]);
+
+  if (isLoading || isAuthenticated) {
+    return <LoadingPage message="Checking session..." />;
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <Logo />
+        <ClientOnly fallback={<div>Loading...</div>}>
+          <LoginForm />
+        </ClientOnly>
+      </div>
+    </div>
+  );
 }

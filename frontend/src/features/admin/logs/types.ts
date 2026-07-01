@@ -1,3 +1,55 @@
+export type AuditEventType =
+  | 'user.signup'
+  | 'user.login'
+  | 'user.logout'
+  | 'upload_request.created'
+  | 'upload_request.approved'
+  | 'upload_request.rejected'
+  | 'photo.processed'
+  | 'photo_approval.decided'
+
+export type AuditActor = {
+  id: string
+  email: string
+  displayName: string | null
+}
+
+export type AuditEvent = {
+  id: string
+  eventType: AuditEventType
+  metadata: Record<string, unknown> | null
+  createdAt: string
+  actor: AuditActor | null
+}
+
+type AuditActorApi = {
+  id: string
+  email: string
+  display_name: string | null
+}
+
+type AuditEventApi = {
+  id: string
+  event_type: AuditEventType
+  metadata: Record<string, unknown> | null
+  created_at: string
+  actor: AuditActorApi | null
+}
+
+export const toAuditEvent = (input: AuditEventApi): AuditEvent => ({
+  id: input.id,
+  eventType: input.event_type,
+  metadata: input.metadata,
+  createdAt: input.created_at,
+  actor: input.actor
+    ? {
+      id: input.actor.id,
+      email: input.actor.email,
+      displayName: input.actor.display_name,
+    }
+    : null,
+})
+
 export type SyncError = {
   id: string;
   timestamp: string;

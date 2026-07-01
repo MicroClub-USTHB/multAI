@@ -70,12 +70,13 @@ export function AssignEventDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Assign new event</DialogTitle>
-					<DialogDescription>
-						Assign an additional event to {user?.fullName ?? 'the selected user'}.
-					</DialogDescription>
-				</DialogHeader>
+					<DialogHeader>
+						<DialogTitle>Assign new event</DialogTitle>
+						<DialogDescription>
+							Assign an additional event to{' '}
+							{user?.displayName ?? user?.email ?? 'the selected user'}.
+						</DialogDescription>
+					</DialogHeader>
 
 				<form className="space-y-4" onSubmit={handleSubmit}>
 					{error && (

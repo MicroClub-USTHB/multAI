@@ -9,12 +9,12 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 
 import ThemeScript from '@/components/theme/theme-script';
+import { AuthProvider } from '@/providers/AuthProvider';
 import { ThemeProvider } from '@/providers/theme-provider';
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import TanStackQueryProvider from '../integrations/tanstack-query/root-provider';
 import appCss from '../styles.css?url';
-
 interface MyRouterContext {
   queryClient: QueryClient;
 }
@@ -53,7 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body className="font-sans wrap-anywhere antialiased selection:bg-[rgba(79,184,178,0.24)]">
         <ThemeProvider defaultTheme="dark">
           <TanStackQueryProvider>
-            {children}
+            <AuthProvider>{children}</AuthProvider>
             <TanStackDevtools
               config={{
                 position: 'bottom-right',

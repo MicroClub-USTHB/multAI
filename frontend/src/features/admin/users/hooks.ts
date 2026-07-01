@@ -2,96 +2,150 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import type {
 	AdminUser,
-	CreateAdminUserInput,
-	UpdateAdminUserRoleInput,
+	AdminUserCreateInput,
+	AdminUserUpdateInput,
+	ListAdminUsersParams,
 } from './types'
 
 import {
+	blockAdminUser,
 	createAdminUser,
 	deleteAdminUser,
-	updateAdminUserRole,
+	getAdminUser,
+	listAdminUsers,
+	unblockAdminUser,
+	updateAdminUser,
 } from './api'
-import { ADMIN_USERS_QUERY_KEY } from './constants'
-import { adminUsersQueryOptions } from './query-options'
 
-const upsertUserInCache = (users: AdminUser[] | undefined, updated: AdminUser) => {
-	if (!users) {
-		return [updated]
-	}
+export const ADMIN_USERS_QUERY_KEY = ['admin', 'users'] as const
 
-	const exists = users.some(user => user.id === updated.id)
-	if (!exists) {
-		return [updated, ...users]
-	}
-
-	return users.map(user => (user.id === updated.id ? updated : user))
+const defaultListParams: ListAdminUsersParams = {
+	limit: 20,
+	offset: 0,
 }
 
-const removeUserFromCache = (users: AdminUser[] | undefined, removedId: string) => {
-	if (!users) {
-		return []
-	}
+const mergeUserInCache = (users: AdminUser[], updated: AdminUser) =>
+	users.map(user => (user.id === updated.id ? updated : user))
 
-	return users.filter(user => user.id !== removedId)
+export function useAdminUsersQuery(
+	params: ListAdminUsersParams = defaultListParams,
+) {
+	return useQuery({
+		queryKey: [...ADMIN_USERS_QUERY_KEY, params],
+		queryFn: () => listAdminUsers(params),
+	})
 }
 
-export function useAdminUsersQuery() {
-	return useQuery(adminUsersQueryOptions())
+export function useAdminUserQuery(userId: string | null, enabled = true) {
+	return useQuery({
+		queryKey: [...ADMIN_USERS_QUERY_KEY, 'detail', userId],
+		queryFn: () => {
+			if (!userId) {
+				throw new Error('Missing user id.')
+			}
+
+			return getAdminUser(userId)
+		},
+		enabled: Boolean(userId) && enabled,
+	})
 }
 
-export function useUpdateAdminUserRoleMutation() {
+export function useCreateAdminUserMutation(params: ListAdminUsersParams) {
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: (input: UpdateAdminUserRoleInput) => updateAdminUserRole(input),
-		onSuccess: updatedUser => {
-			queryClient.setQueryData<AdminUser[]>(ADMIN_USERS_QUERY_KEY, users =>
-				upsertUserInCache(users, updatedUser),
+		mutationFn: (input: AdminUserCreateInput) => createAdminUser(input),
+		onSuccess: created => {
+			queryClient.setQueryData<AdminUser[]>(
+				[...ADMIN_USERS_QUERY_KEY, params],
+				previous => [created, ...(previous ?? [])],
 			)
 		},
 	})
 }
 
-export function useCreateAdminUserMutation() {
+export function useUpdateAdminUserMutation(params: ListAdminUsersParams) {
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: (input: CreateAdminUserInput) => createAdminUser(input),
-		onSuccess: updatedUser => {
-			queryClient.setQueryData<AdminUser[]>(ADMIN_USERS_QUERY_KEY, users =>
-				upsertUserInCache(users, updatedUser),
+		mutationFn: ({ userId, input }: { userId: string; input: AdminUserUpdateInput }) =>
+			updateAdminUser(userId, input),
+		onSuccess: updated => {
+			queryClient.setQueryData<AdminUser[]>(
+				[...ADMIN_USERS_QUERY_KEY, params],
+				previous => (previous ? mergeUserInCache(previous, updated) : previous),
 			)
 		},
 	})
 }
 
-export function useDeleteAdminUserMutation() {
+export function useDeleteAdminUserMutation(params: ListAdminUsersParams) {
 	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: (userId: string) => deleteAdminUser(userId),
-		onSuccess: ({ id }) => {
-			queryClient.setQueryData<AdminUser[]>(ADMIN_USERS_QUERY_KEY, users =>
-				removeUserFromCache(users, id),
+		onSuccess: deleted => {
+			queryClient.setQueryData<AdminUser[]>(
+				[...ADMIN_USERS_QUERY_KEY, params],
+				previous => previous?.filter(user => user.id !== deleted.id) ?? previous,
 			)
 		},
 	})
 }
 
-export function useAdminUsers() {
-	const usersQuery = useAdminUsersQuery()
-	const roleMutation = useUpdateAdminUserRoleMutation()
-	const createMutation = useCreateAdminUserMutation()
-	const deleteUserMutation = useDeleteAdminUserMutation()
+export function useBlockAdminUserMutation(params: ListAdminUsersParams) {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationFn: (userId: string) => blockAdminUser(userId),
+		onSuccess: updated => {
+			queryClient.setQueryData<AdminUser[]>(
+				[...ADMIN_USERS_QUERY_KEY, params],
+				previous => (previous ? mergeUserInCache(previous, updated) : previous),
+			)
+		},
+	})
+}
+
+export function useUnblockAdminUserMutation(params: ListAdminUsersParams) {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationFn: (userId: string) => unblockAdminUser(userId),
+		onSuccess: updated => {
+			queryClient.setQueryData<AdminUser[]>(
+				[...ADMIN_USERS_QUERY_KEY, params],
+				previous => (previous ? mergeUserInCache(previous, updated) : previous),
+			)
+		},
+	})
+}
+
+export function useAdminUsers(params: ListAdminUsersParams = defaultListParams) {
+	const query = useAdminUsersQuery(params)
+	const createMutation = useCreateAdminUserMutation(params)
+	const updateMutation = useUpdateAdminUserMutation(params)
+	const deleteMutation = useDeleteAdminUserMutation(params)
+	const blockMutation = useBlockAdminUserMutation(params)
+	const unblockMutation = useUnblockAdminUserMutation(params)
 
 	return {
-		users: usersQuery.data ?? [],
-		updateRole: roleMutation.mutateAsync,
+		users: query.data ?? [],
+		isLoading: query.isLoading,
+		isError: query.isError,
+		error: query.error,
+		refetch: query.refetch,
+
 		createUser: createMutation.mutateAsync,
-		deleteUser: deleteUserMutation.mutateAsync,
+		updateUser: updateMutation.mutateAsync,
+		deleteUser: deleteMutation.mutateAsync,
+		blockUser: blockMutation.mutateAsync,
+		unblockUser: unblockMutation.mutateAsync,
 		isMutating:
-			roleMutation.isPending ||
 			createMutation.isPending ||
-			deleteUserMutation.isPending,
+			updateMutation.isPending ||
+			deleteMutation.isPending ||
+			blockMutation.isPending ||
+			unblockMutation.isPending,
 	}
 }

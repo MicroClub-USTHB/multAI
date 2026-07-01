@@ -1,153 +1,158 @@
-import type {
-	AdminUser,
-	CreateAdminUserInput,
-	EditableAdminUserRole,
-	UpdateAdminUserRoleInput,
+import {
+	ApiError,
+	apiDelete,
+	apiGet,
+	apiPost,
+	apiPut,
+} from '@/shared/utils/api-client'
+
+import {
+	type AdminUser,
+	type AdminUserCreateInput,
+	type AdminUserUpdateInput,
+	type ListAdminUsersParams,
+	toAdminUser,
+	toAdminUserCreatePayload,
+	toAdminUserUpdatePayload,
 } from './types'
-
-type StaffRole = 'admin' | 'multi_team_lead' | 'multi'
-
-type StaffUserSchema = {
-	id: string
-	email: string | null
-	role: StaffRole
-	created_at: string
-	updated_at: string
-}
-
-const API_BASE_URL =
-	(import.meta.env.VITE_API_BASE_URL as string | undefined) ??
-	'http://localhost:8000'
 
 export class AdminUsersApiError extends Error {
 	status: number
+	details?: unknown
 
-	constructor(message: string, status: number) {
+	constructor(message: string, status: number, details?: unknown) {
 		super(message)
 		this.name = 'AdminUsersApiError'
 		this.status = status
+		this.details = details
 	}
 }
 
-async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
-	const response = await fetch(`${API_BASE_URL}${path}`, {
-		...init,
-		credentials: 'include',
-		headers: init?.headers,
-	})
-
-	if (!response.ok) {
-		const fallback = `Request failed (${response.status})`
-		let message = fallback
-		try {
-			const data = (await response.json()) as { detail?: unknown }
-			if (typeof data.detail === 'string') {
-				message = data.detail
-			}
-		} catch {
-			// Ignore parse errors and keep a generic message.
-		}
-		if (response.status === 401) {
-			throw new AdminUsersApiError(
-				'Session admin invalide ou absente. Connecte-toi puis reessaie.',
-				401,
-			)
+const request = async <TResponse>(requestFn: () => Promise<TResponse>) => {
+	try {
+		return await requestFn()
+	} catch (error) {
+		if (error instanceof ApiError) {
+			throw new AdminUsersApiError(error.message, error.status, error.details)
 		}
 
-		throw new AdminUsersApiError(message, response.status)
-	}
-
-	if (response.status === 204) {
-		return undefined as T
-	}
-
-	return (await response.json()) as T
-}
-
-function roleFromApi(role: StaffRole): AdminUser['role'] {
-	return role
-}
-
-function roleToApi(role: EditableAdminUserRole): Exclude<StaffRole, 'admin'> {
-	return role
-}
-
-function emailToFullName(email: string | null): string {
-	if (!email) {
-		return 'Unknown user'
-	}
-
-	const username = email.split('@')[0] ?? 'user'
-	return username
-		.split(/[._-]/g)
-		.filter(Boolean)
-		.map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-		.join(' ')
-}
-
-function mapStaffUserToAdminUser(user: StaffUserSchema): AdminUser {
-	return {
-		id: user.id,
-		fullName: emailToFullName(user.email),
-		email: user.email ?? '',
-		role: roleFromApi(user.role),
-		avatarUrl: null,
-		createdAt: user.created_at,
-		updatedAt: user.updated_at,
+		throw error
 	}
 }
 
-export async function getAdminUsers(): Promise<AdminUser[]> {
-	const users = await requestJson<StaffUserSchema[]>('/admin/staff-users/')
+const buildListQuery = (params: ListAdminUsersParams) => {
+	const query = new URLSearchParams()
 
-	return users
-		.map(mapStaffUserToAdminUser)
-		.sort((a, b) => a.fullName.localeCompare(b.fullName))
+	if (typeof params.limit === 'number') {
+		query.set('limit', String(params.limit))
+	}
+
+	if (typeof params.offset === 'number') {
+		query.set('offset', String(params.offset))
+	}
+
+	const serialized = query.toString()
+	return serialized ? `?${serialized}` : ''
 }
 
-export async function updateAdminUserRole(
-	input: UpdateAdminUserRoleInput,
-): Promise<AdminUser> {
-	const current = await requestJson<StaffUserSchema>(
-		`/admin/staff-users/${input.userId}`,
-		{
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				email: input.email ?? null,
-				role: roleToApi(input.role),
-			}),
-		},
+export async function listAdminUsers(
+	params: ListAdminUsersParams = {},
+): Promise<AdminUser[]> {
+	const users = await request(() =>
+		apiGet<unknown[]>(`/admin/users/${buildListQuery(params)}`, {
+			credentials: 'include',
+			fallbackErrorMessage: 'Unable to load users.',
+		}),
 	)
 
-	return mapStaffUserToAdminUser(current)
+	return users.map(user => toAdminUser(user as Parameters<typeof toAdminUser>[0]))
+}
+
+export const getAdminUsers = listAdminUsers
+
+export async function getAdminUser(userId: string): Promise<AdminUser> {
+	const user = await request(() =>
+		apiGet<Parameters<typeof toAdminUser>[0]>(`/admin/users/${userId}`, {
+			credentials: 'include',
+			fallbackErrorMessage: 'Unable to load user.',
+		}),
+	)
+
+	return toAdminUser(user)
 }
 
 export async function createAdminUser(
-	input: CreateAdminUserInput,
+	input: AdminUserCreateInput,
 ): Promise<AdminUser> {
-	const created = await requestJson<StaffUserSchema>('/admin/staff-users/', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			email: input.email,
-			password: input.password,
-			role: roleToApi(input.role),
+	const payload = await request(() =>
+		apiPost<Parameters<typeof toAdminUser>[0]>(
+			'/admin/users/',
+			toAdminUserCreatePayload(input),
+			{
+				credentials: 'include',
+				fallbackErrorMessage: 'Unable to create user.',
+			},
+		),
+	)
+
+	return toAdminUser(payload)
+}
+
+export async function updateAdminUser(
+	userId: string,
+	input: AdminUserUpdateInput,
+): Promise<AdminUser> {
+	const payload = await request(() =>
+		apiPut<Parameters<typeof toAdminUser>[0]>(
+			`/admin/users/${userId}`,
+			toAdminUserUpdatePayload(input),
+			{
+				credentials: 'include',
+				fallbackErrorMessage: 'Unable to update user.',
+			},
+		),
+	)
+
+	return toAdminUser(payload)
+}
+
+export async function deleteAdminUser(userId: string): Promise<AdminUser> {
+	const payload = await request(() =>
+		apiDelete<Parameters<typeof toAdminUser>[0]>(`/admin/users/${userId}`, {
+			credentials: 'include',
+			fallbackErrorMessage: 'Unable to delete user.',
 		}),
-	})
+	)
 
-	return mapStaffUserToAdminUser(created)
+	return toAdminUser(payload)
 }
 
-export async function deleteAdminUser(userId: string): Promise<{ id: string }> {
-	await requestJson<StaffUserSchema>(`/admin/staff-users/${userId}`, {
-		method: 'DELETE',
-	})
+export async function blockAdminUser(userId: string): Promise<AdminUser> {
+	const payload = await request(() =>
+		apiPost<Parameters<typeof toAdminUser>[0]>(
+			`/admin/users/${userId}/block`,
+			undefined,
+			{
+				credentials: 'include',
+				fallbackErrorMessage: 'Unable to block user.',
+			},
+		),
+	)
 
-	return { id: userId }
+	return toAdminUser(payload)
 }
 
+export async function unblockAdminUser(userId: string): Promise<AdminUser> {
+	const payload = await request(() =>
+		apiPost<Parameters<typeof toAdminUser>[0]>(
+			`/admin/users/${userId}/unblock`,
+			undefined,
+			{
+				credentials: 'include',
+				fallbackErrorMessage: 'Unable to unblock user.',
+			},
+		),
+	)
+
+	return toAdminUser(payload)
+}

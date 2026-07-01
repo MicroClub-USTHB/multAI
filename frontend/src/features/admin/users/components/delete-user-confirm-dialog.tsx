@@ -63,13 +63,13 @@ export function DeleteUserConfirmDialog({
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Delete user</DialogTitle>
-					<DialogDescription>
-						This action is permanent. Do you really want to delete{' '}
-						<span className="font-medium text-foreground">
-							{user?.email || user?.fullName || 'this user'}
-						</span>
-						?
-					</DialogDescription>
+						<DialogDescription>
+							This action is permanent. Do you really want to delete{' '}
+							<span className="font-medium text-foreground">
+								{user?.displayName || user?.email || 'this user'}
+							</span>
+							?
+						</DialogDescription>
 				</DialogHeader>
 
 				{error && (

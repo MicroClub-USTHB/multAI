@@ -1,28 +1,74 @@
-export const ADMIN_USER_ROLES = ['admin', 'multi_team_lead', 'multi'] as const
-export type AdminUserRole = (typeof ADMIN_USER_ROLES)[number]
-
-export const ADMIN_USER_EDITABLE_ROLES = ['multi_team_lead', 'multi'] as const
-export type EditableAdminUserRole = (typeof ADMIN_USER_EDITABLE_ROLES)[number]
-
-export interface AdminUser {
+export type AdminUser = {
 	id: string
-	fullName: string
 	email: string
-	role: AdminUserRole
-	avatarUrl?: string | null
+	displayName: string | null
+	blocked: boolean
 	createdAt: string
 	updatedAt: string
 }
 
-export interface CreateAdminUserInput {
+export type AdminUserCreateInput = {
 	email: string
 	password: string
-	role: EditableAdminUserRole
+	displayName?: string | null
+	blocked?: boolean
 }
 
-export interface UpdateAdminUserRoleInput {
-	userId: string
-	role: EditableAdminUserRole
-	email: string | null
+export type AdminUserUpdateInput = {
+	email?: string | null
+	displayName?: string | null
+	blocked?: boolean | null
 }
 
+export type ListAdminUsersParams = {
+	limit?: number
+	offset?: number
+}
+
+type AdminUserApi = {
+	id: string
+	email: string
+	display_name: string | null
+	blocked: boolean
+	created_at: string
+	updated_at: string
+}
+
+type AdminUserCreatePayload = {
+	email: string
+	password: string
+	display_name?: string | null
+	blocked?: boolean
+}
+
+type AdminUserUpdatePayload = {
+	email?: string | null
+	display_name?: string | null
+	blocked?: boolean | null
+}
+
+export const toAdminUser = (input: AdminUserApi): AdminUser => ({
+	id: input.id,
+	email: input.email,
+	displayName: input.display_name,
+	blocked: input.blocked,
+	createdAt: input.created_at,
+	updatedAt: input.updated_at,
+})
+
+export const toAdminUserCreatePayload = (
+	input: AdminUserCreateInput,
+): AdminUserCreatePayload => ({
+	email: input.email,
+	password: input.password,
+	display_name: input.displayName ?? undefined,
+	blocked: input.blocked,
+})
+
+export const toAdminUserUpdatePayload = (
+	input: AdminUserUpdateInput,
+): AdminUserUpdatePayload => ({
+	email: input.email,
+	display_name: input.displayName,
+	blocked: input.blocked,
+})
