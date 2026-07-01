@@ -28,7 +28,7 @@ class ApiClient {
 
   Future<Map<String, String>> _getHeaders({bool requiresAuth = false}) async {
     final headers = <String, String>{'Content-Type': 'application/json'};
-    if (_accessToken != null) {
+    if (_accessToken != null && requiresAuth) {
       headers['Authorization'] = 'Bearer $_accessToken';
     }
 
@@ -138,7 +138,7 @@ class ApiClient {
     final uri = Uri.parse('$baseUrl$endpoint');
     final request = http.MultipartRequest('POST', uri);
 
-    if (_accessToken != null) {
+    if (_accessToken != null && requiresAuth) {
       request.headers['Authorization'] = 'Bearer $_accessToken';
     }
 

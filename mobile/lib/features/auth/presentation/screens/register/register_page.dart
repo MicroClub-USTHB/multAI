@@ -130,7 +130,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     isOtpStep: isOtpStep,
                     onTap: () {
                       if (isOtpStep) {
-                        setState(() => _otpController.clear());
+                        setState(() {
+                          _otpController.clear();
+                          context.read<AuthBloc>().add(ResetAuth());
+                        });
                       } else {
                         context.go(AppRoutes.login);
                       }
