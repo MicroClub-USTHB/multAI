@@ -33,7 +33,6 @@ export const getDriveSettings = createServerFn({ method: 'GET' }).handler(
 );
 
 export const connectGoogleDrive = createServerFn({ method: 'POST' })
-  // @ts-expect-error tanstack v1 type changes
   .validator((data: unknown) => connectGoogleDriveInput.parse(data))
   .handler(async (_: { data: any }): Promise<DriveSettings> => {
     await sleep(MOCK_LATENCY_MS);
@@ -50,7 +49,6 @@ export const connectGoogleDrive = createServerFn({ method: 'POST' })
   });
 
 export const updateSyncFrequency = createServerFn({ method: 'POST' })
-  // @ts-expect-error tanstack v1 type changes
   .validator((data: unknown) => updateSyncFrequencyInput.parse(data))
   .handler(async ({ data: input }: { data: any }): Promise<DriveSettings> => {
     await sleep(MOCK_LATENCY_MS);
@@ -65,7 +63,6 @@ export const updateSyncFrequency = createServerFn({ method: 'POST' })
   });
 
 export const updateOutputFolder = createServerFn({ method: 'POST' })
-  // @ts-expect-error tanstack v1 type changes
   .validator((data: unknown) => updateOutputFolderInput.parse(data))
   .handler(async ({ data: input }: { data: any }): Promise<DriveSettings> => {
     const normalizedPath = input.outputFolder.trim();
