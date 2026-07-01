@@ -1,58 +1,44 @@
 import { createServerFn } from '@tanstack/react-start';
 
+import { apiGet } from '@/shared/utils/api-client';
+
 import {
-  mockAdminStats,
-  mockAlerts,
-  mockDriveUsage,
-  mockProcessingLoad,
   type AdminStatsData,
+  type AdminStatsResponse,
   type AlertData,
+  type AlertResponse,
   type DriveUsage,
+  type DriveUsageResponse,
   type ProcessingLoad,
+  transformAdminStatsResponse,
+  transformAlertsResponse,
+  transformDriveUsageResponse,
 } from './types';
-
-const MOCK_LATENCY_MS = 1500;
-
-const sleep = (ms: number) =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-
-const cloneDriveUsage = (): DriveUsage => ({ ...mockDriveUsage });
-
-const cloneAdminStats = (): AdminStatsData => ({ ...mockAdminStats });
-
-const cloneAlerts = (): AlertData => ({
-  ...mockAlerts,
-  alerts: mockAlerts.alerts.map((alert) => ({ ...alert })),
-});
-
-const cloneProcessingLoad = (): ProcessingLoad => ({ ...mockProcessingLoad });
 
 export const getDriveUsage = createServerFn({ method: 'GET' }).handler(
   async (): Promise<DriveUsage> => {
-    await sleep(MOCK_LATENCY_MS);
-    return cloneDriveUsage();
+    const response = await apiGet<DriveUsageResponse>('/admin/stats/storage');
+    return transformDriveUsageResponse(response);
   },
 );
 
 export const getAdminStats = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AdminStatsData> => {
-    await sleep(MOCK_LATENCY_MS);
-    return cloneAdminStats();
+    const response = await apiGet<AdminStatsResponse>('/admin/stats/dashboard');
+    return transformAdminStatsResponse(response);
   },
 );
 
 export const getAlerts = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AlertData> => {
-    await sleep(MOCK_LATENCY_MS);
-    return cloneAlerts();
+    const response = await apiGet<AlertResponse>('/admin/stats/alerts');
+    return transformAlertsResponse(response);
   },
 );
 
 export const getProcessingLoad = createServerFn({ method: 'GET' }).handler(
   async (): Promise<ProcessingLoad> => {
-    await sleep(MOCK_LATENCY_MS);
-    return cloneProcessingLoad();
+    // No transformation needed, the schema matches exactly
+    return apiGet<ProcessingLoad>('/admin/stats/processing-load');
   },
 );

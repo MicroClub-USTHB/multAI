@@ -214,3 +214,22 @@ export function formatTimeAgo(timestamp: Date): string {
   if (hours < 24) return `${hours}h ago`;
   return `${days}d ago`;
 }
+
+export function transformAdminStatsResponse(response: AdminStatsResponse): AdminStatsData {
+  return {
+    activeEvents: response.active_events,
+    photosUploaded: response.photos_uploaded,
+    processed: response.processed_photos,
+    inQueue: response.queue_size,
+    lastUpdated: new Date(response.timestamp),
+  };
+}
+
+export function transformDriveUsageResponse(response: DriveUsageResponse): DriveUsage {
+  const bytesToGB = (bytes: number) => bytes / (1024 * 1024 * 1024);
+  return {
+    usedGB: bytesToGB(response.used_bytes),
+    totalGB: bytesToGB(response.total_bytes),
+    lastUpdated: new Date(response.timestamp),
+  };
+}
