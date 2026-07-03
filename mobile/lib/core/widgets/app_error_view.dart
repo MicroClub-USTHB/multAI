@@ -61,7 +61,7 @@ class AppErrorView extends StatelessWidget {
               label: const Text('Retry'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: AppThemeColors.primaryText,
-                backgroundColor: AppThemeColors.gold,
+                backgroundColor: AppThemeColors.primaryAccent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class OnboardingButton extends StatelessWidget {
@@ -13,17 +14,17 @@ class OnboardingButton extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        width: 60,
-        height: 60,
+        width: context.widthCalculated(60),
+        height: context.widthCalculated(60),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: AppThemeColors.gold, width: 1.5),
-          color: isLast ? AppThemeColors.gold : Colors.transparent,
+          border: Border.all(color: AppThemeColors.primaryAccent, width: 1.5),
+          color: isLast ? AppThemeColors.primaryAccent : Colors.transparent,
         ),
         child: Icon(
           isLast ? Icons.check_rounded : Icons.arrow_forward_rounded,
-          color: isLast ? Colors.white : AppThemeColors.gold,
-          size: 22,
+          color: isLast ? Colors.white : AppThemeColors.primaryAccent,
+          size: context.iconSize(),
         ),
       ),
     );
