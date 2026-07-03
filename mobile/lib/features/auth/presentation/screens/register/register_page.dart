@@ -8,6 +8,7 @@ import 'package:multai_mobile/core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../../core/validators/validators.dart';
 import '../../blocs/auth_bloc.dart';
@@ -138,7 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 // Bottom link
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: EdgeInsets.symmetric(vertical: context.heightCalculated(16)),
                   child: _BottomLink(
                     isOtpStep: isOtpStep,
                     onTap: () {
@@ -185,7 +186,7 @@ class _RegisterPhotoComposition extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Large gold circle — top-right, partially off-screen
+          // Large accent circle — top-right, partially off-screen
           Positioned(
             top: -(height * 0.14),
             right: -(height * 0.08),
@@ -193,15 +194,15 @@ class _RegisterPhotoComposition extends StatelessWidget {
               width: circleSize,
               height: circleSize,
               decoration: const BoxDecoration(
-                color: AppThemeColors.gold,
+                color: AppThemeColors.primaryAccent,
                 shape: BoxShape.circle,
               ),
             ),
           ),
-          // Main photo circle — left, overlapping the gold circle
+          // Main photo circle — left, overlapping the accent circle
           Positioned(
             top: height * 0.08,
-            left: 28,
+            left: context.hPadding(),
             child: ClipOval(
               child: Image.asset(
                 imagePath,
@@ -214,12 +215,12 @@ class _RegisterPhotoComposition extends StatelessWidget {
           // Small accent dot
           Positioned(
             bottom: height * 0.08,
-            right: 52,
+            right: context.widthCalculated(52),
             child: Container(
               width: 18,
               height: 18,
               decoration: BoxDecoration(
-                color: AppThemeColors.gold.withValues(alpha: 0.28),
+                color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
                 shape: BoxShape.circle,
               ),
             ),
@@ -261,16 +262,16 @@ class _RegisterFormContent extends StatelessWidget {
     final cs = context.theme.colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(28, 24, 28, 0),
+      padding: EdgeInsets.fromLTRB(context.hPadding(), context.heightCalculated(24), context.hPadding(), 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Gold accent bar
+          // Accent bar
           Container(
             width: 28,
             height: 2,
             decoration: BoxDecoration(
-              color: AppThemeColors.gold,
+              color: AppThemeColors.primaryAccent,
               borderRadius: BorderRadius.circular(1),
             ),
           ),
@@ -396,16 +397,16 @@ class _OtpFormContent extends StatelessWidget {
     final cs = context.theme.colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(28, 28, 28, 0),
+      padding: EdgeInsets.fromLTRB(context.hPadding(), context.heightCalculated(28), context.hPadding(), 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Gold accent bar
+          // Accent bar
           Container(
             width: 28,
             height: 2,
             decoration: BoxDecoration(
-              color: AppThemeColors.gold,
+              color: AppThemeColors.primaryAccent,
               borderRadius: BorderRadius.circular(1),
             ),
           ),
@@ -430,7 +431,7 @@ class _OtpFormContent extends StatelessWidget {
                 TextSpan(
                   text: email,
                   style: TextStyle(
-                    color: AppThemeColors.gold,
+                    color: AppThemeColors.primaryAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -468,7 +469,7 @@ class _OtpFormContent extends StatelessWidget {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
                 borderSide: const BorderSide(
-                  color: AppThemeColors.gold,
+                  color: AppThemeColors.primaryAccent,
                   width: 1.5,
                 ),
               ),
@@ -520,7 +521,7 @@ class _OtpFormContent extends StatelessWidget {
               child: Text(
                 'Resend code',
                 style: tt.bodySmall?.copyWith(
-                  color: AppThemeColors.gold,
+                  color: AppThemeColors.primaryAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -557,7 +558,7 @@ class _BottomLink extends StatelessWidget {
           child: Text(
             isOtpStep ? 'Go back' : 'Sign In',
             style: tt.bodySmall?.copyWith(
-              color: AppThemeColors.gold,
+              color: AppThemeColors.primaryAccent,
               fontWeight: FontWeight.w600,
             ),
           ),

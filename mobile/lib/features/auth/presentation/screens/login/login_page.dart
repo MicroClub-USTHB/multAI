@@ -7,6 +7,7 @@ import 'package:multai_mobile/core/constants/images.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
 import '../../blocs/auth_bloc.dart';
 import 'widgets/email_field.dart';
@@ -91,20 +92,20 @@ class _LoginPageState extends State<LoginPage> {
                           ),
 
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(28, 28, 28, 0),
+                            padding: EdgeInsets.fromLTRB(context.hPadding(), context.heightCalculated(28), context.hPadding(), 0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Gold accent bar
+                                // Accent bar
                                 Container(
                                   width: 28,
                                   height: 2,
                                   decoration: BoxDecoration(
-                                    color: AppThemeColors.gold,
+                                    color: AppThemeColors.primaryAccent,
                                     borderRadius: BorderRadius.circular(1),
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: context.sectionSpacing()),
                                 Text(
                                   'Welcome back.',
                                   style: tt.displaySmall?.copyWith(
@@ -113,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                                     color: AppThemeColors.primaryText,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
+                                SizedBox(height: context.heightCalculated(6)),
                                 Text(
                                   'Sign in to your account.',
                                   style: tt.bodyMedium?.copyWith(
@@ -121,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                                     fontSize: 15,
                                   ),
                                 ),
-                                const SizedBox(height: 36),
+                                SizedBox(height: context.heightCalculated(36)),
 
                                 // Email
                                 Text(
@@ -130,9 +131,9 @@ class _LoginPageState extends State<LoginPage> {
                                     color: AppThemeColors.neutral200,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: context.heightCalculated(8)),
                                 EmailField(controller: _emailController),
-                                const SizedBox(height: 20),
+                                SizedBox(height: context.sectionSpacing()),
 
                                 // Password
                                 Text(
@@ -141,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                                     color: AppThemeColors.neutral200,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: context.heightCalculated(8)),
                                 PasswordField(
                                   controller: _passwordController,
                                   obscure: _obscurePassword,
@@ -150,13 +151,13 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   onSubmit: _onSignInPressed,
                                 ),
-                                const SizedBox(height: 32),
+                                SizedBox(height: context.heightCalculated(32)),
 
                                 SignInButton(
                                   isLoading: isLoading,
                                   onPressed: _onSignInPressed,
                                 ),
-                                const SizedBox(height: 24),
+                                SizedBox(height: context.sectionSpacing()),
                               ],
                             ),
                           ),
@@ -168,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Register link
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: EdgeInsets.symmetric(vertical: context.heightCalculated(16)),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -183,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: Text(
                           'Sign Up',
                           style: tt.bodySmall?.copyWith(
-                            color: AppThemeColors.gold,
+                            color: AppThemeColors.primaryAccent,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -218,7 +219,7 @@ class _LoginPhotoComposition extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Large gold circle — top-right, partially off-screen
+          // Large accent circle — top-right, partially off-screen
           Positioned(
             top: -(height * 0.13),
             right: -(height * 0.07),
@@ -226,12 +227,12 @@ class _LoginPhotoComposition extends StatelessWidget {
               width: circleSize,
               height: circleSize,
               decoration: const BoxDecoration(
-                color: AppThemeColors.gold,
+                color: AppThemeColors.primaryAccent,
                 shape: BoxShape.circle,
               ),
             ),
           ),
-          // Main photo circle — left, overlapping the gold circle
+          // Main photo circle — left, overlapping the accent circle
           Positioned(
             top: height * 0.07,
             left: 28,
@@ -247,12 +248,12 @@ class _LoginPhotoComposition extends StatelessWidget {
           // Small accent dot — bottom-right
           Positioned(
             bottom: height * 0.08,
-            right: 56,
+            right: context.widthCalculated(56),
             child: Container(
               width: 20,
               height: 20,
               decoration: BoxDecoration(
-                color: AppThemeColors.gold.withValues(alpha: 0.28),
+                color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
                 shape: BoxShape.circle,
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/extensions/snackbar_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
@@ -156,7 +157,7 @@ class _SplashScreenState extends State<SplashScreen>
               const SizedBox(height: AppThemeMetrics.spacingXl),
               Icon(
                 Icons.security_rounded,
-                size: 80,
+                size: context.iconSize() * 3,
                 color: AppThemeColors.error.withValues(alpha: 0.8),
               ),
               const SizedBox(height: AppThemeMetrics.spacingLg),
@@ -195,7 +196,7 @@ class _SplashScreenState extends State<SplashScreen>
               const SizedBox(height: AppThemeMetrics.spacingXl),
               Icon(
                 Icons.wifi_off_rounded,
-                size: 80,
+                size: context.iconSize() * 3,
                 color: AppThemeColors.primaryAccent.withValues(alpha: 0.7),
               ),
               const SizedBox(height: AppThemeMetrics.spacingLg),

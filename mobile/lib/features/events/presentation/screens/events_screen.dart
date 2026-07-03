@@ -180,7 +180,7 @@ class _EventsScreenState extends State<EventsScreen> {
       ),
       child: LinearProgressIndicator(
         backgroundColor: AppThemeColors.border.withValues(alpha: 0.2),
-        valueColor: const AlwaysStoppedAnimation<Color>(AppThemeColors.gold),
+        valueColor: const AlwaysStoppedAnimation<Color>(AppThemeColors.primaryAccent),
       ),
     );
   }
@@ -193,23 +193,23 @@ class _EventsScreenState extends State<EventsScreen> {
         context.widthCalculated(AppThemeMetrics.spacingSm),
       ),
       decoration: BoxDecoration(
-        color: AppThemeColors.gold.withValues(alpha: 0.1),
+        color: AppThemeColors.primaryAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
-        border: Border.all(color: AppThemeColors.gold.withValues(alpha: 0.3)),
+        border: Border.all(color: AppThemeColors.primaryAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
           Icon(
             Icons.wifi_off_rounded,
             size: context.iconSize(),
-            color: AppThemeColors.gold,
+            color: AppThemeColors.primaryAccent,
           ),
           SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
           Expanded(
             child: Text(
               'Showing cached data. Connect to the internet to see the latest.',
               style: context.textTheme.bodySmall?.copyWith(
-                color: AppThemeColors.gold,
+                color: AppThemeColors.primaryAccent,
               ),
             ),
           ),

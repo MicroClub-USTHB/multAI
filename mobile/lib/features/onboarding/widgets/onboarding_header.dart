@@ -24,7 +24,7 @@ class OnboardingHeader extends StatelessWidget {
           child: Text(
             'Skip',
             style: TextStyle(
-              color: AppThemeColors.gold,
+              color: AppThemeColors.primaryAccent,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),

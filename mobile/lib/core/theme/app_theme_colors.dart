@@ -66,14 +66,7 @@ abstract class AppThemeColors {
   static const Color gradientAccentStart = Color(0xFF8B78FF);
   static const Color gradientAccentEnd = Color(0xFF5B44E0);
 
-  @Deprecated('Use primaryAccent instead')
-  static const Color gold = primaryAccent;
 
-  @Deprecated('Use gradientAccentStart instead')
-  static const Color gradientGoldStart = gradientAccentStart;
-
-  @Deprecated('Use gradientAccentEnd instead')
-  static const Color gradientGoldEnd = gradientAccentEnd;
 
   // Neutral scrim for image-behind-text treatments (fades photos into the base).
   static const Color scrim = Color(0xCC08080B);

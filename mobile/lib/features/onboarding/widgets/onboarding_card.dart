@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/constants/onboarding_content.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
+import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class OnboardingCard extends StatelessWidget {
   final OnboardingItem slide;
@@ -23,11 +24,11 @@ class OnboardingCard extends StatelessWidget {
       children: [
         SizedBox(
           height: compositionHeight,
-          child: _buildComposition(compositionHeight),
+          child: _buildComposition(context, compositionHeight),
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(32, 28, 48, 0),
+            padding: EdgeInsets.fromLTRB(context.hPadding(), context.heightCalculated(28), context.hPadding(), 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -36,7 +37,7 @@ class OnboardingCard extends StatelessWidget {
                   width: 28,
                   height: 2,
                   decoration: BoxDecoration(
-                    color: AppThemeColors.gold,
+                    color: AppThemeColors.primaryAccent,
                     borderRadius: BorderRadius.circular(1),
                   ),
                 ),
@@ -68,21 +69,21 @@ class OnboardingCard extends StatelessWidget {
     );
   }
 
-  Widget _buildComposition(double height) {
+  Widget _buildComposition(BuildContext context, double height) {
     switch (slideIndex % 3) {
       case 0:
-        return _buildSlide0(height);
+        return _buildSlide0(context, height);
       case 1:
-        return _buildSlide1(height);
+        return _buildSlide1(context, height);
       case 2:
-        return _buildSlide2(height);
+        return _buildSlide2(context, height);
       default:
-        return _buildSlide0(height);
+        return _buildSlide0(context, height);
     }
   }
 
-  // Slide 0: large rounded-rect photo left + big gold circle overlapping right
-  Widget _buildSlide0(double height) {
+  // Slide 0: large rounded-rect photo left + big accent circle overlapping right
+  Widget _buildSlide0(BuildContext context, double height) {
     final circleSize = height * 0.76;
     final photoW = height * 0.60;
     final photoH = height * 0.70;
@@ -90,7 +91,7 @@ class OnboardingCard extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // Big gold circle — right, partially off-screen
+        // Big accent circle — right, partially off-screen
         Positioned(
           top: -(height * 0.14),
           right: -(height * 0.08),
@@ -98,15 +99,15 @@ class OnboardingCard extends StatelessWidget {
             width: circleSize,
             height: circleSize,
             decoration: const BoxDecoration(
-              color: AppThemeColors.gold,
+              color: AppThemeColors.primaryAccent,
               shape: BoxShape.circle,
             ),
           ),
         ),
-        // Main photo — rounded rect, overlaps the gold circle
+        // Main photo — rounded rect, overlaps the accent circle
         Positioned(
           top: height * 0.06,
-          left: 28,
+          left: context.hPadding(),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Image.asset(
@@ -120,12 +121,12 @@ class OnboardingCard extends StatelessWidget {
         // Small accent dot — bottom right of composition area
         Positioned(
           bottom: height * 0.06,
-          right: 56,
+          right: context.widthCalculated(56),
           child: Container(
             width: 26,
             height: 26,
             decoration: BoxDecoration(
-              color: AppThemeColors.gold.withValues(alpha: 0.28),
+              color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
               shape: BoxShape.circle,
             ),
           ),
@@ -135,22 +136,22 @@ class OnboardingCard extends StatelessWidget {
   }
 
   // Slide 1: two overlapping circular photos
-  Widget _buildSlide1(double height) {
+  Widget _buildSlide1(BuildContext context, double height) {
     final largeSize = height * 0.52;
     final smallSize = height * 0.34;
 
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // Faint gold circle — background, top-left
+        // Faint accent circle — background, top-left
         Positioned(
           top: -(height * 0.1),
-          left: -36,
+          left: -context.widthCalculated(36),
           child: Container(
             width: height * 0.66,
             height: height * 0.66,
             decoration: BoxDecoration(
-              color: AppThemeColors.gold.withValues(alpha: 0.10),
+              color: AppThemeColors.primaryAccent.withValues(alpha: 0.10),
               shape: BoxShape.circle,
             ),
           ),
@@ -158,14 +159,14 @@ class OnboardingCard extends StatelessWidget {
         // Large circle photo — center-left
         Positioned(
           top: height * 0.10,
-          left: 36,
+          left: context.hPadding(),
           child: _photoCircle(slide.image, largeSize),
         ),
         // Smaller circle photo — right side, higher up
         if (slide.secondImage != null)
           Positioned(
             top: 0,
-            right: 28,
+            right: context.widthCalculated(28),
             child: _photoCircle(slide.secondImage!, smallSize),
           ),
         // Small dark dot — floating accent
@@ -179,7 +180,7 @@ class OnboardingCard extends StatelessWidget {
               color: AppThemeColors.surface,
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppThemeColors.gold.withValues(alpha: 0.3),
+                color: AppThemeColors.primaryAccent.withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -188,14 +189,14 @@ class OnboardingCard extends StatelessWidget {
     );
   }
 
-  // Slide 2: centered large circle photo + gold accent
-  Widget _buildSlide2(double height) {
+  // Slide 2: centered large circle photo + accent
+  Widget _buildSlide2(BuildContext context, double height) {
     final circleSize = height * 0.60;
 
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // Faint gold circle — top-right, partially off-screen
+        // Faint accent circle — top-right, partially off-screen
         Positioned(
           top: -(height * 0.18),
           right: -(height * 0.10),
@@ -203,7 +204,7 @@ class OnboardingCard extends StatelessWidget {
             width: height * 0.70,
             height: height * 0.70,
             decoration: BoxDecoration(
-              color: AppThemeColors.gold.withValues(alpha: 0.12),
+              color: AppThemeColors.primaryAccent.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
           ),
@@ -215,15 +216,15 @@ class OnboardingCard extends StatelessWidget {
           right: 0,
           child: Center(child: _photoCircle(slide.image, circleSize)),
         ),
-        // Small gold dot — bottom-left accent
+        // Small accent dot — bottom-left
         Positioned(
           bottom: height * 0.08,
-          left: 44,
+          left: context.widthCalculated(44),
           child: Container(
             width: 20,
             height: 20,
             decoration: const BoxDecoration(
-              color: AppThemeColors.gold,
+              color: AppThemeColors.primaryAccent,
               shape: BoxShape.circle,
             ),
           ),

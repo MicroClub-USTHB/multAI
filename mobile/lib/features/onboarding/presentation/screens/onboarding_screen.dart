@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/core/constants/onboarding_content.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
+import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/di/injection_container.dart';
 import 'package:multai_mobile/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:multai_mobile/features/onboarding/widgets/onboarding_button.dart';
@@ -73,9 +74,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Align(
                       alignment: Alignment.topRight,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 14,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.hPadding(),
+                          vertical: context.heightCalculated(14),
                         ),
                         child: AnimatedOpacity(
                           opacity: isLast ? 0 : 1,
@@ -87,9 +88,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             child: Text(
                               'Skip',
                               style: context.textTheme.labelLarge?.copyWith(
-                                color: AppThemeColors.gold,
+                                color: AppThemeColors.primaryAccent,
                                 fontWeight: FontWeight.w600,
-                                fontSize: 15,
                               ),
                             ),
                           ),
@@ -102,7 +102,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(32, 0, 32, 36),
+                        padding: EdgeInsets.fromLTRB(context.hPadding(), 0, context.hPadding(), context.heightCalculated(36)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
