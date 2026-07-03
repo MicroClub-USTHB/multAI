@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/failure.dart';
+import '../../../../core/errors/failure_handler.dart';
+import '../../../../core/errors/error_presentation.dart';
 import '../../../../core/network/connectivity_service.dart';
 import '../../domain/entities/photo_entity.dart';
 import '../../domain/usecases/get_my_photos_usecase.dart';
@@ -16,6 +18,7 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
   final GetEventPhotosUseCase _getEventPhotos;
   final GetPhotoImageUseCase _getPhotoImage;
   final ConnectivityService _connectivityService;
+  final FailureHandler _failureHandler;
   StreamSubscription<bool>? _connectivitySub;
 
   GalleryBloc({
@@ -23,10 +26,12 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     required GetEventPhotosUseCase getEventPhotos,
     required GetPhotoImageUseCase getPhotoImage,
     required ConnectivityService connectivityService,
+    FailureHandler? failureHandler,
   }) : _getMyPhotos = getMyPhotos,
        _getEventPhotos = getEventPhotos,
        _getPhotoImage = getPhotoImage,
        _connectivityService = connectivityService,
+       _failureHandler = failureHandler ?? FailureHandler.instance,
        super(GalleryInitial()) {
     on<LoadAllPhotos>(_onLoadAll);
     on<LoadEventPhotos>(_onLoadEvent);
@@ -58,7 +63,13 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
         if (failure is NetworkFailure) {
           emit(GalleryOffline());
         } else {
-          emit(GalleryError(message: failure.message));
+          _failureHandler.logFailure(failure, 'GalleryBloc');
+          emit(
+            GalleryError(
+              errorPresentation:
+                  _failureHandler.getErrorPresentation(failure),
+            ),
+          );
         }
       },
       (photos) {
@@ -90,7 +101,13 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
         if (failure is NetworkFailure) {
           emit(GalleryOffline());
         } else {
-          emit(GalleryError(message: failure.message));
+          _failureHandler.logFailure(failure, 'GalleryBloc');
+          emit(
+            GalleryError(
+              errorPresentation:
+                  _failureHandler.getErrorPresentation(failure),
+            ),
+          );
         }
       },
       (data) {

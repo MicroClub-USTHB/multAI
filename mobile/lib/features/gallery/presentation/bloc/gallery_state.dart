@@ -41,6 +41,6 @@ class GalleryOffline extends GalleryState {
 }
 
 class GalleryError extends GalleryState {
-  final String message;
-  GalleryError({required this.message});
+  final ErrorPresentation errorPresentation;
+  GalleryError({required this.errorPresentation});
 }
