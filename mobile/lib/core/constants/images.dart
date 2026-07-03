@@ -26,5 +26,15 @@ class AppImages {
     '$onboardingPath/14.png',
     '$onboardingPath/15.png',
     '$onboardingPath/16.png',
+    '$onboardingPath/17.png',
+    '$onboardingPath/18.png',
+    '$onboardingPath/19.png',
+    '$onboardingPath/20.png',
+    '$onboardingPath/21.png',
+    '$onboardingPath/22.png',
+    '$onboardingPath/23.png',
+    '$onboardingPath/24.png',
+    '$onboardingPath/25.png',
+    '$onboardingPath/26.png',
   ];
 }
