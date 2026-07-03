@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +32,14 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   String? _pendingToken;
+  late final String _randomImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _randomImage = AppImages
+        .onboardingImages[Random().nextInt(AppImages.onboardingImages.length)];
+  }
 
   @override
   void dispose() {
@@ -98,7 +108,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _RegisterPhotoComposition(isOtpStep: isOtpStep),
+                          _RegisterPhotoComposition(
+                            isOtpStep: isOtpStep,
+                            imagePath: _randomImage,
+                          ),
                           isOtpStep
                               ? _OtpFormContent(
                                   email: _emailController.text.trim(),
@@ -143,7 +156,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     isOtpStep: isOtpStep,
                     onTap: () {
                       if (isOtpStep) {
-                        setState(() => _otpController.clear());
+                        setState(() {
+                          _otpController.clear();
+                          context.read<AuthBloc>().add(ResetAuth());
+                        });
                       } else {
                         context.go(AppRoutes.login);
                       }
@@ -163,7 +179,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
 class _RegisterPhotoComposition extends StatelessWidget {
   final bool isOtpStep;
-  const _RegisterPhotoComposition({required this.isOtpStep});
+  final String imagePath;
+  const _RegisterPhotoComposition({
+    required this.isOtpStep,
+    required this.imagePath,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +217,7 @@ class _RegisterPhotoComposition extends StatelessWidget {
             left: 28,
             child: ClipOval(
               child: Image.asset(
-                AppImages.onboarding1,
+                imagePath,
                 width: photoSize,
                 height: photoSize,
                 fit: BoxFit.cover,

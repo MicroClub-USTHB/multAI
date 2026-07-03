@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -23,6 +25,14 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  late final String _randomImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _randomImage = AppImages
+        .onboardingImages[Random().nextInt(AppImages.onboardingImages.length)];
+  }
 
   @override
   void dispose() {
@@ -75,7 +85,10 @@ class _LoginPageState extends State<LoginPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Photo circle composition
-                          _LoginPhotoComposition(height: screenHeight * 0.35),
+                          _LoginPhotoComposition(
+                            height: screenHeight * 0.35,
+                            imagePath: _randomImage,
+                          ),
 
                           Padding(
                             padding: const EdgeInsets.fromLTRB(28, 28, 28, 0),
@@ -189,7 +202,11 @@ class _LoginPageState extends State<LoginPage> {
 
 class _LoginPhotoComposition extends StatelessWidget {
   final double height;
-  const _LoginPhotoComposition({required this.height});
+  final String imagePath;
+  const _LoginPhotoComposition({
+    required this.height,
+    required this.imagePath,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +237,7 @@ class _LoginPhotoComposition extends StatelessWidget {
             left: 28,
             child: ClipOval(
               child: Image.asset(
-                AppImages.onboarding2,
+                imagePath,
                 width: photoSize,
                 height: photoSize,
                 fit: BoxFit.cover,

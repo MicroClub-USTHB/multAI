@@ -4,7 +4,7 @@ import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
 
 class OnboardingCard extends StatelessWidget {
-  final OnboardingSlide slide;
+  final OnboardingItem slide;
   final int slideIndex;
 
   const OnboardingCard({

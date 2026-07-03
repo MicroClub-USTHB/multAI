@@ -62,6 +62,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/onboarding/
     - assets/icons/
     # NOTE: .env is included for development only.
     # Production builds MUST use --dart-define or CI/CD injection for secrets.

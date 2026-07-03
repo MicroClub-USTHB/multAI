@@ -65,6 +65,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RefreshTokenRequested>(_onRefreshTokenRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<GetCurrentUserRequested>(_onGetCurrentUserRequested);
+    on<ResetAuth>(_onResetAuth);
   }
 
   Future<void> _emitAuthenticatedState(
@@ -243,5 +244,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       _logger.error('AuthBloc', 'Get current user failed', e, s);
       emit(AuthFailure(message: 'Could not load user data.'));
     }
+  }
+
+  Future<void> _onResetAuth(
+    ResetAuth event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthInitial());
   }
 }

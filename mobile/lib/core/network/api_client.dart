@@ -37,7 +37,7 @@ class ApiClient {
 
   Future<Map<String, String>> _getHeaders({bool requiresAuth = false}) async {
     final headers = <String, String>{'Content-Type': 'application/json'};
-    if (_accessToken != null) {
+    if (_accessToken != null && requiresAuth) {
       headers['Authorization'] = 'Bearer $_accessToken';
     }
 
@@ -331,10 +331,22 @@ class ApiClient {
 
   String _parseError(http.Response response) {
     try {
-      final body = jsonDecode(response.body) as Map<String, dynamic>;
-      return body['message'] as String? ??
-          body['error'] as String? ??
-          'Unknown server error';
+      final body = jsonDecode(response.body);
+      if (body is Map<String, dynamic>) {
+        if (body['message'] != null) return body['message'] as String;
+        if (body['error'] != null) return body['error'] as String;
+        if (body['detail'] != null) {
+          final detail = body['detail'];
+          if (detail is String) return detail;
+          if (detail is List && detail.isNotEmpty) {
+            final first = detail[0];
+            if (first is Map<String, dynamic>) {
+              return first['msg'] as String? ?? 'Unknown server error';
+            }
+          }
+        }
+      }
+      return 'Unknown server error';
     } catch (_) {
       return 'Server error ${response.statusCode}';
     }

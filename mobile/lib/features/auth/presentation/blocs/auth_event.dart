@@ -43,3 +43,5 @@ class RefreshTokenRequested extends AuthEvent {
 class LogoutRequested extends AuthEvent {}
 
 class GetCurrentUserRequested extends AuthEvent {}
+
+class ResetAuth extends AuthEvent {}
