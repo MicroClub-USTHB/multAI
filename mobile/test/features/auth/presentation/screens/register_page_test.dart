@@ -63,8 +63,8 @@ void main() {
   ) async {
     whenListen(
       mockAuthBloc,
-      Stream.fromIterable([AuthOtpSent(email: 'test@test.com')]),
-      initialState: AuthOtpSent(email: 'test@test.com'),
+      Stream.fromIterable([AuthOtpSent(email: 'test@test.com', pendingToken: 'token')]),
+      initialState: AuthOtpSent(email: 'test@test.com', pendingToken: 'token'),
     );
 
     await tester.pumpWidget(buildTestWidget());
@@ -117,8 +117,8 @@ void main() {
   ) async {
     whenListen(
       mockAuthBloc,
-      Stream.fromIterable([AuthOtpSent(email: 'test@test.com')]),
-      initialState: AuthOtpSent(email: 'test@test.com'),
+      Stream.fromIterable([AuthOtpSent(email: 'test@test.com', pendingToken: 'token')]),
+      initialState: AuthOtpSent(email: 'test@test.com', pendingToken: 'token'),
     );
 
     await tester.pumpWidget(buildTestWidget());

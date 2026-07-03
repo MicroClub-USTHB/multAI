@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'package:http/http.dart' as http;
 import '../../../../core/network/api_client.dart';
 import '../../../../core/constants/end_points.dart';
 import '../models/photo_model.dart';
@@ -41,8 +40,8 @@ class PhotoRemoteDataSourceImpl implements PhotoRemoteDataSource {
 
     final json = await apiClient.get('${EndPoints.photos}$query');
 
-    // response is a list directly
-    final list = json['data'] as List<dynamic>? ?? (json is List ? json : []);
+    // Backend returns a raw array (no wrapper object)
+    final list = json is List ? json : [];
 
     return list
         .map((e) => PhotoModel.fromJson(e as Map<String, dynamic>))
@@ -73,23 +72,6 @@ class PhotoRemoteDataSourceImpl implements PhotoRemoteDataSource {
   // GET /photos/{photo_id}/image — raw bytes
   @override
   Future<Uint8List> getPhotoImageBytes(String photoId) async {
-    await apiClient.checkConnection();
-
-    final uri = Uri.parse(
-      '${apiClient.baseUrl}${EndPoints.photos}/$photoId/image',
-    );
-    final response = await http.get(
-      uri,
-      headers: {
-        if (apiClient.currentAccessToken != null)
-          'Authorization': 'Bearer ${apiClient.currentAccessToken}',
-      },
-    );
-
-    if (response.statusCode == 200) return response.bodyBytes;
-
-    throw Exception(
-      'Failed to download photo $photoId: ${response.statusCode}',
-    );
+    return apiClient.getBytes('${EndPoints.photos}/$photoId/image');
   }
 }

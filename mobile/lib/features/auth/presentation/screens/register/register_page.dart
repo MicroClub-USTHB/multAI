@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
-import '../../../../../core/validators/validators.dart';
+import '../../../../../core/utils/validators.dart';
 import '../../blocs/auth_bloc.dart';
 import '../login/widgets/email_field.dart';
 import '../login/widgets/password_field.dart';
@@ -31,6 +32,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+  String? _pendingToken;
   late final String _randomImage;
 
   @override
@@ -81,6 +83,10 @@ class _RegisterPageState extends State<RegisterPage> {
           context.go(AppRoutes.events);
         } else if (state is AuthNeedsFaceEnrollment) {
           context.go(AppRoutes.faceEnrollment);
+        } else if (state is AuthOtpSent) {
+          setState(() => _pendingToken = state.pendingToken);
+        } else if (state is ResendOtpSuccess) {
+          setState(() => _pendingToken = state.pendingToken);
         }
         if (state is AuthFailure) {
           context.showErrorSnackBar(state.message);
@@ -110,10 +116,17 @@ class _RegisterPageState extends State<RegisterPage> {
                           isOtpStep
                               ? _OtpFormContent(
                                   email: _emailController.text.trim(),
+                                  pendingToken: _pendingToken,
                                   otpController: _otpController,
                                   isLoading: isLoading,
                                   onVerify: _onVerifyOtpPressed,
-                                  onResend: _onSendOtpPressed,
+                                  onResend: (pendingToken) => context
+                                      .read<AuthBloc>()
+                                      .add(
+                                        ResendOtpRequested(
+                                          pendingToken: pendingToken,
+                                        ),
+                                      ),
                                 )
                               : _RegisterFormContent(
                                   emailController: _emailController,
@@ -312,8 +325,11 @@ class _RegisterFormContent extends StatelessWidget {
             obscure: obscurePassword,
             onToggle: onTogglePassword,
             onSubmit: () {},
+            validator: Validators.password,
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 8),
+          _PasswordStrengthIndicator(controller: passwordController),
+          const SizedBox(height: 10),
 
           Text(
             'Confirm Password',
@@ -325,9 +341,9 @@ class _RegisterFormContent extends StatelessWidget {
             obscure: obscureConfirm,
             onToggle: onToggleConfirm,
             onSubmit: onSubmit,
-            validator: (v) => AppValidators.validateConfirmPassword(
+            validator: (v) => Validators.confirmPassword(
               v,
-              password: passwordController.text,
+              passwordController.text,
             ),
           ),
           const SizedBox(height: 32),
@@ -376,15 +392,17 @@ class _RegisterFormContent extends StatelessWidget {
 
 // ── OTP step (step 2) ──────────────────────────────────────────────────────────
 
-class _OtpFormContent extends StatelessWidget {
+class _OtpFormContent extends StatefulWidget {
   final String email;
+  final String? pendingToken;
   final TextEditingController otpController;
   final bool isLoading;
   final VoidCallback onVerify;
-  final VoidCallback onResend;
+  final void Function(String pendingToken) onResend;
 
   const _OtpFormContent({
     required this.email,
+    required this.pendingToken,
     required this.otpController,
     required this.isLoading,
     required this.onVerify,
@@ -392,9 +410,44 @@ class _OtpFormContent extends StatelessWidget {
   });
 
   @override
+  State<_OtpFormContent> createState() => _OtpFormContentState();
+}
+
+class _OtpFormContentState extends State<_OtpFormContent> {
+  int _countdown = 0;
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startCountdown() {
+    _timer?.cancel();
+    setState(() => _countdown = 60);
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_countdown <= 1) {
+        timer.cancel();
+        setState(() => _countdown = 0);
+      } else {
+        setState(() => _countdown = _countdown - 1);
+      }
+    });
+  }
+
+  void _onResendPressed() {
+    final token = widget.pendingToken;
+    if (token == null || token.isEmpty || _countdown > 0) return;
+    widget.onResend(token);
+    _startCountdown();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
+    final canResend = _countdown == 0 && widget.pendingToken != null;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(context.hPadding(), context.heightCalculated(28), context.hPadding(), 0),
@@ -429,7 +482,7 @@ class _OtpFormContent extends StatelessWidget {
               children: [
                 const TextSpan(text: 'We sent a 6-digit code to '),
                 TextSpan(
-                  text: email,
+                  text: widget.email,
                   style: TextStyle(
                     color: AppThemeColors.primaryAccent,
                     fontWeight: FontWeight.w600,
@@ -442,7 +495,7 @@ class _OtpFormContent extends StatelessWidget {
 
           // OTP input — centered, spaced digits
           TextFormField(
-            controller: otpController,
+            controller: widget.otpController,
             keyboardType: TextInputType.number,
             maxLength: 6,
             textAlign: TextAlign.center,
@@ -481,8 +534,8 @@ class _OtpFormContent extends StatelessWidget {
             height: 52,
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: isLoading ? null : onVerify,
-              child: isLoading
+              onPressed: widget.isLoading ? null : widget.onVerify,
+              child: widget.isLoading
                   ? SizedBox(
                       height: 20,
                       width: 20,
@@ -514,12 +567,15 @@ class _OtpFormContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Resend link
+          // Resend link with countdown
           Center(
             child: TextButton(
-              onPressed: isLoading ? null : onResend,
+              onPressed:
+                  widget.isLoading || !canResend ? null : _onResendPressed,
               child: Text(
-                'Resend code',
+                _countdown > 0
+                    ? 'Resend code (${_countdown}s)'
+                    : 'Resend code',
                 style: tt.bodySmall?.copyWith(
                   color: AppThemeColors.primaryAccent,
                   fontWeight: FontWeight.w600,
@@ -530,6 +586,87 @@ class _OtpFormContent extends StatelessWidget {
           const SizedBox(height: 24),
         ],
       ),
+    );
+  }
+}
+
+// ── Password strength indicator ─────────────────────────────────────────────────
+
+class _PasswordStrengthIndicator extends StatefulWidget {
+  final TextEditingController controller;
+  const _PasswordStrengthIndicator({required this.controller});
+
+  @override
+  State<_PasswordStrengthIndicator> createState() =>
+      _PasswordStrengthIndicatorState();
+}
+
+class _PasswordStrengthIndicatorState
+    extends State<_PasswordStrengthIndicator> {
+  int _strength = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onPasswordChanged);
+    _onPasswordChanged();
+  }
+
+  @override
+  void didUpdateWidget(_PasswordStrengthIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_onPasswordChanged);
+      widget.controller.addListener(_onPasswordChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onPasswordChanged);
+    super.dispose();
+  }
+
+  void _onPasswordChanged() {
+    final p = widget.controller.text;
+    int count = 0;
+    if (p.length >= 8) count++;
+    if (p.contains(RegExp(r'[A-Z]'))) count++;
+    if (p.contains(RegExp(r'[a-z]'))) count++;
+    if (p.contains(RegExp(r'[0-9]'))) count++;
+    if (p.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) count++;
+    if (count != _strength) setState(() => _strength = count);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = [
+      AppThemeColors.error,
+      AppThemeColors.warning,
+      AppThemeColors.primaryAccent,
+      AppThemeColors.success,
+    ];
+    final segments = _strength == 0 ? 1 : _strength > 4 ? 4 : _strength;
+    final activeColor = _strength == 0
+        ? AppThemeColors.neutral300.withValues(alpha: 0.3)
+        : colors[(_strength - 1).clamp(0, 3)];
+
+    return Row(
+      children: List.generate(4, (i) {
+        final isActive = i < segments;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(right: i < 3 ? 4 : 0),
+            child: Container(
+              height: 3,
+              decoration: BoxDecoration(
+                color: isActive ? activeColor : AppThemeColors.neutral300.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(1.5),
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }

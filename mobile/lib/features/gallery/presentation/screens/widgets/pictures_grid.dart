@@ -19,7 +19,6 @@ class PicturesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ── responsive columns — use context extension ────────────────────────
     final crossAxisCount = (context.width / context.widthCalculated(160))
         .floor()
         .clamp(1, 6);
@@ -37,12 +36,15 @@ class PicturesGrid extends StatelessWidget {
         final photo = photos[index];
         final localPath = cachedPaths[photo.id];
 
-        // trigger image load if not cached
         if (localPath == null) {
           context.read<GalleryBloc>().add(LoadPhotoImage(photoId: photo.id));
         }
 
-        return PhotoGridItem(photoId: photo.id, localPath: localPath);
+        return PhotoGridItem(
+          photoId: photo.id,
+          localPath: localPath,
+          gridItemSize: context.widthCalculated(160),
+        );
       },
     );
   }

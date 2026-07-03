@@ -37,4 +37,25 @@ class AccountRepositoryImpl implements AccountRepository {
       return Left(const UnknownFailure('Failed to load account data'));
     }
   }
+
+  @override
+  Future<Either<Failure, String>> uploadAvatar(String filePath) async {
+    try {
+      final avatarUrl = await remoteDataSource.uploadAvatar(filePath);
+      final cached = await localDataSource.getCachedAccountData();
+      if (cached != null) {
+        final updated = AccountModel(
+          name: cached.name,
+          email: cached.email,
+          avatarUrl: avatarUrl,
+        );
+        await localDataSource.cacheAccountData(updated);
+      }
+      return Right(avatarUrl);
+    } on Failure catch (f) {
+      return Left(f);
+    } catch (e) {
+      return Left(const UnknownFailure('Failed to upload avatar'));
+    }
+  }
 }

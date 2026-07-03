@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -8,16 +9,24 @@ import 'package:device_info_plus/device_info_plus.dart';
 import '../errors/failure.dart';
 import 'network_info.dart';
 import '../constants/end_points.dart';
+import '../constants/storage_keys.dart';
+import '../storage/app_local_storage.dart';
 
 class ApiClient {
   final http.Client _client;
   final NetworkInfo _networkInfo;
+  final LocalStorage? _localStorage;
 
   String? _accessToken;
+  void Function()? onUnauthorized;
 
-  ApiClient({http.Client? client, required NetworkInfo networkInfo})
-    : _client = client ?? http.Client(),
-      _networkInfo = networkInfo;
+  ApiClient({
+    http.Client? client,
+    required NetworkInfo networkInfo,
+    LocalStorage? localStorage,
+  }) : _client = client ?? http.Client(),
+       _networkInfo = networkInfo,
+       _localStorage = localStorage;
 
   String get baseUrl => EndPoints.baseUrl;
 
@@ -59,16 +68,11 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> get(String endpoint) async {
-    await checkConnection();
-    try {
-      final response = await _client
-          .get(Uri.parse('$baseUrl$endpoint'), headers: await _getHeaders())
-          .timeout(_requestTimeout);
-      return _handleResponse(response);
-    } on TimeoutException {
-      throw const NetworkFailure('Request timed out');
-    }
+  Future<dynamic> get(String endpoint, {bool requiresAuth = true}) async {
+    final headers = await _getHeaders(requiresAuth: requiresAuth);
+    return _executeWithAuth(
+      () => _client.get(Uri.parse('$baseUrl$endpoint'), headers: headers),
+    );
   }
 
   Future<dynamic> post(
@@ -76,19 +80,15 @@ class ApiClient {
     Map<String, dynamic>? body,
     bool requiresAuth = false,
   }) async {
-    await checkConnection();
-    try {
-      final response = await _client
-          .post(
-            Uri.parse('$baseUrl$endpoint'),
-            headers: await _getHeaders(requiresAuth: requiresAuth),
-            body: body != null ? jsonEncode(body) : null,
-          )
-          .timeout(_requestTimeout);
-      return _handleResponse(response);
-    } on TimeoutException {
-      throw const NetworkFailure('Request timed out');
-    }
+    final headers = await _getHeaders(requiresAuth: requiresAuth);
+    final requestBody = body != null ? jsonEncode(body) : null;
+    return _executeWithAuth(
+      () => _client.post(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: headers,
+        body: requestBody,
+      ),
+    );
   }
 
   Future<void> postVoid(
@@ -96,31 +96,22 @@ class ApiClient {
     Map<String, dynamic>? body,
     bool requiresAuth = false,
   }) async {
-    await checkConnection();
-    try {
-      final response = await _client
-          .post(
-            Uri.parse('$baseUrl$endpoint'),
-            headers: await _getHeaders(requiresAuth: requiresAuth),
-            body: body != null ? jsonEncode(body) : null,
-          )
-          .timeout(_requestTimeout);
-      _handleVoidResponse(response);
-    } on TimeoutException {
-      throw const NetworkFailure('Request timed out');
-    }
+    final headers = await _getHeaders(requiresAuth: requiresAuth);
+    final requestBody = body != null ? jsonEncode(body) : null;
+    await _executeWithAuthVoid(
+      () => _client.post(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: headers,
+        body: requestBody,
+      ),
+    );
   }
 
-  Future<void> delete(String endpoint) async {
-    await checkConnection();
-    try {
-      final response = await _client
-          .delete(Uri.parse('$baseUrl$endpoint'), headers: await _getHeaders())
-          .timeout(_requestTimeout);
-      _handleVoidResponse(response);
-    } on TimeoutException {
-      throw const NetworkFailure('Request timed out');
-    }
+  Future<void> delete(String endpoint, {bool requiresAuth = true}) async {
+    final headers = await _getHeaders(requiresAuth: requiresAuth);
+    await _executeWithAuthVoid(
+      () => _client.delete(Uri.parse('$baseUrl$endpoint'), headers: headers),
+    );
   }
 
   void _handleVoidResponse(http.Response response) {
@@ -128,7 +119,7 @@ class ApiClient {
     _throwForStatus(response);
   }
 
-  Future<void> postMultipart(
+  Future<Map<String, dynamic>> postMultipart(
     String endpoint, {
     required List<File> files,
     required List<String> fieldNames,
@@ -167,8 +158,12 @@ class ApiClient {
     final streamedResponse = await request.send().timeout(_requestTimeout);
     final response = await http.Response.fromStream(streamedResponse);
 
-    if (response.statusCode == 200 || response.statusCode == 201) return;
-    _throwForStatus(response);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return Map<String, dynamic>.from(
+        jsonDecode(response.body) as Map,
+      );
+    }
+    return _throwForStatus(response);
   }
 
   String _mimeTypeFromExtension(String ext) {
@@ -185,6 +180,124 @@ class ApiClient {
     }
   }
 
+  Future<Uint8List> getBytes(String url) async {
+    final headers = await _getHeaders();
+    final response = await _executeWithAuthRaw(
+      () => _client.get(Uri.parse('$baseUrl$url'), headers: headers),
+    );
+    if (response.statusCode == 200) return response.bodyBytes;
+    throw ServerFailure(
+      'Failed to fetch bytes: ${response.statusCode}',
+      response.statusCode,
+    );
+  }
+
+  Future<dynamic> _executeWithAuth(
+    Future<http.Response> Function() request,
+  ) async {
+    await checkConnection();
+    try {
+      final response = await request().timeout(_requestTimeout);
+      return _handleResponse(response);
+    } on UnauthorizedFailure {
+      if (await _tryRefreshToken()) {
+        final response = await request().timeout(_requestTimeout);
+        return _handleResponse(response);
+      }
+      onUnauthorized?.call();
+      rethrow;
+    } on TimeoutException {
+      throw const NetworkFailure('Request timed out');
+    }
+  }
+
+  Future<void> _executeWithAuthVoid(
+    Future<http.Response> Function() request,
+  ) async {
+    await checkConnection();
+    try {
+      final response = await request().timeout(_requestTimeout);
+      _handleVoidResponse(response);
+    } on UnauthorizedFailure {
+      if (await _tryRefreshToken()) {
+        final response = await request().timeout(_requestTimeout);
+        _handleVoidResponse(response);
+        return;
+      }
+      onUnauthorized?.call();
+      rethrow;
+    } on TimeoutException {
+      throw const NetworkFailure('Request timed out');
+    }
+  }
+
+  Future<http.Response> _executeWithAuthRaw(
+    Future<http.Response> Function() request,
+  ) async {
+    await checkConnection();
+    try {
+      final response = await request().timeout(_requestTimeout);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response;
+      }
+      _throwForStatus(response);
+    } on UnauthorizedFailure {
+      if (await _tryRefreshToken()) {
+        final response = await request().timeout(_requestTimeout);
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          return response;
+        }
+        _throwForStatus(response);
+      }
+      onUnauthorized?.call();
+      rethrow;
+    } on TimeoutException {
+      throw const NetworkFailure('Request timed out');
+    }
+  }
+
+  Future<bool> _tryRefreshToken() async {
+    final storage = _localStorage;
+    if (storage == null) return false;
+    try {
+      final refreshToken = await storage.getSecureString(
+        StorageKeys.refreshToken,
+      );
+      if (refreshToken == null || refreshToken.isEmpty) return false;
+
+      final response = await _client
+          .post(
+            Uri.parse('$baseUrl${EndPoints.refresh}'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'refresh_token': refreshToken}),
+          )
+          .timeout(_requestTimeout);
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        final newAccessToken = json['access_token'] as String?;
+        final newRefreshToken = json['refresh_token'] as String?;
+        if (newAccessToken != null) {
+          _accessToken = newAccessToken;
+          await storage.setSecureString(
+            StorageKeys.accessToken,
+            newAccessToken,
+          );
+        }
+        if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+          await storage.setSecureString(
+            StorageKeys.refreshToken,
+            newRefreshToken,
+          );
+        }
+        return newAccessToken != null;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return jsonDecode(response.body);
@@ -192,7 +305,7 @@ class ApiClient {
     _throwForStatus(response);
   }
 
-  void _throwForStatus(http.Response response) {
+  Never _throwForStatus(http.Response response) {
     switch (response.statusCode) {
       case 400:
       case 422:

@@ -8,7 +8,13 @@ class AuthLoading extends AuthState {}
 
 class AuthOtpSent extends AuthState {
   final String email;
-  AuthOtpSent({required this.email});
+  final String pendingToken;
+  AuthOtpSent({required this.email, required this.pendingToken});
+}
+
+class ResendOtpSuccess extends AuthState {
+  final String pendingToken;
+  ResendOtpSuccess({required this.pendingToken});
 }
 
 class AuthAuthenticated extends AuthState {

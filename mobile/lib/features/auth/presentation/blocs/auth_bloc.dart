@@ -13,6 +13,7 @@ import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/refresh_token_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
+import '../../domain/usecases/resend_otp_usecase.dart';
 import '../../domain/usecases/verify_register_usecase.dart';
 import '../../utils/device_utils.dart';
 import '../../../face_enrollment/domain/usecases/check_enrollment_done_usecase.dart';
@@ -23,6 +24,7 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase _loginUseCase;
   final RegisterUseCase _registerUseCase;
+  final ResendOtpUseCase _resendOtpUseCase;
   final VerifyRegisterUseCase _verifyRegisterUseCase;
   final RefreshTokenUseCase _refreshTokenUseCase;
   final LogoutUseCase _logoutUseCase;
@@ -35,6 +37,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({
     required LoginUseCase loginUseCase,
     required RegisterUseCase registerUseCase,
+    required ResendOtpUseCase resendOtpUseCase,
     required VerifyRegisterUseCase verifyRegisterUseCase,
     required RefreshTokenUseCase refreshTokenUseCase,
     required LogoutUseCase logoutUseCase,
@@ -45,6 +48,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Logger? logger,
   }) : _loginUseCase = loginUseCase,
        _registerUseCase = registerUseCase,
+       _resendOtpUseCase = resendOtpUseCase,
        _verifyRegisterUseCase = verifyRegisterUseCase,
        _refreshTokenUseCase = refreshTokenUseCase,
        _logoutUseCase = logoutUseCase,
@@ -55,6 +59,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _logger = logger ?? Logger.create(),
        super(AuthInitial()) {
     on<SendOtpRequested>(_onSendOtpRequested);
+    on<ResendOtpRequested>(_onResendOtpRequested);
     on<VerifyOtpRequested>(_onVerifyOtpRequested);
     on<LoginRequested>(_onLoginRequested);
     on<RefreshTokenRequested>(_onRefreshTokenRequested);
@@ -98,11 +103,32 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       await result.fold(
         (failure) async => _emitFailure(emit, failure),
-        (_) async => emit(AuthOtpSent(email: event.email)),
+        (pendingToken) async => emit(
+          AuthOtpSent(email: event.email, pendingToken: pendingToken),
+        ),
       );
     } catch (e, s) {
       _logger.error('AuthBloc', 'Send OTP failed', e, s);
       emit(AuthFailure(message: 'Failed to send OTP. Please try again.'));
+    }
+  }
+
+  Future<void> _onResendOtpRequested(
+    ResendOtpRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final result = await _resendOtpUseCase(event.pendingToken);
+      await result.fold(
+        (failure) async => _emitFailure(emit, failure),
+        (newPendingToken) async => emit(
+          ResendOtpSuccess(pendingToken: newPendingToken),
+        ),
+      );
+    } catch (e, s) {
+      _logger.error('AuthBloc', 'Resend OTP failed', e, s);
+      emit(AuthFailure(message: 'Failed to resend OTP. Please try again.'));
     }
   }
 

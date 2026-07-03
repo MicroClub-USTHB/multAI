@@ -9,6 +9,12 @@ class SendOtpRequested extends AuthEvent {
   SendOtpRequested({required this.email, required this.password});
 }
 
+class ResendOtpRequested extends AuthEvent {
+  final String pendingToken;
+
+  ResendOtpRequested({required this.pendingToken});
+}
+
 class VerifyOtpRequested extends AuthEvent {
   final String email;
   final String password;

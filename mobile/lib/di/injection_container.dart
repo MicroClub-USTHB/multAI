@@ -30,6 +30,7 @@ import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/domain/usecases/login_usecase.dart';
 import '../features/auth/domain/usecases/register_usecase.dart';
 import '../features/auth/domain/usecases/verify_register_usecase.dart';
+import '../features/auth/domain/usecases/resend_otp_usecase.dart';
 import '../features/auth/domain/usecases/logout_usecase.dart';
 import '../features/auth/domain/usecases/refresh_token_usecase.dart';
 import '../features/auth/domain/usecases/get_me_usecase.dart';
@@ -51,7 +52,8 @@ import '../features/account/data/datasources/account_remote_datasource.dart';
 import '../features/account/data/repositories/account_repository_impl.dart';
 import '../features/account/domain/repositories/account_repository.dart';
 import '../features/account/domain/usecases/get_account_data_usecase.dart';
-import '../features/account/presentation/bloc/account_bloc.dart';
+import '../features/account/domain/usecases/upload_avatar_usecase.dart';
+import '../features/account/presentation/bloc/account_bloc.dart' hide LogoutRequested;
 //  ── Notifications ───────────────────────────────────────────────────────────
 import '../features/notifications/data/datasources/notifications_local_datasource.dart';
 import '../features/notifications/data/datasources/notifications_remote_datasource.dart';
@@ -114,7 +116,14 @@ Future<void> init() async {
     ),
   );
 
-  sl.registerLazySingleton(() => ApiClient(networkInfo: sl<NetworkInfo>()));
+  sl.registerLazySingleton<ApiClient>(() {
+    final client = ApiClient(
+      networkInfo: sl<NetworkInfo>(),
+      localStorage: sl<AppLocalStorage>(),
+    );
+    client.onUnauthorized = () => sl<AuthBloc>().add(LogoutRequested());
+    return client;
+  });
 
   sl.registerLazySingleton<DioClient>(() => DioClient());
 
@@ -173,16 +182,18 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LoginUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => RegisterUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => VerifyRegisterUseCase(sl<AuthRepository>()));
+  sl.registerLazySingleton(() => ResendOtpUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => RefreshTokenUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => IsUserLoggedIn(sl<AuthRepository>()));
 
   // ── Auth BLoC ───────────────────────────────────────────────────────────────
-  sl.registerFactory<AuthBloc>(
+  sl.registerLazySingleton<AuthBloc>(
     () => AuthBloc(
       loginUseCase: sl<LoginUseCase>(),
       registerUseCase: sl<RegisterUseCase>(),
+      resendOtpUseCase: sl<ResendOtpUseCase>(),
       verifyRegisterUseCase: sl<VerifyRegisterUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
       refreshTokenUseCase: sl<RefreshTokenUseCase>(),
@@ -248,13 +259,18 @@ Future<void> init() async {
   sl.registerLazySingleton(
     () => GetAccountDataUseCase(sl<AccountRepository>()),
   );
+  sl.registerLazySingleton(
+    () => UploadAvatarUseCase(sl<AccountRepository>()),
+  );
 
   // ── Account BLoC ─────────────────────────────────────────────────────────
   sl.registerFactory<AccountBloc>(
     () => AccountBloc(
       getAccountData: sl<GetAccountDataUseCase>(),
+      uploadAvatar: sl<UploadAvatarUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
       pushNotificationService: sl<PushNotificationService>(),
+      photoCacheService: sl<PhotoCacheService>(),
     ),
   );
 

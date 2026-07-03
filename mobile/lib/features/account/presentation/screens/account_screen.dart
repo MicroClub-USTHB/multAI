@@ -4,6 +4,7 @@ import 'package:multai_mobile/core/widgets/app_error_view.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/router/app_routes.dart';
@@ -17,6 +18,48 @@ import '../widgets/logout_button.dart';
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
+  Future<void> _pickAndUploadAvatar(BuildContext context) async {
+    final bloc = context.read<AccountBloc>();
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+      maxWidth: 512,
+      maxHeight: 512,
+    );
+    if (picked == null) return;
+    bloc.add(UploadAvatar(filePath: picked.path));
+  }
+
+  void _confirmClearCache(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Clear Image Cache'),
+        content: const Text(
+          'This will remove all cached photos from your device. '
+          'Images will need to be re-downloaded when viewed again.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<AccountBloc>().add(ClearImageCacheRequested());
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: context.theme.colorScheme.error,
+            ),
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AccountBloc, AccountState>(
@@ -26,6 +69,11 @@ class AccountScreen extends StatelessWidget {
         }
         if (state is AccountError) {
           context.showErrorSnackBar(state.message);
+        }
+        if (state is AccountCacheCleared) {
+          context.showSuccessSnackBar(
+            'Freed ${state.storageFreed} (${state.filesRemoved} files)',
+          );
         }
       },
       builder: (context, state) {
@@ -39,16 +87,37 @@ class AccountScreen extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, AccountState state) {
-    if (state is AccountLoading) {
+    if (state is AccountLoading || state is AccountCacheClearing) {
       return Center(
-        child: CircularProgressIndicator(
-          color: context.theme.colorScheme.primary,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(
+              color: context.theme.colorScheme.primary,
+            ),
+            if (state is AccountCacheClearing) ...[
+              const SizedBox(height: 16),
+              Text(
+                'Clearing cache...',
+                style: context.textTheme.bodyMedium,
+              ),
+            ],
+          ],
         ),
       );
     }
 
     if (state is AccountLoaded) {
       return _buildContent(context, state);
+    }
+
+    if (state is AccountAvatarUploading) {
+      return _buildContent(
+        context,
+        state,
+        avatarUrl: state.avatarUrl,
+        isUploading: true,
+      );
     }
 
     if (state is AccountInitial) {
@@ -71,7 +140,23 @@ class AccountScreen extends StatelessWidget {
     return const SizedBox.shrink();
   }
 
-  Widget _buildContent(BuildContext context, AccountLoaded state) {
+  Widget _buildContent(
+    BuildContext context,
+    AccountState state, {
+    String? avatarUrl,
+    bool isUploading = false,
+  }) {
+    final name = state is AccountLoaded
+        ? state.name
+        : (state is AccountAvatarUploading ? state.name : '');
+    final email = state is AccountLoaded
+        ? state.email
+        : (state is AccountAvatarUploading ? state.email : '');
+    final url = avatarUrl ??
+        (state is AccountLoaded
+            ? state.avatarUrl
+            : (state is AccountAvatarUploading ? state.avatarUrl : null));
+
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
         horizontal: context.hPadding(),
@@ -82,10 +167,12 @@ class AccountScreen extends StatelessWidget {
         children: [
           // ── Profile ────────────────────────────────────────────────────
           ProfileSection(
-            name: state.name,
-            email: state.email,
+            name: name,
+            email: email,
             membershipType: 'mc-member',
-            avatarUrl: state.avatarUrl,
+            avatarUrl: url,
+            isUploading: isUploading,
+            onAvatarTap: () => _pickAndUploadAvatar(context),
           ),
           SizedBox(height: context.heightCalculated(32)),
 
@@ -110,6 +197,12 @@ class AccountScreen extends StatelessWidget {
                 title: 'Account Data',
                 subtitle: 'Export or manage your personal data',
                 onTap: () {},
+              ),
+              SettingItemData(
+                icon: Icons.cleaning_services_outlined,
+                title: 'Clear Image Cache',
+                subtitle: 'Free up storage space',
+                onTap: () => _confirmClearCache(context),
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
@@ -9,6 +10,8 @@ class ProfileSection extends StatelessWidget {
   final String email;
   final String membershipType;
   final String? avatarUrl;
+  final VoidCallback? onAvatarTap;
+  final bool isUploading;
 
   const ProfileSection({
     super.key,
@@ -16,6 +19,8 @@ class ProfileSection extends StatelessWidget {
     required this.email,
     required this.membershipType,
     this.avatarUrl,
+    this.onAvatarTap,
+    this.isUploading = false,
   });
 
   @override
@@ -28,27 +33,82 @@ class ProfileSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // ── Avatar with amber border ───────────────────────────────────
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: cs.primary,
-                width: context.widthCalculated(3),
-              ),
-            ),
-            child: CircleAvatar(
-              radius: context.widthCalculated(52),
-              backgroundColor: AppThemeColors.surface,
-              backgroundImage: avatarUrl != null
-                  ? NetworkImage(avatarUrl!)
-                  : null,
-              child: avatarUrl == null
-                  ? Icon(
-                      Icons.person,
-                      size: context.widthCalculated(48),
-                      color: AppThemeColors.secondaryText,
-                    )
-                  : null,
+          GestureDetector(
+            onTap: isUploading ? null : onAvatarTap,
+            child: Stack(
+              children: [
+                Container(
+                  width: context.widthCalculated(104),
+                  height: context.widthCalculated(104),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: cs.primary,
+                      width: context.widthCalculated(3),
+                    ),
+                  ),
+                  child: avatarUrl != null
+                      ? ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: avatarUrl!,
+                            fit: BoxFit.cover,
+                            memCacheWidth: 120,
+                            memCacheHeight: 120,
+                            placeholder: (_, _) => Center(
+                              child: SizedBox(
+                                width: context.widthCalculated(24),
+                                height: context.widthCalculated(24),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: cs.primary,
+                                ),
+                              ),
+                            ),
+                            errorWidget: (_, _, _) => Icon(
+                              Icons.person,
+                              size: context.widthCalculated(48),
+                              color: AppThemeColors.secondaryText,
+                            ),
+                          ),
+                        )
+                      : CircleAvatar(
+                          radius: context.widthCalculated(52),
+                          backgroundColor: AppThemeColors.surface,
+                          child: Icon(
+                            Icons.person,
+                            size: context.widthCalculated(48),
+                            color: AppThemeColors.secondaryText,
+                          ),
+                        ),
+                ),
+                if (isUploading)
+                  Positioned.fill(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: cs.primary,
+                        strokeWidth: 3,
+                      ),
+                    ),
+                  ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    padding: EdgeInsets.all(
+                      context.widthCalculated(4),
+                    ),
+                    decoration: BoxDecoration(
+                      color: cs.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: context.widthCalculated(18),
+                      color: cs.onPrimary,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(height: context.heightCalculated(16)),

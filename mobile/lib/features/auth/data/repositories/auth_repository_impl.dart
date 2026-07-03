@@ -87,9 +87,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> register(LoginParams params) async {
+  Future<Either<Failure, String>> register(LoginParams params) async {
     try {
-      await remoteDataSource.register(
+      final pendingToken = await remoteDataSource.register(
         AuthRequestModel(
           email: params.email.trim().toLowerCase(),
           password: params.password,
@@ -98,7 +98,7 @@ class AuthRepositoryImpl implements AuthRepository {
           deviceId: params.deviceId,
         ),
       );
-      return const Right(null);
+      return Right(pendingToken);
     } on Failure catch (f) {
       FailureHandler.instance.logFailure(f, 'AuthRepository');
       return Left(f);
@@ -129,6 +129,23 @@ class AuthRepositoryImpl implements AuthRepository {
       ),
       params,
     );
+  }
+
+  @override
+  Future<Either<Failure, String>> resendOtp(String pendingToken) async {
+    try {
+      final newPendingToken = await remoteDataSource.resendOtp(pendingToken);
+      return Right(newPendingToken);
+    } on Failure catch (f) {
+      FailureHandler.instance.logFailure(f, 'AuthRepository');
+      return Left(f);
+    } catch (e) {
+      FailureHandler.instance.logFailure(
+        UnknownFailure('Failed to resend OTP'),
+        'AuthRepository',
+      );
+      return Left(ServerFailure('Failed to resend OTP. Please try again.'));
+    }
   }
 
   @override
