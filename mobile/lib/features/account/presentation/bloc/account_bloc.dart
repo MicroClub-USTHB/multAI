@@ -5,6 +5,7 @@ import '../../../../core/errors/failure.dart';
 import '../../../../features/notifications/services/push_notification_service.dart';
 import '../../../../features/auth/utils/device_utils.dart';
 import '../../domain/usecases/get_account_data_usecase.dart';
+import '../../domain/usecases/upload_avatar_usecase.dart';
 import '../../../auth/domain/usecases/logout_usecase.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../../gallery/data/cache/photo_cache_service.dart';
@@ -14,6 +15,7 @@ part 'account_state.dart';
 
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final GetAccountDataUseCase _getAccountData;
+  final UploadAvatarUseCase _uploadAvatar;
   final LogoutUseCase _logoutUseCase;
   final PushNotificationService _pushNotificationService;
   final PhotoCacheService _photoCacheService;
@@ -21,11 +23,13 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
   AccountBloc({
     required GetAccountDataUseCase getAccountData,
+    required UploadAvatarUseCase uploadAvatar,
     required LogoutUseCase logoutUseCase,
     required PushNotificationService pushNotificationService,
     required PhotoCacheService photoCacheService,
     FailureHandler? failureHandler,
   }) : _getAccountData = getAccountData,
+       _uploadAvatar = uploadAvatar,
        _logoutUseCase = logoutUseCase,
        _pushNotificationService = pushNotificationService,
        _photoCacheService = photoCacheService,
@@ -34,6 +38,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     on<LoadAccountData>(_onLoadAccountData);
     on<LogoutRequested>(_onLogoutRequested);
     on<ClearImageCacheRequested>(_onClearImageCache);
+    on<UploadAvatar>(_onUploadAvatar);
   }
 
   Future<void> _onLoadAccountData(
@@ -106,5 +111,42 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       ));
     }
+  }
+
+  Future<void> _onUploadAvatar(
+    UploadAvatar event,
+    Emitter<AccountState> emit,
+  ) async {
+    final current = state;
+    if (current is AccountLoaded) {
+      emit(
+        AccountAvatarUploading(
+          name: current.name,
+          email: current.email,
+          avatarUrl: current.avatarUrl,
+        ),
+      );
+    }
+
+    final result = await _uploadAvatar(UploadAvatarParams(filePath: event.filePath));
+
+    await result.fold(
+      (failure) async {
+        _failureHandler.logFailure(failure, 'AccountBloc');
+        if (current is AccountLoaded) {
+          emit(current);
+        }
+        emit(
+          AccountError(
+            message: _failureHandler.getUserFriendlyMessage(failure),
+          ),
+        );
+      },
+      (avatarUrl) async {
+        if (current is AccountLoaded) {
+          emit(current.copyWith(avatarUrl: avatarUrl));
+        }
+      },
+    );
   }
 }

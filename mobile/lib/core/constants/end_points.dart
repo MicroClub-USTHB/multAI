@@ -12,6 +12,7 @@ class EndPoints {
   static const String refreshToken = '/user/auth/refresh';
   static const String logout = '/user/auth/logout';
   static const String me = '/user/auth/me';
+  static const String avatar = '/user/auth/me/avatar';
   static const String revokeDevice = '/user/auth/revoke-device';
   static const String updateDeviceToken = '/user/auth/devices/token';
   static const String inactivateDevice = '/user/auth/devices/inactivate';

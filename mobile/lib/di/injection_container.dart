@@ -52,6 +52,7 @@ import '../features/account/data/datasources/account_remote_datasource.dart';
 import '../features/account/data/repositories/account_repository_impl.dart';
 import '../features/account/domain/repositories/account_repository.dart';
 import '../features/account/domain/usecases/get_account_data_usecase.dart';
+import '../features/account/domain/usecases/upload_avatar_usecase.dart';
 import '../features/account/presentation/bloc/account_bloc.dart' hide LogoutRequested;
 //  ── Notifications ───────────────────────────────────────────────────────────
 import '../features/notifications/data/datasources/notifications_local_datasource.dart';
@@ -258,11 +259,15 @@ Future<void> init() async {
   sl.registerLazySingleton(
     () => GetAccountDataUseCase(sl<AccountRepository>()),
   );
+  sl.registerLazySingleton(
+    () => UploadAvatarUseCase(sl<AccountRepository>()),
+  );
 
   // ── Account BLoC ─────────────────────────────────────────────────────────
   sl.registerFactory<AccountBloc>(
     () => AccountBloc(
       getAccountData: sl<GetAccountDataUseCase>(),
+      uploadAvatar: sl<UploadAvatarUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
       pushNotificationService: sl<PushNotificationService>(),
       photoCacheService: sl<PhotoCacheService>(),

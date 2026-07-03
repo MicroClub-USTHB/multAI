@@ -68,8 +68,8 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> get(String endpoint) async {
-    final headers = await _getHeaders();
+  Future<dynamic> get(String endpoint, {bool requiresAuth = true}) async {
+    final headers = await _getHeaders(requiresAuth: requiresAuth);
     return _executeWithAuth(
       () => _client.get(Uri.parse('$baseUrl$endpoint'), headers: headers),
     );
@@ -107,8 +107,8 @@ class ApiClient {
     );
   }
 
-  Future<void> delete(String endpoint) async {
-    final headers = await _getHeaders();
+  Future<void> delete(String endpoint, {bool requiresAuth = true}) async {
+    final headers = await _getHeaders(requiresAuth: requiresAuth);
     await _executeWithAuthVoid(
       () => _client.delete(Uri.parse('$baseUrl$endpoint'), headers: headers),
     );
@@ -119,7 +119,7 @@ class ApiClient {
     _throwForStatus(response);
   }
 
-  Future<void> postMultipart(
+  Future<Map<String, dynamic>> postMultipart(
     String endpoint, {
     required List<File> files,
     required List<String> fieldNames,
@@ -129,7 +129,7 @@ class ApiClient {
     final uri = Uri.parse('$baseUrl$endpoint');
     final request = http.MultipartRequest('POST', uri);
 
-    if (_accessToken != null) {
+    if (_accessToken != null && requiresAuth) {
       request.headers['Authorization'] = 'Bearer $_accessToken';
     }
 
@@ -158,8 +158,12 @@ class ApiClient {
     final streamedResponse = await request.send().timeout(_requestTimeout);
     final response = await http.Response.fromStream(streamedResponse);
 
-    if (response.statusCode == 200 || response.statusCode == 201) return;
-    _throwForStatus(response);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return Map<String, dynamic>.from(
+        jsonDecode(response.body) as Map,
+      );
+    }
+    return _throwForStatus(response);
   }
 
   String _mimeTypeFromExtension(String ext) {
@@ -303,7 +307,7 @@ class ApiClient {
     _throwForStatus(response);
   }
 
-  void _throwForStatus(http.Response response) {
+  Never _throwForStatus(http.Response response) {
     switch (response.statusCode) {
       case 400:
       case 422:

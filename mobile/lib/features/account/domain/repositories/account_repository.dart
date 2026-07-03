@@ -4,4 +4,5 @@ import '../../../../core/errors/failure.dart';
 
 abstract class AccountRepository {
   Future<Either<Failure, AccountEntity>> getAccountData();
+  Future<Either<Failure, String>> uploadAvatar(String filePath);
 }
