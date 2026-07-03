@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../core/errors/error_presentation.dart';
+import '../../../../core/widgets/app_error_view.dart';
+import '../../../../core/router/app_routes.dart';
+import '../../../../features/auth/presentation/blocs/auth_bloc.dart';
 import '../../domain/entities/photo_entity.dart';
 import '../../../../core/theme/theme.dart';
 import '../bloc/gallery_bloc.dart';
@@ -41,10 +46,33 @@ class _GalleryScreenState extends State<GalleryScreen>
     return BlocConsumer<GalleryBloc, GalleryState>(
       listener: (context, state) {
         if (state is GalleryError) {
-          context.showErrorSnackBar(state.message);
+          context.showErrorSnackBar(state.errorPresentation.description);
         }
       },
       builder: (context, state) {
+        if (state is GalleryError) {
+          final p = state.errorPresentation;
+          return Scaffold(
+            backgroundColor: AppTheme.backgroundColor,
+            body: ErrorStateView(
+              title: p.title,
+              description: p.description,
+              illustration: p.illustration,
+              actionLabel: p.actionLabel,
+              onAction: p.action == ErrorAction.retry
+                  ? () => context.read<GalleryBloc>().add(LoadAllPhotos())
+                  : p.action == ErrorAction.signIn
+                      ? () {
+                          context.read<AuthBloc>().add(LogoutRequested());
+                          context.go(AppRoutes.login);
+                        }
+                      : p.action == ErrorAction.goBack
+                          ? () => context.pop()
+                          : null,
+            ),
+          );
+        }
+
         final allPhotos = state is GalleryLoaded
             ? state.allPhotos
             : <PhotoEntity>[];

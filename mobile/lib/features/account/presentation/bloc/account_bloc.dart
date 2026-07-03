@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/failure_handler.dart';
 import '../../../../core/errors/failure.dart';
+import '../../../../core/errors/error_presentation.dart';
 import '../../../../features/notifications/services/push_notification_service.dart';
 import '../../../../features/auth/utils/device_utils.dart';
 import '../../domain/usecases/get_account_data_usecase.dart';
@@ -55,7 +56,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         _failureHandler.logFailure(failure, 'AccountBloc');
         emit(
           AccountError(
-            message: _failureHandler.getUserFriendlyMessage(failure),
+            errorPresentation:
+                _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
@@ -83,7 +85,10 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     result.fold((failure) {
       _failureHandler.logFailure(failure, 'AccountBloc');
       emit(
-        AccountError(message: _failureHandler.getUserFriendlyMessage(failure)),
+        AccountError(
+          errorPresentation:
+              _failureHandler.getErrorPresentation(failure),
+        ),
       );
     }, (_) => emit(AccountLoggedOut()));
   }
@@ -106,9 +111,10 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         'AccountBloc',
       );
       emit(AccountError(
-        message: _failureHandler.getUserFriendlyMessage(
-          const UnknownFailure('Failed to clear cache'),
-        ),
+        errorPresentation:
+            _failureHandler.getErrorPresentation(
+              const UnknownFailure('Failed to clear cache'),
+            ),
       ));
     }
   }
@@ -138,7 +144,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         }
         emit(
           AccountError(
-            message: _failureHandler.getUserFriendlyMessage(failure),
+            errorPresentation:
+                _failureHandler.getErrorPresentation(failure),
           ),
         );
       },

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/errors/failure_handler.dart';
+import '../../../../core/errors/error_presentation.dart';
 import '../../domain/entities/photo_approval_entity.dart';
 import '../../domain/usecases/get_approvals_usecase.dart';
 import '../../domain/usecases/decide_photo_approval_usecase.dart';
@@ -41,7 +42,8 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
         _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
         emit(
           PhotoApprovalError(
-            message: _failureHandler.getUserFriendlyMessage(failure),
+            errorPresentation:
+                _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
@@ -75,7 +77,8 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
         _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
         emit(
           PhotoApprovalError(
-            message: _failureHandler.getUserFriendlyMessage(failure),
+            errorPresentation:
+                _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
@@ -107,7 +110,8 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
         _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
         emit(
           PhotoApprovalError(
-            message: _failureHandler.getUserFriendlyMessage(failure),
+            errorPresentation:
+                _failureHandler.getErrorPresentation(failure),
           ),
         );
       },

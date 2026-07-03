@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-
 import '../extensions/context_extensions.dart';
 import '../extensions/responsive_extensions.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/app_theme_metrics.dart';
 
-class AppErrorView extends StatelessWidget {
+class ErrorStateView extends StatelessWidget {
   final String title;
-  final String subtitle;
-  final VoidCallback onRetry;
-  final IconData icon;
+  final String description;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+  final IconData illustration;
 
-  const AppErrorView({
+  const ErrorStateView({
     super.key,
     required this.title,
-    required this.subtitle,
-    required this.onRetry,
-    this.icon = Icons.wifi_off_rounded,
+    required this.description,
+    this.actionLabel,
+    this.onAction,
+    this.illustration = Icons.error_outline_rounded,
   });
 
   @override
@@ -30,7 +31,7 @@ class AppErrorView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              icon,
+              illustration,
               size: context.iconSize() * 3,
               color: AppThemeColors.secondaryText,
             ),
@@ -48,25 +49,31 @@ class AppErrorView extends StatelessWidget {
               height: context.heightCalculated(AppThemeMetrics.spacingSm),
             ),
             Text(
-              subtitle,
+              description,
               style: context.textTheme.bodySmall,
               textAlign: TextAlign.center,
             ),
-            SizedBox(
-              height: context.heightCalculated(AppThemeMetrics.spacingXl),
-            ),
-            ElevatedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: AppThemeColors.primaryText,
-                backgroundColor: AppThemeColors.primaryAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
+            if (actionLabel != null && onAction != null) ...[
+              SizedBox(
+                height: context.heightCalculated(AppThemeMetrics.spacingXl),
+              ),
+              ElevatedButton.icon(
+                onPressed: onAction,
+                icon: Icon(actionLabel == 'Retry'
+                    ? Icons.refresh
+                    : Icons.login_rounded),
+                label: Text(actionLabel!),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: AppThemeColors.primaryText,
+                  backgroundColor: AppThemeColors.primaryAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      AppThemeMetrics.radiusSm,
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),

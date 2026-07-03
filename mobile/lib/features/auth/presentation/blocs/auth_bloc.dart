@@ -242,7 +242,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     } catch (e, s) {
       _logger.error('AuthBloc', 'Get current user failed', e, s);
-      emit(AuthFailure(message: 'Could not load user data.'));
+      _failureHandler.logFailure(
+        UnknownFailure('Could not load user data.'),
+        'AuthBloc',
+      );
+      emit(
+        AuthFailure(
+          message: _failureHandler.getUserFriendlyMessage(
+            const UnknownFailure('Could not load user data.'),
+          ),
+        ),
+      );
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/failure_handler.dart';
+import '../../../../core/errors/error_presentation.dart';
 import '../../../../core/network/connectivity_service.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../domain/entities/notification_entity.dart';
@@ -77,7 +78,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           _failureHandler.logFailure(failure, 'NotificationBloc');
           emit(
             NotificationError(
-              message: _failureHandler.getUserFriendlyMessage(failure),
+              errorPresentation:
+                  _failureHandler.getErrorPresentation(failure),
             ),
           );
         }
@@ -116,7 +118,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         } else {
           emit(
             NotificationError(
-              message: _failureHandler.getUserFriendlyMessage(failure),
+              errorPresentation:
+                  _failureHandler.getErrorPresentation(failure),
             ),
           );
         }

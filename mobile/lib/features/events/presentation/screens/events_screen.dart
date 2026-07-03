@@ -10,6 +10,8 @@ import '../../../../../core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/widgets/app_error_view.dart';
+import 'package:multai_mobile/core/errors/error_presentation.dart';
+import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart';
 import '../../domain/validators/event_code_validator.dart';
 import 'package:multai_mobile/features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../bloc/events_bloc.dart';
@@ -54,7 +56,7 @@ class _EventsScreenState extends State<EventsScreen> {
           context.showSuccessSnackBar('Successfully joined event!');
         }
         if (state is EventsFailure) {
-          context.showErrorSnackBar(state.message);
+          context.showErrorSnackBar(state.errorPresentation.description);
         }
       },
       child: Scaffold(
@@ -165,10 +167,24 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   Widget _buildErrorState(BuildContext context) {
-    return AppErrorView(
-      title: 'No internet connection',
-      subtitle: 'Please check your connection and try again.',
-      onRetry: () => context.read<EventsBloc>().add(EventsRetryRequested()),
+    final state = context.read<EventsBloc>().state;
+    if (state is! EventsFailure) return const SizedBox.shrink();
+    final p = state.errorPresentation;
+    return ErrorStateView(
+      title: p.title,
+      description: p.description,
+      illustration: p.illustration,
+      actionLabel: p.actionLabel,
+      onAction: p.action == ErrorAction.retry
+          ? () => context.read<EventsBloc>().add(EventsRetryRequested())
+          : p.action == ErrorAction.signIn
+              ? () {
+                  context.read<AuthBloc>().add(LogoutRequested());
+                  context.go(AppRoutes.login);
+                }
+              : p.action == ErrorAction.goBack
+                  ? () => context.pop()
+                  : null,
     );
   }
 

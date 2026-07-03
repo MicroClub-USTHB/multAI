@@ -4,7 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/errors/error_presentation.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/widgets/app_error_view.dart';
+import '../../../../features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../bloc/notifications_bloc.dart';
 import '../../domain/entities/notification_entity.dart';
@@ -37,7 +40,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           context.showSuccessSnackBar(state.title);
         }
         if (state is NotificationError) {
-          context.showErrorSnackBar(state.message);
+          context.showErrorSnackBar(state.errorPresentation.description);
         }
       },
       builder: (context, state) {
@@ -108,11 +111,34 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
 
     if (state is NotificationOffline) {
-      return _buildOffline(context);
+      return ErrorStateView(
+        title: 'No Internet Connection',
+        description: 'Please check your internet connection and try again.',
+        illustration: Icons.wifi_off_rounded,
+        actionLabel: 'Retry',
+        onAction: () =>
+            context.read<NotificationBloc>().add(LoadNotifications()),
+      );
     }
 
     if (state is NotificationError) {
-      return _buildError(context, state.message);
+      final p = state.errorPresentation;
+      return ErrorStateView(
+        title: p.title,
+        description: p.description,
+        illustration: p.illustration,
+        actionLabel: p.actionLabel,
+        onAction: p.action == ErrorAction.retry
+            ? () => context.read<NotificationBloc>().add(LoadNotifications())
+            : p.action == ErrorAction.signIn
+                ? () {
+                    context.read<AuthBloc>().add(LogoutRequested());
+                    context.go(AppRoutes.login);
+                  }
+                : p.action == ErrorAction.goBack
+                    ? () => context.pop()
+                    : null,
+      );
     }
 
     return const SizedBox.shrink();
@@ -175,90 +201,5 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildOffline(BuildContext context) {
-    final tt = context.textTheme;
-    final cs = context.theme.colorScheme;
 
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: context.hPadding()),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.wifi_off_rounded,
-              size: context.iconSize() * 3,
-              color: AppThemeColors.secondaryText.withValues(alpha: 0.4),
-            ),
-            SizedBox(height: context.heightCalculated(16)),
-            Text(
-              'No internet connection',
-              style: tt.titleMedium?.copyWith(
-                color: AppThemeColors.secondaryText,
-              ),
-            ),
-            SizedBox(height: context.heightCalculated(8)),
-            Text(
-              'Pull down to retry when connected',
-              style: tt.bodySmall?.copyWith(color: AppThemeColors.hintText),
-            ),
-            SizedBox(height: context.heightCalculated(24)),
-            FilledButton.tonal(
-              onPressed: () =>
-                  context.read<NotificationBloc>().add(LoadNotifications()),
-              style: FilledButton.styleFrom(
-                backgroundColor: cs.primaryContainer,
-              ),
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildError(BuildContext context, String message) {
-    final tt = context.textTheme;
-    final cs = context.theme.colorScheme;
-
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: context.hPadding()),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline_rounded,
-              size: context.iconSize() * 3,
-              color: AppThemeColors.error.withValues(alpha: 0.6),
-            ),
-            SizedBox(height: context.heightCalculated(16)),
-            Text(
-              'Something went wrong',
-              style: tt.titleMedium?.copyWith(
-                color: AppThemeColors.primaryText,
-              ),
-            ),
-            SizedBox(height: context.heightCalculated(8)),
-            Text(
-              message,
-              style: tt.bodySmall?.copyWith(
-                color: AppThemeColors.secondaryText,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: context.heightCalculated(24)),
-            FilledButton.tonal(
-              onPressed: () =>
-                  context.read<NotificationBloc>().add(LoadNotifications()),
-              style: FilledButton.styleFrom(
-                backgroundColor: cs.primaryContainer,
-              ),
-              child: const Text('Try Again'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

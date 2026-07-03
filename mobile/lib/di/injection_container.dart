@@ -423,6 +423,7 @@ Future<void> init() async {
       getEventPhotos: sl<GetEventPhotosUseCase>(),
       getPhotoImage: sl<GetPhotoImageUseCase>(),
       connectivityService: sl<ConnectivityService>(),
+      failureHandler: sl<FailureHandler>(),
     ),
   );
 

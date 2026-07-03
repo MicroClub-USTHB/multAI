@@ -18,28 +18,29 @@ class NetworkFailure extends Failure {
   const NetworkFailure([super.message = 'Unable to connect']);
 
   @override
-  AppException get appException => const NetworkException();
+  AppException get appException => NetworkException(message: message);
 }
 
 class TimeoutFailure extends Failure {
   const TimeoutFailure([super.message = 'Request timed out']);
 
   @override
-  AppException get appException => const TimeoutException();
+  AppException get appException => TimeoutException(message: message);
 }
 
 class RateLimitFailure extends Failure {
   const RateLimitFailure([super.message = 'Too many requests']);
 
   @override
-  AppException get appException => const RateLimitException();
+  AppException get appException => RateLimitException(message: message);
 }
 
 class UnauthorizedFailure extends Failure {
   const UnauthorizedFailure([super.message = 'Session expired']);
 
   @override
-  AppException get appException => const AuthenticationException();
+  AppException get appException =>
+      AuthenticationException(message: message);
 }
 
 class ServerFailure extends Failure {
@@ -61,35 +62,35 @@ class CacheFailure extends Failure {
   const CacheFailure([super.message = 'Cache error']);
 
   @override
-  AppException get appException => const CacheException();
+  AppException get appException => CacheException(message: message);
 }
 
 class CancelledFailure extends Failure {
   const CancelledFailure([super.message = '']);
 
   @override
-  AppException get appException => const UnknownException();
+  AppException get appException => UnknownException(message: message);
 }
 
 class ValidationFailure extends Failure {
   const ValidationFailure([super.message = 'Validation error']);
 
   @override
-  AppException get appException => const ValidationException();
+  AppException get appException => ValidationException(message: message);
 }
 
 class NotFoundFailure extends Failure {
   const NotFoundFailure([super.message = 'Resource not found']);
 
   @override
-  AppException get appException => const NotFoundException();
+  AppException get appException => NotFoundException(message: message);
 }
 
 class UnknownFailure extends Failure {
   const UnknownFailure([super.message = 'Unknown error']);
 
   @override
-  AppException get appException => const UnknownException();
+  AppException get appException => UnknownException(message: message);
 }
 
 // Face Enrollment specific failures
