@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/widgets/app_error_view.dart';
+import 'package:multai_mobile/core/errors/error_presentation.dart';
+import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart' as auth;
 import '../../../../core/extensions/responsive_extensions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -68,7 +70,7 @@ class AccountScreen extends StatelessWidget {
           context.go(AppRoutes.login);
         }
         if (state is AccountError) {
-          context.showErrorSnackBar(state.message);
+          context.showErrorSnackBar(state.errorPresentation.description);
         }
         if (state is AccountCacheCleared) {
           context.showSuccessSnackBar(
@@ -130,10 +132,22 @@ class AccountScreen extends StatelessWidget {
     }
 
     if (state is AccountError) {
-      return AppErrorView(
-        title: 'Could not load account data',
-        subtitle: 'Please check your connection and try again.',
-        onRetry: () => context.read<AccountBloc>().add(LoadAccountData()),
+      final p = state.errorPresentation;
+      return ErrorStateView(
+        title: p.title,
+        description: p.description,
+        illustration: p.illustration,
+        actionLabel: p.actionLabel,
+        onAction: p.action == ErrorAction.retry
+            ? () => context.read<AccountBloc>().add(LoadAccountData())
+            : p.action == ErrorAction.signIn
+                ? () {
+                    context.read<auth.AuthBloc>().add(auth.LogoutRequested());
+                    context.go(AppRoutes.login);
+                  }
+                : p.action == ErrorAction.goBack
+                    ? () => context.pop()
+                    : null,
       );
     }
 

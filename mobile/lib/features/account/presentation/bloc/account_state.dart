@@ -35,8 +35,8 @@ class AccountAvatarUploading extends AccountState {
 }
 
 class AccountError extends AccountState {
-  final String message;
-  AccountError({required this.message});
+  final ErrorPresentation errorPresentation;
+  AccountError({required this.errorPresentation});
 }
 
 class AccountLoggedOut extends AccountState {}
