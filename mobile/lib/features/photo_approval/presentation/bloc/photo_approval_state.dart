@@ -30,6 +30,6 @@ class PhotoApprovalDecisionSuccess extends PhotoApprovalState {
 }
 
 class PhotoApprovalError extends PhotoApprovalState {
-  final String message;
-  PhotoApprovalError({required this.message});
+  final ErrorPresentation errorPresentation;
+  PhotoApprovalError({required this.errorPresentation});
 }

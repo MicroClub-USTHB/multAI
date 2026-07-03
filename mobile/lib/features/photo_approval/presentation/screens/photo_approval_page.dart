@@ -23,7 +23,7 @@ class PhotoApprovalPage extends StatelessWidget {
           context.showSuccessSnackBar(msg);
         }
         if (state is PhotoApprovalError) {
-          context.showErrorSnackBar(state.message);
+          context.showErrorSnackBar(state.errorPresentation.description);
         }
       },
       builder: (context, state) {
