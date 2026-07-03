@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/failure_handler.dart';
+import '../../../../core/errors/error_presentation.dart';
 import '../../../../core/network/connectivity_service.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../domain/entities/event_entity.dart';
@@ -83,7 +84,8 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         } else {
           emit(
             EventsFailure(
-              message: _failureHandler.getUserFriendlyMessage(failure),
+              errorPresentation:
+                  _failureHandler.getErrorPresentation(failure),
             ),
           );
         }
@@ -116,7 +118,8 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         _failureHandler.logFailure(failure, 'EventsBloc');
         emit(
           EventsFailure(
-            message: _failureHandler.getUserFriendlyMessage(failure),
+            errorPresentation:
+                _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
@@ -165,7 +168,8 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         } else {
           emit(
             EventsFailure(
-              message: _failureHandler.getUserFriendlyMessage(failure),
+              errorPresentation:
+                  _failureHandler.getErrorPresentation(failure),
             ),
           );
         }

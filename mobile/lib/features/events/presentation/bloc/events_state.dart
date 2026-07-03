@@ -29,8 +29,8 @@ class EventsOffline extends EventsState {
 class JoinEventSuccess extends EventsState {}
 
 class EventsFailure extends EventsState {
-  final String message;
-  EventsFailure({required this.message});
+  final ErrorPresentation errorPresentation;
+  EventsFailure({required this.errorPresentation});
 }
 
 class JoinEventLoading extends EventsState {}
