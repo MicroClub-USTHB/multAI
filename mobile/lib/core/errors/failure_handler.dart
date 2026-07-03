@@ -1,3 +1,4 @@
+import 'error_presentation.dart';
 import 'failure.dart';
 import 'error_handler.dart';
 import 'error_mapper.dart';
@@ -29,6 +30,10 @@ class FailureHandler {
 
   String getUserFriendlyMessage(Failure failure) {
     return errorMapper.getUserFriendlyMessage(failure.appException);
+  }
+
+  ErrorPresentation getErrorPresentation(Failure failure) {
+    return errorMapper.mapToPresentation(failure.appException);
   }
 
   void logFailure(Failure failure, String source) {
