@@ -21,8 +21,8 @@ class NotificationOffline extends NotificationState {
 }
 
 class NotificationError extends NotificationState {
-  final String message;
-  NotificationError({required this.message});
+  final ErrorPresentation errorPresentation;
+  NotificationError({required this.errorPresentation});
 }
 
 class NotificationPushReceived extends NotificationState {
