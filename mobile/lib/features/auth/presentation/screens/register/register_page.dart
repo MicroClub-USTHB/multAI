@@ -187,7 +187,7 @@ class _RegisterPhotoComposition extends StatelessWidget {
             left: 28,
             child: ClipOval(
               child: Image.asset(
-                AppImages.onboarding1,
+                AppImages.onboardingImages[0],
                 width: photoSize,
                 height: photoSize,
                 fit: BoxFit.cover,

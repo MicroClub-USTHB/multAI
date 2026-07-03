@@ -220,7 +220,7 @@ class _LoginPhotoComposition extends StatelessWidget {
             left: 28,
             child: ClipOval(
               child: Image.asset(
-                AppImages.onboarding2,
+                AppImages.onboardingImages[1],
                 width: photoSize,
                 height: photoSize,
                 fit: BoxFit.cover,

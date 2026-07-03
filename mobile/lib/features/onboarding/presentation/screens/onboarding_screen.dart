@@ -18,8 +18,15 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  late final List<OnboardingItem> _slides;
   final PageController _pageController = PageController();
   int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _slides = OnboardingItem.createSlides();
+  }
 
   @override
   void dispose() {
@@ -28,7 +35,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextPage(BuildContext ctx) {
-    if (_currentPage < onboardingSlides.length - 1) {
+    if (_currentPage < _slides.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 420),
         curve: Curves.easeOutCubic,
@@ -40,8 +47,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final slides = onboardingSlides;
-    final isLast = _currentPage == slides.length - 1;
+    final isLast = _currentPage == _slides.length - 1;
 
     return BlocProvider(
       create: (_) => sl<OnboardingBloc>(),
@@ -55,16 +61,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             builder: (ctx) {
               return Stack(
                 children: [
-                  // Full-screen PageView
                   PageView.builder(
                     controller: _pageController,
                     onPageChanged: (i) => setState(() => _currentPage = i),
-                    itemCount: slides.length,
+                    itemCount: _slides.length,
                     itemBuilder: (_, i) =>
-                        OnboardingCard(slide: slides[i], slideIndex: i),
+                        OnboardingCard(slide: _slides[i], slideIndex: i),
                   ),
 
-                  // Skip button — top right
                   SafeArea(
                     child: Align(
                       alignment: Alignment.topRight,
@@ -94,7 +98,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
 
-                  // Bottom navigation — indicators left, arrow right
                   SafeArea(
                     child: Align(
                       alignment: Alignment.bottomCenter,
@@ -106,7 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           children: [
                             OnboardingIndicator(
                               currentPage: _currentPage,
-                              itemCount: slides.length,
+                              itemCount: _slides.length,
                             ),
                             OnboardingButton(
                               isLast: isLast,
