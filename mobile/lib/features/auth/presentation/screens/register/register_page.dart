@@ -643,7 +643,7 @@ class _PasswordStrengthIndicatorState
     final colors = [
       AppThemeColors.error,
       AppThemeColors.warning,
-      AppThemeColors.gold,
+      AppThemeColors.primaryAccent,
       AppThemeColors.success,
     ];
     final segments = _strength == 0 ? 1 : _strength > 4 ? 4 : _strength;

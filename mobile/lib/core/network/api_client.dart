@@ -254,8 +254,6 @@ class ApiClient {
     } on TimeoutException {
       throw const NetworkFailure('Request timed out');
     }
-    // unreachable, keep compiler happy
-    throw const UnknownFailure('Unexpected error');
   }
 
   Future<bool> _tryRefreshToken() async {
