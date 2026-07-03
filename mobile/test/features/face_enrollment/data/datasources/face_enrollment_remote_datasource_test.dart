@@ -35,7 +35,7 @@ void main() {
           fieldNames: any(named: 'fieldNames'),
           requiresAuth: any(named: 'requiresAuth'),
         ),
-      ).thenAnswer((_) async {});
+      ).thenAnswer((_) async => <String, dynamic>{});
 
       await dataSource.uploadFacePhotos(photos);
 
@@ -63,7 +63,7 @@ void main() {
           fieldNames: captureAny(named: 'fieldNames'),
           requiresAuth: any(named: 'requiresAuth'),
         ),
-      ).thenAnswer((_) async {});
+      ).thenAnswer((_) async => <String, dynamic>{});
 
       await dataSource.uploadFacePhotos(photos);
 
@@ -97,8 +97,7 @@ void main() {
           fieldNames: captureAny(named: 'fieldNames'),
           requiresAuth: any(named: 'requiresAuth'),
         ),
-      ).thenAnswer((_) async {});
-
+      ).thenAnswer((_) async => <String, dynamic>{});
       await dataSource.uploadFacePhotos(photos);
 
       final captured = verify(
