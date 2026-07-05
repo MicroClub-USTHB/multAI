@@ -15,6 +15,11 @@ import {
 	CardContent,
 	CardHeader,
 	CardTitle,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
 	Skeleton,
 	Separator,
 } from '@/shared/ui'
@@ -37,6 +42,8 @@ function MultiNotificationsPage() {
 	} = useMultiNotifications()
 
 	const [view, setView] = useState<'all' | 'unread' | 'read'>('all')
+	const [selectedNotification, setSelectedNotification] =
+		useState<MultiNotification | null>(null)
 
 	const unreadNotifications = useMemo(
 		() => notifications.filter((notification) => !notification.readAt),
@@ -174,7 +181,7 @@ function MultiNotificationsPage() {
 						</div>
 					) : (
 						<ScrollArea className='h-[640px] pr-3'>
-							<div className='space-y-3'>
+						<div className='space-y-3'>
 								{visibleNotifications.map((notification, index) => (
 									<div key={notification.id}>
 										<NotificationRow
@@ -182,6 +189,7 @@ function MultiNotificationsPage() {
 											onMarkRead={() => {
 												void handleMarkRead([notification.id])
 											}}
+											onOpen={() => setSelectedNotification(notification)}
 											isMarking={isMutating}
 										/>
 										{index < visibleNotifications.length - 1 ? (
@@ -194,6 +202,16 @@ function MultiNotificationsPage() {
 					)}
 				</CardContent>
 			</Card>
+
+			<NotificationDetailsDialog
+				notification={selectedNotification}
+				open={Boolean(selectedNotification)}
+				onOpenChange={(open) => {
+					if (!open) {
+						setSelectedNotification(null)
+					}
+				}}
+			/>
 		</div>
 	)
 }
@@ -230,12 +248,14 @@ function SummaryCard({
 type NotificationRowProps = {
 	notification: MultiNotification
 	onMarkRead: () => void
+	onOpen: () => void
 	isMarking: boolean
 }
 
 function NotificationRow({
 	notification,
 	onMarkRead,
+	onOpen,
 	isMarking,
 }: NotificationRowProps) {
 	const isRead = Boolean(notification.readAt)
@@ -250,7 +270,12 @@ function NotificationRow({
 			)}
 		>
 			<div className='flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between'>
-				<div className='min-w-0 space-y-2'>
+				<button
+					type='button'
+					onClick={onOpen}
+					className='min-w-0 flex-1 text-left outline-none'
+				>
+					<div className='space-y-2'>
 					<div className='flex flex-wrap items-center gap-2'>
 						<Badge variant={isRead ? 'secondary' : 'default'}>
 							{isRead ? 'Read' : 'New'}
@@ -271,7 +296,8 @@ function NotificationRow({
 							{renderNotificationPayload(notification.payload)}
 						</p>
 					) : null}
-				</div>
+					</div>
+				</button>
 
 				<div className='flex shrink-0 items-center gap-2'>
 					{!isRead ? (
@@ -287,6 +313,83 @@ function NotificationRow({
 				</div>
 			</div>
 		</div>
+	)
+}
+
+type NotificationDetailsDialogProps = {
+	notification: MultiNotification | null
+	open: boolean
+	onOpenChange: (open: boolean) => void
+}
+
+function NotificationDetailsDialog({
+	notification,
+	open,
+	onOpenChange,
+}: NotificationDetailsDialogProps) {
+	if (!notification) {
+		return null
+	}
+
+	const payloadEntries = Object.entries(notification.payload)
+
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent className='sm:max-w-2xl'>
+				<DialogHeader>
+					<DialogTitle className='flex items-center gap-2'>
+						<Bell className='size-4' />
+						{renderNotificationTitle(notification)}
+					</DialogTitle>
+					<DialogDescription>
+						{formatRelativeTime(notification.createdAt)}
+					</DialogDescription>
+				</DialogHeader>
+
+				<div className='space-y-4'>
+					<div className='flex flex-wrap items-center gap-2'>
+						<Badge variant={notification.readAt ? 'secondary' : 'default'}>
+							{notification.readAt ? 'Read' : 'New'}
+						</Badge>
+						<Badge variant='outline' className='font-mono uppercase'>
+							{notification.type}
+						</Badge>
+					</div>
+
+					<div className='space-y-2'>
+						<p className='text-sm font-medium'>Message</p>
+						<p className='text-muted-foreground text-sm leading-6'>
+							{renderNotificationTitle(notification)}
+						</p>
+					</div>
+
+					<div className='space-y-2'>
+						<p className='text-sm font-medium'>Details</p>
+						{payloadEntries.length === 0 ? (
+							<p className='text-muted-foreground text-sm'>No extra details.</p>
+						) : (
+							<div className='bg-muted/40 rounded-lg border p-4'>
+								<dl className='grid gap-3'>
+									{payloadEntries.map(([key, value]) => (
+										<div
+											key={key}
+											className='grid gap-1 border-b border-dashed pb-3 last:border-b-0 last:pb-0'
+										>
+											<dt className='text-muted-foreground text-xs uppercase tracking-[0.2em]'>
+												{key}
+											</dt>
+											<dd className='text-sm break-words'>
+												{formatDetailValue(value)}
+											</dd>
+										</div>
+									))}
+								</dl>
+							</div>
+						)}
+					</div>
+				</div>
+			</DialogContent>
+		</Dialog>
 	)
 }
 
@@ -341,6 +444,22 @@ function formatPayloadValue(value: unknown) {
 
 	try {
 		return JSON.stringify(value)
+	} catch {
+		return '[unserializable]'
+	}
+}
+
+function formatDetailValue(value: unknown) {
+	if (value === null || value === undefined) {
+		return 'null'
+	}
+
+	if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+		return String(value)
+	}
+
+	try {
+		return JSON.stringify(value, null, 2)
 	} catch {
 		return '[unserializable]'
 	}
