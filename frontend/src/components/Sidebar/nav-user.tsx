@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
-import { ChevronsUpDownIcon, LogOutIcon, MessageSquare } from 'lucide-react';
+import { ChevronsUpDownIcon, LogOutIcon } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui';
@@ -93,13 +93,6 @@ export function NavUser({
                   <ThemeToggle />
                 </div>
               </DropdownMenuLabel>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <MessageSquare />
-                Feedback
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem

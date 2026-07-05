@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router';
-import { Bell } from 'lucide-react';
 
 import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
 import {
@@ -10,7 +9,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/shared/ui';
-import { Button } from '@/shared/ui';
 import { Separator } from '@/shared/ui';
 import { SidebarTrigger } from '@/shared/ui';
 
@@ -62,10 +60,6 @@ export function MultiHeader() {
         </Breadcrumb>
       </div>
 
-      <Button variant="ghost" size="icon" className="relative rounded-full">
-        <Bell className="h-5 w-5" />
-        <span className="bg-destructive absolute top-1 right-1 h-2 w-2 rounded-full"></span>
-      </Button>
     </header>
   );
 }

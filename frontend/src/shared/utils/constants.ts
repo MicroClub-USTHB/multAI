@@ -5,7 +5,6 @@ import {
   ListChecks,
   Megaphone,
   ScrollText,
-  Settings,
   UsersRound,
 } from 'lucide-react';
 
@@ -35,13 +34,7 @@ export const ADMIN_NAV_DATA: NavData = {
       icon: ScrollText,
     },
   ],
-  secondary: [
-    {
-      title: 'Settings',
-      url: '/admin/settings',
-      icon: Settings,
-    },
-  ],
+  secondary: [],
   user: {
     name: 'Admin User',
     avatar: '',
@@ -90,11 +83,6 @@ export const MULTI_NAV_LINKS: NavData = {
       title: 'Notifications',
       url: '/multi/notifications',
       icon: Bell,
-    },
-    {
-      title: 'Settings',
-      url: '/multi/settings',
-      icon: Settings,
     },
   ],
   user: {
