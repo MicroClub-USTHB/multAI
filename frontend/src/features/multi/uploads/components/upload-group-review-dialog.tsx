@@ -114,11 +114,22 @@ export function UploadGroupReviewDialog({ groupId, onOpenChange, canModerate }: 
 
         {canModerate && (
           <DialogFooter>
-            <Button variant="destructive" disabled={isBusy || !group} onClick={handleReject}>
-              {rejectMutation.isPending ? 'Rejecting…' : 'Reject'}
+            <Button
+              variant="destructive"
+              disabled={isBusy || !group}
+              isLoading={rejectMutation.isPending}
+              loadingText="Rejecting…"
+              onClick={handleReject}
+            >
+              Reject
             </Button>
-            <Button disabled={isBusy || !group} onClick={handleApprove}>
-              {approveMutation.isPending ? 'Approving…' : 'Approve'}
+            <Button
+              disabled={isBusy || !group}
+              isLoading={approveMutation.isPending}
+              loadingText="Approving…"
+              onClick={handleApprove}
+            >
+              Approve
             </Button>
           </DialogFooter>
         )}

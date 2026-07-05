@@ -11,10 +11,10 @@ const uploadGroupsKey = ['multi', 'upload-groups'] as const
 const uploadGroupDetailsKey = (groupId: string) =>
   ['multi', 'upload-groups', groupId] as const
 
-export function useUploadGroups() {
+export function useUploadGroups(scope: 'my' | 'all') {
   const query = useQuery({
-    queryKey: uploadGroupsKey,
-    queryFn: listUploadGroups,
+    queryKey: [...uploadGroupsKey, scope],
+    queryFn: () => listUploadGroups(scope),
   })
 
   return {

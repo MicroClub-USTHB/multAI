@@ -2,8 +2,8 @@ import { api } from '@/shared/api/client'
 
 import type { UploadRequestGroup, UploadRequestGroupListResponse } from './types'
 
-export function listUploadGroups() {
-  return api.get<UploadRequestGroupListResponse>('/staff/uploads/groups')
+export function listUploadGroups(scope: 'my' | 'all') {
+  return api.get<UploadRequestGroupListResponse>('/staff/uploads/groups', { scope })
 }
 
 export function getUploadGroupDetails(groupId: string) {
