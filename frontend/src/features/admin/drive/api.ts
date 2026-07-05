@@ -34,6 +34,7 @@ export const getDriveSettings = createServerFn({ method: 'GET' }).handler(
 
 export const connectGoogleDrive = createServerFn({ method: 'POST' })
   .validator((data: unknown) => connectGoogleDriveInput.parse(data))
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   .handler(async (_: { data: any }): Promise<DriveSettings> => {
     await sleep(MOCK_LATENCY_MS);
 
