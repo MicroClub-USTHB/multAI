@@ -2,9 +2,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Bell, CheckCheck, RefreshCcw } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+import type { MultiNotification } from '@/features/multi/notifications/types'
+
 import { MultiNotificationsApiError } from '@/features/multi/notifications/api'
 import { useMultiNotifications } from '@/features/multi/notifications/hooks'
-import type { MultiNotification } from '@/features/multi/notifications/types'
 import {
 	Alert,
 	AlertDescription,

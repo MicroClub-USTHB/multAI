@@ -1,9 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import * as React from 'react';
 
-import { useAuth } from '@/hooks/useAuth';
 import type { NavData } from '@/shared/utils/types';
 
+import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/shared/ui';
 import { GlobalSearch } from '@/shared/ui';
 import {
