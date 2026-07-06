@@ -2,7 +2,7 @@ export type UploadStatus = 'pending' | 'approved' | 'rejected'
 
 export type GroupProcessingStatus = 'pending' | 'running' | 'completed' | 'failed'
 
-export type PhotoStatus = 'pending' | 'approved' | 'rejected'
+export type PhotoStatus = 'staged' | 'approved' | 'rejected'
 
 export interface UploadRequestPhoto {
   id: string
