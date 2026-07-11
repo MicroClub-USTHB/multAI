@@ -20,6 +20,7 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
   final ConnectivityService _connectivityService;
   final FailureHandler _failureHandler;
   StreamSubscription<bool>? _connectivitySub;
+  final Set<String> _loadingImageIds = {};
 
   GalleryBloc({
     required GetMyPhotosUseCase getMyPhotos,
@@ -127,16 +128,25 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     if (current is! GalleryLoaded) return;
 
     if (current.cachedPaths.containsKey(event.photoId)) return;
+    if (_loadingImageIds.contains(event.photoId)) return;
+    _loadingImageIds.add(event.photoId);
 
-    final result = await _getPhotoImage(
-      GetPhotoImageParams(photoId: event.photoId),
-    );
+    try {
+      final result = await _getPhotoImage(
+        GetPhotoImageParams(photoId: event.photoId),
+      );
 
-    result.fold((_) {}, (localPath) {
-      final updated = Map<String, String>.from(current.cachedPaths)
-        ..[event.photoId] = localPath;
-      emit(current.copyWith(cachedPaths: updated));
-    });
+      final latest = state;
+      if (latest is! GalleryLoaded) return;
+
+      result.fold((_) {}, (localPath) {
+        final updated = Map<String, String>.from(latest.cachedPaths)
+          ..[event.photoId] = localPath;
+        emit(latest.copyWith(cachedPaths: updated));
+      });
+    } finally {
+      _loadingImageIds.remove(event.photoId);
+    }
   }
 
   Future<void> _onRefresh(
