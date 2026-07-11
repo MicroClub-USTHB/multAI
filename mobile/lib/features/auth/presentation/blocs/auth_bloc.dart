@@ -34,6 +34,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final FailureHandler _failureHandler;
   final Logger _logger;
 
+  bool _logoutInFlight = false;
+  bool get isLoggedOutOrLoggingOut =>
+      _logoutInFlight || state is Unauthenticated;
+
   AuthBloc({
     required LoginUseCase loginUseCase,
     required RegisterUseCase registerUseCase,
@@ -215,6 +219,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
+    _logoutInFlight = true;
     try {
       await _pushNotificationService.revokeToken();
       final result = await _logoutUseCase(NoParams());
@@ -226,6 +231,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e, s) {
       _logger.error('AuthBloc', 'Logout failed', e, s);
       emit(Unauthenticated());
+    } finally {
+      _logoutInFlight = false;
     }
   }
 
