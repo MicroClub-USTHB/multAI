@@ -121,7 +121,11 @@ Future<void> init() async {
       networkInfo: sl<NetworkInfo>(),
       localStorage: sl<AppLocalStorage>(),
     );
-    client.onUnauthorized = () => sl<AuthBloc>().add(LogoutRequested());
+    client.onUnauthorized = () {
+      final authBloc = sl<AuthBloc>();
+      if (authBloc.isLoggedOutOrLoggingOut) return;
+      authBloc.add(LogoutRequested());
+    };
     return client;
   });
 
