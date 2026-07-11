@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/core/constants/images.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/features/account/presentation/bloc/account_bloc.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
@@ -61,9 +63,12 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthAuthenticated) {
+          context.read<AccountBloc>().add(ResetAccountData());
           context.go(AppRoutes.events);
         } else if (state is AuthNeedsFaceEnrollment) {
-          context.go(AppRoutes.faceEnrollment);
+          context.read<AccountBloc>().add(ResetAccountData());
+          // Allow development builds to test the app before face enrollment.
+          context.go(kDebugMode ? AppRoutes.events : AppRoutes.faceEnrollment);
         }
         // ignore: use_build_context_synchronously
         if (state is AuthFailure) {
@@ -92,7 +97,12 @@ class _LoginPageState extends State<LoginPage> {
                           ),
 
                           Padding(
-                            padding: EdgeInsets.fromLTRB(context.hPadding(), context.heightCalculated(28), context.hPadding(), 0),
+                            padding: EdgeInsets.fromLTRB(
+                              context.hPadding(),
+                              context.heightCalculated(28),
+                              context.hPadding(),
+                              0,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -169,7 +179,9 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Register link
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: context.heightCalculated(16)),
+                  padding: EdgeInsets.symmetric(
+                    vertical: context.heightCalculated(16),
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -204,10 +216,7 @@ class _LoginPageState extends State<LoginPage> {
 class _LoginPhotoComposition extends StatelessWidget {
   final double height;
   final String imagePath;
-  const _LoginPhotoComposition({
-    required this.height,
-    required this.imagePath,
-  });
+  const _LoginPhotoComposition({required this.height, required this.imagePath});
 
   @override
   Widget build(BuildContext context) {
