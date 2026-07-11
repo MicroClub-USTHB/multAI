@@ -37,6 +37,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
        _failureHandler = failureHandler ?? FailureHandler.instance,
        super(AccountInitial()) {
     on<LoadAccountData>(_onLoadAccountData);
+    on<ResetAccountData>(_onResetAccountData);
     on<LogoutRequested>(_onLogoutRequested);
     on<ClearImageCacheRequested>(_onClearImageCache);
     on<UploadAvatar>(_onUploadAvatar);
@@ -56,8 +57,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         _failureHandler.logFailure(failure, 'AccountBloc');
         emit(
           AccountError(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
@@ -69,6 +69,10 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         ),
       ),
     );
+  }
+
+  void _onResetAccountData(ResetAccountData event, Emitter<AccountState> emit) {
+    emit(AccountInitial());
   }
 
   Future<void> _onLogoutRequested(
@@ -86,8 +90,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       _failureHandler.logFailure(failure, 'AccountBloc');
       emit(
         AccountError(
-          errorPresentation:
-              _failureHandler.getErrorPresentation(failure),
+          errorPresentation: _failureHandler.getErrorPresentation(failure),
         ),
       );
     }, (_) => emit(AccountLoggedOut()));
@@ -101,21 +104,24 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     try {
       final before = await _photoCacheService.getStats();
       await _photoCacheService.clearCache();
-      emit(AccountCacheCleared(
-        storageFreed: before.formattedSize,
-        filesRemoved: before.fileCount,
-      ));
+      emit(
+        AccountCacheCleared(
+          storageFreed: before.formattedSize,
+          filesRemoved: before.fileCount,
+        ),
+      );
     } catch (e) {
       _failureHandler.logFailure(
         UnknownFailure('Failed to clear cache: $e'),
         'AccountBloc',
       );
-      emit(AccountError(
-        errorPresentation:
-            _failureHandler.getErrorPresentation(
-              const UnknownFailure('Failed to clear cache'),
-            ),
-      ));
+      emit(
+        AccountError(
+          errorPresentation: _failureHandler.getErrorPresentation(
+            const UnknownFailure('Failed to clear cache'),
+          ),
+        ),
+      );
     }
   }
 
@@ -134,7 +140,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       );
     }
 
-    final result = await _uploadAvatar(UploadAvatarParams(filePath: event.filePath));
+    final result = await _uploadAvatar(
+      UploadAvatarParams(filePath: event.filePath),
+    );
 
     await result.fold(
       (failure) async {
@@ -144,8 +152,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         }
         emit(
           AccountError(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
