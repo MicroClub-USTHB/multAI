@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
-import { ChevronsUpDownIcon, LogOutIcon, MessageSquare } from 'lucide-react';
+import { ChevronsUpDownIcon, LogOutIcon } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui';
@@ -27,6 +27,7 @@ export function NavUser({
 }: {
   user: {
     name: string;
+    subtitle?: string;
     avatar: string;
   };
 }) {
@@ -58,6 +59,11 @@ export function NavUser({
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{user.name}</span>
+              {user.subtitle ? (
+                <span className="text-muted-foreground truncate text-xs">
+                  {user.subtitle}
+                </span>
+              ) : null}
             </div>
             <ChevronsUpDownIcon className="ml-auto size-4" />
           </DropdownMenuTrigger>
@@ -78,17 +84,15 @@ export function NavUser({
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>
+                    {user.subtitle ? (
+                      <span className="text-muted-foreground truncate text-xs">
+                        {user.subtitle}
+                      </span>
+                    ) : null}
                   </div>
                   <ThemeToggle />
                 </div>
               </DropdownMenuLabel>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <MessageSquare />
-                Feedback
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem

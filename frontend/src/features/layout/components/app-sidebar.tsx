@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import type { NavData } from '@/shared/utils/types';
 
+import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/shared/ui';
 import { GlobalSearch } from '@/shared/ui';
 import {
@@ -26,6 +27,22 @@ export function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar> & { navData: NavData }) {
   const [searchOpen, setSearchOpen] = React.useState(false);
+  const { user } = useAuth();
+
+  const userLabel =
+    user?.email?.trim() ||
+    (navData.isAdmin ? 'Admin user' : 'Multi member');
+
+  const userSubtitle =
+    user?.role === 'admin'
+      ? 'Admin'
+      : user?.role === 'multi_team_lead'
+        ? 'Multi team lead'
+        : user?.role === 'multi'
+          ? 'Multi member'
+          : navData.isAdmin
+            ? 'Admin'
+            : 'Multi member';
 
   return (
     <>
@@ -51,7 +68,13 @@ export function AppSidebar({
           <NavSecondary items={navData.secondary} className="mt-auto" />
         </SidebarContent>
         <SidebarFooter>
-          <NavUser user={navData.user} />
+          <NavUser
+            user={{
+              name: userLabel,
+              subtitle: userSubtitle,
+              avatar: navData.user.avatar,
+            }}
+          />
         </SidebarFooter>
       </Sidebar>
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />

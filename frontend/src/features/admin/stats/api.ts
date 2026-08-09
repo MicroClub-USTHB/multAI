@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start';
+import { getRequestHeader } from '@tanstack/react-start/server';
 
 import { apiGet } from '@/shared/utils/api-client';
 
@@ -17,21 +18,33 @@ import {
 
 export const getDriveUsage = createServerFn({ method: 'GET' }).handler(
   async (): Promise<DriveUsage> => {
-    const response = await apiGet<DriveUsageResponse>('/admin/stats/storage');
+    const response = await apiGet<DriveUsageResponse>('/admin/stats/storage', {
+      headers: {
+        cookie: getRequestHeader('cookie') ?? '',
+      },
+    });
     return transformDriveUsageResponse(response);
   },
 );
 
 export const getAdminStats = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AdminStatsData> => {
-    const response = await apiGet<AdminStatsResponse>('/admin/stats/dashboard');
+    const response = await apiGet<AdminStatsResponse>('/admin/stats/dashboard', {
+      headers: {
+        cookie: getRequestHeader('cookie') ?? '',
+      },
+    });
     return transformAdminStatsResponse(response);
   },
 );
 
 export const getAlerts = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AlertData> => {
-    const response = await apiGet<AlertResponse>('/admin/stats/alerts');
+    const response = await apiGet<AlertResponse>('/admin/stats/alerts', {
+      headers: {
+        cookie: getRequestHeader('cookie') ?? '',
+      },
+    });
     return transformAlertsResponse(response);
   },
 );
@@ -39,6 +52,10 @@ export const getAlerts = createServerFn({ method: 'GET' }).handler(
 export const getProcessingLoad = createServerFn({ method: 'GET' }).handler(
   async (): Promise<ProcessingLoad> => {
     // No transformation needed, the schema matches exactly
-    return apiGet<ProcessingLoad>('/admin/stats/processing-load');
+    return apiGet<ProcessingLoad>('/admin/stats/processing-load', {
+      headers: {
+        cookie: getRequestHeader('cookie') ?? '',
+      },
+    });
   },
 );

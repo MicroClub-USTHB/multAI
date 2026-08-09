@@ -1,3 +1,5 @@
+import { env } from '@/env'
+
 export const API_BASE_URL =
 	(import.meta.env.VITE_API_BASE_URL as string | undefined) ??
 	(import.meta.env.VITE_SERVER_URL as string | undefined) ??
@@ -81,6 +83,31 @@ const parsePayload = (rawText: string) => {
 	}
 }
 
+const getOriginForAbsoluteUrl = () => {
+	if (typeof window !== 'undefined' && window.location?.origin) {
+		return window.location.origin
+	}
+
+	return env.SERVER_URL ?? env.VITE_SITE_URL ?? null
+}
+
+const buildUrl = (path: string) => {
+	const origin = getOriginForAbsoluteUrl()
+
+	if (!origin) {
+		throw new Error(
+			'Cannot build absolute API URL during SSR. Set SERVER_URL in the server environment.',
+		)
+	}
+
+	const base = API_BASE_URL.endsWith('/')
+		? API_BASE_URL.slice(0, -1)
+		: API_BASE_URL
+	const resolvedPath = path.startsWith('/') ? path : `/${path}`
+
+	return new URL(`${base}${resolvedPath}`, origin).toString()
+}
+
 export const apiRequest = async <TResponse>(
 	path: string,
 	init: RequestInit,
@@ -89,7 +116,7 @@ export const apiRequest = async <TResponse>(
 	const setJsonContentType =
 		init.body !== undefined && !(init.body instanceof FormData)
 
-	const response = await fetch(`${API_BASE_URL}${path}`, {
+	const response = await fetch(buildUrl(path), {
 		...init,
 		headers: buildHeaders(init.headers, {
 			setJsonContentType,
