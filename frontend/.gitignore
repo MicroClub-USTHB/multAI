@@ -13,3 +13,4 @@ backend-runtime/.env
 __unconfig*
 todos.json
 .content-collections
+.env.mobile
