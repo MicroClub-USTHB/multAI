@@ -1,9 +1,10 @@
-import { useProcessingJobs } from '../hooks';
-import { Badge } from '@/shared/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { Separator } from '@/shared/ui/separator';
 import { Star } from 'lucide-react';
+
+import { Badge, Card, CardContent, CardHeader, CardTitle, Separator } from '@/shared/ui';
+
 import type { ProcessingJob } from '../types';
+
+import { useProcessingJobs } from '../hooks';
 
 function formatJobName(job: ProcessingJob) {
   return `${job.eventId}/${job.photoId}`;

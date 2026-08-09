@@ -1,3 +1,6 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { Calendar, ListOrdered, Settings, Users } from 'lucide-react';
+
 import { StatsCard } from '@/features/common/components/stats-card';
 import { AlertsPanel } from '@/features/multi/stats/components/alerts-panel';
 import { EventSummaryChart } from '@/features/multi/stats/components/event-summary-chart';
@@ -7,8 +10,6 @@ import {
   useEventSummary,
   useMultiStats,
 } from '@/features/multi/stats/hooks';
-import { createFileRoute } from '@tanstack/react-router';
-import { Calendar, ListOrdered, Settings, Users } from 'lucide-react';
 
 export const Route = createFileRoute('/multi/')({
   component: RouteComponent,

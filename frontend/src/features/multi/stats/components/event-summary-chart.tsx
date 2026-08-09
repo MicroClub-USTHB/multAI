@@ -1,4 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
+import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui';
 import {
   ChartContainer,
   ChartLegend,
@@ -6,8 +8,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from '@/shared/ui/chart';
-import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
+} from '@/shared/ui';
+
 import type { EventSummary } from '../types';
 
 interface EventSummaryChartProps {
@@ -74,7 +76,7 @@ export function EventSummaryChart({
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  formatter={(value, name) => [
+                  formatter={(value: any, name: any) => [
                     value,
                     name === 'uploaded' ? ' Uploaded' : ' Processed',
                   ]}
