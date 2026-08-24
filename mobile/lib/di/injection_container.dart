@@ -71,6 +71,7 @@ import '../features/notifications/services/push_notification_service.dart';
 import '../features/notifications/services/notification_navigation_service.dart';
 // Photo Approval ─────────────────────────────────────────────
 import '../features/photo_approval/presentation/bloc/photo_approval_bloc.dart';
+import '../features/photo_approval/data/datasources/photo_approval_local_datasource.dart';
 import '../features/photo_approval/data/datasources/photo_approval_remote_datasource.dart';
 import '../features/photo_approval/data/repositories/photo_approval_repository_impl.dart';
 import '../features/photo_approval/domain/repositories/photo_approval_repository.dart';
@@ -378,11 +379,15 @@ Future<void> init() async {
   sl.registerLazySingleton<PhotoApprovalRemoteDataSource>(
     () => PhotoApprovalRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
+  sl.registerLazySingleton<PhotoApprovalLocalDataSource>(
+    () => PhotoApprovalLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
+  );
 
   // Photo Approval Repository
   sl.registerLazySingleton<PhotoApprovalRepository>(
     () => PhotoApprovalRepositoryImpl(
       remoteDataSource: sl<PhotoApprovalRemoteDataSource>(),
+      localDataSource: sl<PhotoApprovalLocalDataSource>(),
     ),
   );
 
