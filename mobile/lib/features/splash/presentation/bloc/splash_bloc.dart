@@ -2,27 +2,28 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/logger.dart';
-import '../../../../core/network/network_info.dart';
 import '../../../../core/security/device_security.dart';
 import '../../../../core/security/secure_logger.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../onboarding/domain/usecases/get_onboarding_seen.dart';
-import '../../domain/is_user_loged_in.dart';
+import '../../../auth/domain/usecases/get_me_usecase.dart';
+import '../../../auth/domain/usecases/logout_usecase.dart';
 part 'splash_event.dart';
 part 'splash_state.dart';
 
 class SplashBloc extends Bloc<SplashEvent, SplashState> {
   final GetOnboardingSeen getOnboardingSeen;
-  final IsUserLoggedIn isUserLoggedIn;
-  final NetworkInfo networkInfo;
+  final GetCurrentUserUseCase getCurrentUserUseCase;
+  final LogoutUseCase logoutUseCase;
   final Logger _logger;
 
   SplashBloc({
     required this.getOnboardingSeen,
-    required this.isUserLoggedIn,
-    required this.networkInfo,
+    required this.getCurrentUserUseCase,
+    required this.logoutUseCase,
     Logger? logger,
   }) : _logger = logger ?? Logger.create(),
        super(const SplashInitial()) {
@@ -53,24 +54,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
 
       await Future.delayed(const Duration(milliseconds: 1500));
 
-      final isOnline = await networkInfo.isConnected;
-      final hasSeenOnboarding = await getOnboardingSeen();
-      final loggedInResult = await isUserLoggedIn(NoParams());
-
-      if (isOnline) {
-        loggedInResult.fold(
-          (failure) => emit(const SplashLoaded(route: AppRoutes.onboarding)),
-          (isLoggedIn) {
-            if (isLoggedIn && hasSeenOnboarding) {
-              emit(const SplashLoaded(route: AppRoutes.events));
-            } else {
-              emit(const SplashLoaded(route: AppRoutes.onboarding));
-            }
-          },
-        );
-      } else {
-        emit(SplashOffline());
-      }
+      await _resolveSessionAndEmit(emit);
     } catch (e, s) {
       _logger.error('SplashBloc', 'Initialization failed', e, s);
       emit(SplashError(message: 'Could not start the application.'));
@@ -83,26 +67,48 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
   ) async {
     emit(const SplashLoading());
     try {
-      final isOnline = await networkInfo.isConnected;
-      if (isOnline) {
-        final hasSeenOnboarding = await getOnboardingSeen();
-        final loggedInResult = await isUserLoggedIn(NoParams());
-        loggedInResult.fold(
-          (failure) => emit(const SplashLoaded(route: AppRoutes.onboarding)),
-          (isLoggedIn) {
-            if (isLoggedIn && hasSeenOnboarding) {
-              emit(const SplashLoaded(route: AppRoutes.events));
-            } else {
-              emit(const SplashLoaded(route: AppRoutes.onboarding));
-            }
-          },
-        );
-      } else {
-        emit(SplashOffline());
-      }
+      await _resolveSessionAndEmit(emit);
     } catch (e, s) {
       _logger.error('SplashBloc', 'Retry connection failed', e, s);
       emit(SplashError(message: 'Could not connect. Please try again.'));
     }
+  }
+
+  /// Local-first session resolution. We never gate on raw token presence —
+  /// [GetCurrentUserUseCase] already knows how to fall back to a cached
+  /// identity when there's no network, no server, or (now) no access token
+  /// at all, so it's always worth asking it first:
+  ///   - Success (fresh from network OR served from cache): route based on
+  ///     onboarding state.
+  ///   - Unauthorized failure: no valid credentials AND no cached identity
+  ///     to fall back to — this is genuinely "not logged in". Clear any
+  ///     leftover local session state and send the user to onboarding.
+  ///   - Any other failure: there IS a session, we just couldn't verify it
+  ///     (offline/server error) and have nothing cached either -> offline.
+  Future<void> _resolveSessionAndEmit(Emitter<SplashState> emit) async {
+    final hasSeenOnboarding = await getOnboardingSeen();
+
+    final meResult = await getCurrentUserUseCase(NoParams());
+    await meResult.fold(
+      (failure) async {
+        if (failure is UnauthorizedFailure) {
+          await logoutUseCase(NoParams());
+          emit(const SplashLoaded(route: AppRoutes.onboarding));
+        } else {
+          emit(SplashOffline());
+        }
+      },
+      (user) async {
+        final String route;
+        if (!hasSeenOnboarding) {
+          route = AppRoutes.onboarding;
+        } else if (!user.isOnboarded) {
+          route = AppRoutes.faceEnrollment;
+        } else {
+          route = AppRoutes.events;
+        }
+        emit(SplashLoaded(route: route));
+      },
+    );
   }
 }

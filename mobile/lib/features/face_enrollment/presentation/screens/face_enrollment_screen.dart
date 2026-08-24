@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -690,10 +691,22 @@ Future<void> _pickPhoto(BuildContext context, FacePhotoType type) async {
   if (source == null || !context.mounted) return;
 
   final picker = ImagePicker();
-  final picked = await picker.pickImage(
-    source: source,
-    imageQuality: 90,
-  );
+  XFile? picked;
+  try {
+    picked = await picker.pickImage(source: source, imageQuality: 90);
+  } on PlatformException catch (_) {
+    if (!context.mounted) return;
+    context.showErrorSnackBar(
+      source == ImageSource.camera
+          ? 'No camera available on this device. Please choose a photo from your gallery instead.'
+          : 'Could not open the photo library. Please try again.',
+    );
+    return;
+  } catch (_) {
+    if (!context.mounted) return;
+    context.showErrorSnackBar('Could not select a photo. Please try again.');
+    return;
+  }
 
   if (picked == null || !context.mounted) return;
 

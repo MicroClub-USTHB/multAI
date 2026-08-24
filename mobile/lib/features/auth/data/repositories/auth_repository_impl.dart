@@ -8,6 +8,7 @@ import '../../domain/entities/auth_entity.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasource/remote_data.dart';
+import '../datasource/auth_local_datasource.dart';
 import '../models/auth_model.dart';
 import '../../../../core/network/api_client.dart';
 
@@ -15,11 +16,13 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final ApiClient apiClient;
   final LocalStorage localStorage;
+  final AuthLocalDataSource localDataSource;
 
   AuthRepositoryImpl({
     required this.remoteDataSource,
     required this.apiClient,
     required this.localStorage,
+    required this.localDataSource,
   });
 
   Future<void> _persistTokens(AuthEntity result) async {
@@ -191,12 +194,15 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await remoteDataSource.logout();
       await _clearTokens();
+      await localDataSource.clearCachedMe();
       return const Right(null);
     } on Failure {
       await _clearTokens();
+      await localDataSource.clearCachedMe();
       return const Right(null);
     } catch (e) {
       await _clearTokens();
+      await localDataSource.clearCachedMe();
       return const Right(null);
     }
   }
@@ -205,9 +211,14 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, MeEntity>> getMe() async {
     try {
       final result = await remoteDataSource.getMe();
+      await localDataSource.cacheMe(result);
       return Right(result);
     } on Failure catch (f) {
       FailureHandler.instance.logFailure(f, 'AuthRepository');
+      final cached = await localDataSource.getCachedMe();
+      if (cached != null) {
+        return Right(cached);
+      }
       return Left(f);
     } catch (e) {
       FailureHandler.instance.logFailure(

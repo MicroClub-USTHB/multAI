@@ -24,16 +24,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<String> register(AuthRequestModel request) async {
     final json = await apiClient.post(EndPoints.register, body: request.toJson());
-    return json['pending_token'] as String;
+    return json['email'] as String;
   }
 
   @override
-  Future<String> resendOtp(String pendingToken) async {
+  Future<String> resendOtp(String email) async {
     final json = await apiClient.post(
       EndPoints.resendOtp,
-      body: {'pending_token': pendingToken},
+      body: {'email': email},
     );
-    return json['pending_token'] as String;
+    return json['email'] as String;
   }
 
   @override

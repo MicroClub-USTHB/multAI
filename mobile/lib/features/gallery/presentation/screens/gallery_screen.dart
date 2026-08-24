@@ -54,21 +54,23 @@ class _GalleryScreenState extends State<GalleryScreen>
           final p = state.errorPresentation;
           return Scaffold(
             backgroundColor: AppTheme.backgroundColor,
-            body: ErrorStateView(
-              title: p.title,
-              description: p.description,
-              illustration: p.illustration,
-              actionLabel: p.actionLabel,
-              onAction: p.action == ErrorAction.retry
-                  ? () => context.read<GalleryBloc>().add(LoadAllPhotos())
-                  : p.action == ErrorAction.signIn
-                      ? () {
-                          context.read<AuthBloc>().add(LogoutRequested());
-                          context.go(AppRoutes.login);
-                        }
-                      : p.action == ErrorAction.goBack
-                          ? () => context.pop()
-                          : null,
+            body: SafeArea(
+              child: ErrorStateView(
+                title: p.title,
+                description: p.description,
+                illustration: p.illustration,
+                actionLabel: p.actionLabel,
+                onAction: p.action == ErrorAction.retry
+                    ? () => context.read<GalleryBloc>().add(LoadAllPhotos())
+                    : p.action == ErrorAction.signIn
+                    ? () {
+                        context.read<AuthBloc>().add(LogoutRequested());
+                        context.go(AppRoutes.login);
+                      }
+                    : p.action == ErrorAction.goBack
+                    ? () => context.pop()
+                    : null,
+              ),
             ),
           );
         }

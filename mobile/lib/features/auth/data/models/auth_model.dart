@@ -20,7 +20,7 @@ class AuthRequestModel {
     'password': password,
     'device_name': deviceName,
     'device_type': deviceType,
-    'device_id': deviceId,
+    'physical_device_id': deviceId,
   };
 }
 

@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -67,8 +66,7 @@ class _LoginPageState extends State<LoginPage> {
           context.go(AppRoutes.events);
         } else if (state is AuthNeedsFaceEnrollment) {
           context.read<AccountBloc>().add(ResetAccountData());
-          // Allow development builds to test the app before face enrollment.
-          context.go(kDebugMode ? AppRoutes.events : AppRoutes.faceEnrollment);
+          context.go(AppRoutes.faceEnrollment);
         }
         // ignore: use_build_context_synchronously
         if (state is AuthFailure) {

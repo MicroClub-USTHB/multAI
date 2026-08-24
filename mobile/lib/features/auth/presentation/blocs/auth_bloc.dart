@@ -16,7 +16,6 @@ import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/resend_otp_usecase.dart';
 import '../../domain/usecases/verify_register_usecase.dart';
 import '../../utils/device_utils.dart';
-import '../../../face_enrollment/domain/usecases/check_enrollment_done_usecase.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -29,7 +28,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RefreshTokenUseCase _refreshTokenUseCase;
   final LogoutUseCase _logoutUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
-  final CheckEnrollmentDoneUseCase _checkEnrollmentDone;
   final PushNotificationService _pushNotificationService;
   final FailureHandler _failureHandler;
   final Logger _logger;
@@ -46,7 +44,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required RefreshTokenUseCase refreshTokenUseCase,
     required LogoutUseCase logoutUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
-    required CheckEnrollmentDoneUseCase checkEnrollmentDone,
     required PushNotificationService pushNotificationService,
     FailureHandler? failureHandler,
     Logger? logger,
@@ -57,7 +54,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _refreshTokenUseCase = refreshTokenUseCase,
        _logoutUseCase = logoutUseCase,
        _getCurrentUserUseCase = getCurrentUserUseCase,
-       _checkEnrollmentDone = checkEnrollmentDone,
        _pushNotificationService = pushNotificationService,
        _failureHandler = failureHandler ?? FailureHandler.instance,
        _logger = logger ?? Logger.create(),
@@ -76,8 +72,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthEntity auth,
     Emitter<AuthState> emit,
   ) async {
-    final isDone = await _checkEnrollmentDone();
-    if (isDone) {
+    final meResult = await _getCurrentUserUseCase(NoParams());
+    final isOnboarded = meResult.fold(
+      (failure) => false,
+      (user) => user.isOnboarded,
+    );
+    if (isOnboarded) {
       emit(AuthAuthenticated(auth: auth));
     } else {
       emit(AuthNeedsFaceEnrollment(auth: auth));

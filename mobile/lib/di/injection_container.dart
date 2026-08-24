@@ -3,7 +3,6 @@ import 'package:multai_mobile/core/security/session_manager.dart';
 import 'package:multai_mobile/features/gallery/domain/repositories/photo_repository.dart';
 import 'package:multai_mobile/features/gallery/domain/usecases/get_event_photos_usecase.dart';
 import 'package:multai_mobile/features/gallery/domain/usecases/get_my_photos_usecase.dart';
-import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
 import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -25,6 +24,7 @@ import '../features/onboarding/presentation/bloc/onboarding_bloc.dart';
 
 // Auth
 import '../features/auth/data/datasource/remote_data.dart';
+import '../features/auth/data/datasource/auth_local_datasource.dart';
 import '../features/auth/data/repositories/auth_repository_impl.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/domain/usecases/login_usecase.dart';
@@ -70,6 +70,7 @@ import '../features/notifications/services/push_notification_service.dart';
 import '../features/notifications/services/notification_navigation_service.dart';
 // Photo Approval ─────────────────────────────────────────────
 import '../features/photo_approval/presentation/bloc/photo_approval_bloc.dart';
+import '../features/photo_approval/data/datasources/photo_approval_local_datasource.dart';
 import '../features/photo_approval/data/datasources/photo_approval_remote_datasource.dart';
 import '../features/photo_approval/data/repositories/photo_approval_repository_impl.dart';
 import '../features/photo_approval/domain/repositories/photo_approval_repository.dart';
@@ -146,8 +147,8 @@ Future<void> init() async {
   sl.registerFactory<SplashBloc>(
     () => SplashBloc(
       getOnboardingSeen: sl<GetOnboardingSeen>(),
-      isUserLoggedIn: sl<IsUserLoggedIn>(),
-      networkInfo: sl<NetworkInfo>(),
+      getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
+      logoutUseCase: sl<LogoutUseCase>(),
     ),
   );
 
@@ -172,6 +173,9 @@ Future<void> init() async {
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
+  sl.registerLazySingleton<AuthLocalDataSource>(
+    () => AuthLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
+  );
 
   // ── Auth Repository ─────────────────────────────────────────────────────────
   sl.registerLazySingleton<AuthRepository>(
@@ -179,6 +183,7 @@ Future<void> init() async {
       remoteDataSource: sl<AuthRemoteDataSource>(),
       apiClient: sl<ApiClient>(),
       localStorage: sl<AppLocalStorage>(),
+      localDataSource: sl<AuthLocalDataSource>(),
     ),
   );
 
@@ -190,7 +195,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => RefreshTokenUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl<AuthRepository>()));
-  sl.registerLazySingleton(() => IsUserLoggedIn(sl<AuthRepository>()));
 
   // ── Auth BLoC ───────────────────────────────────────────────────────────────
   sl.registerLazySingleton<AuthBloc>(
@@ -202,7 +206,6 @@ Future<void> init() async {
       logoutUseCase: sl<LogoutUseCase>(),
       refreshTokenUseCase: sl<RefreshTokenUseCase>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
-      checkEnrollmentDone: sl<CheckEnrollmentDoneUseCase>(),
       pushNotificationService: sl<PushNotificationService>(),
     ),
   );
@@ -372,11 +375,15 @@ Future<void> init() async {
   sl.registerLazySingleton<PhotoApprovalRemoteDataSource>(
     () => PhotoApprovalRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
+  sl.registerLazySingleton<PhotoApprovalLocalDataSource>(
+    () => PhotoApprovalLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
+  );
 
   // Photo Approval Repository
   sl.registerLazySingleton<PhotoApprovalRepository>(
     () => PhotoApprovalRepositoryImpl(
       remoteDataSource: sl<PhotoApprovalRemoteDataSource>(),
+      localDataSource: sl<PhotoApprovalLocalDataSource>(),
     ),
   );
 
