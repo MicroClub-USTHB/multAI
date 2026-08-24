@@ -62,12 +62,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             builder: (ctx) {
               return Stack(
                 children: [
-                  PageView.builder(
-                    controller: _pageController,
-                    onPageChanged: (i) => setState(() => _currentPage = i),
-                    itemCount: _slides.length,
-                    itemBuilder: (_, i) =>
-                        OnboardingCard(slide: _slides[i], slideIndex: i),
+                  SafeArea(
+                    bottom: false,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (i) => setState(() => _currentPage = i),
+                      itemCount: _slides.length,
+                      itemBuilder: (_, i) =>
+                          OnboardingCard(slide: _slides[i], slideIndex: i),
+                    ),
                   ),
 
                   SafeArea(
