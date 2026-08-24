@@ -40,11 +40,9 @@ class PhotoRepositoryImpl implements PhotoRepository {
       );
       await localDataSource.cacheAllPhotos(models);
       return Right(models);
-    } on NetworkFailure catch (_) {
+    } on Failure catch (f) {
       final cached = localDataSource.getCachedAllPhotos();
       if (cached != null && cached.isNotEmpty) return Right(cached);
-      return Left(const NetworkFailure('No internet connection'));
-    } on Failure catch (f) {
       return Left(f);
     } catch (e) {
       return Left(const UnknownFailure('Failed to load photos'));
@@ -72,11 +70,9 @@ class PhotoRepositoryImpl implements PhotoRepository {
         result.total,
       );
       return Right((items: result.items, total: result.total));
-    } on NetworkFailure catch (_) {
+    } on Failure catch (f) {
       final cached = localDataSource.getCachedEventPhotos(eventId);
       if (cached != null && cached.items.isNotEmpty) return Right(cached);
-      return Left(const NetworkFailure('No internet connection'));
-    } on Failure catch (f) {
       return Left(f);
     } catch (e) {
       return Left(const UnknownFailure('Failed to load event photos'));
