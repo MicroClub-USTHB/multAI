@@ -291,7 +291,15 @@ class ApiClient {
     }
   }
 
-  Future<bool> _tryRefreshToken() async {
+  Future<bool>? _refreshInFlight;
+
+  Future<bool> _tryRefreshToken() {
+    return _refreshInFlight ??= _doRefreshToken().whenComplete(() {
+      _refreshInFlight = null;
+    });
+  }
+
+  Future<bool> _doRefreshToken() async {
     final storage = _localStorage;
     if (storage == null) return false;
     try {
