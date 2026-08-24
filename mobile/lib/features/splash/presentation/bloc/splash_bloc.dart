@@ -11,20 +11,17 @@ import '../../../../core/router/app_routes.dart';
 import '../../../onboarding/domain/usecases/get_onboarding_seen.dart';
 import '../../../auth/domain/usecases/get_me_usecase.dart';
 import '../../../auth/domain/usecases/logout_usecase.dart';
-import '../../domain/is_user_loged_in.dart';
 part 'splash_event.dart';
 part 'splash_state.dart';
 
 class SplashBloc extends Bloc<SplashEvent, SplashState> {
   final GetOnboardingSeen getOnboardingSeen;
-  final IsUserLoggedIn isUserLoggedIn;
   final GetCurrentUserUseCase getCurrentUserUseCase;
   final LogoutUseCase logoutUseCase;
   final Logger _logger;
 
   SplashBloc({
     required this.getOnboardingSeen,
-    required this.isUserLoggedIn,
     required this.getCurrentUserUseCase,
     required this.logoutUseCase,
     Logger? logger,
@@ -77,25 +74,19 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     }
   }
 
-  /// Local-first session resolution:
-  /// - No token: go straight to onboarding.
-  /// - Token present: resolve identity via [GetCurrentUserUseCase], which
-  ///   transparently falls back to a cached identity when the network is
-  ///   unavailable or the server errors out.
-  ///   - Success (fresh or cached): route based on onboarding state.
-  ///   - Unauthorized failure: session is genuinely invalid, log out locally
-  ///     and send the user to onboarding.
-  ///   - Any other failure: truly stuck (no cache, no network) -> offline.
+  /// Local-first session resolution. We never gate on raw token presence —
+  /// [GetCurrentUserUseCase] already knows how to fall back to a cached
+  /// identity when there's no network, no server, or (now) no access token
+  /// at all, so it's always worth asking it first:
+  ///   - Success (fresh from network OR served from cache): route based on
+  ///     onboarding state.
+  ///   - Unauthorized failure: no valid credentials AND no cached identity
+  ///     to fall back to — this is genuinely "not logged in". Clear any
+  ///     leftover local session state and send the user to onboarding.
+  ///   - Any other failure: there IS a session, we just couldn't verify it
+  ///     (offline/server error) and have nothing cached either -> offline.
   Future<void> _resolveSessionAndEmit(Emitter<SplashState> emit) async {
     final hasSeenOnboarding = await getOnboardingSeen();
-    final loggedInResult = await isUserLoggedIn(NoParams());
-
-    final isLoggedIn = loggedInResult.fold((failure) => false, (v) => v);
-
-    if (!isLoggedIn) {
-      emit(const SplashLoaded(route: AppRoutes.onboarding));
-      return;
-    }
 
     final meResult = await getCurrentUserUseCase(NoParams());
     await meResult.fold(

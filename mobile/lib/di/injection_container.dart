@@ -3,7 +3,6 @@ import 'package:multai_mobile/core/security/session_manager.dart';
 import 'package:multai_mobile/features/gallery/domain/repositories/photo_repository.dart';
 import 'package:multai_mobile/features/gallery/domain/usecases/get_event_photos_usecase.dart';
 import 'package:multai_mobile/features/gallery/domain/usecases/get_my_photos_usecase.dart';
-import 'package:multai_mobile/features/splash/domain/is_user_loged_in.dart';
 import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -148,7 +147,6 @@ Future<void> init() async {
   sl.registerFactory<SplashBloc>(
     () => SplashBloc(
       getOnboardingSeen: sl<GetOnboardingSeen>(),
-      isUserLoggedIn: sl<IsUserLoggedIn>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
     ),
@@ -197,7 +195,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => RefreshTokenUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl<AuthRepository>()));
-  sl.registerLazySingleton(() => IsUserLoggedIn(sl<AuthRepository>()));
 
   // ── Auth BLoC ───────────────────────────────────────────────────────────────
   sl.registerLazySingleton<AuthBloc>(
