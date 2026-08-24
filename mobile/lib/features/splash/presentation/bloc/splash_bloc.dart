@@ -99,13 +99,15 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
         }
       },
       (user) async {
-        emit(
-          SplashLoaded(
-            route: hasSeenOnboarding
-                ? AppRoutes.events
-                : AppRoutes.onboarding,
-          ),
-        );
+        final String route;
+        if (!hasSeenOnboarding) {
+          route = AppRoutes.onboarding;
+        } else if (!user.isOnboarded) {
+          route = AppRoutes.faceEnrollment;
+        } else {
+          route = AppRoutes.events;
+        }
+        emit(SplashLoaded(route: route));
       },
     );
   }

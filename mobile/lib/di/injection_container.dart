@@ -206,7 +206,6 @@ Future<void> init() async {
       logoutUseCase: sl<LogoutUseCase>(),
       refreshTokenUseCase: sl<RefreshTokenUseCase>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
-      checkEnrollmentDone: sl<CheckEnrollmentDoneUseCase>(),
       pushNotificationService: sl<PushNotificationService>(),
     ),
   );

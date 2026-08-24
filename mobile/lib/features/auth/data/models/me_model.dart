@@ -8,6 +8,7 @@ class MeResponseModel extends UserEntity {
     required super.email,
     required super.devices,
     super.session,
+    super.isOnboarded,
   });
 
   factory MeResponseModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +29,7 @@ class MeResponseModel extends UserEntity {
       email: userJson['email']?.toString() ?? '',
       devices: devicesList,
       session: sessionJson != null ? SessionModel.fromJson(sessionJson) : null,
+      isOnboarded: userJson['is_onboarded'] as bool? ?? false,
     );
   }
 
@@ -36,5 +38,6 @@ class MeResponseModel extends UserEntity {
     'email': email,
     'devices': devices.map((d) => (d as DeviceModel).toJson()).toList(),
     'sessions': session != null ? (session as SessionModel).toJson() : null,
+    'is_onboarded': isOnboarded,
   };
 }

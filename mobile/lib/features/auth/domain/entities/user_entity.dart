@@ -6,12 +6,14 @@ class UserEntity {
   final String email;
   final List<DeviceEntity> devices;
   final SessionEntity? session;
+  final bool isOnboarded;
 
   const UserEntity({
     required this.id,
     required this.email,
     required this.devices,
     this.session,
+    this.isOnboarded = false,
   });
 }
 
