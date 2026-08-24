@@ -9,4 +9,5 @@ abstract class StorageKeys {
   static const String faceEnrollmentDone = 'is_face_enrollment_done';
   static const String galleryCacheManifest = 'gallery_cache_manifest';
   static const String cachedEvents = 'cached_events';
+  static const String cachedMe = 'cached_me';
 }

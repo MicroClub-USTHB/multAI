@@ -25,6 +25,7 @@ import '../features/onboarding/presentation/bloc/onboarding_bloc.dart';
 
 // Auth
 import '../features/auth/data/datasource/remote_data.dart';
+import '../features/auth/data/datasource/auth_local_datasource.dart';
 import '../features/auth/data/repositories/auth_repository_impl.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/domain/usecases/login_usecase.dart';
@@ -147,7 +148,8 @@ Future<void> init() async {
     () => SplashBloc(
       getOnboardingSeen: sl<GetOnboardingSeen>(),
       isUserLoggedIn: sl<IsUserLoggedIn>(),
-      networkInfo: sl<NetworkInfo>(),
+      getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
+      logoutUseCase: sl<LogoutUseCase>(),
     ),
   );
 
@@ -172,6 +174,9 @@ Future<void> init() async {
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
   );
+  sl.registerLazySingleton<AuthLocalDataSource>(
+    () => AuthLocalDataSourceImpl(localStorage: sl<AppLocalStorage>()),
+  );
 
   // ── Auth Repository ─────────────────────────────────────────────────────────
   sl.registerLazySingleton<AuthRepository>(
@@ -179,6 +184,7 @@ Future<void> init() async {
       remoteDataSource: sl<AuthRemoteDataSource>(),
       apiClient: sl<ApiClient>(),
       localStorage: sl<AppLocalStorage>(),
+      localDataSource: sl<AuthLocalDataSource>(),
     ),
   );
 

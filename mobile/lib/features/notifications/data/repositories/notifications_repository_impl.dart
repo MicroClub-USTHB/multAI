@@ -20,11 +20,9 @@ class NotificationRepositoryImpl implements NotificationsRepository {
       final r = await remoteDataSource.getNotifications();
       await localDataSource.cacheNotifications(r);
       return Right(r);
-    } on NetworkFailure catch (_) {
+    } on Failure catch (f) {
       final cached = localDataSource.getCachedNotifications();
       if (cached != null && cached.isNotEmpty) return Right(cached);
-      return Left(const NetworkFailure('No internet connection'));
-    } on Failure catch (f) {
       return Left(f);
     } catch (e) {
       return Left(const ServerFailure('An unexpected error occurred'));
