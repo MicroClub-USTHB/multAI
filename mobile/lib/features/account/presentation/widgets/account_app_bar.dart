@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 
-import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -14,13 +13,7 @@ class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: AppThemeColors.background,
       elevation: 0,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back,
-          color: context.theme.colorScheme.onSurface,
-        ),
-        onPressed: () => context.pop(),
-      ),
+      automaticallyImplyLeading: false,
       centerTitle: true,
       title: Text(
         'Account',

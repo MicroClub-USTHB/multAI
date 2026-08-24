@@ -80,7 +80,7 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
     if (state.isSuccess) {
       _navigateAfterSuccess(context);
     }
-    if (state.isFailure && state.submitError != null) {
+    if (state.submitError != null) {
       context.showErrorSnackBar(state.submitError!);
     }
   }

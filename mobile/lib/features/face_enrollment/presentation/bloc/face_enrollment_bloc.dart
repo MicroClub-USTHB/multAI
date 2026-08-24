@@ -91,7 +91,7 @@ class FaceEnrollmentBloc
       (failure) async {
         _failureHandler.logFailure(failure, 'FaceEnrollmentBloc');
         emit(state.copyWith(
-          status: EnrollmentStatus.failure,
+          status: EnrollmentStatus.editing,
           submitError: _failureHandler.getUserFriendlyMessage(failure),
         ));
       },
@@ -105,7 +105,7 @@ class FaceEnrollmentBloc
             'FaceEnrollmentBloc',
           );
           emit(state.copyWith(
-            status: EnrollmentStatus.failure,
+            status: EnrollmentStatus.editing,
             submitError: _failureHandler.getUserFriendlyMessage(
               const UnknownFailure('Failed to save enrollment status'),
             ),
