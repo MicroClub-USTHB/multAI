@@ -215,9 +215,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(result);
     } on Failure catch (f) {
       FailureHandler.instance.logFailure(f, 'AuthRepository');
-      if (f is UnauthorizedFailure) {
-        return Left(f);
-      }
       final cached = await localDataSource.getCachedMe();
       if (cached != null) {
         return Right(cached);
