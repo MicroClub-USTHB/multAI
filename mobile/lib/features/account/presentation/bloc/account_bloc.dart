@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../../core/errors/failure_handler.dart';
 import '../../../../core/errors/failure.dart';
@@ -157,6 +158,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         );
       },
       (avatarUrl) async {
+        await CachedNetworkImage.evictFromCache(avatarUrl);
         if (current is AccountLoaded) {
           emit(current.copyWith(avatarUrl: avatarUrl));
         }

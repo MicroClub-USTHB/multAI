@@ -24,7 +24,7 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
     final json = await apiClient.postMultipart(
       EndPoints.avatar,
       files: [File(filePath)],
-      fieldNames: ['avatar'],
+      fieldNames: ['file'],
       requiresAuth: true,
     );
     return json['avatar_url'] as String;
