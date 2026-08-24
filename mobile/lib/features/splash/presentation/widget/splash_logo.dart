@@ -18,23 +18,6 @@ class SplashLogo extends StatelessWidget {
           height: 72,
           fit: BoxFit.contain,
         ),
-        const SizedBox(height: AppThemeMetrics.spacingXl),
-        RichText(
-          text: TextSpan(
-            style: context.textTheme.displayMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              letterSpacing: -1,
-              color: AppThemeColors.primaryText,
-            ),
-            children: const [
-              TextSpan(text: 'mult'),
-              TextSpan(
-                text: 'AI',
-                style: TextStyle(color: AppThemeColors.primaryAccent),
-              ),
-            ],
-          ),
-        ),
         const SizedBox(height: AppThemeMetrics.spacingSm),
         Text(
           'Your moments, found automatically',
