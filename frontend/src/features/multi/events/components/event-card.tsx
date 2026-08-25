@@ -1,4 +1,4 @@
-import { Calendar, Check, Copy, Download, QrCode } from 'lucide-react'
+import { Calendar, CalendarX, Check, Copy, Download, QrCode } from 'lucide-react'
 import { useState } from 'react'
 import QRCode from 'react-qr-code'
 
@@ -78,7 +78,13 @@ export function EventCard({ event }: EventCardProps) {
 			<CardContent className="space-y-3">
 				<div className="text-muted-foreground flex items-center gap-2 text-sm">
 					<Calendar className="size-4" />
-					<span>{formatDateTime(event.eventDate)}</span>
+					<span>Starts {formatDateTime(event.eventDate)}</span>
+				</div>
+				<div className="text-muted-foreground flex items-center gap-2 text-sm">
+					<CalendarX className="size-4" />
+					<span>
+						{event.endDate ? `Ends ${formatDateTime(event.endDate)}` : 'No end date set'}
+					</span>
 				</div>
 				<div className="flex items-center justify-between gap-2 rounded-md border border-border/70 bg-muted/30 px-3 py-2">
 					<span className="font-mono text-sm">{event.eventCode}</span>

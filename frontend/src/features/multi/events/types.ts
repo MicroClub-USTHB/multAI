@@ -6,6 +6,7 @@ export interface MultiEvent {
 	name: string
 	eventCode: string
 	eventDate: string
+	endDate: string | null
 	status: EventStatus
 	createdBy: string
 	createdAt: string
@@ -30,6 +31,7 @@ interface EventResponseDto {
 	name: string
 	event_code: string
 	event_date: string
+	end_date: string | null
 	status: string
 	created_by: string
 	created_at: string
@@ -58,6 +60,7 @@ export const toMultiEvent = (event: EventResponseDto): MultiEvent => ({
 	name: event.name,
 	eventCode: event.event_code,
 	eventDate: event.event_date,
+	endDate: event.end_date,
 	status: normalizeStatus(event.status),
 	createdBy: event.created_by,
 	createdAt: event.created_at,

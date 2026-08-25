@@ -4,7 +4,7 @@ import type { EventStatus } from '../types'
 
 const STATUS_LABELS: Record<EventStatus, string> = {
 	draft: 'Draft',
-	scheduled: 'Scheduled',
+	scheduled: 'Live',
 	archived: 'Archived',
 }
 

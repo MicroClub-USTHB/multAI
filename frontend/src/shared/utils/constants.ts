@@ -51,11 +51,6 @@ export const MULTI_NAV_LINKS: NavData = {
       title: 'Events',
       url: '/multi/events',
       icon: Megaphone,
-      items: [
-        { title: 'MicoCode', url: '/multi/events/micocode' },
-        { title: 'HackOPS', url: '/multi/events/hackops' },
-        { title: 'Visual Crew', url: '/multi/events/visualcrew' },
-      ],
     },
     {
       title: 'Upload & Storage',
