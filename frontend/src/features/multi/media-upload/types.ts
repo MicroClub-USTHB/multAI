@@ -1,4 +1,4 @@
-export type UploadItemStatus = 'pending' | 'uploading' | 'success' | 'failed'
+export type UploadItemStatus = 'pending' | 'uploading' | 'success' | 'failed' | 'paused'
 
 export interface UploadItem {
 	id: string
@@ -8,6 +8,8 @@ export interface UploadItem {
 	status: UploadItemStatus
 	progress: number
 	error: string | null
+	photoId: string | null
+	uploadUrl: string | null
 }
 
 export interface UploadStats {
@@ -16,4 +18,5 @@ export interface UploadStats {
 	uploading: number
 	success: number
 	failed: number
+	paused: number
 }

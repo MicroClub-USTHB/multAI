@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle2, Loader2, RotateCcw, X } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Loader2, PauseCircle, RotateCcw, X } from 'lucide-react'
 
 import { Button, Progress, ProgressTrack, ProgressIndicator } from '@/shared/ui'
 
@@ -54,6 +54,8 @@ export function UploadItemRow({ item, onRetry, onRemove }: UploadItemRowProps) {
 							<RotateCcw className="size-4" />
 						</Button>
 					</>
+				) : item.status === 'paused' ? (
+					<PauseCircle className="text-muted-foreground size-4" />
 				) : (
 					<span className="text-muted-foreground text-xs">Queued</span>
 				)}

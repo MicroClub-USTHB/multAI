@@ -14,8 +14,17 @@ export const Route = createFileRoute('/multi/upload')({
 
 function RouteComponent() {
   const [eventId, setEventId] = useState<string | null>(null);
-  const { items, stats, addFiles, retryOne, retryFailed, removeItem } =
-    useBulkUpload(eventId);
+  const {
+    items,
+    stats,
+    isPaused,
+    addFiles,
+    retryOne,
+    retryFailed,
+    pauseAll,
+    continueAll,
+    removeItem,
+  } = useBulkUpload(eventId);
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-6">
@@ -39,7 +48,13 @@ function RouteComponent() {
       ) : (
         <>
           <UploadDropzone onFilesSelected={(files) => addFiles(files)} />
-          <UploadSummary stats={stats} onRetryFailed={retryFailed} />
+          <UploadSummary
+            stats={stats}
+            isPaused={isPaused}
+            onRetryFailed={() => void retryFailed()}
+            onPauseAll={pauseAll}
+            onContinueAll={continueAll}
+          />
           <UploadList items={items} onRetry={retryOne} onRemove={removeItem} />
         </>
       )}
