@@ -23,6 +23,7 @@ class EventsLocalDataSourceImpl implements EventsLocalDataSource {
             'id': e.id,
             'name': e.name,
             'event_date': e.eventDate.toIso8601String(),
+            'end_date': e.endDate?.toIso8601String(),
             'status': e.status,
             'joined_at': e.joinedAt.toIso8601String(),
           },
@@ -45,6 +46,9 @@ class EventsLocalDataSourceImpl implements EventsLocalDataSource {
           id: map['id'] as String,
           name: map['name'] as String,
           eventDate: DateTime.parse(map['event_date'] as String),
+          endDate: map['end_date'] != null
+              ? DateTime.parse(map['end_date'] as String)
+              : null,
           status: map['status'] as String,
           joinedAt: DateTime.parse(map['joined_at'] as String),
         );

@@ -443,6 +443,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       event.status,
                     ),
                     eventDate: event.eventDate,
+                    endDate: event.endDate,
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => EventPhotosScreen(

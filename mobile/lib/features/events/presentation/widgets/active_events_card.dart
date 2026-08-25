@@ -11,18 +11,23 @@ class ActiveEventsCard extends StatelessWidget {
     required this.eventTitle,
     required this.eventStatus,
     required this.eventDate,
+    this.endDate,
     this.onTap,
   });
 
   final String eventTitle;
   final String eventStatus;
   final DateTime eventDate;
+  final DateTime? endDate;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
-    final cs = context.theme.colorScheme;
+
+    final dateLabel = endDate != null
+        ? '${eventDate.toDisplayDate()} - ${endDate!.toDisplayDate()}'
+        : eventDate.toDisplayDate();
 
     return GestureDetector(
       onTap: onTap,
@@ -35,97 +40,56 @@ class ActiveEventsCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
           border: Border.all(color: AppThemeColors.activeCardBorder, width: 1),
         ),
-        child: Row(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.widthCalculated(AppThemeMetrics.spacingMd),
+          vertical: context.heightCalculated(AppThemeMetrics.spacingMd),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // ── Title + status ─────────────────────────────────
-                  Padding(
-                    padding: EdgeInsets.only(
-                      top: context.heightCalculated(AppThemeMetrics.spacingMd),
-                      bottom: context.heightCalculated(
-                        AppThemeMetrics.spacingSm,
-                      ),
+            // ── Title + status ─────────────────────────────────────────
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    eventTitle,
+                    style: tt.titleMedium?.copyWith(
+                      color: AppThemeColors.primaryText,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            eventTitle,
-                            style: tt.titleMedium?.copyWith(
-                              color: AppThemeColors.primaryText,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                            right: context.widthCalculated(
-                              AppThemeMetrics.spacingSm,
-                            ),
-                          ),
-                          child: Text(
-                            eventStatus,
-                            style: tt.labelSmall?.copyWith(
-                              color: AppThemeColors.success,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
+                ),
+                SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
+                Text(
+                  eventStatus,
+                  style: tt.labelSmall?.copyWith(
+                    color: AppThemeColors.success,
+                  ),
+                ),
+              ],
+            ),
 
-                  // ── Date ──────────────────────────────────────────
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom: context.heightCalculated(
-                        AppThemeMetrics.spacingMd,
-                      ),
+            // ── Date ────────────────────────────────────────────────────
+            Row(
+              children: [
+                Icon(
+                  Icons.calendar_month,
+                  size: context.iconSize() * 0.8,
+                  color: AppThemeColors.cardDateText,
+                ),
+                SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingXs)),
+                Expanded(
+                  child: Text(
+                    dateLabel,
+                    style: tt.labelSmall?.copyWith(
+                      color: AppThemeColors.cardDateText,
                     ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_month,
-                          size: context.iconSize() * 0.8,
-                          color: AppThemeColors.cardDateText,
-                        ),
-                        SizedBox(
-                          width: context.widthCalculated(
-                            AppThemeMetrics.spacingXs,
-                          ),
-                        ),
-                        Text(
-                          eventDate.toDisplayDate(),
-                          style: tt.labelSmall?.copyWith(
-                            color: AppThemeColors.cardDateText,
-                          ),
-                        ),
-                      ],
-                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-
-                  // ── View link ──────────────────────────────────────
-                  Padding(
-                    padding: EdgeInsets.only(
-                      right: context.widthCalculated(AppThemeMetrics.spacingSm),
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        'View',
-                        style: tt.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: cs.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
