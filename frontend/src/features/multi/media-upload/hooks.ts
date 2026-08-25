@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
 	confirmDirectUpload,
@@ -10,7 +10,8 @@ import {
 	type DirectFileInput,
 } from './api'
 import type { UploadItem, UploadItemStatus, UploadStats } from './types'
-import { putToPresignedUrl, UploadAbortedError } from './upload-client'
+import { putToPresignedUrlWithRetry, UploadAbortedError } from './upload-client'
+import { acquireUploadWakeLock, releaseUploadWakeLock } from './utils/wake-lock'
 
 const CONCURRENCY = 4
 
@@ -72,6 +73,31 @@ export function useBulkUpload(eventId: string | null) {
 	const groupIdRef = useRef<string | null>(null)
 	const groupEventIdRef = useRef<string | null>(null)
 
+	const stats = computeStats(items)
+	const hasActiveUpload = stats.uploading > 0
+
+	useEffect(() => {
+		if (hasActiveUpload) {
+			void acquireUploadWakeLock()
+		} else {
+			void releaseUploadWakeLock()
+		}
+	}, [hasActiveUpload])
+
+	useEffect(() => {
+		const onVisibilityChange = () => {
+			if (document.visibilityState === 'visible' && hasActiveUpload) {
+				void acquireUploadWakeLock()
+			}
+		}
+		document.addEventListener('visibilitychange', onVisibilityChange)
+		return () => document.removeEventListener('visibilitychange', onVisibilityChange)
+	}, [hasActiveUpload])
+
+	useEffect(() => {
+		return () => void releaseUploadWakeLock()
+	}, [])
+
 	const updateItem = useCallback((id: string, patch: Partial<UploadItem>) => {
 		setItems((previous) =>
 			previous.map((item) => (item.id === id ? { ...item, ...patch } : item)),
@@ -108,7 +134,12 @@ export function useBulkUpload(eventId: string | null) {
 			runningCount.current += 1
 			updateItem(id, { status: 'uploading', progress: 0, error: null })
 
-			putToPresignedUrl(item.uploadUrl, item.file, (percent) => updateItem(id, { progress: percent }), controller.signal)
+			putToPresignedUrlWithRetry(
+				item.uploadUrl,
+				item.file,
+				(percent) => updateItem(id, { progress: percent }),
+				controller.signal,
+			)
 				.then(async () => {
 					await confirmDirectUpload(item.photoId!)
 					updateItem(id, { status: 'success', progress: 100 })
@@ -280,7 +311,7 @@ export function useBulkUpload(eventId: string | null) {
 
 	return {
 		items,
-		stats: computeStats(items),
+		stats,
 		isPaused: isPaused.current,
 		addFiles,
 		retryOne,

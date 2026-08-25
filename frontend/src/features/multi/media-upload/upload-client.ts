@@ -58,3 +58,49 @@ export function putToPresignedUrl(
 		xhr.send(file)
 	})
 }
+
+const RETRY_DELAYS_MS = [1000, 3000, 6000]
+
+const delay = (ms: number, signal?: AbortSignal) =>
+	new Promise<void>((resolve, reject) => {
+		if (signal?.aborted) {
+			reject(new UploadAbortedError())
+			return
+		}
+		const timeout = setTimeout(resolve, ms)
+		signal?.addEventListener('abort', () => {
+			clearTimeout(timeout)
+			reject(new UploadAbortedError())
+		})
+	})
+
+/**
+ * Same as putToPresignedUrl, but transparently retries transient failures
+ * (network blips, storage hiccups) a few times with backoff before giving
+ * up. Never retries an intentional abort (pause/cancel) — that propagates
+ * immediately.
+ */
+export async function putToPresignedUrlWithRetry(
+	uploadUrl: string,
+	file: File,
+	onProgress: (percent: number) => void,
+	signal?: AbortSignal,
+): Promise<void> {
+	let lastError: unknown
+
+	for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
+		try {
+			await putToPresignedUrl(uploadUrl, file, onProgress, signal)
+			return
+		} catch (error) {
+			if (error instanceof UploadAbortedError) throw error
+			lastError = error
+			if (attempt < RETRY_DELAYS_MS.length) {
+				onProgress(0)
+				await delay(RETRY_DELAYS_MS[attempt], signal)
+			}
+		}
+	}
+
+	throw lastError
+}
