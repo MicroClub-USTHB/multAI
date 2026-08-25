@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/features/photo_approval/domain/entities/photo_approval_entity.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
+import '../../../../../di/injection_container.dart';
+import '../../../../gallery/domain/usecases/get_photo_image_usecase.dart';
 
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
@@ -58,18 +61,13 @@ class PhotoApprovalCard extends StatelessWidget {
           ),
           SizedBox(height: context.heightCalculated(12)),
 
-          // ── Photo placeholder (will be real image when photo URL added) ──
+          // ── Photo ──────────────────────────────────────────────────
           ClipRRect(
             borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
-            child: Container(
+            child: SizedBox(
               width: double.infinity,
               height: context.heightCalculated(220),
-              color: AppThemeColors.card,
-              child: Icon(
-                Icons.image_outlined,
-                size: context.iconSize() * 3,
-                color: AppThemeColors.secondaryText.withValues(alpha: 0.3),
-              ),
+              child: _ApprovalPhoto(photoId: approval.photoId),
             ),
           ),
           SizedBox(height: context.heightCalculated(16)),
@@ -111,6 +109,76 @@ class PhotoApprovalCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ApprovalPhoto extends StatefulWidget {
+  final String photoId;
+
+  const _ApprovalPhoto({required this.photoId});
+
+  @override
+  State<_ApprovalPhoto> createState() => _ApprovalPhotoState();
+}
+
+class _ApprovalPhotoState extends State<_ApprovalPhoto> {
+  late Future<String?> _pathFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _pathFuture = _load();
+  }
+
+  Future<String?> _load() async {
+    final result = await sl<GetPhotoImageUseCase>()(
+      GetPhotoImageParams(photoId: widget.photoId),
+    );
+    return result.fold((_) => null, (path) => path);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: _pathFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Container(
+            color: AppThemeColors.card,
+            child: Center(
+              child: CircularProgressIndicator(
+                color: context.theme.colorScheme.primary,
+              ),
+            ),
+          );
+        }
+
+        final path = snapshot.data;
+        if (path == null) {
+          return Container(
+            color: AppThemeColors.card,
+            child: Icon(
+              Icons.image_outlined,
+              size: context.iconSize() * 3,
+              color: AppThemeColors.secondaryText.withValues(alpha: 0.3),
+            ),
+          );
+        }
+
+        return Image.file(
+          File(path),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Container(
+            color: AppThemeColors.card,
+            child: Icon(
+              Icons.image_outlined,
+              size: context.iconSize() * 3,
+              color: AppThemeColors.secondaryText.withValues(alpha: 0.3),
+            ),
+          ),
+        );
+      },
     );
   }
 }
