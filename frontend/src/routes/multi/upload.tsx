@@ -47,7 +47,7 @@ function RouteComponent() {
         </Alert>
       ) : (
         <>
-          <UploadDropzone onFilesSelected={(files) => addFiles(files)} />
+          <UploadDropzone onFilesSelected={addFiles} />
           <UploadSummary
             stats={stats}
             isPaused={isPaused}
