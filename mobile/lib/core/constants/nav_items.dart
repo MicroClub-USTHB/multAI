@@ -34,7 +34,7 @@ const List<NavItemData> navItems = [
     item: NavItem.event,
     icon: Icons.calendar_month_outlined,
     label: 'EVENT',
-    route: AppRoutes.events,
+    route: AppRoutes.eventGrid,
   ),
   NavItemData(
     item: NavItem.account,

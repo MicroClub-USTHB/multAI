@@ -9,6 +9,7 @@ abstract class AppRoutes {
   // ── Home shell ─────────────────────────────────────────────────────────────
   static const String home = '/home';
   static const String events = '/home/events';
+  static const String eventGrid = '/home/event-grid';
   static const String gallery = '/home/gallery';
   static const String account = '/home/account';
 

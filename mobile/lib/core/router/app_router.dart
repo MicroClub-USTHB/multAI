@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:multai_mobile/features/splash/presentation/pages/splash_screen.dart';
+import '../../features/events/presentation/screens/event_grid_screen.dart';
 
 import '../../di/injection_container.dart' as di;
 import '../../features/auth/presentation/screens/login/login_page.dart';
@@ -66,6 +67,10 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: AppRoutes.events,
           builder: (context, state) => const EventsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.eventGrid,
+          builder: (context, state) => const EventGridScreen(),
         ),
         GoRoute(
           path: AppRoutes.gallery,
