@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import '../../../../core/extensions/snackbar_extensions.dart';
+import '../../../../core/errors/error_presentation.dart';
+import '../../../../core/router/app_routes.dart';
+import '../../../../core/widgets/app_error_view.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import '../../../auth/presentation/blocs/auth_bloc.dart';
 import '../bloc/photo_approval_bloc.dart';
 import 'widgets/header_section.dart';
 import 'widgets/photo_approval_card.dart';
@@ -105,6 +110,26 @@ class PhotoApprovalPage extends StatelessWidget {
             ],
           ),
         ),
+      );
+    }
+
+    if (state is PhotoApprovalError) {
+      final p = state.errorPresentation;
+      return ErrorStateView(
+        title: p.title,
+        description: p.description,
+        illustration: p.illustration,
+        actionLabel: p.actionLabel,
+        onAction: p.action == ErrorAction.retry
+            ? () => context.read<PhotoApprovalBloc>().add(LoadApprovals())
+            : p.action == ErrorAction.signIn
+            ? () {
+                context.read<AuthBloc>().add(LogoutRequested());
+                context.go(AppRoutes.login);
+              }
+            : p.action == ErrorAction.goBack
+            ? () => context.pop()
+            : null,
       );
     }
 
