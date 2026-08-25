@@ -147,7 +147,18 @@ export function useBulkUpload(eventId: string | null) {
 	const registerAndEnqueue = useCallback(
 		async (pendingItems: UploadItem[]) => {
 			if (pendingItems.length === 0) return
-			const groupId = await ensureGroup()
+
+			let groupId: string
+			try {
+				groupId = await ensureGroup()
+			} catch (error) {
+				const message =
+					error instanceof Error ? error.message : 'Could not start the upload session'
+				for (const localItem of pendingItems) {
+					updateItem(localItem.id, { status: 'failed', error: message })
+				}
+				return
+			}
 
 			for (const batch of chunk(pendingItems, DIRECT_UPLOAD_MAX_BATCH_SIZE)) {
 				try {
