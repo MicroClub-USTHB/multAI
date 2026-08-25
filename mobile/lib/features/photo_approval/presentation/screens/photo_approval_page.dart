@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:screen_protector/screen_protector.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import '../../../../core/extensions/snackbar_extensions.dart';
@@ -14,8 +15,27 @@ import 'widgets/header_section.dart';
 import 'widgets/photo_approval_card.dart';
 import 'widgets/recent_decisions_section.dart';
 
-class PhotoApprovalPage extends StatelessWidget {
+class PhotoApprovalPage extends StatefulWidget {
   const PhotoApprovalPage({super.key});
+
+  @override
+  State<PhotoApprovalPage> createState() => _PhotoApprovalPageState();
+}
+
+class _PhotoApprovalPageState extends State<PhotoApprovalPage> {
+  @override
+  void initState() {
+    super.initState();
+    ScreenProtector.preventScreenshotOn();
+    ScreenProtector.protectDataLeakageOn();
+  }
+
+  @override
+  void dispose() {
+    ScreenProtector.preventScreenshotOff();
+    ScreenProtector.protectDataLeakageOff();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
