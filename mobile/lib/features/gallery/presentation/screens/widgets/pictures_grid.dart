@@ -5,6 +5,7 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/theme/theme.dart';
 import '../../../domain/entities/photo_entity.dart';
 import '../../bloc/gallery_bloc.dart';
+import '../photo_preview_screen.dart';
 import 'photo_grid_item.dart';
 
 class PicturesGrid extends StatelessWidget {
@@ -44,8 +45,30 @@ class PicturesGrid extends StatelessWidget {
           photoId: photo.id,
           localPath: localPath,
           gridItemSize: context.widthCalculated(160),
+          onTap: localPath == null ? null : () => _openPreview(context, index),
         );
       },
+    );
+  }
+
+  void _openPreview(BuildContext context, int tappedIndex) {
+    final available = <String>[];
+    var initialIndex = 0;
+    for (var i = 0; i < photos.length; i++) {
+      final path = cachedPaths[photos[i].id];
+      if (path == null) continue;
+      if (i == tappedIndex) initialIndex = available.length;
+      available.add(path);
+    }
+    if (available.isEmpty) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PhotoPreviewScreen(
+          localPaths: available,
+          initialIndex: initialIndex,
+        ),
+      ),
     );
   }
 }
