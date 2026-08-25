@@ -18,6 +18,7 @@ import '../bloc/events_bloc.dart';
 import '../mappers/event_status_mapper.dart';
 import '../widgets/active_events_card.dart';
 import '../widgets/archived_events_card.dart';
+import 'qr_scan_screen.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -45,6 +46,14 @@ class _EventsScreenState extends State<EventsScreen> {
   void dispose() {
     _eventCodeController.dispose();
     super.dispose();
+  }
+
+  Future<void> _scanQrCode() async {
+    final result = await Navigator.of(
+      context,
+    ).push<String>(MaterialPageRoute(builder: (_) => const QrScanScreen()));
+    if (result == null || result.isEmpty || !mounted) return;
+    setState(() => _eventCodeController.text = result.toEventCode());
   }
 
   @override
@@ -267,7 +276,7 @@ class _EventsScreenState extends State<EventsScreen> {
               height: context.heightCalculated(AppThemeMetrics.spacingXs),
             ),
             Text(
-              'Have an invite? Enter the link below to participate.',
+              'Have an invite? Enter the event code below to participate.',
               style: tt.bodySmall,
             ),
             SizedBox(
@@ -275,8 +284,13 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
             TextFormField(
               controller: _eventCodeController,
-              decoration: const InputDecoration(
-                hintText: 'https://multiai.app/e/...',
+              decoration: InputDecoration(
+                hintText: 'e.g. Xk3p9QzL2A',
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.qr_code_scanner),
+                  tooltip: 'Scan QR code',
+                  onPressed: _scanQrCode,
+                ),
               ),
               validator: EventCodeValidator.validate,
             ),
