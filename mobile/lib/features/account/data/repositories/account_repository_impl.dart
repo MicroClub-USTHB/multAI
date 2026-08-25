@@ -39,6 +39,19 @@ class AccountRepositoryImpl implements AccountRepository {
   }
 
   @override
+  Future<Either<Failure, AccountEntity>> updateProfile(String name) async {
+    try {
+      final updated = await remoteDataSource.updateProfile(name);
+      await localDataSource.cacheAccountData(updated);
+      return Right(updated);
+    } on Failure catch (f) {
+      return Left(f);
+    } catch (e) {
+      return Left(const UnknownFailure('Failed to update profile'));
+    }
+  }
+
+  @override
   Future<Either<Failure, String>> uploadAvatar(String filePath) async {
     try {
       final avatarUrl = await remoteDataSource.uploadAvatar(filePath);

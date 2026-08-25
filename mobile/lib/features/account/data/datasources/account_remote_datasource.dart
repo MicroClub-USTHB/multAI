@@ -6,6 +6,7 @@ import '../../../../core/constants/end_points.dart';
 abstract class AccountRemoteDataSource {
   Future<AccountModel> fetchAccountData();
   Future<String> uploadAvatar(String filePath);
+  Future<AccountModel> updateProfile(String name);
 }
 
 class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
@@ -28,5 +29,15 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
       requiresAuth: true,
     );
     return json['avatar_url'] as String;
+  }
+
+  @override
+  Future<AccountModel> updateProfile(String name) async {
+    final response = await apiClient.patch(
+      EndPoints.updateProfile,
+      body: {'name': name},
+      requiresAuth: true,
+    );
+    return AccountModel.fromJson(response);
   }
 }

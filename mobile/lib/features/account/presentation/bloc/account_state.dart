@@ -34,6 +34,18 @@ class AccountAvatarUploading extends AccountState {
   });
 }
 
+class AccountProfileUpdating extends AccountState {
+  final String name;
+  final String email;
+  final String? avatarUrl;
+
+  AccountProfileUpdating({
+    required this.name,
+    required this.email,
+    this.avatarUrl,
+  });
+}
+
 class AccountError extends AccountState {
   final ErrorPresentation errorPresentation;
   AccountError({required this.errorPresentation});

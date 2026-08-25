@@ -11,6 +11,7 @@ class ProfileSection extends StatelessWidget {
   final String membershipType;
   final String? avatarUrl;
   final VoidCallback? onAvatarTap;
+  final VoidCallback? onEditName;
   final bool isUploading;
 
   const ProfileSection({
@@ -20,6 +21,7 @@ class ProfileSection extends StatelessWidget {
     required this.membershipType,
     this.avatarUrl,
     this.onAvatarTap,
+    this.onEditName,
     this.isUploading = false,
   });
 
@@ -114,12 +116,28 @@ class ProfileSection extends StatelessWidget {
           SizedBox(height: context.heightCalculated(16)),
 
           // ── Name ──────────────────────────────────────────────────────
-          Text(
-            name,
-            style: tt.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppThemeColors.primaryText,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                name,
+                style: tt.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppThemeColors.primaryText,
+                ),
+              ),
+              if (onEditName != null) ...[
+                SizedBox(width: context.widthCalculated(6)),
+                GestureDetector(
+                  onTap: onEditName,
+                  child: Icon(
+                    Icons.edit_outlined,
+                    size: context.iconSize() * 0.8,
+                    color: AppThemeColors.secondaryText,
+                  ),
+                ),
+              ],
+            ],
           ),
           SizedBox(height: context.heightCalculated(8)),
 

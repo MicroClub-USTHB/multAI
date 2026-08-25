@@ -14,3 +14,8 @@ class UploadAvatar extends AccountEvent {
   final String filePath;
   UploadAvatar({required this.filePath});
 }
+
+class UpdateProfileRequested extends AccountEvent {
+  final String name;
+  UpdateProfileRequested({required this.name});
+}

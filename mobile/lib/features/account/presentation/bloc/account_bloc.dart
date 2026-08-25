@@ -8,6 +8,7 @@ import '../../../../features/notifications/services/push_notification_service.da
 import '../../../../features/auth/utils/device_utils.dart';
 import '../../domain/usecases/get_account_data_usecase.dart';
 import '../../domain/usecases/upload_avatar_usecase.dart';
+import '../../domain/usecases/update_profile_usecase.dart';
 import '../../../auth/domain/usecases/logout_usecase.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../../../gallery/data/cache/photo_cache_service.dart';
@@ -18,6 +19,7 @@ part 'account_state.dart';
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final GetAccountDataUseCase _getAccountData;
   final UploadAvatarUseCase _uploadAvatar;
+  final UpdateProfileUseCase _updateProfile;
   final LogoutUseCase _logoutUseCase;
   final PushNotificationService _pushNotificationService;
   final PhotoCacheService _photoCacheService;
@@ -26,12 +28,14 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   AccountBloc({
     required GetAccountDataUseCase getAccountData,
     required UploadAvatarUseCase uploadAvatar,
+    required UpdateProfileUseCase updateProfile,
     required LogoutUseCase logoutUseCase,
     required PushNotificationService pushNotificationService,
     required PhotoCacheService photoCacheService,
     FailureHandler? failureHandler,
   }) : _getAccountData = getAccountData,
        _uploadAvatar = uploadAvatar,
+       _updateProfile = updateProfile,
        _logoutUseCase = logoutUseCase,
        _pushNotificationService = pushNotificationService,
        _photoCacheService = photoCacheService,
@@ -42,6 +46,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     on<LogoutRequested>(_onLogoutRequested);
     on<ClearImageCacheRequested>(_onClearImageCache);
     on<UploadAvatar>(_onUploadAvatar);
+    on<UpdateProfileRequested>(_onUpdateProfile);
   }
 
   Future<void> _onLoadAccountData(
@@ -161,6 +166,45 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         await CachedNetworkImage.evictFromCache(avatarUrl);
         if (current is AccountLoaded) {
           emit(current.copyWith(avatarUrl: avatarUrl));
+        }
+      },
+    );
+  }
+
+  Future<void> _onUpdateProfile(
+    UpdateProfileRequested event,
+    Emitter<AccountState> emit,
+  ) async {
+    final current = state;
+    if (current is AccountLoaded) {
+      emit(
+        AccountProfileUpdating(
+          name: current.name,
+          email: current.email,
+          avatarUrl: current.avatarUrl,
+        ),
+      );
+    }
+
+    final result = await _updateProfile(
+      UpdateProfileParams(name: event.name),
+    );
+
+    result.fold(
+      (failure) {
+        _failureHandler.logFailure(failure, 'AccountBloc');
+        if (current is AccountLoaded) {
+          emit(current);
+        }
+        emit(
+          AccountError(
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
+          ),
+        );
+      },
+      (account) {
+        if (current is AccountLoaded) {
+          emit(current.copyWith(name: account.name));
         }
       },
     );

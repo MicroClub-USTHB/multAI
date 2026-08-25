@@ -111,6 +111,27 @@ class ApiClient {
     );
   }
 
+  Future<dynamic> patch(
+    String endpoint, {
+    Map<String, dynamic>? body,
+    bool requiresAuth = true,
+  }) async {
+    if (requiresAuth && !await _hasValidCredentials()) {
+      throw const UnauthorizedFailure('No access token');
+    }
+    final requestBody = body != null ? jsonEncode(body) : null;
+    return _executeWithAuth(
+      () async {
+        final headers = await _getHeaders(requiresAuth: requiresAuth);
+        return _client.patch(
+          Uri.parse('$baseUrl$endpoint'),
+          headers: headers,
+          body: requestBody,
+        );
+      },
+    );
+  }
+
   Future<void> postVoid(
     String endpoint, {
     Map<String, dynamic>? body,

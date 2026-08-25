@@ -33,6 +33,39 @@ class AccountScreen extends StatelessWidget {
     bloc.add(UploadAvatar(filePath: picked.path));
   }
 
+  void _editName(BuildContext context, String currentName) {
+    final controller = TextEditingController(text: currentName);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Edit Name'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 100,
+          decoration: const InputDecoration(hintText: 'Your name'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final newName = controller.text.trim();
+              Navigator.of(ctx).pop();
+              if (newName.isEmpty || newName == currentName) return;
+              context.read<AccountBloc>().add(
+                UpdateProfileRequested(name: newName),
+              );
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _confirmClearCache(BuildContext context) {
     showDialog(
       context: context,
@@ -122,6 +155,10 @@ class AccountScreen extends StatelessWidget {
       );
     }
 
+    if (state is AccountProfileUpdating) {
+      return _buildContent(context, state);
+    }
+
     if (state is AccountInitial) {
       context.read<AccountBloc>().add(LoadAccountData());
       return Center(
@@ -162,14 +199,20 @@ class AccountScreen extends StatelessWidget {
   }) {
     final name = state is AccountLoaded
         ? state.name
-        : (state is AccountAvatarUploading ? state.name : '');
+        : (state is AccountAvatarUploading
+            ? state.name
+            : (state is AccountProfileUpdating ? state.name : ''));
     final email = state is AccountLoaded
         ? state.email
-        : (state is AccountAvatarUploading ? state.email : '');
+        : (state is AccountAvatarUploading
+            ? state.email
+            : (state is AccountProfileUpdating ? state.email : ''));
     final url = avatarUrl ??
         (state is AccountLoaded
             ? state.avatarUrl
-            : (state is AccountAvatarUploading ? state.avatarUrl : null));
+            : (state is AccountAvatarUploading
+                ? state.avatarUrl
+                : (state is AccountProfileUpdating ? state.avatarUrl : null)));
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
@@ -187,6 +230,9 @@ class AccountScreen extends StatelessWidget {
             avatarUrl: url,
             isUploading: isUploading,
             onAvatarTap: () => _pickAndUploadAvatar(context),
+            onEditName: state is AccountProfileUpdating
+                ? null
+                : () => _editName(context, name),
           ),
           SizedBox(height: context.heightCalculated(32)),
 
