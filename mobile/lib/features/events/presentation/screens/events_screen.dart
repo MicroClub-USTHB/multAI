@@ -18,6 +18,7 @@ import '../bloc/events_bloc.dart';
 import '../mappers/event_status_mapper.dart';
 import '../widgets/active_events_card.dart';
 import '../widgets/archived_events_card.dart';
+import 'event_photos_screen.dart';
 import 'qr_scan_screen.dart';
 
 class EventsScreen extends StatefulWidget {
@@ -442,6 +443,14 @@ class _EventsScreenState extends State<EventsScreen> {
                       event.status,
                     ),
                     eventDate: event.eventDate,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => EventPhotosScreen(
+                          eventId: event.id,
+                          eventName: event.name,
+                        ),
+                      ),
+                    ),
                   );
                 },
               );
@@ -490,6 +499,14 @@ class _EventsScreenState extends State<EventsScreen> {
                 return ArchivedEventsCard(
                   eventTitle: event.name,
                   eventDate: event.eventDate,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => EventPhotosScreen(
+                        eventId: event.id,
+                        eventName: event.name,
+                      ),
+                    ),
+                  ),
                 );
               }).toList(),
             ),

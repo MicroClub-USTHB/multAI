@@ -87,7 +87,9 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     Emitter<GalleryState> emit,
   ) async {
     final current = state;
-    if (current is! GalleryLoaded) return;
+    if (current is! GalleryLoaded) {
+      emit(GalleryLoading());
+    }
 
     final result = await _getEventPhotos(
       GetEventPhotosParams(
@@ -112,7 +114,18 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
         }
       },
       (data) {
-        emit(current.copyWith(eventPhotos: data.items, eventTotal: data.total));
+        emit(
+          current is GalleryLoaded
+              ? current.copyWith(
+                  eventPhotos: data.items,
+                  eventTotal: data.total,
+                )
+              : GalleryLoaded(
+                  allPhotos: const [],
+                  eventPhotos: data.items,
+                  eventTotal: data.total,
+                ),
+        );
         for (final photo in data.items.take(20)) {
           add(LoadPhotoImage(photoId: photo.id));
         }
