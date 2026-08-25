@@ -9,6 +9,7 @@ class PhotoModel extends PhotoEntity {
     super.takenAt,
     super.dayNumber,
     required super.createdAt,
+    super.faceCount,
     super.localPath,
   });
 
@@ -23,6 +24,7 @@ class PhotoModel extends PhotoEntity {
           : null,
       dayNumber: json['day_number'] as int?,
       createdAt: DateTime.parse(json['created_at'] as String),
+      faceCount: json['face_count'] as int? ?? 0,
     );
   }
 
@@ -35,6 +37,7 @@ class PhotoModel extends PhotoEntity {
       takenAt: takenAt,
       dayNumber: dayNumber,
       createdAt: createdAt,
+      faceCount: faceCount,
       localPath: path,
     );
   }

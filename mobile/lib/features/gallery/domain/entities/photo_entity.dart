@@ -46,6 +46,7 @@ class PhotoEntity {
   final DateTime? takenAt;
   final int? dayNumber;
   final DateTime createdAt;
+  final int faceCount;
 
   // local cache path — set after download
   final String? localPath;
@@ -58,8 +59,11 @@ class PhotoEntity {
     this.takenAt,
     this.dayNumber,
     required this.createdAt,
+    this.faceCount = 0,
     this.localPath,
   });
 
   bool get isCached => localPath != null;
+  bool get isSolo => faceCount == 1;
+  bool get isGroup => faceCount > 1;
 }

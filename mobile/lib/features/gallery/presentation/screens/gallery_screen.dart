@@ -27,7 +27,7 @@ class _GalleryScreenState extends State<GalleryScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     // trigger load
     context.read<GalleryBloc>().add(LoadAllPhotos());
   }
@@ -78,9 +78,8 @@ class _GalleryScreenState extends State<GalleryScreen>
         final allPhotos = state is GalleryLoaded
             ? state.allPhotos
             : <PhotoEntity>[];
-        final eventPhotos = state is GalleryLoaded
-            ? state.eventPhotos
-            : <PhotoEntity>[];
+        final soloPhotos = allPhotos.where((p) => p.isSolo).toList();
+        final groupPhotos = allPhotos.where((p) => p.isGroup).toList();
         final cachedPaths = state is GalleryLoaded
             ? state.cachedPaths
             : <String, String>{};
@@ -144,7 +143,8 @@ class _GalleryScreenState extends State<GalleryScreen>
                   ),
                   tabs: [
                     _buildTab('All', allPhotos.length, 0),
-                    _buildTab('Events', eventPhotos.length, 1),
+                    _buildTab('Solo', soloPhotos.length, 1),
+                    _buildTab('Group', groupPhotos.length, 2),
                   ],
                 ),
               ),
@@ -170,10 +170,16 @@ class _GalleryScreenState extends State<GalleryScreen>
                                     cachedPaths: cachedPaths,
                                   ),
                           ),
-                          eventPhotos.isEmpty
+                          soloPhotos.isEmpty
                               ? _buildEmpty(context)
                               : PicturesGrid(
-                                  photos: eventPhotos,
+                                  photos: soloPhotos,
+                                  cachedPaths: cachedPaths,
+                                ),
+                          groupPhotos.isEmpty
+                              ? _buildEmpty(context)
+                              : PicturesGrid(
+                                  photos: groupPhotos,
                                   cachedPaths: cachedPaths,
                                 ),
                         ],

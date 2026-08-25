@@ -76,6 +76,7 @@ class PhotoLocalDataSource {
     'taken_at': p.takenAt?.toIso8601String(),
     'day_number': p.dayNumber,
     'created_at': p.createdAt.toIso8601String(),
+    'face_count': p.faceCount,
   };
 
   static PhotoEntity _photoFromJson(Map<String, dynamic> json) => PhotoEntity(
@@ -88,5 +89,6 @@ class PhotoLocalDataSource {
         : null,
     dayNumber: json['day_number'] as int?,
     createdAt: DateTime.parse(json['created_at'] as String),
+    faceCount: json['face_count'] as int? ?? 0,
   );
 }
