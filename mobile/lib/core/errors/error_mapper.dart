@@ -67,9 +67,9 @@ class ErrorMapper {
   }
 
   ErrorPresentation _authPresentation(AppException e) {
-    return ErrorPresentation(
-      title: 'Session Expired',
-      description: _message(e, 'Authentication failed. Please sign in again.'),
+    return const ErrorPresentation(
+      title: 'Sign In Required',
+      description: 'Please sign in to continue.',
       actionLabel: 'Sign In',
       action: ErrorAction.signIn,
       illustration: Icons.lock_outline_rounded,
