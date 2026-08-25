@@ -77,6 +77,8 @@
 	<string>MultAI needs camera access to capture photos for face enrollment.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>MultAI needs photo library access to upload photos for face enrollment.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>MultAI saves your matched event photos to your photo library.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSAppTransportSecurity</key>

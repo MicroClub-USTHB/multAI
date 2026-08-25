@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:collection';
+import 'package:gal/gal.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 
@@ -112,8 +113,26 @@ class PhotoCacheService {
       } finally {
         _pendingWrites.remove(key);
       }
+      unawaited(_saveToDeviceGallery(bytes));
       return file.path;
     });
+  }
+
+  /// Auto-saves every newly downloaded photo to the device's own photo
+  /// library, like WhatsApp does for received media. Best-effort: a denied
+  /// permission or platform error must never break the in-app cache/display
+  /// path, so failures are swallowed.
+  Future<void> _saveToDeviceGallery(Uint8List bytes) async {
+    try {
+      final hasAccess = await Gal.hasAccess(toAlbum: true);
+      if (!hasAccess) {
+        final granted = await Gal.requestAccess(toAlbum: true);
+        if (!granted) return;
+      }
+      await Gal.putImageBytes(bytes, album: 'MultAI');
+    } catch (e) {
+      debugPrint('Save to device gallery failed: $e');
+    }
   }
 
   Future<void> _evictIfNeeded(Directory dir) async {
