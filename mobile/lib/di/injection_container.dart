@@ -11,7 +11,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import '../core/network/network_info.dart';
 import '../core/network/api_client.dart';
 import '../core/network/connectivity_service.dart';
-import '../core/network/dio_client.dart';
 import '../core/storage/app_local_storage.dart';
 import '../core/errors/failure_handler.dart';
 
@@ -131,7 +130,6 @@ Future<void> init() async {
     return client;
   });
 
-  sl.registerLazySingleton<DioClient>(() => DioClient());
 
   sl.registerLazySingleton<ConnectivityService>(
     () => ConnectivityService(

@@ -107,7 +107,6 @@ void main() {
       logoutUseCase: logoutUseCase,
       refreshTokenUseCase: refreshTokenUseCase,
       getCurrentUserUseCase: getCurrentUserUseCase,
-      checkEnrollmentDone: checkEnrollmentDoneUseCase,
       pushNotificationService: pushNotificationService,
     );
   });
