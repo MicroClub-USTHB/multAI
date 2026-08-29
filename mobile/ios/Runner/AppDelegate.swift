@@ -19,5 +19,20 @@ import Firebase
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+
+    let channel = FlutterMethodChannel(
+      name: "com.multai/settings",
+      binaryMessenger: engineBridge.binaryMessenger
+    )
+    channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
+      if call.method == "openAppSettings" {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+          UIApplication.shared.open(url)
+        }
+        result(nil)
+      } else {
+        result(FlutterMethodNotImplemented)
+      }
+    }
   }
 }

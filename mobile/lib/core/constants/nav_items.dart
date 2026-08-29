@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../router/app_routes.dart';
 
 enum NavItem { home, gallery, event, account }
 
 class NavItemData {
   final NavItem item;
-  final IconData icon;
+  final FaIconData icon;
   final String label;
   final String route;
 
@@ -20,25 +20,25 @@ class NavItemData {
 const List<NavItemData> navItems = [
   NavItemData(
     item: NavItem.home,
-    icon: Icons.home_outlined,
+    icon: FontAwesomeIcons.house,
     label: 'HOME',
     route: AppRoutes.events,
   ),
   NavItemData(
     item: NavItem.gallery,
-    icon: Icons.image_outlined,
+    icon: FontAwesomeIcons.images,
     label: 'GALLERY',
     route: AppRoutes.gallery,
   ),
   NavItemData(
     item: NavItem.event,
-    icon: Icons.calendar_month_outlined,
+    icon: FontAwesomeIcons.calendar,
     label: 'EVENT',
     route: AppRoutes.eventGrid,
   ),
   NavItemData(
     item: NavItem.account,
-    icon: Icons.person_outline,
+    icon: FontAwesomeIcons.user,
     label: 'ACCOUNT',
     route: AppRoutes.account,
   ),
