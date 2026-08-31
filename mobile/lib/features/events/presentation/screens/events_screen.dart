@@ -10,6 +10,7 @@ import '../../../../../core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/widgets/app_error_view.dart';
+import 'package:multai_mobile/core/widgets/join_event_success_animation.dart';
 import 'package:multai_mobile/core/errors/error_presentation.dart';
 import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart';
 import '../../domain/validators/event_code_validator.dart';
@@ -31,6 +32,7 @@ class EventsScreen extends StatefulWidget {
 class _EventsScreenState extends State<EventsScreen> {
   final TextEditingController _eventCodeController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _showJoinAnimation = false;
 
   @override
   void initState() {
@@ -63,115 +65,126 @@ class _EventsScreenState extends State<EventsScreen> {
       listener: (context, state) {
         if (state is JoinEventSuccess) {
           _eventCodeController.clear();
-          context.showSuccessSnackBar('Successfully joined event!');
+          setState(() => _showJoinAnimation = true);
         }
         if (state is EventsFailure) {
           context.showErrorSnackBar(state.errorPresentation.description);
         }
       },
-      child: Scaffold(
-        backgroundColor: AppThemeColors.background,
-        appBar: AppBar(
-          title: Text(
-            'MultiAi Events',
-            style: context.theme.appBarTheme.titleTextStyle?.copyWith(
-              color: AppThemeColors.accent,
+      child: Stack(
+        children: [
+          Scaffold(
+            backgroundColor: AppThemeColors.background,
+            appBar: AppBar(
+              title: Text(
+                'MultiAi Events',
+                style: context.theme.appBarTheme.titleTextStyle?.copyWith(
+                  color: AppThemeColors.accent,
+                ),
+              ),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: context.widthCalculated(AppThemeMetrics.spacingLg),
+                  ),
+                  child: GestureDetector(
+                    onTap: () => context.go(AppRoutes.notifications),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Icon(
+                          Icons.notifications_none,
+                          color: AppThemeColors.secondaryText,
+                          size: context.iconSize(),
+                        ),
+                        BlocBuilder<NotificationBloc, NotificationState>(
+                          builder: (context, nState) {
+                            final unread = nState is NotificationLoaded
+                                ? nState.unreadCount
+                                : 0;
+                            if (unread <= 0) return const SizedBox.shrink();
+                            return Positioned(
+                              top: 1,
+                              right: context.widthCalculated(
+                                AppThemeMetrics.spacingXs,
+                              ),
+                              child: Container(
+                                width: context.widthCalculated(
+                                  AppThemeMetrics.notifDotSize,
+                                ),
+                                height: context.widthCalculated(
+                                  AppThemeMetrics.notifDotSize,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppThemeColors.accent,
+                                  border: Border.all(
+                                    color: AppThemeColors.background,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppThemeMetrics.radiusXl,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            body: BlocBuilder<EventsBloc, EventsState>(
+              builder: (context, state) {
+                if (state is EventsFailure) {
+                  return _buildErrorState(context);
+                }
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(
+                      context.widthCalculated(AppThemeMetrics.spacingLg),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (state is EventsLoaded && state.isOffline)
+                          _buildOfflineBanner(context),
+                        if (state is EventsLoaded && state.isRefreshing)
+                          _buildRefreshingIndicator(context),
+                        SizedBox(
+                          height: context.heightCalculated(
+                            AppThemeMetrics.spacingMd,
+                          ),
+                        ),
+                        _buildJoinSection(context, state),
+                        SizedBox(
+                          height: context.heightCalculated(
+                            AppThemeMetrics.spacingXl,
+                          ),
+                        ),
+                        _buildActiveSection(context, state),
+                        SizedBox(
+                          height: context.heightCalculated(
+                            AppThemeMetrics.spacingXl,
+                          ),
+                        ),
+                        _buildArchivedSection(context, state),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(
-                right: context.widthCalculated(AppThemeMetrics.spacingLg),
-              ),
-              child: GestureDetector(
-                onTap: () => context.go(AppRoutes.notifications),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Icon(
-                      Icons.notifications_none,
-                      color: AppThemeColors.secondaryText,
-                      size: context.iconSize(),
-                    ),
-                    BlocBuilder<NotificationBloc, NotificationState>(
-                      builder: (context, nState) {
-                        final unread = nState is NotificationLoaded
-                            ? nState.unreadCount
-                            : 0;
-                        if (unread <= 0) return const SizedBox.shrink();
-                        return Positioned(
-                          top: 1,
-                          right: context.widthCalculated(
-                            AppThemeMetrics.spacingXs,
-                          ),
-                          child: Container(
-                            width: context.widthCalculated(
-                              AppThemeMetrics.notifDotSize,
-                            ),
-                            height: context.widthCalculated(
-                              AppThemeMetrics.notifDotSize,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppThemeColors.accent,
-                              border: Border.all(
-                                color: AppThemeColors.background,
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                AppThemeMetrics.radiusXl,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+          if (_showJoinAnimation)
+            JoinEventSuccessAnimation(
+              onComplete: () {
+                setState(() => _showJoinAnimation = false);
+                context.showSuccessSnackBar('Successfully joined event!');
+              },
             ),
-          ],
-        ),
-        body: BlocBuilder<EventsBloc, EventsState>(
-          builder: (context, state) {
-            if (state is EventsFailure) {
-              return _buildErrorState(context);
-            }
-            return SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(
-                  context.widthCalculated(AppThemeMetrics.spacingLg),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (state is EventsLoaded && state.isOffline)
-                      _buildOfflineBanner(context),
-                    if (state is EventsLoaded && state.isRefreshing)
-                      _buildRefreshingIndicator(context),
-                    SizedBox(
-                      height: context.heightCalculated(
-                        AppThemeMetrics.spacingMd,
-                      ),
-                    ),
-                    _buildJoinSection(context, state),
-                    SizedBox(
-                      height: context.heightCalculated(
-                        AppThemeMetrics.spacingXl,
-                      ),
-                    ),
-                    _buildActiveSection(context, state),
-                    SizedBox(
-                      height: context.heightCalculated(
-                        AppThemeMetrics.spacingXl,
-                      ),
-                    ),
-                    _buildArchivedSection(context, state),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+        ],
       ),
     );
   }

@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image/image.dart' as img;
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/extensions/snackbar_extensions.dart';
@@ -13,7 +15,6 @@ import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/features/face_enrollment/presentation/bloc/face_enrollment_bloc.dart';
 import 'package:multai_mobile/features/face_enrollment/domain/entities/face_photo_entity.dart';
 import 'package:multai_mobile/features/face_enrollment/presentation/screens/widgets/face_capture_area.dart';
-import 'package:multai_mobile/features/face_enrollment/presentation/screens/widgets/face_guide_3d.dart';
 import 'package:multai_mobile/features/face_enrollment/presentation/screens/widgets/photo_slot.dart';
 import 'package:multai_mobile/features/face_enrollment/presentation/screens/widgets/enrollment_progress.dart';
 import 'package:multai_mobile/features/face_enrollment/presentation/screens/widgets/step_instructions.dart';
@@ -92,7 +93,7 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
 
       _cameraController = CameraController(
         camera,
-        ResolutionPreset.high,
+        ResolutionPreset.medium,
         enableAudio: false,
       );
 
@@ -172,14 +173,25 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
       return;
     }
 
+    final bloc = context.read<FaceEnrollmentBloc>();
+
     final type = _pageTypes[_currentPage];
 
     try {
       final XFile photo = await _cameraController!.takePicture();
       if (!mounted) return;
 
-      context.read<FaceEnrollmentBloc>().add(
-        PhotoSelected(type: type, filePath: photo.path),
+      final isFrontCamera = _cameraController!.description.lensDirection ==
+          CameraLensDirection.front;
+
+      String filePath = photo.path;
+
+      if (isFrontCamera) {
+        filePath = await _flipImageHorizontally(photo.path);
+      }
+
+      bloc.add(
+        PhotoSelected(type: type, filePath: filePath),
       );
     } on CameraException catch (e) {
       if (!mounted) return;
@@ -188,6 +200,21 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
       if (!mounted) return;
       context.showErrorSnackBar('Failed to capture photo. Please try again.');
     }
+  }
+
+  Future<String> _flipImageHorizontally(String imagePath) async {
+    final bytes = await File(imagePath).readAsBytes();
+    final image = img.decodeImage(bytes);
+    if (image == null) return imagePath;
+
+    final flipped = img.flip(image, direction: img.FlipDirection.horizontal);
+    final flippedBytes = img.encodeJpg(flipped, quality: 95);
+
+    final lastDot = imagePath.lastIndexOf('.');
+    final basePath = lastDot > 0 ? imagePath.substring(0, lastDot) : imagePath;
+    final flippedPath = '${basePath}_flipped.jpg';
+    await File(flippedPath).writeAsBytes(flippedBytes);
+    return flippedPath;
   }
 
   static const _settingsChannel = MethodChannel('com.multai/settings');
@@ -468,14 +495,6 @@ class _StepPage extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 10),
-          // 3D Face Guide (above camera)
-          if (!hasPhoto && !isLoading && currentError == null)
-            SizedBox(
-              height: 130,
-              child: FaceGuide3D(type: type),
-            ),
-          if (!hasPhoto && !isLoading && currentError == null)
-            const SizedBox(height: 10),
           // Camera / capture area
           Expanded(
             child: _buildCaptureArea(context, hasPhoto, isLoading, currentPhoto,

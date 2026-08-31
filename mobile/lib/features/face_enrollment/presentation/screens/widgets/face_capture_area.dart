@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../domain/entities/face_photo_entity.dart';
+import 'face_guide_overlay.dart';
+import 'face_guide_painter.dart';
 
 class FaceCaptureArea extends StatelessWidget {
   final CameraController? cameraController;
@@ -11,6 +13,7 @@ class FaceCaptureArea extends StatelessWidget {
   final VoidCallback onCapture;
   final String? capturedFilePath;
   final bool isProcessing;
+  final FaceGuideState guideState;
 
   const FaceCaptureArea({
     super.key,
@@ -19,6 +22,7 @@ class FaceCaptureArea extends StatelessWidget {
     required this.onCapture,
     this.capturedFilePath,
     this.isProcessing = false,
+    this.guideState = FaceGuideState.neutral,
   });
 
   @override
@@ -36,6 +40,13 @@ class FaceCaptureArea extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           _buildCameraLayer(),
+
+          // Face guide overlay (dim cutout + outline)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: FaceGuideOverlay(guideState: guideState),
+            ),
+          ),
 
           // Capture button
           Positioned(
@@ -71,14 +82,9 @@ class FaceCaptureArea extends StatelessWidget {
       );
     }
 
-    return FittedBox(
-      fit: BoxFit.cover,
-      clipBehavior: Clip.hardEdge,
-      child: SizedBox(
-        width: cameraController!.value.previewSize!.height,
-        height: cameraController!.value.previewSize!.width,
-        child: CameraPreview(cameraController!),
-      ),
+    return AspectRatio(
+      aspectRatio: cameraController!.value.aspectRatio,
+      child: CameraPreview(cameraController!),
     );
   }
 }

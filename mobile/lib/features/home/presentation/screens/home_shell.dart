@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:multai_mobile/core/constants/nav_items.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../../../../../core/widgets/app_bottom_nav_bar.dart';
 
 class HomeShell extends StatefulWidget {
@@ -54,7 +53,7 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppThemeColors.background,
+      backgroundColor: Colors.transparent,
       body: widget.child,
       bottomNavigationBar: AppBottomNavBar(
         controller: _controller,

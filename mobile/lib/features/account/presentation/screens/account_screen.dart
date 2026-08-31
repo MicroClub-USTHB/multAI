@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:multai_mobile/core/cubits/locale_cubit.dart';
+import 'package:multai_mobile/core/cubits/theme_cubit.dart';
+import 'package:multai_mobile/core/localization/app_localizations.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/widgets/app_error_view.dart';
 import 'package:multai_mobile/core/errors/error_presentation.dart';
@@ -35,20 +38,21 @@ class AccountScreen extends StatelessWidget {
 
   void _editName(BuildContext context, String currentName) {
     final controller = TextEditingController(text: currentName);
+    final loc = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Edit Name'),
+        title: Text(loc.translate('Edit Name')),
         content: TextField(
           controller: controller,
           autofocus: true,
           maxLength: 100,
-          decoration: const InputDecoration(hintText: 'Your name'),
+          decoration: InputDecoration(hintText: loc.translate('Your name')),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc.translate('Cancel')),
           ),
           FilledButton(
             onPressed: () {
@@ -59,7 +63,7 @@ class AccountScreen extends StatelessWidget {
                 UpdateProfileRequested(name: newName),
               );
             },
-            child: const Text('Save'),
+            child: Text(loc.translate('Save')),
           ),
         ],
       ),
@@ -67,18 +71,19 @@ class AccountScreen extends StatelessWidget {
   }
 
   void _confirmClearCache(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Clear Image Cache'),
-        content: const Text(
+        title: Text(loc.translate('Clear Image Cache')),
+        content: Text(loc.translate(
           'This will remove all cached photos from your device. '
           'Images will need to be re-downloaded when viewed again.',
-        ),
+        )),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc.translate('Cancel')),
           ),
           FilledButton(
             onPressed: () {
@@ -88,11 +93,143 @@ class AccountScreen extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: context.theme.colorScheme.error,
             ),
-            child: const Text('Clear'),
+            child: Text(loc.translate('Clear')),
           ),
         ],
       ),
     );
+  }
+
+  void _showThemeSheet(BuildContext context) {
+    final themeCubit = context.read<ThemeCubit>();
+    final currentMode = themeCubit.state;
+    final loc = AppLocalizations.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                loc.translate('Select theme'),
+                style: context.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            _ThemeOption(
+              label: loc.translate('Light'),
+              icon: Icons.light_mode_outlined,
+              selected: currentMode == ThemeMode.light,
+              onTap: () {
+                themeCubit.setThemeMode(ThemeMode.light);
+                Navigator.of(ctx).pop();
+              },
+            ),
+            _ThemeOption(
+              label: loc.translate('Dark'),
+              icon: Icons.dark_mode_outlined,
+              selected: currentMode == ThemeMode.dark,
+              onTap: () {
+                themeCubit.setThemeMode(ThemeMode.dark);
+                Navigator.of(ctx).pop();
+              },
+            ),
+            _ThemeOption(
+              label: loc.translate('System'),
+              icon: Icons.brightness_auto_outlined,
+              selected: currentMode == ThemeMode.system,
+              onTap: () {
+                themeCubit.setThemeMode(ThemeMode.system);
+                Navigator.of(ctx).pop();
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLanguageSheet(BuildContext context) {
+    final localeCubit = context.read<LocaleCubit>();
+    final currentLocale = localeCubit.state;
+    final loc = AppLocalizations.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                loc.translate('Select language'),
+                style: context.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            _LanguageOption(
+              label: loc.translate('English'),
+              flag: '🇬🇧',
+              selected: currentLocale.languageCode == 'en',
+              onTap: () {
+                localeCubit.setLocale(const Locale('en'));
+                Navigator.of(ctx).pop();
+              },
+            ),
+            _LanguageOption(
+              label: loc.translate('Arabic'),
+              flag: '🇸🇦',
+              selected: currentLocale.languageCode == 'ar',
+              onTap: () {
+                localeCubit.setLocale(const Locale('ar'));
+                Navigator.of(ctx).pop();
+              },
+            ),
+            _LanguageOption(
+              label: loc.translate('French'),
+              flag: '🇫🇷',
+              selected: currentLocale.languageCode == 'fr',
+              onTap: () {
+                localeCubit.setLocale(const Locale('fr'));
+                Navigator.of(ctx).pop();
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _themeModeLabel(BuildContext context, ThemeMode mode) {
+    final loc = AppLocalizations.of(context);
+    switch (mode) {
+      case ThemeMode.light:
+        return loc.translate('Light');
+      case ThemeMode.dark:
+        return loc.translate('Dark');
+      case ThemeMode.system:
+        return loc.translate('System');
+    }
+  }
+
+  String _localeLabel(BuildContext context, Locale locale) {
+    final loc = AppLocalizations.of(context);
+    switch (locale.languageCode) {
+      case 'ar':
+        return loc.translate('Arabic');
+      case 'fr':
+        return loc.translate('French');
+      default:
+        return loc.translate('English');
+    }
   }
 
   @override
@@ -133,7 +270,7 @@ class AccountScreen extends StatelessWidget {
             if (state is AccountCacheClearing) ...[
               const SizedBox(height: 16),
               Text(
-                'Clearing cache...',
+                AppLocalizations.of(context).translate('Clearing cache...'),
                 style: context.textTheme.bodyMedium,
               ),
             ],
@@ -214,6 +351,10 @@ class AccountScreen extends StatelessWidget {
                 ? state.avatarUrl
                 : (state is AccountProfileUpdating ? state.avatarUrl : null)));
 
+    final loc = AppLocalizations.of(context);
+    final themeMode = context.watch<ThemeCubit>().state;
+    final currentLocale = context.watch<LocaleCubit>().state;
+
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
         horizontal: context.hPadding(),
@@ -226,7 +367,7 @@ class AccountScreen extends StatelessWidget {
           ProfileSection(
             name: name,
             email: email,
-            membershipType: 'mc-member',
+            membershipType: loc.translate('mc-member'),
             avatarUrl: url,
             isUploading: isUploading,
             onAvatarTap: () => _pickAndUploadAvatar(context),
@@ -236,32 +377,58 @@ class AccountScreen extends StatelessWidget {
           ),
           SizedBox(height: context.heightCalculated(32)),
 
+          // ── Preferences ────────────────────────────────────────────────
+          SettingsSection(
+            title: loc.translate('PREFERENCES'),
+            items: [
+              SettingItemData(
+                icon: Icons.dark_mode_outlined,
+                title: loc.translate('Appearance'),
+                subtitle: '${loc.translate('Light / Dark mode')} · ${_themeModeLabel(context, themeMode)}',
+                onTap: () => _showThemeSheet(context),
+              ),
+              SettingItemData(
+                icon: Icons.language_outlined,
+                title: loc.translate('Language'),
+                subtitle: '${loc.translate('Change app language')} · ${_localeLabel(context, currentLocale)}',
+                onTap: () => _showLanguageSheet(context),
+              ),
+            ],
+          ),
+          SizedBox(height: context.heightCalculated(24)),
+
           // ── Account Settings ───────────────────────────────────────────
           SettingsSection(
-            title: 'ACCOUNT SETTINGS',
+            title: loc.translate('ACCOUNT SETTINGS'),
             items: [
               SettingItemData(
                 icon: Icons.notifications_outlined,
-                title: 'Notifications',
-                subtitle: 'Manage alerts and activity',
+                title: loc.translate('Notifications'),
+                subtitle: loc.translate('Manage alerts and activity'),
                 onTap: () {},
               ),
               SettingItemData(
                 icon: Icons.lock_outline,
-                title: 'Privacy & Security',
-                subtitle: 'Password, 2FA, and data sharing',
+                title: loc.translate('Privacy & Security'),
+                subtitle: loc.translate('Password, 2FA, and data sharing'),
                 onTap: () {},
               ),
               SettingItemData(
-                icon: Icons.storage_outlined,
-                title: 'Account Data',
-                subtitle: 'Export or manage your personal data',
-                onTap: () {},
+                icon: Icons.backup_outlined,
+                title: loc.translate('Backup Photos'),
+                subtitle: loc.translate('Download all photos as a ZIP file'),
+                onTap: () => context.push(AppRoutes.backup),
+              ),
+              SettingItemData(
+                icon: Icons.photo_library_outlined,
+                title: loc.translate('My Albums'),
+                subtitle: loc.translate('Organize photos into albums'),
+                onTap: () => context.push(AppRoutes.albums),
               ),
               SettingItemData(
                 icon: Icons.cleaning_services_outlined,
-                title: 'Clear Image Cache',
-                subtitle: 'Free up storage space',
+                title: loc.translate('Clear Image Cache'),
+                subtitle: loc.translate('Free up storage space'),
                 onTap: () => _confirmClearCache(context),
               ),
             ],
@@ -270,11 +437,11 @@ class AccountScreen extends StatelessWidget {
 
           // ── Support ────────────────────────────────────────────────────
           SettingsSection(
-            title: 'SUPPORT',
+            title: loc.translate('SUPPORT'),
             items: [
               SettingItemData(
                 icon: Icons.help_outline,
-                title: 'Help Center',
+                title: loc.translate('Help Center'),
                 onTap: () {},
               ),
             ],
@@ -288,6 +455,62 @@ class AccountScreen extends StatelessWidget {
           SizedBox(height: context.heightCalculated(24)),
         ],
       ),
+    );
+  }
+}
+
+// ── Helper widgets for bottom sheets ──────────────────────────────────────────
+
+class _ThemeOption extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ThemeOption({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = context.theme.colorScheme;
+    return ListTile(
+      leading: Icon(icon, color: selected ? cs.primary : null),
+      title: Text(label),
+      trailing: selected
+          ? Icon(Icons.check_circle, color: cs.primary)
+          : Icon(Icons.circle_outlined, color: cs.onSurface.withValues(alpha: 0.3)),
+      onTap: onTap,
+    );
+  }
+}
+
+class _LanguageOption extends StatelessWidget {
+  final String label;
+  final String flag;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _LanguageOption({
+    required this.label,
+    required this.flag,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = context.theme.colorScheme;
+    return ListTile(
+      leading: Text(flag, style: const TextStyle(fontSize: 24)),
+      title: Text(label),
+      trailing: selected
+          ? Icon(Icons.check_circle, color: cs.primary)
+          : Icon(Icons.circle_outlined, color: cs.onSurface.withValues(alpha: 0.3)),
+      onTap: onTap,
     );
   }
 }

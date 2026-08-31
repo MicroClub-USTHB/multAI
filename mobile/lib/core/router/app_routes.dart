@@ -17,4 +17,12 @@ abstract class AppRoutes {
   static const String faceEnrollment = '/face-enrollment';
   static const String photoApproval = '/photo-approval';
   static const String notifications = '/home/notifications';
+
+  // ── Backup & Albums ──────────────────────────────────────────────────────
+  static const String backup = '/backup';
+  static const String albums = '/albums';
+  static const String albumDetail = '/album-detail';
+
+  // ── Debug ─────────────────────────────────────────────────────────────────
+  static const String faceGuideDebug = '/debug/face-guide';
 }

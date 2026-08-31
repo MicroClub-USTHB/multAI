@@ -19,9 +19,9 @@ class AppBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedNotchBottomBar(
       notchBottomBarController: controller,
-      color: AppThemeColors.background,
+      color: Colors.transparent,
       showLabel: false,
-      notchColor: AppThemeColors.background,
+      notchColor: Colors.transparent,
       bottomBarItems: navItems
           .map(
             (data) => BottomBarItem(

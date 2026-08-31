@@ -5,13 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/cubits/locale_cubit.dart';
+import 'core/cubits/theme_cubit.dart';
 import 'core/errors/error_handler.dart';
 import 'core/errors/error_mapper.dart';
+import 'core/localization/app_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/security/env_validator.dart';
 import 'core/security/device_security.dart';
 import 'core/security/secure_logger.dart';
 import 'core/security/session_manager.dart';
+import 'core/storage/app_local_storage.dart';
 import 'core/theme/theme.dart';
 import 'features/auth/presentation/blocs/auth_bloc.dart';
 import 'features/events/presentation/bloc/events_bloc.dart';
@@ -165,12 +169,35 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) => di.sl<NotificationBloc>()..add(LoadNotifications()),
         ),
         BlocProvider<GalleryBloc>(create: (_) => di.sl<GalleryBloc>()),
+        BlocProvider<ThemeCubit>(
+          create: (_) => ThemeCubit(di.sl<AppLocalStorage>()),
+        ),
+        BlocProvider<LocaleCubit>(
+          create: (_) => LocaleCubit(di.sl<AppLocalStorage>()),
+        ),
       ],
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: !DeviceSecurity.isDebugMode(),
-        title: 'MultAI',
-        theme: AppTheme.lightTheme,
-        routerConfig: appRouter,
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
+          return BlocBuilder<LocaleCubit, Locale>(
+            builder: (context, locale) {
+              return MaterialApp.router(
+                debugShowCheckedModeBanner: !DeviceSecurity.isDebugMode(),
+                title: 'MultAI',
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: themeMode,
+                locale: locale,
+                supportedLocales: AppLocalizations.supportedLocales,
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  DefaultMaterialLocalizations.delegate,
+                  DefaultWidgetsLocalizations.delegate,
+                ],
+                routerConfig: appRouter,
+              );
+            },
+          );
+        },
       ),
     );
   }
