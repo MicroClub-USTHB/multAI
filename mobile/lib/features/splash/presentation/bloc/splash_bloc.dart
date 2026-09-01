@@ -102,8 +102,6 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
         final String route;
         if (!hasSeenOnboarding) {
           route = AppRoutes.onboarding;
-        } else if (!user.isOnboarded) {
-          route = AppRoutes.faceEnrollment;
         } else {
           route = AppRoutes.events;
         }

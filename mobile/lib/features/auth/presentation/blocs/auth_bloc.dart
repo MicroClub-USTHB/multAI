@@ -71,18 +71,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _emitAuthenticatedState(
     AuthEntity auth,
     Emitter<AuthState> emit,
-  ) async {
-    final meResult = await _getCurrentUserUseCase(NoParams());
-    final isOnboarded = meResult.fold(
-      (failure) => false,
-      (user) => user.isOnboarded,
-    );
-    if (isOnboarded) {
-      emit(AuthAuthenticated(auth: auth));
-    } else {
-      emit(AuthNeedsFaceEnrollment(auth: auth));
-    }
-  }
+ ) async {
+    emit(AuthAuthenticated(auth: auth));
+ }
 
   void _emitFailure(Emitter<AuthState> emit, Failure failure) {
     _failureHandler.logFailure(failure, 'AuthBloc');
