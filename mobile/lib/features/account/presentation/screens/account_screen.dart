@@ -95,6 +95,34 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
+  void _confirmDeleteAccount(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Account'),
+        content: const Text(
+          'Are you sure you want to delete this account?'
+          'This action cannot be undone'
+        ) ,
+        actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () {
+            Navigator.of(ctx).pop();
+          },
+          style: FilledButton.styleFrom(
+            backgroundColor: context.theme.colorScheme.error,
+          ),
+          child: const Text('Delete Account'),
+        ),
+       ]
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AccountBloc, AccountState>(
@@ -241,9 +269,9 @@ class AccountScreen extends StatelessWidget {
             title: 'ACCOUNT SETTINGS',
             items: [
               SettingItemData(
-                icon: Icons.notifications_outlined,
-                title: 'Notifications',
-                subtitle: 'Manage alerts and activity',
+                icon: Icons.dark_mode_outlined,
+                title: 'Theme',
+                subtitle: 'Choose dark or light theme',
                 onTap: () {},
               ),
               SettingItemData(
@@ -253,9 +281,9 @@ class AccountScreen extends StatelessWidget {
                 onTap: () {},
               ),
               SettingItemData(
-                icon: Icons.storage_outlined,
-                title: 'Account Data',
-                subtitle: 'Export or manage your personal data',
+                icon: Icons.language_outlined,
+                title: 'Languages',
+                subtitle: 'Choose your language',
                 onTap: () {},
               ),
               SettingItemData(
@@ -263,6 +291,12 @@ class AccountScreen extends StatelessWidget {
                 title: 'Clear Image Cache',
                 subtitle: 'Free up storage space',
                 onTap: () => _confirmClearCache(context),
+              ),
+              SettingItemData(
+                icon: Icons.delete_outlined,
+                title: 'Delete Account',
+                subtitle: 'Permanently delete your account',
+                onTap: () => _confirmDeleteAccount(context),
               ),
             ],
           ),
