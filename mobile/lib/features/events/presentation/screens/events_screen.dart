@@ -70,7 +70,7 @@ class _EventsScreenState extends State<EventsScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppThemeColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           title: Text(
             'MultiAi Events',
@@ -90,7 +90,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   children: [
                     Icon(
                       Icons.notifications_none,
-                      color: AppThemeColors.secondaryText,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       size: context.iconSize(),
                     ),
                     BlocBuilder<NotificationBloc, NotificationState>(
@@ -270,7 +270,7 @@ class _EventsScreenState extends State<EventsScreen> {
             Text(
               'Join New Event',
               style: tt.headlineSmall?.copyWith(
-                color: AppThemeColors.primaryText,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             SizedBox(
@@ -332,7 +332,7 @@ class _EventsScreenState extends State<EventsScreen> {
                     : Text(
                         'Join Event',
                         style: tt.titleLarge?.copyWith(
-                          color: AppThemeColors.primaryText,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
               ),
@@ -475,7 +475,7 @@ class _EventsScreenState extends State<EventsScreen> {
             Icon(
               Icons.archive_outlined,
               size: context.iconSize(),
-              color: AppThemeColors.secondaryText,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
             Text('Archived Events', style: tt.headlineSmall),
@@ -536,7 +536,7 @@ class _EventsScreenState extends State<EventsScreen> {
             Icon(
               icon,
               size: context.iconSize() * 2.5,
-              color: AppThemeColors.secondaryText,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             SizedBox(
               height: context.heightCalculated(AppThemeMetrics.spacingMd),
@@ -544,7 +544,7 @@ class _EventsScreenState extends State<EventsScreen> {
             Text(
               title,
               style: tt.titleMedium?.copyWith(
-                color: AppThemeColors.secondaryText,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             SizedBox(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/widgets/app_error_view.dart';
 import 'package:multai_mobile/core/errors/error_presentation.dart';
-import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart' as auth;
+import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart'
+    as auth;
 import '../../../../core/extensions/responsive_extensions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -16,6 +16,7 @@ import '../widgets/profile_section.dart';
 import '../widgets/settings_section.dart';
 import '../widgets/settings_tile.dart';
 import '../widgets/logout_button.dart';
+import 'package:multai_mobile/core/theme/theme.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -102,24 +103,75 @@ class AccountScreen extends StatelessWidget {
         title: const Text('Delete Account'),
         content: const Text(
           'Are you sure you want to delete this account?'
-          'This action cannot be undone'
-        ) ,
+          'This action cannot be undone',
+        ),
         actions: [
-        TextButton(
-          onPressed: () => Navigator.of(ctx).pop(),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: () {
-            Navigator.of(ctx).pop();
-          },
-          style: FilledButton.styleFrom(
-            backgroundColor: context.theme.colorScheme.error,
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
           ),
-          child: const Text('Delete Account'),
-        ),
-       ]
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: context.theme.colorScheme.error,
+            ),
+            child: const Text('Delete Account'),
+          ),
+        ],
       ),
+    );
+  }
+
+  void _showThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Theme'),
+          content: ValueListenableBuilder<ThemeMode>(
+            valueListenable: AppTheme.themeMode,
+            builder: (context, currentMode, _) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile<ThemeMode>(
+                    value: ThemeMode.light,
+                    groupValue: currentMode,
+                    title: const Text('Light'),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      AppTheme.themeMode.value = value;
+                      Navigator.of(ctx).pop();
+                    },
+                  ),
+                  RadioListTile<ThemeMode>(
+                    value: ThemeMode.dark,
+                    groupValue: currentMode,
+                    title: const Text('Dark'),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      AppTheme.themeMode.value = value;
+                      Navigator.of(ctx).pop();
+                    },
+                  ),
+                  RadioListTile<ThemeMode>(
+                    value: ThemeMode.system,
+                    groupValue: currentMode,
+                    title: const Text('System default'),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      AppTheme.themeMode.value = value;
+                      Navigator.of(ctx).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -141,7 +193,7 @@ class AccountScreen extends StatelessWidget {
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: const AccountAppBar(),
           body: _buildBody(context, state),
         );
@@ -155,15 +207,10 @@ class AccountScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(
-              color: context.theme.colorScheme.primary,
-            ),
+            CircularProgressIndicator(color: context.theme.colorScheme.primary),
             if (state is AccountCacheClearing) ...[
               const SizedBox(height: 16),
-              Text(
-                'Clearing cache...',
-                style: context.textTheme.bodyMedium,
-              ),
+              Text('Clearing cache...', style: context.textTheme.bodyMedium),
             ],
           ],
         ),
@@ -206,13 +253,13 @@ class AccountScreen extends StatelessWidget {
         onAction: p.action == ErrorAction.retry
             ? () => context.read<AccountBloc>().add(LoadAccountData())
             : p.action == ErrorAction.signIn
-                ? () {
-                    context.read<auth.AuthBloc>().add(auth.LogoutRequested());
-                    context.go(AppRoutes.login);
-                  }
-                : p.action == ErrorAction.goBack
-                    ? () => context.pop()
-                    : null,
+            ? () {
+                context.read<auth.AuthBloc>().add(auth.LogoutRequested());
+                context.go(AppRoutes.login);
+              }
+            : p.action == ErrorAction.goBack
+            ? () => context.pop()
+            : null,
       );
     }
 
@@ -228,19 +275,22 @@ class AccountScreen extends StatelessWidget {
     final name = state is AccountLoaded
         ? state.name
         : (state is AccountAvatarUploading
-            ? state.name
-            : (state is AccountProfileUpdating ? state.name : ''));
+              ? state.name
+              : (state is AccountProfileUpdating ? state.name : ''));
     final email = state is AccountLoaded
         ? state.email
         : (state is AccountAvatarUploading
-            ? state.email
-            : (state is AccountProfileUpdating ? state.email : ''));
-    final url = avatarUrl ??
+              ? state.email
+              : (state is AccountProfileUpdating ? state.email : ''));
+    final url =
+        avatarUrl ??
         (state is AccountLoaded
             ? state.avatarUrl
             : (state is AccountAvatarUploading
-                ? state.avatarUrl
-                : (state is AccountProfileUpdating ? state.avatarUrl : null)));
+                  ? state.avatarUrl
+                  : (state is AccountProfileUpdating
+                        ? state.avatarUrl
+                        : null)));
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
@@ -272,7 +322,7 @@ class AccountScreen extends StatelessWidget {
                 icon: Icons.dark_mode_outlined,
                 title: 'Theme',
                 subtitle: 'Choose dark or light theme',
-                onTap: () {},
+                onTap: () => _showThemeDialog(context),
               ),
               SettingItemData(
                 icon: Icons.lock_outline,

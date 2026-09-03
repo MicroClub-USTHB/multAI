@@ -66,8 +66,6 @@ abstract class AppThemeColors {
   static const Color gradientAccentStart = Color(0xFF8B78FF);
   static const Color gradientAccentEnd = Color(0xFF5B44E0);
 
-
-
   // Neutral scrim for image-behind-text treatments (fades photos into the base).
   static const Color scrim = Color(0xCC08080B);
 

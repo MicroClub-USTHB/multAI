@@ -13,8 +13,8 @@ class AppBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppThemeColors.background,
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
         border: Border(
           top: BorderSide(
             color: AppThemeColors.divider,
@@ -105,7 +105,7 @@ class _NavBarItem extends StatelessWidget {
                         color: AppThemeColors.error,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppThemeColors.background,
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           width: AppThemeMetrics.borderThin,
                         ),
                       ),

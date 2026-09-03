@@ -186,9 +186,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       );
     }
 
-    final result = await _updateProfile(
-      UpdateProfileParams(name: event.name),
-    );
+    final result = await _updateProfile(UpdateProfileParams(name: event.name));
 
     result.fold(
       (failure) {

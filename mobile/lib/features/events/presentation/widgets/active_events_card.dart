@@ -3,7 +3,6 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/datetime_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class ActiveEventsCard extends StatelessWidget {
   const ActiveEventsCard({
@@ -34,11 +33,12 @@ class ActiveEventsCard extends StatelessWidget {
       child: Container(
         height: context.heightCalculated(120),
         decoration: BoxDecoration(
-          color: AppThemeColors.activeCardBackground.withValues(
-            alpha: AppThemeColors.activeCardBackgroundOpacity,
-          ),
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
-          border: Border.all(color: AppThemeColors.activeCardBorder, width: 1),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant,
+            width: 1,
+          ),
         ),
         padding: EdgeInsets.symmetric(
           horizontal: context.widthCalculated(AppThemeMetrics.spacingMd),
@@ -56,16 +56,18 @@ class ActiveEventsCard extends StatelessWidget {
                   child: Text(
                     eventTitle,
                     style: tt.titleMedium?.copyWith(
-                      color: AppThemeColors.primaryText,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
+                SizedBox(
+                  width: context.widthCalculated(AppThemeMetrics.spacingSm),
+                ),
                 Text(
                   eventStatus,
                   style: tt.labelSmall?.copyWith(
-                    color: AppThemeColors.success,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ],
@@ -77,14 +79,16 @@ class ActiveEventsCard extends StatelessWidget {
                 Icon(
                   Icons.calendar_month,
                   size: context.iconSize() * 0.8,
-                  color: AppThemeColors.cardDateText,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
-                SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingXs)),
+                SizedBox(
+                  width: context.widthCalculated(AppThemeMetrics.spacingXs),
+                ),
                 Expanded(
                   child: Text(
                     dateLabel,
                     style: tt.labelSmall?.copyWith(
-                      color: AppThemeColors.cardDateText,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),

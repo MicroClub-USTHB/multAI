@@ -14,6 +14,10 @@ export 'app_theme_text_styles.dart';
 abstract class AppTheme {
   AppTheme._();
 
+  static final ValueNotifier<ThemeMode> themeMode = ValueNotifier(
+    ThemeMode.dark,
+  );
+
   static ThemeData get lightTheme => AppThemeData.lightTheme;
   static ThemeData get darkTheme => AppThemeData.darkTheme;
 

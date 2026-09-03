@@ -166,11 +166,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider<GalleryBloc>(create: (_) => di.sl<GalleryBloc>()),
       ],
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: !DeviceSecurity.isDebugMode(),
-        title: 'MultAI',
-        theme: AppTheme.lightTheme,
-        routerConfig: appRouter,
+      child: ValueListenableBuilder<ThemeMode>(
+        valueListenable: AppTheme.themeMode,
+        builder: (context, themeMode, _) {
+          return MaterialApp.router(
+            debugShowCheckedModeBanner: !DeviceSecurity.isDebugMode(),
+            title: 'MultAI',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeMode,
+            routerConfig: appRouter,
+          );
+        },
       ),
     );
   }

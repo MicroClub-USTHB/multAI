@@ -75,7 +75,9 @@ class ProfileSection extends StatelessWidget {
                         )
                       : CircleAvatar(
                           radius: context.widthCalculated(52),
-                          backgroundColor: AppThemeColors.surface,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.surface,
                           child: Icon(
                             Icons.person,
                             size: context.widthCalculated(48),
@@ -96,9 +98,7 @@ class ProfileSection extends StatelessWidget {
                   bottom: 0,
                   right: 0,
                   child: Container(
-                    padding: EdgeInsets.all(
-                      context.widthCalculated(4),
-                    ),
+                    padding: EdgeInsets.all(context.widthCalculated(4)),
                     decoration: BoxDecoration(
                       color: cs.primary,
                       shape: BoxShape.circle,
@@ -123,7 +123,7 @@ class ProfileSection extends StatelessWidget {
                 name,
                 style: tt.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppThemeColors.primaryText,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               if (onEditName != null) ...[
@@ -133,7 +133,7 @@ class ProfileSection extends StatelessWidget {
                   child: Icon(
                     Icons.edit_outlined,
                     size: context.iconSize() * 0.8,
-                    color: AppThemeColors.secondaryText,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

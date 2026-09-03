@@ -40,9 +40,9 @@ class _EventGridScreenState extends State<EventGridScreen> {
     final cs = context.theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: AppThemeColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppThemeColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         title: Text('Your Events', style: tt.headlineMedium),
       ),
@@ -60,9 +60,7 @@ class _EventGridScreenState extends State<EventGridScreen> {
               illustration: p.illustration,
               actionLabel: p.actionLabel,
               onAction: p.action == ErrorAction.retry
-                  ? () => context.read<EventsBloc>().add(
-                      EventsRetryRequested(),
-                    )
+                  ? () => context.read<EventsBloc>().add(EventsRetryRequested())
                   : p.action == ErrorAction.signIn
                   ? () {
                       context.read<AuthBloc>().add(LogoutRequested());
@@ -86,13 +84,15 @@ class _EventGridScreenState extends State<EventGridScreen> {
                   Icon(
                     Icons.event_outlined,
                     size: context.iconSize() * 3,
-                    color: AppThemeColors.secondaryText.withValues(alpha: 0.4),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                   ),
                   SizedBox(height: context.heightCalculated(16)),
                   Text(
                     'No events yet',
                     style: tt.titleMedium?.copyWith(
-                      color: AppThemeColors.secondaryText,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -101,11 +101,17 @@ class _EventGridScreenState extends State<EventGridScreen> {
           }
 
           return GridView.builder(
-            padding: EdgeInsets.all(context.widthCalculated(AppThemeMetrics.spacingLg)),
+            padding: EdgeInsets.all(
+              context.widthCalculated(AppThemeMetrics.spacingLg),
+            ),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: context.widthCalculated(AppThemeMetrics.spacingMd),
-              mainAxisSpacing: context.heightCalculated(AppThemeMetrics.spacingMd),
+              crossAxisSpacing: context.widthCalculated(
+                AppThemeMetrics.spacingMd,
+              ),
+              mainAxisSpacing: context.heightCalculated(
+                AppThemeMetrics.spacingMd,
+              ),
               childAspectRatio: 0.95,
             ),
             itemCount: events.length,
@@ -133,21 +139,22 @@ class _EventGridTile extends StatelessWidget {
       key: ValueKey(event.id),
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => EventPhotosScreen(
-            eventId: event.id,
-            eventName: event.name,
-          ),
+          builder: (_) =>
+              EventPhotosScreen(eventId: event.id, eventName: event.name),
         ),
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: AppThemeColors.activeCardBackground.withValues(
-            alpha: AppThemeColors.activeCardBackgroundOpacity,
-          ),
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
-          border: Border.all(color: AppThemeColors.activeCardBorder, width: 1),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant,
+            width: 1,
+          ),
         ),
-        padding: EdgeInsets.all(context.widthCalculated(AppThemeMetrics.spacingMd)),
+        padding: EdgeInsets.all(
+          context.widthCalculated(AppThemeMetrics.spacingMd),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,15 +172,17 @@ class _EventGridTile extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: tt.titleSmall?.copyWith(
-                    color: AppThemeColors.primaryText,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                SizedBox(height: context.heightCalculated(AppThemeMetrics.spacingXs)),
+                SizedBox(
+                  height: context.heightCalculated(AppThemeMetrics.spacingXs),
+                ),
                 Text(
                   event.eventDate.toDisplayDate(),
                   style: tt.labelSmall?.copyWith(
-                    color: AppThemeColors.cardDateText,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

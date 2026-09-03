@@ -33,14 +33,10 @@ class ArchivedEventsCard extends StatelessWidget {
           height: context.heightCalculated(197),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: AppThemeColors.archivedCardBackground.withValues(
-                alpha: AppThemeColors.archivedCardBackgroundOpacity,
-              ),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
               border: Border.all(
-                color: AppThemeColors.archivedCardBorder.withValues(
-                  alpha: AppThemeColors.archivedCardBorderOpacity,
-                ),
+                color: Theme.of(context).colorScheme.outlineVariant,
                 width: 1,
               ),
             ),

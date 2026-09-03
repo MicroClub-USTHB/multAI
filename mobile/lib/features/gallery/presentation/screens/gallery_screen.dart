@@ -53,7 +53,7 @@ class _GalleryScreenState extends State<GalleryScreen>
         if (state is GalleryError) {
           final p = state.errorPresentation;
           return Scaffold(
-            backgroundColor: AppTheme.backgroundColor,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             body: SafeArea(
               child: ErrorStateView(
                 title: p.title,
@@ -86,9 +86,9 @@ class _GalleryScreenState extends State<GalleryScreen>
         final isLoading = state is GalleryLoading;
 
         return Scaffold(
-          backgroundColor: AppTheme.backgroundColor,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
-            backgroundColor: AppTheme.backgroundColor,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
             title: Text('Gallery', style: tt.headlineMedium),
             actions: [
