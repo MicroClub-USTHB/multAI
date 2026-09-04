@@ -7,22 +7,22 @@ import 'app_theme_colors.dart';
 abstract class AppThemeTextStyles {
   AppThemeTextStyles._();
 
-  static TextStyle get appBarTitleStyle => GoogleFonts.raleway(
+  static TextStyle get appBarTitleStyle => GoogleFonts.dmSans(
     color: AppThemeColors.primaryText,
     fontSize: 20,
     fontWeight: FontWeight.w600,
   );
 
-  static TextStyle get buttonTextStyle => GoogleFonts.raleway(
+  static TextStyle get buttonTextStyle => GoogleFonts.dmSans(
     fontSize: 16,
     fontWeight: FontWeight.w600,
     letterSpacing: 0.5,
   );
 
   static TextStyle get inputHintStyle =>
-      GoogleFonts.montserrat(color: AppThemeColors.hintText, fontSize: 14);
+      GoogleFonts.dmSans(color: AppThemeColors.hintText, fontSize: 14);
 
-  static TextStyle get inputLabelStyle => GoogleFonts.raleway(
+  static TextStyle get inputLabelStyle => GoogleFonts.dmSans(
     color: AppThemeColors.secondaryText,
     fontSize: 14,
     fontWeight: FontWeight.w500,
@@ -43,7 +43,7 @@ abstract class AppThemeTextStyles {
     fontStyle: FontStyle.italic,
   );
 
-  static TextStyle get onboardingLargeText => GoogleFonts.raleway(
+  static TextStyle get onboardingLargeText => GoogleFonts.dmSans(
     color: AppThemeColors.primaryText,
     fontSize: 36,
     fontWeight: FontWeight.w700,
@@ -52,7 +52,7 @@ abstract class AppThemeTextStyles {
     fontStyle: FontStyle.normal,
   );
 
-  static TextStyle get onboardingMediumText => GoogleFonts.montserrat(
+  static TextStyle get onboardingMediumText => GoogleFonts.dmSans(
     color: AppThemeColors.subtitleText,
     fontSize: 18,
     height: 1.5,
@@ -64,94 +64,94 @@ abstract class AppThemeTextStyles {
     required Color secondary,
     required Color hint,
   }) => TextTheme(
-    displayLarge: GoogleFonts.raleway(
+    displayLarge: GoogleFonts.dmSans(
       color: primary,
       fontSize: 32,
       fontWeight: FontWeight.bold,
       height: 1.15,
       letterSpacing: -0.5,
     ),
-    displayMedium: GoogleFonts.raleway(
+    displayMedium: GoogleFonts.dmSans(
       color: primary,
       fontSize: 28,
       fontWeight: FontWeight.bold,
       height: 1.2,
       letterSpacing: -0.4,
     ),
-    displaySmall: GoogleFonts.raleway(
+    displaySmall: GoogleFonts.dmSans(
       color: primary,
       fontSize: 24,
       fontWeight: FontWeight.bold,
       height: 1.3,
       letterSpacing: -0.3,
     ),
-    headlineLarge: GoogleFonts.raleway(
+    headlineLarge: GoogleFonts.dmSans(
       color: primary,
       fontSize: 22,
       fontWeight: FontWeight.w600,
       height: 1.3,
     ),
-    headlineMedium: GoogleFonts.raleway(
+    headlineMedium: GoogleFonts.dmSans(
       color: primary,
       fontSize: 20,
       fontWeight: FontWeight.w600,
       height: 1.3,
     ),
-    headlineSmall: GoogleFonts.raleway(
+    headlineSmall: GoogleFonts.dmSans(
       color: primary,
       fontSize: 18,
       fontWeight: FontWeight.w600,
       height: 1.4,
     ),
-    titleLarge: GoogleFonts.raleway(
+    titleLarge: GoogleFonts.dmSans(
       color: primary,
       fontSize: 16,
       fontWeight: FontWeight.w600,
       height: 1.4,
     ),
-    titleMedium: GoogleFonts.raleway(
+    titleMedium: GoogleFonts.dmSans(
       color: primary,
       fontSize: 14,
       fontWeight: FontWeight.w600,
       height: 1.4,
     ),
-    titleSmall: GoogleFonts.raleway(
+    titleSmall: GoogleFonts.dmSans(
       color: secondary,
       fontSize: 12,
       fontWeight: FontWeight.w600,
       height: 1.4,
     ),
-    bodyLarge: GoogleFonts.montserrat(
+    bodyLarge: GoogleFonts.dmSans(
       color: primary,
       fontSize: 18,
       fontWeight: FontWeight.normal,
       height: 1.6,
     ),
-    bodyMedium: GoogleFonts.montserrat(
+    bodyMedium: GoogleFonts.dmSans(
       color: primary,
       fontSize: 16,
       fontWeight: FontWeight.normal,
       height: 1.5,
     ),
-    bodySmall: GoogleFonts.raleway(
+    bodySmall: GoogleFonts.dmSans(
       color: secondary,
       fontSize: 14,
       fontWeight: FontWeight.normal,
       height: 1.4,
     ),
-    labelLarge: GoogleFonts.raleway(
+    labelLarge: GoogleFonts.dmSans(
       color: primary,
       fontSize: 14,
       fontWeight: FontWeight.w500,
       letterSpacing: 0.1,
     ),
-    labelMedium: GoogleFonts.raleway(
+    labelMedium: GoogleFonts.dmSans(
       color: secondary,
       fontSize: 12,
       fontWeight: FontWeight.w500,
       letterSpacing: 0.5,
     ),
-    labelSmall: GoogleFonts.raleway(
+    labelSmall: GoogleFonts.dmSans(
       color: hint,
       fontSize: 10,
       fontWeight: FontWeight.w500,
