@@ -16,6 +16,7 @@ import '../widgets/profile_section.dart';
 import '../widgets/settings_section.dart';
 import '../widgets/settings_tile.dart';
 import '../widgets/logout_button.dart';
+import '../widgets/delete_account_button.dart';
 import 'package:multai_mobile/core/theme/theme.dart';
 
 class AccountScreen extends StatelessWidget {
@@ -342,12 +343,6 @@ class AccountScreen extends StatelessWidget {
                 subtitle: 'Free up storage space',
                 onTap: () => _confirmClearCache(context),
               ),
-              SettingItemData(
-                icon: Icons.delete_outlined,
-                title: 'Delete Account',
-                subtitle: 'Permanently delete your account',
-                onTap: () => _confirmDeleteAccount(context),
-              ),
             ],
           ),
           SizedBox(height: context.heightCalculated(24)),
@@ -363,7 +358,12 @@ class AccountScreen extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: context.heightCalculated(32)),
+
+          SizedBox(height: context.heightCalculated(16)),
+
+          DeleteAccountButton(onPressed: () => _confirmDeleteAccount(context)),
+
+          SizedBox(height: context.heightCalculated(16)),
 
           // ── Logout ─────────────────────────────────────────────────────
           LogoutButton(
