@@ -1,0 +1,9 @@
+{
+  "@@locale": "en",
+  "theme": "Theme",
+  "languages": "Languages",
+  "chooseYourLanguage": "Choose your language",
+  "english": "English",
+  "french": "French",
+  "arabic": "Arabic"
+}

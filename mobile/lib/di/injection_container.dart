@@ -13,6 +13,7 @@ import '../core/network/api_client.dart';
 import '../core/network/connectivity_service.dart';
 import '../core/storage/app_local_storage.dart';
 import '../core/errors/failure_handler.dart';
+import '../core/services/language_service.dart';
 
 // Onboarding
 import '../features/onboarding/data/repositories/onboarding_repository_impl.dart';
@@ -53,7 +54,8 @@ import '../features/account/domain/repositories/account_repository.dart';
 import '../features/account/domain/usecases/get_account_data_usecase.dart';
 import '../features/account/domain/usecases/upload_avatar_usecase.dart';
 import '../features/account/domain/usecases/update_profile_usecase.dart';
-import '../features/account/presentation/bloc/account_bloc.dart' hide LogoutRequested;
+import '../features/account/presentation/bloc/account_bloc.dart'
+    hide LogoutRequested;
 //  ── Notifications ───────────────────────────────────────────────────────────
 import '../features/notifications/data/datasources/notifications_local_datasource.dart';
 import '../features/notifications/data/datasources/notifications_remote_datasource.dart';
@@ -107,6 +109,10 @@ Future<void> init() async {
   sl.registerLazySingleton<AppLocalStorage>(
     () => AppLocalStorage(prefs: sl<SharedPreferences>()),
   );
+
+  sl.registerLazySingleton<LanguageService>(
+    () => LanguageService(sl<AppLocalStorage>()),
+  );
   sl.registerLazySingleton<InternetConnection>(() => InternetConnection());
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
   // ── Core ───────────────────────────────────────────────────────────────────
@@ -130,7 +136,6 @@ Future<void> init() async {
     return client;
   });
 
-
   sl.registerLazySingleton<ConnectivityService>(
     () => ConnectivityService(
       connectivity: sl<Connectivity>(),
@@ -138,9 +143,7 @@ Future<void> init() async {
     ),
   );
 
-  sl.registerLazySingleton<FailureHandler>(
-    () => FailureHandler(),
-  );
+  sl.registerLazySingleton<FailureHandler>(() => FailureHandler());
 
   // ── Onboarding ─────────────────────────────────────────────────────────────
   sl.registerFactory<SplashBloc>(
@@ -265,12 +268,8 @@ Future<void> init() async {
   sl.registerLazySingleton(
     () => GetAccountDataUseCase(sl<AccountRepository>()),
   );
-  sl.registerLazySingleton(
-    () => UploadAvatarUseCase(sl<AccountRepository>()),
-  );
-  sl.registerLazySingleton(
-    () => UpdateProfileUseCase(sl<AccountRepository>()),
-  );
+  sl.registerLazySingleton(() => UploadAvatarUseCase(sl<AccountRepository>()));
+  sl.registerLazySingleton(() => UpdateProfileUseCase(sl<AccountRepository>()));
 
   // ── Account BLoC ─────────────────────────────────────────────────────────
   sl.registerFactory<AccountBloc>(

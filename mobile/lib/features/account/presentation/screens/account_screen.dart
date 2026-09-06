@@ -10,6 +10,9 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../core/services/language_service.dart';
+import '../../../../di/injection_container.dart';
 import '../bloc/account_bloc.dart';
 import '../widgets/account_app_bar.dart';
 import '../widgets/profile_section.dart';
@@ -176,6 +179,71 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
+  void _showLanguageDialog(BuildContext context) {
+    final languageService = sl<LanguageService>();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return ValueListenableBuilder<Locale>(
+          valueListenable: languageService.locale,
+          builder: (context, currentLocale, _) {
+            return AlertDialog(
+              title: Text(AppLocalizations.of(context)!.chooseYourLanguage),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile<String>(
+                    value: 'en',
+                    groupValue: currentLocale.languageCode,
+                    title: Text(AppLocalizations.of(context)!.english),
+                    onChanged: (value) async {
+                      if (value == null) return;
+
+                      await languageService.setLanguage(value);
+
+                      if (ctx.mounted) {
+                        Navigator.of(ctx).pop();
+                      }
+                    },
+                  ),
+                  RadioListTile<String>(
+                    value: 'fr',
+                    groupValue: currentLocale.languageCode,
+                    title: Text(AppLocalizations.of(context)!.french),
+                    onChanged: (value) async {
+                      if (value == null) return;
+
+                      await languageService.setLanguage(value);
+
+                      if (ctx.mounted) {
+                        Navigator.of(ctx).pop();
+                      }
+                    },
+                  ),
+                  RadioListTile<String>(
+                    value: 'ar',
+                    groupValue: currentLocale.languageCode,
+                    title: Text(AppLocalizations.of(context)!.arabic),
+                    onChanged: (value) async {
+                      if (value == null) return;
+
+                      await languageService.setLanguage(value);
+
+                      if (ctx.mounted) {
+                        Navigator.of(ctx).pop();
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AccountBloc, AccountState>(
@@ -333,9 +401,9 @@ class AccountScreen extends StatelessWidget {
               ),
               SettingItemData(
                 icon: Icons.language_outlined,
-                title: 'Languages',
-                subtitle: 'Choose your language',
-                onTap: () {},
+                title: AppLocalizations.of(context)!.languages,
+                subtitle: AppLocalizations.of(context)!.chooseYourLanguage,
+                onTap: () => _showLanguageDialog(context),
               ),
               SettingItemData(
                 icon: Icons.cleaning_services_outlined,

@@ -21,6 +21,9 @@ import 'features/notifications/services/push_notification_service.dart';
 import 'features/notifications/services/notification_navigation_service.dart';
 import 'features/gallery/presentation/bloc/gallery_bloc.dart';
 import 'di/injection_container.dart' as di;
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'core/services/language_service.dart';
+import 'l10n/app_localizations.dart';
 
 late final SessionManager sessionManager;
 
@@ -69,6 +72,8 @@ void main() async {
   await di.init();
 
   // Wire push notification lifecycle
+  final languageService = di.sl<LanguageService>();
+  await languageService.load();
   final pushService = di.sl<PushNotificationService>();
   await pushService.init();
   di.sl<NotificationNavigationService>().init(appRouter);
@@ -169,13 +174,37 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       child: ValueListenableBuilder<ThemeMode>(
         valueListenable: AppTheme.themeMode,
         builder: (context, themeMode, _) {
-          return MaterialApp.router(
-            debugShowCheckedModeBanner: !DeviceSecurity.isDebugMode(),
-            title: 'MultAI',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeMode,
-            routerConfig: appRouter,
+          final languageService = di.sl<LanguageService>();
+
+          return ValueListenableBuilder<Locale>(
+            valueListenable: languageService.locale,
+            builder: (context, locale, _) {
+              return MaterialApp.router(
+                debugShowCheckedModeBanner: !DeviceSecurity.isDebugMode(),
+                title: 'MultAI',
+
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: themeMode,
+
+                locale: locale,
+
+                supportedLocales: const [
+                  Locale('en'),
+                  Locale('fr'),
+                  Locale('ar'),
+                ],
+
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+
+                routerConfig: appRouter,
+              );
+            },
           );
         },
       ),
