@@ -25,4 +25,75 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get arabic => 'Arabe';
+
+  @override
+  String get editName => 'Modifier le nom';
+
+  @override
+  String get yourName => 'Votre nom';
+
+  @override
+  String get cancel => 'Annuler';
+
+  @override
+  String get save => 'Enregistrer';
+
+  @override
+  String get clearImageCache => 'Vider le cache des images';
+
+  @override
+  String get clearImageCacheDescription =>
+      'Cela supprimera toutes les photos mises en cache de votre appareil. Les images devront être téléchargées à nouveau lorsqu\'elles seront consultées.';
+
+  @override
+  String get clear => 'Vider';
+
+  @override
+  String get freeUpStorage => 'Libérer de l\'espace de stockage';
+
+  @override
+  String get clearingCache => 'Nettoyage du cache...';
+
+  @override
+  String freedStorage(Object storage, Object files) {
+    return '$storage libérés ($files fichiers)';
+  }
+
+  @override
+  String get light => 'Clair';
+
+  @override
+  String get dark => 'Sombre';
+
+  @override
+  String get systemDefault => 'Par défaut du système';
+
+  @override
+  String get chooseTheme => 'Choisissez un thème clair ou sombre';
+
+  @override
+  String get accountSettings => 'PARAMÈTRES DU COMPTE';
+
+  @override
+  String get privacySecurity => 'Confidentialité et sécurité';
+
+  @override
+  String get privacySecurityDescription =>
+      'Mot de passe, 2FA et partage des données';
+
+  @override
+  String get support => 'ASSISTANCE';
+
+  @override
+  String get helpCenter => 'Centre d\'aide';
+
+  @override
+  String get deleteAccount => 'Supprimer le compte';
+
+  @override
+  String get deleteAccountConfirmation =>
+      'Êtes-vous sûr de vouloir supprimer ce compte ? Cette action est irréversible.';
+
+  @override
+  String get logout => 'Se déconnecter';
 }

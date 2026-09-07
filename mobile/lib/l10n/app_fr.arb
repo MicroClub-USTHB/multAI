@@ -5,5 +5,41 @@
   "chooseYourLanguage": "Choisissez votre langue",
   "english": "Anglais",
   "french": "Français",
-  "arabic": "Arabe"
+  "arabic": "Arabe",
+
+  "editName": "Modifier le nom",
+  "yourName": "Votre nom",
+  "cancel": "Annuler",
+  "save": "Enregistrer",
+
+  "clearImageCache": "Vider le cache des images",
+  "clearImageCacheDescription": "Cela supprimera toutes les photos mises en cache de votre appareil. Les images devront être téléchargées à nouveau lorsqu'elles seront consultées.",
+  "clear": "Vider",
+  "freeUpStorage": "Libérer de l'espace de stockage",
+  "clearingCache": "Nettoyage du cache...",
+  "freedStorage": "{storage} libérés ({files} fichiers)",
+  "@freedStorage": {
+    "placeholders": {
+      "storage": {},
+      "files": {}
+    }
+  },
+
+  "light": "Clair",
+  "dark": "Sombre",
+  "systemDefault": "Par défaut du système",
+  "chooseTheme": "Choisissez un thème clair ou sombre",
+
+
+  "accountSettings": "PARAMÈTRES DU COMPTE",
+  "privacySecurity": "Confidentialité et sécurité",
+  "privacySecurityDescription": "Mot de passe, 2FA et partage des données",
+
+  "support": "ASSISTANCE",
+  "helpCenter": "Centre d'aide",
+
+  "deleteAccount": "Supprimer le compte",
+  "deleteAccountConfirmation": "Êtes-vous sûr de vouloir supprimer ce compte ? Cette action est irréversible.",
+
+  "logout": "Se déconnecter"
 }

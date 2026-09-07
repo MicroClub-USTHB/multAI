@@ -5,5 +5,40 @@
   "chooseYourLanguage": "اختر لغتك",
   "english": "الإنجليزية",
   "french": "الفرنسية",
-  "arabic": "العربية"
+  "arabic": "العربية",
+
+  "editName": "تعديل الاسم",
+  "yourName": "اسمك",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+
+  "clearImageCache": "مسح ذاكرة التخزين المؤقت للصور",
+  "clearImageCacheDescription": "سيؤدي هذا إلى إزالة جميع الصور المخزنة مؤقتًا من جهازك. ستحتاج الصور إلى إعادة تنزيلها عند عرضها مرة أخرى.",
+  "clear": "مسح",
+  "freeUpStorage": "تحرير مساحة التخزين",
+  "clearingCache": "جارٍ مسح ذاكرة التخزين المؤقت...",
+  "freedStorage": "تم تحرير {storage} ({files} ملفات)",
+  "@freedStorage": {
+    "placeholders": {
+      "storage": {},
+      "files": {}
+    }
+  },
+
+  "light": "فاتح",
+  "dark": "داكن",
+  "systemDefault": "إعداد النظام",
+  "chooseTheme": "اختر مظهرًا فاتحًا أو داكنًا",
+
+  "accountSettings": "إعدادات الحساب",
+  "privacySecurity": "الخصوصية والأمان",
+  "privacySecurityDescription": "كلمة المرور والمصادقة الثنائية ومشاركة البيانات",
+
+  "support": "الدعم",
+  "helpCenter": "مركز المساعدة",
+
+  "deleteAccount": "حذف الحساب",
+  "deleteAccountConfirmation": "هل أنت متأكد أنك تريد حذف هذا الحساب؟ لا يمكن التراجع عن هذا الإجراء.",
+
+  "logout": "تسجيل الخروج"
 }

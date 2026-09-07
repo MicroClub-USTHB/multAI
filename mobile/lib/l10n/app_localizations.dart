@@ -135,6 +135,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Arabic'**
   String get arabic;
+
+  /// No description provided for @editName.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Name'**
+  String get editName;
+
+  /// No description provided for @yourName.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get yourName;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @clearImageCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Image Cache'**
+  String get clearImageCache;
+
+  /// No description provided for @clearImageCacheDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This will remove all cached photos from your device. Images will need to be re-downloaded when viewed again.'**
+  String get clearImageCacheDescription;
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @freeUpStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Free up storage space'**
+  String get freeUpStorage;
+
+  /// No description provided for @clearingCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing cache...'**
+  String get clearingCache;
+
+  /// No description provided for @freedStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Freed {storage} ({files} files)'**
+  String freedStorage(Object storage, Object files);
+
+  /// No description provided for @light.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get light;
+
+  /// No description provided for @dark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get dark;
+
+  /// No description provided for @systemDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'System default'**
+  String get systemDefault;
+
+  /// No description provided for @chooseTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose dark or light theme'**
+  String get chooseTheme;
+
+  /// No description provided for @accountSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'ACCOUNT SETTINGS'**
+  String get accountSettings;
+
+  /// No description provided for @privacySecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & Security'**
+  String get privacySecurity;
+
+  /// No description provided for @privacySecurityDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Password, 2FA, and data sharing'**
+  String get privacySecurityDescription;
+
+  /// No description provided for @support.
+  ///
+  /// In en, this message translates to:
+  /// **'SUPPORT'**
+  String get support;
+
+  /// No description provided for @helpCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Help Center'**
+  String get helpCenter;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this account? This action cannot be undone.'**
+  String get deleteAccountConfirmation;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
 }
 
 class _AppLocalizationsDelegate

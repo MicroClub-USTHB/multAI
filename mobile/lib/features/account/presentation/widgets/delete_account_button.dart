@@ -4,6 +4,7 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/l10n/app_localizations.dart';
 
 class DeleteAccountButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -45,7 +46,7 @@ class DeleteAccountButton extends StatelessWidget {
               width: context.widthCalculated(8),
             ),
             Text(
-              'Delete Account',
+              AppLocalizations.of(context)!.deleteAccount,
               style: tt.titleMedium?.copyWith(
                 color: AppThemeColors.error,
                 fontWeight: FontWeight.w600,
