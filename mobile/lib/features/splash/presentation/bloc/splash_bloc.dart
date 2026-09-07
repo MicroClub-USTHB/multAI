@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +87,11 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
   ///   - Any other failure: there IS a session, we just couldn't verify it
   ///     (offline/server error) and have nothing cached either -> offline.
   Future<void> _resolveSessionAndEmit(Emitter<SplashState> emit) async {
+    if (kDebugMode) {
+      emit(const SplashLoaded(route: AppRoutes.events));
+      return;
+    }
+
     final hasSeenOnboarding = await getOnboardingSeen();
 
     final meResult = await getCurrentUserUseCase(NoParams());

@@ -232,4 +232,47 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get previousStep => 'Étape précédente';
+
+  @override
+  String get preferences => 'PRÉFÉRENCES';
+
+  @override
+  String get appearance => 'Apparence';
+
+  @override
+  String get lightDarkMode => 'Mode clair / sombre';
+
+  @override
+  String get language => 'Langue';
+
+  @override
+  String get changeAppLanguage => 'Changer la langue de l\'application';
+
+  @override
+  String get selectTheme => 'Sélectionner le thème';
+
+  @override
+  String get selectLanguage => 'Sélectionner la langue';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get manageAlertsAndActivity => 'Gérer les alertes et l\'activité';
+
+  @override
+  String get backupPhotos => 'Sauvegarder les photos';
+
+  @override
+  String get downloadPhotosAsZip =>
+      'Télécharger toutes les photos en fichier ZIP';
+
+  @override
+  String get myAlbums => 'Mes albums';
+
+  @override
+  String get organizePhotosIntoAlbums => 'Organiser les photos en albums';
+
+  @override
+  String get mcMember => 'membre mc';
 }

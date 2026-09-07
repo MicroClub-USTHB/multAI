@@ -79,6 +79,20 @@ import '../features/photo_approval/domain/repositories/photo_approval_repository
 import '../features/photo_approval/domain/usecases/decide_photo_approval_usecase.dart';
 import '../features/photo_approval/domain/usecases/get_approvals_usecase.dart';
 
+// Backup
+import '../features/backup/data/repositories/backup_repository_impl.dart';
+import '../features/backup/domain/repositories/backup_repository.dart';
+import '../features/backup/domain/usecases/create_backup_usecase.dart';
+import '../features/backup/presentation/bloc/backup_bloc.dart';
+
+// Albums
+import '../features/albums/data/repositories/album_repository_impl.dart';
+import '../features/albums/domain/repositories/album_repository.dart';
+import '../features/albums/domain/usecases/get_albums_usecase.dart';
+import '../features/albums/domain/usecases/create_album_usecase.dart';
+import '../features/albums/domain/usecases/add_photos_to_album_usecase.dart';
+import '../features/albums/presentation/bloc/albums_bloc.dart';
+
 // Events
 import '../features/events/data/datasources/events_local_datasource.dart';
 import '../features/events/data/datasources/events_remote_datasource.dart';
@@ -437,6 +451,42 @@ Future<void> init() async {
       getPhotoImage: sl<GetPhotoImageUseCase>(),
       connectivityService: sl<ConnectivityService>(),
       failureHandler: sl<FailureHandler>(),
+    ),
+  );
+
+  // ── Backup ──────────────────────────────────────────────────────────────
+  sl.registerLazySingleton<BackupRepository>(
+    () => BackupRepositoryImpl(),
+  );
+  sl.registerLazySingleton(
+    () => CreateBackupUseCase(sl<BackupRepository>()),
+  );
+  sl.registerFactory<BackupBloc>(
+    () => BackupBloc(
+      createBackup: sl<CreateBackupUseCase>(),
+      repository: sl<BackupRepository>(),
+    ),
+  );
+
+  // ── Albums ──────────────────────────────────────────────────────────────
+  sl.registerLazySingleton<AlbumRepository>(
+    () => AlbumRepositoryImpl(localStorage: sl<AppLocalStorage>()),
+  );
+  sl.registerLazySingleton(
+    () => GetAlbumsUseCase(sl<AlbumRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => CreateAlbumUseCase(sl<AlbumRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => AddPhotosToAlbumUseCase(sl<AlbumRepository>()),
+  );
+  sl.registerFactory<AlbumsBloc>(
+    () => AlbumsBloc(
+      getAlbums: sl<GetAlbumsUseCase>(),
+      createAlbum: sl<CreateAlbumUseCase>(),
+      addPhotos: sl<AddPhotosToAlbumUseCase>(),
+      repository: sl<AlbumRepository>(),
     ),
   );
 

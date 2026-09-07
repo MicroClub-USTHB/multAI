@@ -10,6 +10,7 @@ import '../../../../../core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/widgets/app_error_view.dart';
+import 'package:multai_mobile/core/widgets/join_event_success_animation.dart';
 import 'package:multai_mobile/core/errors/error_presentation.dart';
 import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart';
 import '../../domain/validators/event_code_validator.dart';
@@ -32,6 +33,7 @@ class EventsScreen extends StatefulWidget {
 class _EventsScreenState extends State<EventsScreen> {
   final TextEditingController _eventCodeController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _showJoinAnimation = false;
 
   @override
   void initState() {
@@ -65,115 +67,126 @@ class _EventsScreenState extends State<EventsScreen> {
       listener: (context, state) {
         if (state is JoinEventSuccess) {
           _eventCodeController.clear();
-          context.showSuccessSnackBar(l10n.eventJoinedSuccess);
+          setState(() => _showJoinAnimation = true);
         }
         if (state is EventsFailure) {
           context.showErrorSnackBar(state.errorPresentation.description);
         }
       },
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          title: Text(
-            l10n.eventsTitle,
-            style: context.theme.appBarTheme.titleTextStyle?.copyWith(
-              color: AppThemeColors.accent,
+      child: Stack(
+        children: [
+          Scaffold(
+            backgroundColor: AppThemeColors.background,
+            appBar: AppBar(
+              title: Text(
+                l10n.eventsTitle,
+                style: context.theme.appBarTheme.titleTextStyle?.copyWith(
+                  color: AppThemeColors.accent,
+                ),
+              ),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: context.widthCalculated(AppThemeMetrics.spacingLg),
+                  ),
+                  child: GestureDetector(
+                    onTap: () => context.go(AppRoutes.notifications),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Icon(
+                          Icons.notifications_none,
+                          color: AppThemeColors.secondaryText,
+                          size: context.iconSize(),
+                        ),
+                        BlocBuilder<NotificationBloc, NotificationState>(
+                          builder: (context, nState) {
+                            final unread = nState is NotificationLoaded
+                                ? nState.unreadCount
+                                : 0;
+                            if (unread <= 0) return const SizedBox.shrink();
+                            return Positioned(
+                              top: 1,
+                              right: context.widthCalculated(
+                                AppThemeMetrics.spacingXs,
+                              ),
+                              child: Container(
+                                width: context.widthCalculated(
+                                  AppThemeMetrics.notifDotSize,
+                                ),
+                                height: context.widthCalculated(
+                                  AppThemeMetrics.notifDotSize,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppThemeColors.accent,
+                                  border: Border.all(
+                                    color: AppThemeColors.background,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppThemeMetrics.radiusXl,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            body: BlocBuilder<EventsBloc, EventsState>(
+              builder: (context, state) {
+                if (state is EventsFailure) {
+                  return _buildErrorState(context);
+                }
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(
+                      context.widthCalculated(AppThemeMetrics.spacingLg),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (state is EventsLoaded && state.isOffline)
+                          _buildOfflineBanner(context),
+                        if (state is EventsLoaded && state.isRefreshing)
+                          _buildRefreshingIndicator(context),
+                        SizedBox(
+                          height: context.heightCalculated(
+                            AppThemeMetrics.spacingMd,
+                          ),
+                        ),
+                        _buildJoinSection(context, state),
+                        SizedBox(
+                          height: context.heightCalculated(
+                            AppThemeMetrics.spacingXl,
+                          ),
+                        ),
+                        _buildActiveSection(context, state),
+                        SizedBox(
+                          height: context.heightCalculated(
+                            AppThemeMetrics.spacingXl,
+                          ),
+                        ),
+                        _buildArchivedSection(context, state),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(
-                right: context.widthCalculated(AppThemeMetrics.spacingLg),
-              ),
-              child: GestureDetector(
-                onTap: () => context.go(AppRoutes.notifications),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Icon(
-                      Icons.notifications_none,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      size: context.iconSize(),
-                    ),
-                    BlocBuilder<NotificationBloc, NotificationState>(
-                      builder: (context, nState) {
-                        final unread = nState is NotificationLoaded
-                            ? nState.unreadCount
-                            : 0;
-                        if (unread <= 0) return const SizedBox.shrink();
-                        return Positioned(
-                          top: 1,
-                          right: context.widthCalculated(
-                            AppThemeMetrics.spacingXs,
-                          ),
-                          child: Container(
-                            width: context.widthCalculated(
-                              AppThemeMetrics.notifDotSize,
-                            ),
-                            height: context.widthCalculated(
-                              AppThemeMetrics.notifDotSize,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppThemeColors.accent,
-                              border: Border.all(
-                                color: AppThemeColors.background,
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                AppThemeMetrics.radiusXl,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+          if (_showJoinAnimation)
+            JoinEventSuccessAnimation(
+              onComplete: () {
+                setState(() => _showJoinAnimation = false);
+                context.showSuccessSnackBar(l10n.eventJoinedSuccess);
+              },
             ),
-          ],
-        ),
-        body: BlocBuilder<EventsBloc, EventsState>(
-          builder: (context, state) {
-            if (state is EventsFailure) {
-              return _buildErrorState(context);
-            }
-            return SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(
-                  context.widthCalculated(AppThemeMetrics.spacingLg),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (state is EventsLoaded && state.isOffline)
-                      _buildOfflineBanner(context),
-                    if (state is EventsLoaded && state.isRefreshing)
-                      _buildRefreshingIndicator(context),
-                    SizedBox(
-                      height: context.heightCalculated(
-                        AppThemeMetrics.spacingMd,
-                      ),
-                    ),
-                    _buildJoinSection(context, state),
-                    SizedBox(
-                      height: context.heightCalculated(
-                        AppThemeMetrics.spacingXl,
-                      ),
-                    ),
-                    _buildActiveSection(context, state),
-                    SizedBox(
-                      height: context.heightCalculated(
-                        AppThemeMetrics.spacingXl,
-                      ),
-                    ),
-                    _buildArchivedSection(context, state),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+        ],
       ),
     );
   }
@@ -190,13 +203,13 @@ class _EventsScreenState extends State<EventsScreen> {
       onAction: p.action == ErrorAction.retry
           ? () => context.read<EventsBloc>().add(EventsRetryRequested())
           : p.action == ErrorAction.signIn
-          ? () {
-              context.read<AuthBloc>().add(LogoutRequested());
-              context.go(AppRoutes.login);
-            }
-          : p.action == ErrorAction.goBack
-          ? () => context.pop()
-          : null,
+              ? () {
+                  context.read<AuthBloc>().add(LogoutRequested());
+                  context.go(AppRoutes.login);
+                }
+              : p.action == ErrorAction.goBack
+                  ? () => context.pop()
+                  : null,
     );
   }
 
@@ -208,9 +221,7 @@ class _EventsScreenState extends State<EventsScreen> {
       ),
       child: LinearProgressIndicator(
         backgroundColor: AppThemeColors.border.withValues(alpha: 0.2),
-        valueColor: const AlwaysStoppedAnimation<Color>(
-          AppThemeColors.primaryAccent,
-        ),
+        valueColor: const AlwaysStoppedAnimation<Color>(AppThemeColors.primaryAccent),
       ),
     );
   }
@@ -226,9 +237,7 @@ class _EventsScreenState extends State<EventsScreen> {
       decoration: BoxDecoration(
         color: AppThemeColors.primaryAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
-        border: Border.all(
-          color: AppThemeColors.primaryAccent.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: AppThemeColors.primaryAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -278,7 +287,7 @@ class _EventsScreenState extends State<EventsScreen> {
             Text(
               l10n.joinNewEvent,
               style: tt.headlineSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
+                color: AppThemeColors.primaryText,
               ),
             ),
             SizedBox(
@@ -337,7 +346,7 @@ class _EventsScreenState extends State<EventsScreen> {
                     : Text(
                         l10n.joinEvent,
                         style: tt.titleLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: AppThemeColors.primaryText,
                         ),
                       ),
               ),
@@ -482,7 +491,7 @@ class _EventsScreenState extends State<EventsScreen> {
             Icon(
               Icons.archive_outlined,
               size: context.iconSize(),
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              color: AppThemeColors.secondaryText,
             ),
             SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
             Text(l10n.archivedEvents, style: tt.headlineSmall),
@@ -543,7 +552,7 @@ class _EventsScreenState extends State<EventsScreen> {
             Icon(
               icon,
               size: context.iconSize() * 2.5,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              color: AppThemeColors.secondaryText,
             ),
             SizedBox(
               height: context.heightCalculated(AppThemeMetrics.spacingMd),
@@ -551,7 +560,7 @@ class _EventsScreenState extends State<EventsScreen> {
             Text(
               title,
               style: tt.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                color: AppThemeColors.secondaryText,
               ),
             ),
             SizedBox(

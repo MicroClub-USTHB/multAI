@@ -525,6 +525,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Previous step'**
   String get previousStep;
+
+  /// No description provided for @preferences.
+  ///
+  /// In en, this message translates to:
+  /// **'PREFERENCES'**
+  String get preferences;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @lightDarkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light / Dark mode'**
+  String get lightDarkMode;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @changeAppLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Change app language'**
+  String get changeAppLanguage;
+
+  /// No description provided for @selectTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Select theme'**
+  String get selectTheme;
+
+  /// No description provided for @selectLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select language'**
+  String get selectLanguage;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @manageAlertsAndActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage alerts and activity'**
+  String get manageAlertsAndActivity;
+
+  /// No description provided for @backupPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Photos'**
+  String get backupPhotos;
+
+  /// No description provided for @downloadPhotosAsZip.
+  ///
+  /// In en, this message translates to:
+  /// **'Download all photos as a ZIP file'**
+  String get downloadPhotosAsZip;
+
+  /// No description provided for @myAlbums.
+  ///
+  /// In en, this message translates to:
+  /// **'My Albums'**
+  String get myAlbums;
+
+  /// No description provided for @organizePhotosIntoAlbums.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize photos into albums'**
+  String get organizePhotosIntoAlbums;
+
+  /// No description provided for @mcMember.
+  ///
+  /// In en, this message translates to:
+  /// **'mc-member'**
+  String get mcMember;
 }
 
 class _AppLocalizationsDelegate

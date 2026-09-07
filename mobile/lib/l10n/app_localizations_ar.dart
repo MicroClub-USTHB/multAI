@@ -230,4 +230,46 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get previousStep => 'الخطوة السابقة';
+
+  @override
+  String get preferences => 'التفضيلات';
+
+  @override
+  String get appearance => 'المظهر';
+
+  @override
+  String get lightDarkMode => 'الوضع الفاتح / الداكن';
+
+  @override
+  String get language => 'اللغة';
+
+  @override
+  String get changeAppLanguage => 'تغيير لغة التطبيق';
+
+  @override
+  String get selectTheme => 'اختر المظهر';
+
+  @override
+  String get selectLanguage => 'اختر اللغة';
+
+  @override
+  String get notifications => 'الإشعارات';
+
+  @override
+  String get manageAlertsAndActivity => 'إدارة التنبيهات والنشاط';
+
+  @override
+  String get backupPhotos => 'نسخ الصور احتياطيًا';
+
+  @override
+  String get downloadPhotosAsZip => 'تنزيل جميع الصور كملف ZIP';
+
+  @override
+  String get myAlbums => 'ألبوماتي';
+
+  @override
+  String get organizePhotosIntoAlbums => 'تنظيم الصور في ألبومات';
+
+  @override
+  String get mcMember => 'عضو mc';
 }

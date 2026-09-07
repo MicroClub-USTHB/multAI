@@ -6,12 +6,10 @@
   "english": "English",
   "french": "French",
   "arabic": "Arabic",
-
   "editName": "Edit Name",
   "yourName": "Your name",
   "cancel": "Cancel",
   "save": "Save",
-
   "clearImageCache": "Clear Image Cache",
   "clearImageCacheDescription": "This will remove all cached photos from your device. Images will need to be re-downloaded when viewed again.",
   "clear": "Clear",
@@ -24,24 +22,18 @@
       "files": {}
     }
   },
-
   "light": "Light",
   "dark": "Dark",
   "systemDefault": "System default",
   "chooseTheme": "Choose dark or light theme",
-
   "accountSettings": "ACCOUNT SETTINGS",
   "privacySecurity": "Privacy & Security",
   "privacySecurityDescription": "Password, 2FA, and data sharing",
-
   "support": "SUPPORT",
   "helpCenter": "Help Center",
-
   "deleteAccount": "Delete Account",
   "deleteAccountConfirmation": "Are you sure you want to delete this account? This action cannot be undone.",
-
   "logout": "Logout",
-
   "home": "HOME",
   "gallery": "GALLERY",
   "event": "EVENT",
@@ -84,5 +76,19 @@
   "securityAlert": "Security Alert",
   "noInternetConnection": "No Internet Connection",
   "checkConnectionAndRetry": "Please check your connection and try again.",
-  "previousStep": "Previous step"
+  "previousStep": "Previous step",
+  "preferences": "PREFERENCES",
+  "appearance": "Appearance",
+  "lightDarkMode": "Light / Dark mode",
+  "language": "Language",
+  "changeAppLanguage": "Change app language",
+  "selectTheme": "Select theme",
+  "selectLanguage": "Select language",
+  "notifications": "Notifications",
+  "manageAlertsAndActivity": "Manage alerts and activity",
+  "backupPhotos": "Backup Photos",
+  "downloadPhotosAsZip": "Download all photos as a ZIP file",
+  "myAlbums": "My Albums",
+  "organizePhotosIntoAlbums": "Organize photos into albums",
+  "mcMember": "mc-member"
 }

@@ -229,4 +229,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get previousStep => 'Previous step';
+
+  @override
+  String get preferences => 'PREFERENCES';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get lightDarkMode => 'Light / Dark mode';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get changeAppLanguage => 'Change app language';
+
+  @override
+  String get selectTheme => 'Select theme';
+
+  @override
+  String get selectLanguage => 'Select language';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get manageAlertsAndActivity => 'Manage alerts and activity';
+
+  @override
+  String get backupPhotos => 'Backup Photos';
+
+  @override
+  String get downloadPhotosAsZip => 'Download all photos as a ZIP file';
+
+  @override
+  String get myAlbums => 'My Albums';
+
+  @override
+  String get organizePhotosIntoAlbums => 'Organize photos into albums';
+
+  @override
+  String get mcMember => 'mc-member';
 }

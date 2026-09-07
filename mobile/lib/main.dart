@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/cubits/locale_cubit.dart';
+import 'core/cubits/theme_cubit.dart';
 import 'core/errors/error_handler.dart';
 import 'core/errors/error_mapper.dart';
 import 'core/router/app_router.dart';
@@ -12,6 +14,7 @@ import 'core/security/env_validator.dart';
 import 'core/security/device_security.dart';
 import 'core/security/secure_logger.dart';
 import 'core/security/session_manager.dart';
+import 'core/storage/app_local_storage.dart';
 import 'core/theme/theme.dart';
 import 'features/auth/presentation/blocs/auth_bloc.dart';
 import 'features/events/presentation/bloc/events_bloc.dart';
@@ -22,7 +25,6 @@ import 'features/notifications/services/notification_navigation_service.dart';
 import 'features/gallery/presentation/bloc/gallery_bloc.dart';
 import 'di/injection_container.dart' as di;
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'core/services/language_service.dart';
 import 'l10n/app_localizations.dart';
 
 late final SessionManager sessionManager;
@@ -72,8 +74,6 @@ void main() async {
   await di.init();
 
   // Wire push notification lifecycle
-  final languageService = di.sl<LanguageService>();
-  await languageService.load();
   final pushService = di.sl<PushNotificationService>();
   await pushService.init();
   di.sl<NotificationNavigationService>().init(appRouter);
@@ -170,38 +170,31 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (_) => di.sl<NotificationBloc>()..add(LoadNotifications()),
         ),
         BlocProvider<GalleryBloc>(create: (_) => di.sl<GalleryBloc>()),
+        BlocProvider<ThemeCubit>(
+          create: (_) => ThemeCubit(di.sl<AppLocalStorage>()),
+        ),
+        BlocProvider<LocaleCubit>(
+          create: (_) => LocaleCubit(di.sl<AppLocalStorage>()),
+        ),
       ],
-      child: ValueListenableBuilder<ThemeMode>(
-        valueListenable: AppTheme.themeMode,
-        builder: (context, themeMode, _) {
-          final languageService = di.sl<LanguageService>();
-
-          return ValueListenableBuilder<Locale>(
-            valueListenable: languageService.locale,
-            builder: (context, locale, _) {
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
+          return BlocBuilder<LocaleCubit, Locale>(
+            builder: (context, locale) {
               return MaterialApp.router(
                 debugShowCheckedModeBanner: !DeviceSecurity.isDebugMode(),
                 title: 'MultAI',
-
                 theme: AppTheme.lightTheme,
                 darkTheme: AppTheme.darkTheme,
                 themeMode: themeMode,
-
                 locale: locale,
-
-                supportedLocales: const [
-                  Locale('en'),
-                  Locale('fr'),
-                  Locale('ar'),
-                ],
-
+                supportedLocales: AppLocalizations.supportedLocales,
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,
                   GlobalWidgetsLocalizations.delegate,
                   GlobalCupertinoLocalizations.delegate,
                 ],
-
                 routerConfig: appRouter,
               );
             },

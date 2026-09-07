@@ -27,7 +27,7 @@ Widget createTestWidget(MockFaceEnrollmentBloc bloc) {
     supportedLocales: AppLocalizations.supportedLocales,
     home: BlocProvider<FaceEnrollmentBloc>.value(
       value: bloc,
-      child: const FaceEnrollmentScreen(),
+      child: const FaceEnrollmentScreen(skipCameraInit: true),
     ),
   );
 }
@@ -61,7 +61,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(mockBloc));
       await tester.pump();
 
-      expect(find.text('Frontal View'), findsAtLeast(1));
+      expect(find.text('Front View'), findsAtLeast(1));
     });
 
     testWidgets('shows step progress header', (tester) async {
@@ -149,7 +149,7 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      expect(find.text('Extra View 1'), findsAtLeast(1));
+      expect(find.text('Tilt Up'), findsAtLeast(1));
 
       await tester.tapSkipOptional();
 
@@ -177,7 +177,7 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      expect(find.text('Extra View 2'), findsAtLeast(1));
+      expect(find.text('Tilt Down'), findsAtLeast(1));
 
       await tester.tapSubmit();
 

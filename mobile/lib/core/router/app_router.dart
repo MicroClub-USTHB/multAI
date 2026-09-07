@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/features/onboarding/presentation/screens/onboarding_screen.dart';
@@ -8,6 +9,7 @@ import '../../di/injection_container.dart' as di;
 import '../../features/auth/presentation/screens/login/login_page.dart';
 import '../../features/auth/presentation/screens/register/register_page.dart';
 import '../../features/face_enrollment/presentation/screens/face_enrollment_screen.dart';
+import '../../features/face_enrollment/presentation/screens/face_guide_debug_preview.dart';
 import '../../features/face_enrollment/presentation/bloc/face_enrollment_bloc.dart';
 import '../../features/home/presentation/screens/home_shell.dart';
 import '../../features/events/presentation/screens/events_screen.dart';
@@ -16,6 +18,9 @@ import '../../features/account/presentation/screens/account_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/photo_approval/presentation/bloc/photo_approval_bloc.dart';
 import '../../features/photo_approval/presentation/screens/photo_approval_page.dart';
+import '../../features/backup/presentation/screens/backup_screen.dart';
+import '../../features/albums/presentation/screens/albums_screen.dart';
+import '../../features/albums/presentation/screens/album_detail_screen.dart';
 import 'app_routes.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -51,6 +56,13 @@ final GoRouter appRouter = GoRouter(
       ),
     ),
 
+    // ── Face Guide Debug Preview (debug only) ──────────────────────────────
+    if (kDebugMode)
+      GoRoute(
+        path: AppRoutes.faceGuideDebug,
+        builder: (context, state) => const FaceGuideDebugPreview(),
+      ),
+
     // ── Photo Approval ────────────────────────────────────────────────────────
     GoRoute(
       path: AppRoutes.photoApproval,
@@ -58,6 +70,26 @@ final GoRouter appRouter = GoRouter(
         create: (_) => di.sl<PhotoApprovalBloc>(),
         child: const PhotoApprovalPage(),
       ),
+    ),
+
+    // ── Backup ────────────────────────────────────────────────────────────────
+    GoRoute(
+      path: AppRoutes.backup,
+      builder: (context, state) => const BackupScreen(),
+    ),
+
+    // ── Albums ────────────────────────────────────────────────────────────────
+    GoRoute(
+      path: AppRoutes.albums,
+      builder: (context, state) => const AlbumsScreen(),
+    ),
+
+    GoRoute(
+      path: AppRoutes.albumDetail,
+      builder: (context, state) {
+        final albumName = state.uri.queryParameters['name'] ?? '';
+        return AlbumDetailScreen(albumName: albumName);
+      },
     ),
 
     // ── Home shell with bottom nav ─────────────────────────────────────────────
