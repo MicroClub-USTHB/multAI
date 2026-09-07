@@ -96,4 +96,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get logout => 'تسجيل الخروج';
+
+  @override
+  String get home => 'الرئيسية';
+
+  @override
+  String get gallery => 'المعرض';
+
+  @override
+  String get event => 'الفعالية';
+
+  @override
+  String get account => 'الحساب';
 }

@@ -96,4 +96,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get logout => 'Se déconnecter';
+
+  @override
+  String get home => 'ACCUEIL';
+
+  @override
+  String get gallery => 'GALERIE';
+
+  @override
+  String get event => 'ÉVÉNEMENT';
+
+  @override
+  String get account => 'COMPTE';
 }

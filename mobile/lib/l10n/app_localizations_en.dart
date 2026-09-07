@@ -95,4 +95,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logout => 'Logout';
+
+  @override
+  String get home => 'HOME';
+
+  @override
+  String get gallery => 'GALLERY';
+
+  @override
+  String get event => 'EVENT';
+
+  @override
+  String get account => 'ACCOUNT';
 }

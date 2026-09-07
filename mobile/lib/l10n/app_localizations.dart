@@ -267,6 +267,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Logout'**
   String get logout;
+
+  /// No description provided for @home.
+  ///
+  /// In en, this message translates to:
+  /// **'HOME'**
+  String get home;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'GALLERY'**
+  String get gallery;
+
+  /// No description provided for @event.
+  ///
+  /// In en, this message translates to:
+  /// **'EVENT'**
+  String get event;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'ACCOUNT'**
+  String get account;
 }
 
 class _AppLocalizationsDelegate

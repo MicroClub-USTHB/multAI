@@ -40,5 +40,10 @@
   "deleteAccount": "Delete Account",
   "deleteAccountConfirmation": "Are you sure you want to delete this account? This action cannot be undone.",
 
-  "logout": "Logout"
+  "logout": "Logout",
+
+  "home": "HOME",
+  "gallery": "GALLERY",
+  "event": "EVENT",
+  "account": "ACCOUNT"
 }
