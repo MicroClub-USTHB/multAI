@@ -4,7 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:multai_mobile/l10n/app_localizations.dart';
 import 'package:multai_mobile/features/face_enrollment/domain/entities/face_photo_entity.dart';
 import 'package:multai_mobile/features/face_enrollment/presentation/bloc/face_enrollment_bloc.dart';
 import 'package:multai_mobile/features/face_enrollment/presentation/screens/face_enrollment_screen.dart';
@@ -17,6 +18,13 @@ class FakeFaceEnrollmentEvent extends Fake implements FaceEnrollmentEvent {}
 
 Widget createTestWidget(MockFaceEnrollmentBloc bloc) {
   return MaterialApp(
+    localizationsDelegates: const [
+      AppLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: AppLocalizations.supportedLocales,
     home: BlocProvider<FaceEnrollmentBloc>.value(
       value: bloc,
       child: const FaceEnrollmentScreen(),
