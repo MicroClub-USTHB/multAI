@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/l10n/app_localizations.dart';
 
 class QrScanScreen extends StatefulWidget {
   const QrScanScreen({super.key});
@@ -31,12 +32,13 @@ class _QrScanScreenState extends State<QrScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: const Text('Scan Event QR Code'),
+        title: Text(l10n.scanEventQrCode),
         actions: [
           IconButton(
             icon: ValueListenableBuilder(
@@ -72,7 +74,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
             left: 0,
             right: 0,
             child: Text(
-              'Point your camera at the event QR code',
+              l10n.pointCameraAtQrCode,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.white,

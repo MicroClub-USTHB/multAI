@@ -108,4 +108,128 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get account => 'COMPTE';
+
+  @override
+  String get eventsTitle => 'Événements MultiAi';
+
+  @override
+  String get eventJoinedSuccess => 'Événement rejoint avec succès !';
+
+  @override
+  String get cachedDataMessage =>
+      'Affichage des données en cache. Connectez-vous à Internet pour voir les dernières données.';
+
+  @override
+  String get joinNewEvent => 'Rejoindre un nouvel événement';
+
+  @override
+  String get joinEventDescription =>
+      'Vous avez une invitation ? Entrez le code de l\'événement ci-dessous pour participer.';
+
+  @override
+  String get scanQrCode => 'Scanner le code QR';
+
+  @override
+  String get joinEvent => 'Rejoindre l\'événement';
+
+  @override
+  String get activeEvents => 'Événements actifs';
+
+  @override
+  String ongoingEvents(Object count) {
+    return '$count en cours';
+  }
+
+  @override
+  String get noActiveEvents => 'Aucun événement actif';
+
+  @override
+  String get joinEventToSeeHere => 'Rejoignez un événement pour le voir ici !';
+
+  @override
+  String get archivedEvents => 'Événements archivés';
+
+  @override
+  String get noArchivedEvents => 'Aucun événement archivé';
+
+  @override
+  String get archivedEventsEmpty => 'Vos événements archivés apparaîtront ici.';
+
+  @override
+  String get galleryTitle => 'Galerie';
+
+  @override
+  String get allPhotos => 'Toutes';
+
+  @override
+  String get soloPhotos => 'Solo';
+
+  @override
+  String get groupPhotos => 'Groupe';
+
+  @override
+  String get noPhotosYet => 'Pas encore de photos';
+
+  @override
+  String get yourEvents => 'Vos événements';
+
+  @override
+  String get scanEventQrCode => 'Scanner le code QR de l\'événement';
+
+  @override
+  String get camera => 'Caméra';
+
+  @override
+  String get galleryPicker => 'Galerie';
+
+  @override
+  String get previous => 'Précédent';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get noEventsYet => 'Pas encore d’événements';
+
+  @override
+  String get pointCameraAtQrCode =>
+      'Pointez votre caméra vers le code QR de l’événement';
+
+  @override
+  String get skipOptionalPhotos => 'Ignorer les photos facultatives';
+
+  @override
+  String get skip => 'Ignorer';
+
+  @override
+  String get completeEnrollment => 'Terminer l’enregistrement';
+
+  @override
+  String get uploadRequiredPhotosFirst =>
+      'Importez d’abord les photos requises';
+
+  @override
+  String get nextStep => 'Étape suivante';
+
+  @override
+  String get complete => 'Terminer';
+
+  @override
+  String get uploadRequired => 'Importation requise';
+
+  @override
+  String get next => 'Suivant';
+
+  @override
+  String get securityAlert => 'Alerte de sécurité';
+
+  @override
+  String get noInternetConnection => 'Aucune connexion Internet';
+
+  @override
+  String get checkConnectionAndRetry =>
+      'Veuillez vérifier votre connexion et réessayer.';
+
+  @override
+  String get previousStep => 'Étape précédente';
 }

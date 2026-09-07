@@ -10,6 +10,7 @@ import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart
 import 'package:multai_mobile/features/splash/presentation/widget/splash_footer.dart';
 import 'package:multai_mobile/features/splash/presentation/widget/splash_logo.dart';
 import 'package:multai_mobile/features/splash/presentation/widget/splash_progress_section.dart';
+import 'package:multai_mobile/l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -145,6 +146,7 @@ class _SplashScreenState extends State<SplashScreen>
     SplashSecurityWarning state,
   ) {
     final tt = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppThemeColors.splashBackground,
       body: Center(
@@ -162,7 +164,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: AppThemeMetrics.spacingLg),
               Text(
-                'Security Alert',
+                l10n.securityAlert,
                 style: tt.headlineSmall?.copyWith(
                   color: AppThemeColors.primaryText,
                 ),
@@ -184,6 +186,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   Widget _buildOfflineScreen(BuildContext context) {
     final tt = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppThemeColors.splashBackground,
       body: Center(
@@ -201,14 +204,14 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: AppThemeMetrics.spacingLg),
               Text(
-                'No Internet Connection',
+                l10n.noInternetConnection,
                 style: tt.headlineSmall?.copyWith(
                   color: AppThemeColors.primaryText,
                 ),
               ),
               const SizedBox(height: AppThemeMetrics.spacingSm),
               Text(
-                'Please check your connection and try again.',
+                l10n.checkConnectionAndRetry,
                 style: tt.bodySmall?.copyWith(
                   color: AppThemeColors.secondaryText,
                 ),
@@ -219,7 +222,7 @@ class _SplashScreenState extends State<SplashScreen>
                 onPressed: () =>
                     context.read<SplashBloc>().add(const RetryConnection()),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: Text(l10n.retry),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: AppThemeColors.primaryText,
                   backgroundColor: AppThemeColors.primaryAccent,

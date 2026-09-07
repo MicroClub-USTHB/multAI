@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:multai_mobile/l10n/app_localizations.dart';
 import '../../../../core/errors/error_presentation.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
@@ -38,13 +38,15 @@ class _EventGridScreenState extends State<EventGridScreen> {
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        title: Text('Your Events', style: tt.headlineMedium),
+        title: Text(l10n.yourEvents, style: tt.headlineMedium),
       ),
       body: BlocBuilder<EventsBloc, EventsState>(
         builder: (context, state) {
@@ -90,7 +92,7 @@ class _EventGridScreenState extends State<EventGridScreen> {
                   ),
                   SizedBox(height: context.heightCalculated(16)),
                   Text(
-                    'No events yet',
+                    l10n.noEventsYet,
                     style: tt.titleMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),

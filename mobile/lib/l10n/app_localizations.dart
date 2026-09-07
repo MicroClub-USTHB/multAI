@@ -291,6 +291,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ACCOUNT'**
   String get account;
+
+  /// No description provided for @eventsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MultiAi Events'**
+  String get eventsTitle;
+
+  /// No description provided for @eventJoinedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully joined event!'**
+  String get eventJoinedSuccess;
+
+  /// No description provided for @cachedDataMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing cached data. Connect to the internet to see the latest.'**
+  String get cachedDataMessage;
+
+  /// No description provided for @joinNewEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Join New Event'**
+  String get joinNewEvent;
+
+  /// No description provided for @joinEventDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Have an invite? Enter the event code below to participate.'**
+  String get joinEventDescription;
+
+  /// No description provided for @scanQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code'**
+  String get scanQrCode;
+
+  /// No description provided for @joinEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Event'**
+  String get joinEvent;
+
+  /// No description provided for @activeEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Events'**
+  String get activeEvents;
+
+  /// No description provided for @ongoingEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Ongoing'**
+  String ongoingEvents(Object count);
+
+  /// No description provided for @noActiveEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'No active events'**
+  String get noActiveEvents;
+
+  /// No description provided for @joinEventToSeeHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Join an event to see it here!'**
+  String get joinEventToSeeHere;
+
+  /// No description provided for @archivedEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived Events'**
+  String get archivedEvents;
+
+  /// No description provided for @noArchivedEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'No archived events'**
+  String get noArchivedEvents;
+
+  /// No description provided for @archivedEventsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your archived events will appear here.'**
+  String get archivedEventsEmpty;
+
+  /// No description provided for @galleryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get galleryTitle;
+
+  /// No description provided for @allPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allPhotos;
+
+  /// No description provided for @soloPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Solo'**
+  String get soloPhotos;
+
+  /// No description provided for @groupPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get groupPhotos;
+
+  /// No description provided for @noPhotosYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No photos yet'**
+  String get noPhotosYet;
+
+  /// No description provided for @yourEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Events'**
+  String get yourEvents;
+
+  /// No description provided for @scanEventQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Event QR Code'**
+  String get scanEventQrCode;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @galleryPicker.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get galleryPicker;
+
+  /// No description provided for @previous.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previous;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @noEventsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No events yet'**
+  String get noEventsYet;
+
+  /// No description provided for @pointCameraAtQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Point your camera at the event QR code'**
+  String get pointCameraAtQrCode;
+
+  /// No description provided for @skipOptionalPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip optional photos'**
+  String get skipOptionalPhotos;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @completeEnrollment.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete enrollment'**
+  String get completeEnrollment;
+
+  /// No description provided for @uploadRequiredPhotosFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload required photos first'**
+  String get uploadRequiredPhotosFirst;
+
+  /// No description provided for @nextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Next step'**
+  String get nextStep;
+
+  /// No description provided for @complete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get complete;
+
+  /// No description provided for @uploadRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Required'**
+  String get uploadRequired;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @securityAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Alert'**
+  String get securityAlert;
+
+  /// No description provided for @noInternetConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'No Internet Connection'**
+  String get noInternetConnection;
+
+  /// No description provided for @checkConnectionAndRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your connection and try again.'**
+  String get checkConnectionAndRetry;
+
+  /// No description provided for @previousStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous step'**
+  String get previousStep;
 }
 
 class _AppLocalizationsDelegate

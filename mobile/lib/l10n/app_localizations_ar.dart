@@ -108,4 +108,126 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get account => 'الحساب';
+
+  @override
+  String get eventsTitle => 'فعاليات MultiAi';
+
+  @override
+  String get eventJoinedSuccess => 'تم الانضمام إلى الفعالية بنجاح!';
+
+  @override
+  String get cachedDataMessage =>
+      'يتم عرض البيانات المخزنة مؤقتًا. اتصل بالإنترنت لرؤية أحدث البيانات.';
+
+  @override
+  String get joinNewEvent => 'الانضمام إلى فعالية جديدة';
+
+  @override
+  String get joinEventDescription =>
+      'لديك دعوة؟ أدخل رمز الفعالية أدناه للمشاركة.';
+
+  @override
+  String get scanQrCode => 'مسح رمز QR';
+
+  @override
+  String get joinEvent => 'الانضمام إلى الفعالية';
+
+  @override
+  String get activeEvents => 'الفعاليات النشطة';
+
+  @override
+  String ongoingEvents(Object count) {
+    return '$count جارية';
+  }
+
+  @override
+  String get noActiveEvents => 'لا توجد فعاليات نشطة';
+
+  @override
+  String get joinEventToSeeHere => 'انضم إلى فعالية لرؤيتها هنا!';
+
+  @override
+  String get archivedEvents => 'الفعاليات المؤرشفة';
+
+  @override
+  String get noArchivedEvents => 'لا توجد فعاليات مؤرشفة';
+
+  @override
+  String get archivedEventsEmpty => 'ستظهر فعالياتك المؤرشفة هنا.';
+
+  @override
+  String get galleryTitle => 'المعرض';
+
+  @override
+  String get allPhotos => 'الكل';
+
+  @override
+  String get soloPhotos => 'فردية';
+
+  @override
+  String get groupPhotos => 'جماعية';
+
+  @override
+  String get noPhotosYet => 'لا توجد صور بعد';
+
+  @override
+  String get yourEvents => 'فعالياتك';
+
+  @override
+  String get scanEventQrCode => 'مسح رمز QR للفعالية';
+
+  @override
+  String get camera => 'الكاميرا';
+
+  @override
+  String get galleryPicker => 'المعرض';
+
+  @override
+  String get previous => 'السابق';
+
+  @override
+  String get retry => 'إعادة المحاولة';
+
+  @override
+  String get noEventsYet => 'لا توجد فعاليات بعد';
+
+  @override
+  String get pointCameraAtQrCode => 'وجّه الكاميرا نحو رمز QR الخاص بالفعالية';
+
+  @override
+  String get skipOptionalPhotos => 'تخطي الصور الاختيارية';
+
+  @override
+  String get skip => 'تخطي';
+
+  @override
+  String get completeEnrollment => 'إكمال التسجيل';
+
+  @override
+  String get uploadRequiredPhotosFirst => 'قم بتحميل الصور المطلوبة أولًا';
+
+  @override
+  String get nextStep => 'الخطوة التالية';
+
+  @override
+  String get complete => 'إكمال';
+
+  @override
+  String get uploadRequired => 'التحميل مطلوب';
+
+  @override
+  String get next => 'التالي';
+
+  @override
+  String get securityAlert => 'تنبيه أمني';
+
+  @override
+  String get noInternetConnection => 'لا يوجد اتصال بالإنترنت';
+
+  @override
+  String get checkConnectionAndRetry =>
+      'يُرجى التحقق من اتصالك والمحاولة مرة أخرى.';
+
+  @override
+  String get previousStep => 'الخطوة السابقة';
 }

@@ -3,6 +3,7 @@ import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/l10n/app_localizations.dart';
 
 class StepNavigation extends StatelessWidget {
   final bool canGoPrevious;
@@ -36,6 +37,7 @@ class StepNavigation extends StatelessWidget {
     final cs = context.theme.colorScheme;
     final showSubmit = isLastPage;
     final canSubmit = allRequiredDone && !isSubmitting;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -56,7 +58,7 @@ class StepNavigation extends StatelessWidget {
           children: [
             // Previous
             Semantics(
-              label: 'Previous step',
+              label: l10n.previousStep,
               button: true,
               child: AnimatedOpacity(
                 opacity: canGoPrevious ? 1.0 : 0.0,
@@ -74,7 +76,7 @@ class StepNavigation extends StatelessWidget {
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: Text('Previous'),
+                  child: Text(l10n.previous),
                 ),
               ),
             ),
@@ -86,7 +88,7 @@ class StepNavigation extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: Semantics(
-                  label: 'Skip optional photos',
+                  label: l10n.skipOptionalPhotos,
                   button: true,
                   child: TextButton(
                     onPressed: isSubmitting ? null : onSkipOptional,
@@ -99,7 +101,7 @@ class StepNavigation extends StatelessWidget {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     child: Text(
-                      'Skip',
+                      l10n.skip,
                       style: tt.labelMedium?.copyWith(
                         color: cs.onSurface.withValues(alpha: 0.5),
                         decoration: TextDecoration.underline,
@@ -113,9 +115,9 @@ class StepNavigation extends StatelessWidget {
             Semantics(
               label: showSubmit
                   ? (canSubmit
-                      ? 'Complete enrollment'
-                      : 'Upload required photos first')
-                  : 'Next step',
+                      ? l10n.completeEnrollment
+                      : l10n.uploadRequiredPhotosFirst)
+                  : l10n.nextStep,
               button: true,
               child: AnimatedContainer(
                 duration: AppThemeMetrics.durationFast,
@@ -160,8 +162,8 @@ class StepNavigation extends StatelessWidget {
                                 children: [
                                   Text(
                                     canSubmit
-                                        ? 'Complete'
-                                        : 'Upload Required',
+                                        ? l10n.complete
+                                        : l10n.uploadRequired,
                                     style: tt.labelLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: canSubmit
@@ -211,7 +213,7 @@ class StepNavigation extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Next',
+                              l10n.next,
                               style: tt.labelLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color:

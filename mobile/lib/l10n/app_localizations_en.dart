@@ -107,4 +107,126 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get account => 'ACCOUNT';
+
+  @override
+  String get eventsTitle => 'MultiAi Events';
+
+  @override
+  String get eventJoinedSuccess => 'Successfully joined event!';
+
+  @override
+  String get cachedDataMessage =>
+      'Showing cached data. Connect to the internet to see the latest.';
+
+  @override
+  String get joinNewEvent => 'Join New Event';
+
+  @override
+  String get joinEventDescription =>
+      'Have an invite? Enter the event code below to participate.';
+
+  @override
+  String get scanQrCode => 'Scan QR code';
+
+  @override
+  String get joinEvent => 'Join Event';
+
+  @override
+  String get activeEvents => 'Active Events';
+
+  @override
+  String ongoingEvents(Object count) {
+    return '$count Ongoing';
+  }
+
+  @override
+  String get noActiveEvents => 'No active events';
+
+  @override
+  String get joinEventToSeeHere => 'Join an event to see it here!';
+
+  @override
+  String get archivedEvents => 'Archived Events';
+
+  @override
+  String get noArchivedEvents => 'No archived events';
+
+  @override
+  String get archivedEventsEmpty => 'Your archived events will appear here.';
+
+  @override
+  String get galleryTitle => 'Gallery';
+
+  @override
+  String get allPhotos => 'All';
+
+  @override
+  String get soloPhotos => 'Solo';
+
+  @override
+  String get groupPhotos => 'Group';
+
+  @override
+  String get noPhotosYet => 'No photos yet';
+
+  @override
+  String get yourEvents => 'Your Events';
+
+  @override
+  String get scanEventQrCode => 'Scan Event QR Code';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get galleryPicker => 'Gallery';
+
+  @override
+  String get previous => 'Previous';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get noEventsYet => 'No events yet';
+
+  @override
+  String get pointCameraAtQrCode => 'Point your camera at the event QR code';
+
+  @override
+  String get skipOptionalPhotos => 'Skip optional photos';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get completeEnrollment => 'Complete enrollment';
+
+  @override
+  String get uploadRequiredPhotosFirst => 'Upload required photos first';
+
+  @override
+  String get nextStep => 'Next step';
+
+  @override
+  String get complete => 'Complete';
+
+  @override
+  String get uploadRequired => 'Upload Required';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get securityAlert => 'Security Alert';
+
+  @override
+  String get noInternetConnection => 'No Internet Connection';
+
+  @override
+  String get checkConnectionAndRetry =>
+      'Please check your connection and try again.';
+
+  @override
+  String get previousStep => 'Previous step';
 }
