@@ -63,5 +63,10 @@
   "placeholders": {
     "count": {}
   }
-}
+},
+"galleryTitle": "المعرض",
+"allPhotos": "الكل",
+"soloPhotos": "فردية",
+"groupPhotos": "جماعية",
+"noPhotosYet": "لا توجد صور بعد"
 }

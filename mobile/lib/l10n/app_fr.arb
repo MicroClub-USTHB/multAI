@@ -64,5 +64,10 @@
   "placeholders": {
     "count": {}
   }
-}
+},
+"galleryTitle": "Galerie",
+"allPhotos": "Toutes",
+"soloPhotos": "Solo",
+"groupPhotos": "Groupe",
+"noPhotosYet": "Aucune photo pour le moment"
 }

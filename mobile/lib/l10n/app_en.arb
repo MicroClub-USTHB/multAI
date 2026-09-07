@@ -59,5 +59,10 @@
   "joinEventToSeeHere": "Join an event to see it here!",
   "archivedEvents": "Archived Events",
   "noArchivedEvents": "No archived events",
-  "archivedEventsEmpty": "Your archived events will appear here."
+  "archivedEventsEmpty": "Your archived events will appear here.",
+  "galleryTitle": "Gallery",
+  "allPhotos": "All",
+  "soloPhotos": "Solo",
+  "groupPhotos": "Group",
+  "noPhotosYet": "No photos yet"
 }

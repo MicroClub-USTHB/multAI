@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:multai_mobile/l10n/app_localizations.dart';
 import '../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/context_extensions.dart';
@@ -42,6 +43,7 @@ class _GalleryScreenState extends State<GalleryScreen>
   Widget build(BuildContext context) {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return BlocConsumer<GalleryBloc, GalleryState>(
       listener: (context, state) {
@@ -90,7 +92,7 @@ class _GalleryScreenState extends State<GalleryScreen>
           appBar: AppBar(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
-            title: Text('Gallery', style: tt.headlineMedium),
+            title: Text(l10n.galleryTitle, style: tt.headlineMedium),
             actions: [
               // ── Search ──────────────────────────────────────────────
               Container(
@@ -142,9 +144,9 @@ class _GalleryScreenState extends State<GalleryScreen>
                     vertical: context.heightCalculated(AppTheme.spacingSm),
                   ),
                   tabs: [
-                    _buildTab('All', allPhotos.length, 0),
-                    _buildTab('Solo', soloPhotos.length, 1),
-                    _buildTab('Group', groupPhotos.length, 2),
+                    _buildTab(l10n.allPhotos, allPhotos.length, 0),
+                    _buildTab(l10n.soloPhotos, soloPhotos.length, 1),
+                    _buildTab(l10n.groupPhotos, groupPhotos.length, 2),
                   ],
                 ),
               ),
@@ -232,6 +234,7 @@ class _GalleryScreenState extends State<GalleryScreen>
 
   Widget _buildEmpty(BuildContext context) {
     final tt = context.textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: Column(
@@ -244,7 +247,7 @@ class _GalleryScreenState extends State<GalleryScreen>
           ),
           SizedBox(height: context.heightCalculated(16)),
           Text(
-            'No photos yet',
+            l10n.noPhotosYet,
             style: tt.titleMedium?.copyWith(color: AppTheme.secondaryTextColor),
           ),
         ],
