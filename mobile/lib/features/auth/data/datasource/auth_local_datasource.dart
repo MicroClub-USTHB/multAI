@@ -22,9 +22,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<MeResponseModel?> getCachedMe() async {
-    final encrypted = await localStorage.getSecureString(
-      StorageKeys.cachedMe,
-    );
+    final encrypted = await localStorage.getSecureString(StorageKeys.cachedMe);
     if (encrypted == null || encrypted.isEmpty) return null;
 
     try {

@@ -42,8 +42,7 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
         _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
         emit(
           PhotoApprovalError(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
@@ -77,8 +76,7 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
         _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
         emit(
           PhotoApprovalError(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
@@ -110,8 +108,7 @@ class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
         _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
         emit(
           PhotoApprovalError(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
           ),
         );
       },

@@ -106,10 +106,7 @@ class _EventPhotosScreenState extends State<EventPhotosScreen> {
             onRefresh: () async => context.read<GalleryBloc>().add(
               LoadEventPhotos(eventId: widget.eventId),
             ),
-            child: PicturesGrid(
-              photos: photos,
-              cachedPaths: cachedPaths,
-            ),
+            child: PicturesGrid(photos: photos, cachedPaths: cachedPaths),
           );
         },
       ),

@@ -6,7 +6,7 @@ enum NavItem { home, gallery, event, account }
 class NavItemData {
   final NavItem item;
   final FaIconData icon;
-  final String label;
+  final NavItem label;
   final String route;
 
   const NavItemData({
@@ -21,25 +21,25 @@ const List<NavItemData> navItems = [
   NavItemData(
     item: NavItem.home,
     icon: FontAwesomeIcons.house,
-    label: 'HOME',
+    label: NavItem.home,
     route: AppRoutes.events,
   ),
   NavItemData(
     item: NavItem.gallery,
     icon: FontAwesomeIcons.images,
-    label: 'GALLERY',
+    label: NavItem.gallery,
     route: AppRoutes.gallery,
   ),
   NavItemData(
     item: NavItem.event,
     icon: FontAwesomeIcons.calendar,
-    label: 'EVENT',
+    label: NavItem.event,
     route: AppRoutes.eventGrid,
   ),
   NavItemData(
     item: NavItem.account,
     icon: FontAwesomeIcons.user,
-    label: 'ACCOUNT',
+    label: NavItem.account,
     route: AppRoutes.account,
   ),
 ];

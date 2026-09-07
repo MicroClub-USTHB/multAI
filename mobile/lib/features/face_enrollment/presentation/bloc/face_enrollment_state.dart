@@ -40,13 +40,12 @@ class FaceEnrollmentState extends Equatable {
     return FaceEnrollmentState(
       status: status ?? this.status,
       photos: photos != null ? Map.unmodifiable(photos) : this.photos,
-      loadingPhotoTypes:
-          loadingPhotoTypes ?? this.loadingPhotoTypes,
+      loadingPhotoTypes: loadingPhotoTypes ?? this.loadingPhotoTypes,
       photoErrors: clearPhotoErrors
           ? const {}
           : (photoErrors != null
-              ? Map.unmodifiable(photoErrors)
-              : this.photoErrors),
+                ? Map.unmodifiable(photoErrors)
+                : this.photoErrors),
       submitError: submitError,
     );
   }
@@ -71,7 +70,11 @@ class FaceEnrollmentState extends Equatable {
 
   Set<FacePhotoType> toggleLoading(FacePhotoType type, bool add) {
     final next = Set<FacePhotoType>.from(loadingPhotoTypes);
-    if (add) { next.add(type); } else { next.remove(type); }
+    if (add) {
+      next.add(type);
+    } else {
+      next.remove(type);
+    }
     return next;
   }
 
@@ -83,10 +86,10 @@ class FaceEnrollmentState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        photos,
-        loadingPhotoTypes,
-        photoErrors,
-        submitError,
-      ];
+    status,
+    photos,
+    loadingPhotoTypes,
+    photoErrors,
+    submitError,
+  ];
 }

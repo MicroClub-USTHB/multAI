@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:multai_mobile/l10n/app_localizations.dart';
 import '../../../../core/extensions/context_extensions.dart';
-
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 
 class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
   const AccountAppBar({super.key});
@@ -11,15 +10,15 @@ class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
     final tt = context.textTheme;
 
     return AppBar(
-      backgroundColor: AppThemeColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 0,
       automaticallyImplyLeading: false,
       centerTitle: true,
       title: Text(
-        'Account',
+        AppLocalizations.of(context)!.account,
         style: tt.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
-          color: AppThemeColors.primaryText,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );

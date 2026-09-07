@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../constants/nav_items.dart';
 import '../theme/app_theme_colors.dart';
+import 'package:multai_mobile/l10n/app_localizations.dart';
 
 class AppBottomNavBar extends StatelessWidget {
   final NotchBottomBarController controller;
@@ -14,6 +15,21 @@ class AppBottomNavBar extends StatelessWidget {
     required this.controller,
     required this.onTap,
   });
+
+  String _getNavLabel(BuildContext context, NavItem item) {
+    final l10n = AppLocalizations.of(context)!;
+
+    switch (item) {
+      case NavItem.home:
+        return l10n.home;
+      case NavItem.gallery:
+        return l10n.gallery;
+      case NavItem.event:
+        return l10n.event;
+      case NavItem.account:
+        return l10n.account;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +51,7 @@ class AppBottomNavBar extends StatelessWidget {
                 color: AppThemeColors.primaryAccent,
                 size: 20,
               ),
-              itemLabel: data.label,
+              itemLabel: _getNavLabel(context, data.label),
             ),
           )
           .toList(),

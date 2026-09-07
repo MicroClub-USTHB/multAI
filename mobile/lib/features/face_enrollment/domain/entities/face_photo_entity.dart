@@ -6,10 +6,10 @@ enum FacePhotoType {
   extra2;
 
   static List<FacePhotoType> get required => [
-        frontal,
-        leftProfile,
-        rightProfile,
-      ];
+    frontal,
+    leftProfile,
+    rightProfile,
+  ];
 
   static List<FacePhotoType> get optional => [extra1, extra2];
 }
@@ -101,14 +101,12 @@ extension FacePhotoTypeX on FacePhotoType {
 }
 
 extension FacePhotoMapX on Map<FacePhotoType, String> {
-  bool get hasRequiredPhotos => FacePhotoType.required
-      .every((type) => this[type] != null);
+  bool get hasRequiredPhotos =>
+      FacePhotoType.required.every((type) => this[type] != null);
 
-  int get requiredCount =>
-      entries.where((e) => e.key.isRequired).length;
+  int get requiredCount => entries.where((e) => e.key.isRequired).length;
 
-  int get optionalCount =>
-      entries.where((e) => !e.key.isRequired).length;
+  int get optionalCount => entries.where((e) => !e.key.isRequired).length;
 }
 
 class FacePhotoEntity {

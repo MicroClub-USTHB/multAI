@@ -120,9 +120,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   otpController: _otpController,
                                   isLoading: isLoading,
                                   onVerify: _onVerifyOtpPressed,
-                                  onResend: (pendingToken) => context
-                                      .read<AuthBloc>()
-                                      .add(
+                                  onResend: (pendingToken) =>
+                                      context.read<AuthBloc>().add(
                                         ResendOtpRequested(
                                           pendingToken: pendingToken,
                                         ),
@@ -152,7 +151,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 // Bottom link
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: context.heightCalculated(16)),
+                  padding: EdgeInsets.symmetric(
+                    vertical: context.heightCalculated(16),
+                  ),
                   child: _BottomLink(
                     isOtpStep: isOtpStep,
                     onTap: () {
@@ -275,7 +276,12 @@ class _RegisterFormContent extends StatelessWidget {
     final cs = context.theme.colorScheme;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(context.hPadding(), context.heightCalculated(24), context.hPadding(), 0),
+      padding: EdgeInsets.fromLTRB(
+        context.hPadding(),
+        context.heightCalculated(24),
+        context.hPadding(),
+        0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -341,10 +347,8 @@ class _RegisterFormContent extends StatelessWidget {
             obscure: obscureConfirm,
             onToggle: onToggleConfirm,
             onSubmit: onSubmit,
-            validator: (v) => Validators.confirmPassword(
-              v,
-              passwordController.text,
-            ),
+            validator: (v) =>
+                Validators.confirmPassword(v, passwordController.text),
           ),
           const SizedBox(height: 32),
 
@@ -450,7 +454,12 @@ class _OtpFormContentState extends State<_OtpFormContent> {
     final canResend = _countdown == 0 && widget.pendingToken != null;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(context.hPadding(), context.heightCalculated(28), context.hPadding(), 0),
+      padding: EdgeInsets.fromLTRB(
+        context.hPadding(),
+        context.heightCalculated(28),
+        context.hPadding(),
+        0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -570,12 +579,11 @@ class _OtpFormContentState extends State<_OtpFormContent> {
           // Resend link with countdown
           Center(
             child: TextButton(
-              onPressed:
-                  widget.isLoading || !canResend ? null : _onResendPressed,
+              onPressed: widget.isLoading || !canResend
+                  ? null
+                  : _onResendPressed,
               child: Text(
-                _countdown > 0
-                    ? 'Resend code (${_countdown}s)'
-                    : 'Resend code',
+                _countdown > 0 ? 'Resend code (${_countdown}s)' : 'Resend code',
                 style: tt.bodySmall?.copyWith(
                   color: AppThemeColors.primaryAccent,
                   fontWeight: FontWeight.w600,
@@ -646,7 +654,11 @@ class _PasswordStrengthIndicatorState
       AppThemeColors.primaryAccent,
       AppThemeColors.success,
     ];
-    final segments = _strength == 0 ? 1 : _strength > 4 ? 4 : _strength;
+    final segments = _strength == 0
+        ? 1
+        : _strength > 4
+        ? 4
+        : _strength;
     final activeColor = _strength == 0
         ? AppThemeColors.neutral300.withValues(alpha: 0.3)
         : colors[(_strength - 1).clamp(0, 3)];
@@ -660,7 +672,9 @@ class _PasswordStrengthIndicatorState
             child: Container(
               height: 3,
               decoration: BoxDecoration(
-                color: isActive ? activeColor : AppThemeColors.neutral300.withValues(alpha: 0.15),
+                color: isActive
+                    ? activeColor
+                    : AppThemeColors.neutral300.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(1.5),
               ),
             ),

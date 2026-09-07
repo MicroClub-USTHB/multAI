@@ -214,10 +214,7 @@ class PhotoCacheService {
         files.map((f) async {
           try {
             final stat = await f.stat();
-            return (
-              size: stat.size,
-              modified: stat.modified,
-            );
+            return (size: stat.size, modified: stat.modified);
           } catch (_) {
             return (size: 0, modified: DateTime.now());
           }

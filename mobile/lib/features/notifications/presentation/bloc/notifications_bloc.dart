@@ -78,8 +78,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           _failureHandler.logFailure(failure, 'NotificationBloc');
           emit(
             NotificationError(
-              errorPresentation:
-                  _failureHandler.getErrorPresentation(failure),
+              errorPresentation: _failureHandler.getErrorPresentation(failure),
             ),
           );
         }
@@ -118,8 +117,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         } else {
           emit(
             NotificationError(
-              errorPresentation:
-                  _failureHandler.getErrorPresentation(failure),
+              errorPresentation: _failureHandler.getErrorPresentation(failure),
             ),
           );
         }

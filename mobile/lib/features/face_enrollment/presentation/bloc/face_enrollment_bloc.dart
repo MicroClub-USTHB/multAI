@@ -46,27 +46,25 @@ class FaceEnrollmentBloc
 
     if (emit.isDone) return;
 
-    result.fold(
-      (failure) => _emitPhotoError(event.type, failure, emit),
-      (compressedFile) {
-        _safeDeleteOldPhoto(event.type);
-        _trackTempFile(compressedFile.path);
-        _emitPhotoAdded(event.type, compressedFile.path, emit);
-      },
-    );
+    result.fold((failure) => _emitPhotoError(event.type, failure, emit), (
+      compressedFile,
+    ) {
+      _safeDeleteOldPhoto(event.type);
+      _trackTempFile(compressedFile.path);
+      _emitPhotoAdded(event.type, compressedFile.path, emit);
+    });
   }
 
-  void _onPhotoRemoved(
-    PhotoRemoved event,
-    Emitter<FaceEnrollmentState> emit,
-  ) {
+  void _onPhotoRemoved(PhotoRemoved event, Emitter<FaceEnrollmentState> emit) {
     if (_shouldRejectInteraction()) return;
 
     _safeDeletePhoto(event.type);
-    emit(state.copyWith(
-      photos: state.removePhoto(event.type),
-      photoErrors: state.removeError(event.type),
-    ));
+    emit(
+      state.copyWith(
+        photos: state.removePhoto(event.type),
+        photoErrors: state.removeError(event.type),
+      ),
+    );
   }
 
   Future<void> _onEnrollmentSubmitted(
@@ -90,10 +88,12 @@ class FaceEnrollmentBloc
     await uploadResult.fold(
       (failure) async {
         _failureHandler.logFailure(failure, 'FaceEnrollmentBloc');
-        emit(state.copyWith(
-          status: EnrollmentStatus.editing,
-          submitError: _failureHandler.getUserFriendlyMessage(failure),
-        ));
+        emit(
+          state.copyWith(
+            status: EnrollmentStatus.editing,
+            submitError: _failureHandler.getUserFriendlyMessage(failure),
+          ),
+        );
       },
       (_) async {
         try {
@@ -104,12 +104,14 @@ class FaceEnrollmentBloc
             UnknownFailure('Failed to save enrollment status'),
             'FaceEnrollmentBloc',
           );
-          emit(state.copyWith(
-            status: EnrollmentStatus.editing,
-            submitError: _failureHandler.getUserFriendlyMessage(
-              const UnknownFailure('Failed to save enrollment status'),
+          emit(
+            state.copyWith(
+              status: EnrollmentStatus.editing,
+              submitError: _failureHandler.getUserFriendlyMessage(
+                const UnknownFailure('Failed to save enrollment status'),
+              ),
             ),
-          ));
+          );
           return;
         }
 
@@ -128,14 +130,15 @@ class FaceEnrollmentBloc
     emit(const FaceEnrollmentState());
   }
 
-  bool _shouldRejectInteraction() =>
-      state.isSubmitting || state.isSuccess;
+  bool _shouldRejectInteraction() => state.isSubmitting || state.isSuccess;
 
   void _emitLoading(FacePhotoType type, Emitter<FaceEnrollmentState> emit) {
-    emit(state.copyWith(
-      loadingPhotoTypes: state.toggleLoading(type, true),
-      photoErrors: state.removeError(type),
-    ));
+    emit(
+      state.copyWith(
+        loadingPhotoTypes: state.toggleLoading(type, true),
+        photoErrors: state.removeError(type),
+      ),
+    );
   }
 
   void _emitPhotoAdded(
@@ -143,10 +146,12 @@ class FaceEnrollmentBloc
     String path,
     Emitter<FaceEnrollmentState> emit,
   ) {
-    emit(state.copyWith(
-      photos: state.addPhoto(type, path),
-      loadingPhotoTypes: state.toggleLoading(type, false),
-    ));
+    emit(
+      state.copyWith(
+        photos: state.addPhoto(type, path),
+        loadingPhotoTypes: state.toggleLoading(type, false),
+      ),
+    );
   }
 
   void _emitPhotoError(
@@ -155,13 +160,15 @@ class FaceEnrollmentBloc
     Emitter<FaceEnrollmentState> emit,
   ) {
     _failureHandler.logFailure(failure, 'FaceEnrollmentBloc');
-    emit(state.copyWith(
-      loadingPhotoTypes: state.toggleLoading(type, false),
-      photoErrors: state.addPhotoError(
-        type,
-        _failureHandler.getUserFriendlyMessage(failure),
+    emit(
+      state.copyWith(
+        loadingPhotoTypes: state.toggleLoading(type, false),
+        photoErrors: state.addPhotoError(
+          type,
+          _failureHandler.getUserFriendlyMessage(failure),
+        ),
       ),
-    ));
+    );
   }
 
   void _trackTempFile(String path) {

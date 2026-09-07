@@ -131,13 +131,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         onAction: p.action == ErrorAction.retry
             ? () => context.read<NotificationBloc>().add(LoadNotifications())
             : p.action == ErrorAction.signIn
-                ? () {
-                    context.read<AuthBloc>().add(LogoutRequested());
-                    context.go(AppRoutes.login);
-                  }
-                : p.action == ErrorAction.goBack
-                    ? () => context.pop()
-                    : null,
+            ? () {
+                context.read<AuthBloc>().add(LogoutRequested());
+                context.go(AppRoutes.login);
+              }
+            : p.action == ErrorAction.goBack
+            ? () => context.pop()
+            : null,
       );
     }
 
@@ -200,6 +200,4 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
     );
   }
-
-
 }

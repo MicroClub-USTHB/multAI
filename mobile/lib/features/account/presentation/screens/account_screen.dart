@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/cubits/locale_cubit.dart';
-import 'package:multai_mobile/core/cubits/theme_cubit.dart';
-import 'package:multai_mobile/core/localization/app_localizations.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
-import 'package:multai_mobile/core/widgets/app_error_view.dart';
-import 'package:multai_mobile/core/errors/error_presentation.dart';
-import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart' as auth;
-import '../../../../core/extensions/responsive_extensions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/extensions/snackbar_extensions.dart';
-import '../../../../core/extensions/context_extensions.dart';
-import '../../../../core/router/app_routes.dart';
+
+import 'package:multai_mobile/core/cubits/locale_cubit.dart';
+import 'package:multai_mobile/core/cubits/theme_cubit.dart';
+import 'package:multai_mobile/core/errors/error_presentation.dart';
+import 'package:multai_mobile/core/extensions/context_extensions.dart';
+import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
+import 'package:multai_mobile/core/extensions/snackbar_extensions.dart';
+import 'package:multai_mobile/core/router/app_routes.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/widgets/app_error_view.dart';
+import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart'
+    as auth;
+import 'package:multai_mobile/l10n/app_localizations.dart';
+
 import '../bloc/account_bloc.dart';
 import '../widgets/account_app_bar.dart';
+import '../widgets/delete_account_button.dart';
+import '../widgets/logout_button.dart';
 import '../widgets/profile_section.dart';
 import '../widgets/settings_section.dart';
 import '../widgets/settings_tile.dart';
-import '../widgets/logout_button.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -38,21 +42,21 @@ class AccountScreen extends StatelessWidget {
 
   void _editName(BuildContext context, String currentName) {
     final controller = TextEditingController(text: currentName);
-    final loc = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(loc.translate('Edit Name')),
+        title: Text(l10n.editName),
         content: TextField(
           controller: controller,
           autofocus: true,
           maxLength: 100,
-          decoration: InputDecoration(hintText: loc.translate('Your name')),
+          decoration: InputDecoration(hintText: l10n.yourName),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(loc.translate('Cancel')),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -63,7 +67,7 @@ class AccountScreen extends StatelessWidget {
                 UpdateProfileRequested(name: newName),
               );
             },
-            child: Text(loc.translate('Save')),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -71,19 +75,16 @@ class AccountScreen extends StatelessWidget {
   }
 
   void _confirmClearCache(BuildContext context) {
-    final loc = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(loc.translate('Clear Image Cache')),
-        content: Text(loc.translate(
-          'This will remove all cached photos from your device. '
-          'Images will need to be re-downloaded when viewed again.',
-        )),
+        title: Text(l10n.clearImageCache),
+        content: Text(l10n.clearImageCacheDescription),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(loc.translate('Cancel')),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -93,7 +94,34 @@ class AccountScreen extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: context.theme.colorScheme.error,
             ),
-            child: Text(loc.translate('Clear')),
+            child: Text(l10n.clear),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteAccount(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.deleteAccount),
+        content: Text(l10n.deleteAccountConfirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: context.theme.colorScheme.error,
+            ),
+            child: Text(l10n.deleteAccount),
           ),
         ],
       ),
@@ -103,7 +131,7 @@ class AccountScreen extends StatelessWidget {
   void _showThemeSheet(BuildContext context) {
     final themeCubit = context.read<ThemeCubit>();
     final currentMode = themeCubit.state;
-    final loc = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     showModalBottomSheet(
       context: context,
@@ -114,14 +142,14 @@ class AccountScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Text(
-                loc.translate('Select theme'),
+                l10n.selectTheme,
                 style: context.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
             _ThemeOption(
-              label: loc.translate('Light'),
+              label: l10n.light,
               icon: Icons.light_mode_outlined,
               selected: currentMode == ThemeMode.light,
               onTap: () {
@@ -130,7 +158,7 @@ class AccountScreen extends StatelessWidget {
               },
             ),
             _ThemeOption(
-              label: loc.translate('Dark'),
+              label: l10n.dark,
               icon: Icons.dark_mode_outlined,
               selected: currentMode == ThemeMode.dark,
               onTap: () {
@@ -139,7 +167,7 @@ class AccountScreen extends StatelessWidget {
               },
             ),
             _ThemeOption(
-              label: loc.translate('System'),
+              label: l10n.systemDefault,
               icon: Icons.brightness_auto_outlined,
               selected: currentMode == ThemeMode.system,
               onTap: () {
@@ -157,7 +185,7 @@ class AccountScreen extends StatelessWidget {
   void _showLanguageSheet(BuildContext context) {
     final localeCubit = context.read<LocaleCubit>();
     final currentLocale = localeCubit.state;
-    final loc = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     showModalBottomSheet(
       context: context,
@@ -168,14 +196,14 @@ class AccountScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Text(
-                loc.translate('Select language'),
+                l10n.selectLanguage,
                 style: context.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
             _LanguageOption(
-              label: loc.translate('English'),
+              label: l10n.english,
               flag: '🇬🇧',
               selected: currentLocale.languageCode == 'en',
               onTap: () {
@@ -184,7 +212,7 @@ class AccountScreen extends StatelessWidget {
               },
             ),
             _LanguageOption(
-              label: loc.translate('Arabic'),
+              label: l10n.arabic,
               flag: '🇸🇦',
               selected: currentLocale.languageCode == 'ar',
               onTap: () {
@@ -193,7 +221,7 @@ class AccountScreen extends StatelessWidget {
               },
             ),
             _LanguageOption(
-              label: loc.translate('French'),
+              label: l10n.french,
               flag: '🇫🇷',
               selected: currentLocale.languageCode == 'fr',
               onTap: () {
@@ -209,26 +237,26 @@ class AccountScreen extends StatelessWidget {
   }
 
   String _themeModeLabel(BuildContext context, ThemeMode mode) {
-    final loc = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     switch (mode) {
       case ThemeMode.light:
-        return loc.translate('Light');
+        return l10n.light;
       case ThemeMode.dark:
-        return loc.translate('Dark');
+        return l10n.dark;
       case ThemeMode.system:
-        return loc.translate('System');
+        return l10n.systemDefault;
     }
   }
 
   String _localeLabel(BuildContext context, Locale locale) {
-    final loc = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     switch (locale.languageCode) {
       case 'ar':
-        return loc.translate('Arabic');
+        return l10n.arabic;
       case 'fr':
-        return loc.translate('French');
+        return l10n.french;
       default:
-        return loc.translate('English');
+        return l10n.english;
     }
   }
 
@@ -244,7 +272,10 @@ class AccountScreen extends StatelessWidget {
         }
         if (state is AccountCacheCleared) {
           context.showSuccessSnackBar(
-            'Freed ${state.storageFreed} (${state.filesRemoved} files)',
+            AppLocalizations.of(context)!.freedStorage(
+              state.storageFreed,
+              state.filesRemoved,
+            ),
           );
         }
       },
@@ -270,7 +301,7 @@ class AccountScreen extends StatelessWidget {
             if (state is AccountCacheClearing) ...[
               const SizedBox(height: 16),
               Text(
-                AppLocalizations.of(context).translate('Clearing cache...'),
+                AppLocalizations.of(context)!.clearingCache,
                 style: context.textTheme.bodyMedium,
               ),
             ],
@@ -351,7 +382,7 @@ class AccountScreen extends StatelessWidget {
                 ? state.avatarUrl
                 : (state is AccountProfileUpdating ? state.avatarUrl : null)));
 
-    final loc = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final themeMode = context.watch<ThemeCubit>().state;
     final currentLocale = context.watch<LocaleCubit>().state;
 
@@ -367,7 +398,7 @@ class AccountScreen extends StatelessWidget {
           ProfileSection(
             name: name,
             email: email,
-            membershipType: loc.translate('mc-member'),
+            membershipType: l10n.mcMember,
             avatarUrl: url,
             isUploading: isUploading,
             onAvatarTap: () => _pickAndUploadAvatar(context),
@@ -379,18 +410,20 @@ class AccountScreen extends StatelessWidget {
 
           // ── Preferences ────────────────────────────────────────────────
           SettingsSection(
-            title: loc.translate('PREFERENCES'),
+            title: l10n.preferences,
             items: [
               SettingItemData(
                 icon: Icons.dark_mode_outlined,
-                title: loc.translate('Appearance'),
-                subtitle: '${loc.translate('Light / Dark mode')} · ${_themeModeLabel(context, themeMode)}',
+                title: l10n.appearance,
+                subtitle:
+                    '${l10n.lightDarkMode} · ${_themeModeLabel(context, themeMode)}',
                 onTap: () => _showThemeSheet(context),
               ),
               SettingItemData(
                 icon: Icons.language_outlined,
-                title: loc.translate('Language'),
-                subtitle: '${loc.translate('Change app language')} · ${_localeLabel(context, currentLocale)}',
+                title: l10n.language,
+                subtitle:
+                    '${l10n.changeAppLanguage} · ${_localeLabel(context, currentLocale)}',
                 onTap: () => _showLanguageSheet(context),
               ),
             ],
@@ -399,36 +432,36 @@ class AccountScreen extends StatelessWidget {
 
           // ── Account Settings ───────────────────────────────────────────
           SettingsSection(
-            title: loc.translate('ACCOUNT SETTINGS'),
+            title: l10n.accountSettings,
             items: [
               SettingItemData(
                 icon: Icons.notifications_outlined,
-                title: loc.translate('Notifications'),
-                subtitle: loc.translate('Manage alerts and activity'),
+                title: l10n.notifications,
+                subtitle: l10n.manageAlertsAndActivity,
                 onTap: () {},
               ),
               SettingItemData(
                 icon: Icons.lock_outline,
-                title: loc.translate('Privacy & Security'),
-                subtitle: loc.translate('Password, 2FA, and data sharing'),
+                title: l10n.privacySecurity,
+                subtitle: l10n.privacySecurityDescription,
                 onTap: () {},
               ),
               SettingItemData(
                 icon: Icons.backup_outlined,
-                title: loc.translate('Backup Photos'),
-                subtitle: loc.translate('Download all photos as a ZIP file'),
+                title: l10n.backupPhotos,
+                subtitle: l10n.downloadPhotosAsZip,
                 onTap: () => context.push(AppRoutes.backup),
               ),
               SettingItemData(
                 icon: Icons.photo_library_outlined,
-                title: loc.translate('My Albums'),
-                subtitle: loc.translate('Organize photos into albums'),
+                title: l10n.myAlbums,
+                subtitle: l10n.organizePhotosIntoAlbums,
                 onTap: () => context.push(AppRoutes.albums),
               ),
               SettingItemData(
                 icon: Icons.cleaning_services_outlined,
-                title: loc.translate('Clear Image Cache'),
-                subtitle: loc.translate('Free up storage space'),
+                title: l10n.clearImageCache,
+                subtitle: l10n.freeUpStorage,
                 onTap: () => _confirmClearCache(context),
               ),
             ],
@@ -437,20 +470,24 @@ class AccountScreen extends StatelessWidget {
 
           // ── Support ────────────────────────────────────────────────────
           SettingsSection(
-            title: loc.translate('SUPPORT'),
+            title: l10n.support,
             items: [
               SettingItemData(
                 icon: Icons.help_outline,
-                title: loc.translate('Help Center'),
+                title: l10n.helpCenter,
                 onTap: () {},
               ),
             ],
           ),
           SizedBox(height: context.heightCalculated(32)),
 
-          // ── Logout ─────────────────────────────────────────────────────
+          // ── Logout / Delete ────────────────────────────────────────────
           LogoutButton(
             onPressed: () => context.read<AccountBloc>().add(LogoutRequested()),
+          ),
+          SizedBox(height: context.heightCalculated(12)),
+          DeleteAccountButton(
+            onPressed: () => _confirmDeleteAccount(context),
           ),
           SizedBox(height: context.heightCalculated(24)),
         ],

@@ -9,7 +9,6 @@ import 'core/cubits/locale_cubit.dart';
 import 'core/cubits/theme_cubit.dart';
 import 'core/errors/error_handler.dart';
 import 'core/errors/error_mapper.dart';
-import 'core/localization/app_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/security/env_validator.dart';
 import 'core/security/device_security.dart';
@@ -25,6 +24,8 @@ import 'features/notifications/services/push_notification_service.dart';
 import 'features/notifications/services/notification_navigation_service.dart';
 import 'features/gallery/presentation/bloc/gallery_bloc.dart';
 import 'di/injection_container.dart' as di;
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 
 late final SessionManager sessionManager;
 
@@ -190,8 +191,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 supportedLocales: AppLocalizations.supportedLocales,
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
-                  DefaultMaterialLocalizations.delegate,
-                  DefaultWidgetsLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
                 ],
                 routerConfig: appRouter,
               );

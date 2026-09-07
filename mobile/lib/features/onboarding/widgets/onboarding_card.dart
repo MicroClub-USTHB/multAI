@@ -28,7 +28,12 @@ class OnboardingCard extends StatelessWidget {
         ),
         Expanded(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(context.hPadding(), context.heightCalculated(28), context.hPadding(), 0),
+            padding: EdgeInsets.fromLTRB(
+              context.hPadding(),
+              context.heightCalculated(28),
+              context.hPadding(),
+              0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
