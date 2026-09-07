@@ -9,10 +9,7 @@ import 'package:multai_mobile/l10n/app_localizations.dart';
 class DeleteAccountButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const DeleteAccountButton({
-    super.key,
-    required this.onPressed,
-  });
+  const DeleteAccountButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +22,9 @@ class DeleteAccountButton extends StatelessWidget {
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           backgroundColor: AppThemeColors.error.withValues(alpha: 0.1),
-          side: BorderSide(
-            color: AppThemeColors.error.withValues(alpha: 0.4),
-          ),
+          side: BorderSide(color: AppThemeColors.error.withValues(alpha: 0.4)),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              AppThemeMetrics.radiusMd,
-            ),
+            borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
           ),
         ),
         child: Row(
@@ -42,9 +35,7 @@ class DeleteAccountButton extends StatelessWidget {
               color: AppThemeColors.error,
               size: context.iconSize(),
             ),
-            SizedBox(
-              width: context.widthCalculated(8),
-            ),
+            SizedBox(width: context.widthCalculated(8)),
             Text(
               AppLocalizations.of(context)!.deleteAccount,
               style: tt.titleMedium?.copyWith(

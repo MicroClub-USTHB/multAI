@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum ErrorAction {
-  retry,
-  signIn,
-  goBack,
-  none,
-}
+enum ErrorAction { retry, signIn, goBack, none }
 
 class ErrorPresentation {
   final String title;

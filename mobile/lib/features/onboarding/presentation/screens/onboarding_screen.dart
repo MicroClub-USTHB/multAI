@@ -105,7 +105,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
-                        padding: EdgeInsets.fromLTRB(context.hPadding(), 0, context.hPadding(), context.heightCalculated(36)),
+                        padding: EdgeInsets.fromLTRB(
+                          context.hPadding(),
+                          0,
+                          context.hPadding(),
+                          context.heightCalculated(36),
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,

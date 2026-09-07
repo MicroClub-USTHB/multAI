@@ -39,7 +39,6 @@ class _EventGridScreenState extends State<EventGridScreen> {
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
     final l10n = AppLocalizations.of(context)!;
-    
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

@@ -39,8 +39,7 @@ class UnauthorizedFailure extends Failure {
   const UnauthorizedFailure([super.message = 'Session expired']);
 
   @override
-  AppException get appException =>
-      AuthenticationException(message: message);
+  AppException get appException => AuthenticationException(message: message);
 }
 
 class ServerFailure extends Failure {

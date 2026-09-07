@@ -67,8 +67,7 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
           _failureHandler.logFailure(failure, 'GalleryBloc');
           emit(
             GalleryError(
-              errorPresentation:
-                  _failureHandler.getErrorPresentation(failure),
+              errorPresentation: _failureHandler.getErrorPresentation(failure),
             ),
           );
         }
@@ -107,8 +106,7 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
           _failureHandler.logFailure(failure, 'GalleryBloc');
           emit(
             GalleryError(
-              errorPresentation:
-                  _failureHandler.getErrorPresentation(failure),
+              errorPresentation: _failureHandler.getErrorPresentation(failure),
             ),
           );
         }

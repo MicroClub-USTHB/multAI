@@ -47,9 +47,7 @@ class StepNavigation extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppThemeColors.background,
         border: Border(
-          top: BorderSide(
-            color: AppThemeColors.divider.withValues(alpha: 0.3),
-          ),
+          top: BorderSide(color: AppThemeColors.divider.withValues(alpha: 0.3)),
         ),
       ),
       child: SafeArea(
@@ -64,9 +62,7 @@ class StepNavigation extends StatelessWidget {
                 opacity: canGoPrevious ? 1.0 : 0.0,
                 duration: AppThemeMetrics.durationFast,
                 child: TextButton(
-                  onPressed: canGoPrevious && !isSubmitting
-                      ? onPrevious
-                      : null,
+                  onPressed: canGoPrevious && !isSubmitting ? onPrevious : null,
                   style: TextButton.styleFrom(
                     foregroundColor: cs.onSurface.withValues(alpha: 0.7),
                     padding: const EdgeInsets.symmetric(
@@ -84,7 +80,10 @@ class StepNavigation extends StatelessWidget {
             const Spacer(),
 
             // Skip optional
-            if (isOptional && allRequiredDone && !isLastPage && onSkipOptional != null)
+            if (isOptional &&
+                allRequiredDone &&
+                !isLastPage &&
+                onSkipOptional != null)
               Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: Semantics(
@@ -115,8 +114,8 @@ class StepNavigation extends StatelessWidget {
             Semantics(
               label: showSubmit
                   ? (canSubmit
-                      ? l10n.completeEnrollment
-                      : l10n.uploadRequiredPhotosFirst)
+                        ? l10n.completeEnrollment
+                        : l10n.uploadRequiredPhotosFirst)
                   : l10n.nextStep,
               button: true,
               child: AnimatedContainer(
@@ -129,12 +128,14 @@ class StepNavigation extends StatelessWidget {
                           backgroundColor: canSubmit
                               ? AppThemeColors.primaryAccent
                               : AppThemeColors.enrollDisabled,
-                          foregroundColor:
-                              canSubmit ? Colors.black : Colors.white,
+                          foregroundColor: canSubmit
+                              ? Colors.black
+                              : Colors.white,
                           disabledBackgroundColor:
                               AppThemeColors.enrollDisabled,
-                          disabledForegroundColor:
-                              Colors.white.withValues(alpha: 0.6),
+                          disabledForegroundColor: Colors.white.withValues(
+                            alpha: 0.6,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
                               AppThemeMetrics.radiusMd,
@@ -183,19 +184,19 @@ class StepNavigation extends StatelessWidget {
                               ),
                       )
                     : ElevatedButton(
-                        onPressed: canGoNext && !isSubmitting
-                            ? onNext
-                            : null,
+                        onPressed: canGoNext && !isSubmitting ? onNext : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: canGoNext
                               ? AppThemeColors.primaryAccent
                               : AppThemeColors.enrollDisabled,
-                          foregroundColor:
-                              canGoNext ? Colors.black : Colors.white,
+                          foregroundColor: canGoNext
+                              ? Colors.black
+                              : Colors.white,
                           disabledBackgroundColor:
                               AppThemeColors.enrollDisabled,
-                          disabledForegroundColor:
-                              Colors.white.withValues(alpha: 0.6),
+                          disabledForegroundColor: Colors.white.withValues(
+                            alpha: 0.6,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
                               AppThemeMetrics.radiusMd,
@@ -216,15 +217,13 @@ class StepNavigation extends StatelessWidget {
                               l10n.next,
                               style: tt.labelLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    canGoNext ? Colors.black : Colors.white,
+                                color: canGoNext ? Colors.black : Colors.white,
                               ),
                             ),
                             const SizedBox(width: 6),
                             Icon(
                               Icons.arrow_forward,
-                              color:
-                                  canGoNext ? Colors.black : Colors.white,
+                              color: canGoNext ? Colors.black : Colors.white,
                               size: context.iconSize() * 0.8,
                             ),
                           ],

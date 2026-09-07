@@ -82,12 +82,10 @@ class ApiClient {
     if (requiresAuth && !await _hasValidCredentials()) {
       throw const UnauthorizedFailure('No access token');
     }
-    return _executeWithAuth(
-      () async {
-        final headers = await _getHeaders(requiresAuth: requiresAuth);
-        return _client.get(Uri.parse('$baseUrl$endpoint'), headers: headers);
-      },
-    );
+    return _executeWithAuth(() async {
+      final headers = await _getHeaders(requiresAuth: requiresAuth);
+      return _client.get(Uri.parse('$baseUrl$endpoint'), headers: headers);
+    });
   }
 
   Future<dynamic> post(
@@ -99,16 +97,14 @@ class ApiClient {
       throw const UnauthorizedFailure('No access token');
     }
     final requestBody = body != null ? jsonEncode(body) : null;
-    return _executeWithAuth(
-      () async {
-        final headers = await _getHeaders(requiresAuth: requiresAuth);
-        return _client.post(
-          Uri.parse('$baseUrl$endpoint'),
-          headers: headers,
-          body: requestBody,
-        );
-      },
-    );
+    return _executeWithAuth(() async {
+      final headers = await _getHeaders(requiresAuth: requiresAuth);
+      return _client.post(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: headers,
+        body: requestBody,
+      );
+    });
   }
 
   Future<dynamic> patch(
@@ -120,16 +116,14 @@ class ApiClient {
       throw const UnauthorizedFailure('No access token');
     }
     final requestBody = body != null ? jsonEncode(body) : null;
-    return _executeWithAuth(
-      () async {
-        final headers = await _getHeaders(requiresAuth: requiresAuth);
-        return _client.patch(
-          Uri.parse('$baseUrl$endpoint'),
-          headers: headers,
-          body: requestBody,
-        );
-      },
-    );
+    return _executeWithAuth(() async {
+      final headers = await _getHeaders(requiresAuth: requiresAuth);
+      return _client.patch(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: headers,
+        body: requestBody,
+      );
+    });
   }
 
   Future<void> postVoid(
@@ -141,28 +135,24 @@ class ApiClient {
       throw const UnauthorizedFailure('No access token');
     }
     final requestBody = body != null ? jsonEncode(body) : null;
-    await _executeWithAuthVoid(
-      () async {
-        final headers = await _getHeaders(requiresAuth: requiresAuth);
-        return _client.post(
-          Uri.parse('$baseUrl$endpoint'),
-          headers: headers,
-          body: requestBody,
-        );
-      },
-    );
+    await _executeWithAuthVoid(() async {
+      final headers = await _getHeaders(requiresAuth: requiresAuth);
+      return _client.post(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: headers,
+        body: requestBody,
+      );
+    });
   }
 
   Future<void> delete(String endpoint, {bool requiresAuth = true}) async {
     if (requiresAuth && !await _hasValidCredentials()) {
       throw const UnauthorizedFailure('No access token');
     }
-    await _executeWithAuthVoid(
-      () async {
-        final headers = await _getHeaders(requiresAuth: requiresAuth);
-        return _client.delete(Uri.parse('$baseUrl$endpoint'), headers: headers);
-      },
-    );
+    await _executeWithAuthVoid(() async {
+      final headers = await _getHeaders(requiresAuth: requiresAuth);
+      return _client.delete(Uri.parse('$baseUrl$endpoint'), headers: headers);
+    });
   }
 
   void _handleVoidResponse(http.Response response) {
@@ -210,9 +200,7 @@ class ApiClient {
     final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      return Map<String, dynamic>.from(
-        jsonDecode(response.body) as Map,
-      );
+      return Map<String, dynamic>.from(jsonDecode(response.body) as Map);
     }
     return _throwForStatus(response);
   }
@@ -235,12 +223,10 @@ class ApiClient {
     if (!await _hasValidCredentials()) {
       throw const UnauthorizedFailure('No access token');
     }
-    final response = await _executeWithAuthRaw(
-      () async {
-        final headers = await _getHeaders(requiresAuth: true);
-        return _client.get(Uri.parse('$baseUrl$url'), headers: headers);
-      },
-    );
+    final response = await _executeWithAuthRaw(() async {
+      final headers = await _getHeaders(requiresAuth: true);
+      return _client.get(Uri.parse('$baseUrl$url'), headers: headers);
+    });
     if (response.statusCode == 200) return response.bodyBytes;
     throw ServerFailure(
       'Failed to fetch bytes: ${response.statusCode}',

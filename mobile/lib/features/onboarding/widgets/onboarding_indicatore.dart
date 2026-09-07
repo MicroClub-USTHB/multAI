@@ -23,7 +23,9 @@ class OnboardingIndicator extends StatelessWidget {
           curve: Curves.easeOutCubic,
           margin: EdgeInsets.only(right: context.widthCalculated(6)),
           height: 2,
-          width: isActive ? context.widthCalculated(28) : context.widthCalculated(12),
+          width: isActive
+              ? context.widthCalculated(28)
+              : context.widthCalculated(12),
           decoration: BoxDecoration(
             color: isActive
                 ? AppThemeColors.primaryAccent

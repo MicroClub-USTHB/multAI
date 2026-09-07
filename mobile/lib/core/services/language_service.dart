@@ -11,33 +11,30 @@ class LanguageService {
   final ValueNotifier<Locale> locale = ValueNotifier(const Locale('en'));
 
   Future<void> load() async {
-  final savedLanguage = _storage.getString(StorageKeys.language);
+    final savedLanguage = _storage.getString(StorageKeys.language);
 
-  switch (savedLanguage) {
-    case 'fr':
-      locale.value = const Locale('fr');
-      break;
+    switch (savedLanguage) {
+      case 'fr':
+        locale.value = const Locale('fr');
+        break;
 
-    case 'ar':
-      locale.value = const Locale('ar');
-      break;
+      case 'ar':
+        locale.value = const Locale('ar');
+        break;
 
-    case 'en':
-    default:
-      locale.value = const Locale('en');
-      break;
+      case 'en':
+      default:
+        locale.value = const Locale('en');
+        break;
+    }
   }
-}
 
   Future<void> setLanguage(String languageCode) async {
     final newLocale = Locale(languageCode);
 
     locale.value = newLocale;
 
-    await _storage.setString(
-      StorageKeys.language,
-      languageCode,
-    );
+    await _storage.setString(StorageKeys.language, languageCode);
   }
 
   void dispose() {

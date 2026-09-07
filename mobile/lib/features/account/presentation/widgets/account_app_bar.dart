@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:multai_mobile/l10n/app_localizations.dart';
 import '../../../../core/extensions/context_extensions.dart';
 
-
-
 class AccountAppBar extends StatelessWidget implements PreferredSizeWidget {
   const AccountAppBar({super.key});
 

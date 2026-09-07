@@ -33,8 +33,9 @@ class _EnrollmentProgressState extends State<EnrollmentProgress> {
     }
   }
 
-  double get _progress =>
-      widget.totalSteps > 0 ? (widget.currentStep + 1) / widget.totalSteps : 0.0;
+  double get _progress => widget.totalSteps > 0
+      ? (widget.currentStep + 1) / widget.totalSteps
+      : 0.0;
 
   @override
   Widget build(BuildContext context) {

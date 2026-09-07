@@ -71,9 +71,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _emitAuthenticatedState(
     AuthEntity auth,
     Emitter<AuthState> emit,
- ) async {
+  ) async {
     emit(AuthAuthenticated(auth: auth));
- }
+  }
 
   void _emitFailure(Emitter<AuthState> emit, Failure failure) {
     _failureHandler.logFailure(failure, 'AuthBloc');
@@ -98,9 +98,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       await result.fold(
         (failure) async => _emitFailure(emit, failure),
-        (pendingToken) async => emit(
-          AuthOtpSent(email: event.email, pendingToken: pendingToken),
-        ),
+        (pendingToken) async =>
+            emit(AuthOtpSent(email: event.email, pendingToken: pendingToken)),
       );
     } catch (e, s) {
       _logger.error('AuthBloc', 'Send OTP failed', e, s);
@@ -117,9 +116,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _resendOtpUseCase(event.pendingToken);
       await result.fold(
         (failure) async => _emitFailure(emit, failure),
-        (newPendingToken) async => emit(
-          ResendOtpSuccess(pendingToken: newPendingToken),
-        ),
+        (newPendingToken) async =>
+            emit(ResendOtpSuccess(pendingToken: newPendingToken)),
       );
     } catch (e, s) {
       _logger.error('AuthBloc', 'Resend OTP failed', e, s);
@@ -254,10 +252,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onResetAuth(
-    ResetAuth event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onResetAuth(ResetAuth event, Emitter<AuthState> emit) async {
     emit(AuthInitial());
   }
 }

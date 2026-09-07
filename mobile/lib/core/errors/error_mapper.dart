@@ -183,10 +183,7 @@ class ErrorMapper {
   ErrorPresentation _aiUnavailablePresentation(AppException e) {
     return ErrorPresentation(
       title: 'Service Unavailable',
-      description: _message(
-        e,
-        'The AI service is temporarily unavailable.',
-      ),
+      description: _message(e, 'The AI service is temporarily unavailable.'),
       actionLabel: 'Retry',
       action: ErrorAction.retry,
       illustration: Icons.cloud_off_rounded,

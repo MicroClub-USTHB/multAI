@@ -59,9 +59,9 @@ class ErrorStateView extends StatelessWidget {
               ),
               ElevatedButton.icon(
                 onPressed: onAction,
-                icon: Icon(actionLabel == 'Retry'
-                    ? Icons.refresh
-                    : Icons.login_rounded),
+                icon: Icon(
+                  actionLabel == 'Retry' ? Icons.refresh : Icons.login_rounded,
+                ),
                 label: Text(actionLabel!),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: AppThemeColors.primaryText,

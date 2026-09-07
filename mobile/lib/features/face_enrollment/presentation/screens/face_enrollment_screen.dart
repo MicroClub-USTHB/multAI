@@ -112,8 +112,9 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color:
-                          AppThemeColors.primaryAccent.withValues(alpha: 0.15),
+                      color: AppThemeColors.primaryAccent.withValues(
+                        alpha: 0.15,
+                      ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
@@ -174,10 +175,7 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
               Column(
                 children: [
                   // Progress header (thin)
-                  _ProgressHeader(
-                    state: state,
-                    currentStep: _currentPage,
-                  ),
+                  _ProgressHeader(state: state, currentStep: _currentPage),
 
                   // Hero content area
                   Expanded(
@@ -214,9 +212,7 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
                   ),
 
                   // Privacy info bar
-                  _PrivacyBar(
-                    onTap: () => _showPrivacySheet(context),
-                  ),
+                  _PrivacyBar(onTap: () => _showPrivacySheet(context)),
 
                   // Fixed bottom navigation
                   StepNavigation(
@@ -228,15 +224,14 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
                     isSubmitting: state.isSubmitting,
                     onPrevious: _currentPage > 0 ? _goPrevious : null,
                     onNext: canGoNext ? _goNext : null,
-                    onSkipOptional:
-                        isOptional && allRequiredDone
-                            ? () => context
-                                .read<FaceEnrollmentBloc>()
-                                .add(EnrollmentSubmitted())
-                            : null,
-                    onSubmit: () => context
-                        .read<FaceEnrollmentBloc>()
-                        .add(EnrollmentSubmitted()),
+                    onSkipOptional: isOptional && allRequiredDone
+                        ? () => context.read<FaceEnrollmentBloc>().add(
+                            EnrollmentSubmitted(),
+                          )
+                        : null,
+                    onSubmit: () => context.read<FaceEnrollmentBloc>().add(
+                      EnrollmentSubmitted(),
+                    ),
                   ),
                 ],
               ),
@@ -255,10 +250,7 @@ class _ProgressHeader extends StatelessWidget {
   final FaceEnrollmentState state;
   final int currentStep;
 
-  const _ProgressHeader({
-    required this.state,
-    required this.currentStep,
-  });
+  const _ProgressHeader({required this.state, required this.currentStep});
 
   @override
   Widget build(BuildContext context) {
@@ -285,10 +277,7 @@ class _StepPage extends StatelessWidget {
   final FacePhotoType type;
   final FaceEnrollmentState state;
 
-  const _StepPage({
-    required this.type,
-    required this.state,
-  });
+  const _StepPage({required this.type, required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -298,9 +287,7 @@ class _StepPage extends StatelessWidget {
     final isLoading = state.loadingPhotoTypes.contains(type);
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.hPadding(),
-      ),
+      padding: EdgeInsets.symmetric(horizontal: context.hPadding()),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -321,9 +308,7 @@ class _StepPage extends StatelessWidget {
           Text(
             _description,
             style: tt.bodySmall?.copyWith(
-              color: context
-                  .theme.colorScheme.onSurface
-                  .withValues(alpha: 0.7),
+              color: context.theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -338,9 +323,9 @@ class _StepPage extends StatelessWidget {
               error: currentError,
               onTap: () => _pickPhoto(context, type),
               onDelete: currentPhoto != null
-                  ? () => context
-                      .read<FaceEnrollmentBloc>()
-                      .add(PhotoRemoved(type: type))
+                  ? () => context.read<FaceEnrollmentBloc>().add(
+                      PhotoRemoved(type: type),
+                    )
                   : null,
             ),
           ),
@@ -382,10 +367,7 @@ class _PrivacyBar extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 6,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -503,10 +485,8 @@ class _LoadingOverlayState extends State<_LoadingOverlay> {
                   SizedBox(height: context.heightCalculated(16)),
                   AnimatedSwitcher(
                     duration: AppThemeMetrics.durationMedium,
-                    transitionBuilder: (child, animation) => FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    ),
+                    transitionBuilder: (child, animation) =>
+                        FadeTransition(opacity: animation, child: child),
                     child: Text(
                       _messages[_messageIndex],
                       key: ValueKey(_messageIndex),
@@ -519,9 +499,7 @@ class _LoadingOverlayState extends State<_LoadingOverlay> {
                   SizedBox(height: context.heightCalculated(4)),
                   Text(
                     'Please wait while we process your enrollment.',
-                    style: tt.bodySmall?.copyWith(
-                      color: Colors.white70,
-                    ),
+                    style: tt.bodySmall?.copyWith(color: Colors.white70),
                   ),
                 ],
               ),
@@ -555,10 +533,7 @@ class _SuccessScreenState extends State<_SuccessScreen>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    _scaleAnim = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    );
+    _scaleAnim = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _fadeAnim = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
@@ -620,9 +595,9 @@ class _SuccessScreenState extends State<_SuccessScreen>
                       Text(
                         'Your face profile has been saved.',
                         style: tt.bodyMedium?.copyWith(
-                          color: context
-                              .theme.colorScheme.onSurface
-                              .withValues(alpha: 0.7),
+                          color: context.theme.colorScheme.onSurface.withValues(
+                            alpha: 0.7,
+                          ),
                         ),
                       ),
                     ],

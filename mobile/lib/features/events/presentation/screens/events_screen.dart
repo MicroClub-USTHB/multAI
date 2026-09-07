@@ -190,13 +190,13 @@ class _EventsScreenState extends State<EventsScreen> {
       onAction: p.action == ErrorAction.retry
           ? () => context.read<EventsBloc>().add(EventsRetryRequested())
           : p.action == ErrorAction.signIn
-              ? () {
-                  context.read<AuthBloc>().add(LogoutRequested());
-                  context.go(AppRoutes.login);
-                }
-              : p.action == ErrorAction.goBack
-                  ? () => context.pop()
-                  : null,
+          ? () {
+              context.read<AuthBloc>().add(LogoutRequested());
+              context.go(AppRoutes.login);
+            }
+          : p.action == ErrorAction.goBack
+          ? () => context.pop()
+          : null,
     );
   }
 
@@ -208,7 +208,9 @@ class _EventsScreenState extends State<EventsScreen> {
       ),
       child: LinearProgressIndicator(
         backgroundColor: AppThemeColors.border.withValues(alpha: 0.2),
-        valueColor: const AlwaysStoppedAnimation<Color>(AppThemeColors.primaryAccent),
+        valueColor: const AlwaysStoppedAnimation<Color>(
+          AppThemeColors.primaryAccent,
+        ),
       ),
     );
   }
@@ -224,7 +226,9 @@ class _EventsScreenState extends State<EventsScreen> {
       decoration: BoxDecoration(
         color: AppThemeColors.primaryAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
-        border: Border.all(color: AppThemeColors.primaryAccent.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: AppThemeColors.primaryAccent.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         children: [
@@ -280,10 +284,7 @@ class _EventsScreenState extends State<EventsScreen> {
             SizedBox(
               height: context.heightCalculated(AppThemeMetrics.spacingXs),
             ),
-            Text(
-              l10n.joinEventDescription,
-              style: tt.bodySmall,
-            ),
+            Text(l10n.joinEventDescription, style: tt.bodySmall),
             SizedBox(
               height: context.heightCalculated(AppThemeMetrics.spacingLg),
             ),

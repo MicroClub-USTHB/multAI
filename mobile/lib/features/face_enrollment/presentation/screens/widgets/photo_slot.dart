@@ -95,10 +95,7 @@ class PhotoSlot extends StatelessWidget {
           decoration: BoxDecoration(
             color: _backgroundColor,
             borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
-            border: Border.all(
-              color: _borderColor(cs),
-              width: _borderWidth,
-            ),
+            border: Border.all(color: _borderColor(cs), width: _borderWidth),
           ),
           clipBehavior: Clip.hardEdge,
           child: AnimatedSwitcher(
@@ -163,10 +160,7 @@ class PhotoSlot extends StatelessWidget {
       case _SlotState.error:
         return _ErrorContent(type: type, error: error!);
       case _SlotState.completed:
-        return _CompletedContent(
-          filePath: filePath!,
-          onDelete: onDelete,
-        );
+        return _CompletedContent(filePath: filePath!, onDelete: onDelete);
       case _SlotState.empty:
         return const _EmptyContent();
     }
@@ -333,10 +327,7 @@ class _CompletedContent extends StatelessWidget {
   final String filePath;
   final VoidCallback? onDelete;
 
-  const _CompletedContent({
-    required this.filePath,
-    this.onDelete,
-  });
+  const _CompletedContent({required this.filePath, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -403,8 +394,9 @@ class _CompletedContent extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.black54,
-                      borderRadius:
-                          BorderRadius.circular(AppThemeMetrics.radiusSm),
+                      borderRadius: BorderRadius.circular(
+                        AppThemeMetrics.radiusSm,
+                      ),
                     ),
                     child: Icon(
                       Icons.delete_outline,

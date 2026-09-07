@@ -76,9 +76,9 @@ class _QrScanScreenState extends State<QrScanScreen> {
             child: Text(
               l10n.pointCameraAtQrCode,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.white,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.white),
             ),
           ),
         ],

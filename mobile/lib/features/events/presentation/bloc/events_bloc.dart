@@ -84,8 +84,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         } else {
           emit(
             EventsFailure(
-              errorPresentation:
-                  _failureHandler.getErrorPresentation(failure),
+              errorPresentation: _failureHandler.getErrorPresentation(failure),
             ),
           );
         }
@@ -118,8 +117,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         _failureHandler.logFailure(failure, 'EventsBloc');
         emit(
           EventsFailure(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
@@ -168,8 +166,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         } else {
           emit(
             EventsFailure(
-              errorPresentation:
-                  _failureHandler.getErrorPresentation(failure),
+              errorPresentation: _failureHandler.getErrorPresentation(failure),
             ),
           );
         }
