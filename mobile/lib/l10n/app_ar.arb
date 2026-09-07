@@ -44,5 +44,24 @@
   "home": "الرئيسية",
   "gallery": "المعرض",
   "event": "الفعالية",
-  "account": "الحساب"
+  "account": "الحساب",
+  "eventsTitle": "فعاليات MultiAi",
+"eventJoinedSuccess": "تم الانضمام إلى الفعالية بنجاح!",
+"cachedDataMessage": "يتم عرض البيانات المخزنة مؤقتًا. اتصل بالإنترنت لرؤية أحدث البيانات.",
+"joinNewEvent": "الانضمام إلى فعالية جديدة",
+"joinEventDescription": "لديك دعوة؟ أدخل رمز الفعالية أدناه للمشاركة.",
+"scanQrCode": "مسح رمز QR",
+"joinEvent": "الانضمام إلى الفعالية",
+"activeEvents": "الفعاليات النشطة",
+"ongoingEvents": "{count} جارية",
+"noActiveEvents": "لا توجد فعاليات نشطة",
+"joinEventToSeeHere": "انضم إلى فعالية لرؤيتها هنا!",
+"archivedEvents": "الفعاليات المؤرشفة",
+"noArchivedEvents": "لا توجد فعاليات مؤرشفة",
+"archivedEventsEmpty": "ستظهر فعالياتك المؤرشفة هنا.",
+"@ongoingEvents": {
+  "placeholders": {
+    "count": {}
+  }
+}
 }

@@ -45,5 +45,19 @@
   "home": "HOME",
   "gallery": "GALLERY",
   "event": "EVENT",
-  "account": "ACCOUNT"
+  "account": "ACCOUNT",
+  "eventsTitle": "MultiAi Events",
+  "eventJoinedSuccess": "Successfully joined event!",
+  "cachedDataMessage": "Showing cached data. Connect to the internet to see the latest.",
+  "joinNewEvent": "Join New Event",
+  "joinEventDescription": "Have an invite? Enter the event code below to participate.",
+  "scanQrCode": "Scan QR code",
+  "joinEvent": "Join Event",
+  "activeEvents": "Active Events",
+  "ongoingEvents": "{count} Ongoing",
+  "noActiveEvents": "No active events",
+  "joinEventToSeeHere": "Join an event to see it here!",
+  "archivedEvents": "Archived Events",
+  "noArchivedEvents": "No archived events",
+  "archivedEventsEmpty": "Your archived events will appear here."
 }

@@ -45,5 +45,24 @@
   "home": "ACCUEIL",
   "gallery": "GALERIE",
   "event": "ÉVÉNEMENT",
-  "account": "COMPTE"
+  "account": "COMPTE",
+  "eventsTitle": "Événements MultiAi",
+"eventJoinedSuccess": "Événement rejoint avec succès !",
+"cachedDataMessage": "Affichage des données en cache. Connectez-vous à Internet pour voir les dernières données.",
+"joinNewEvent": "Rejoindre un nouvel événement",
+"joinEventDescription": "Vous avez une invitation ? Entrez le code de l'événement ci-dessous pour participer.",
+"scanQrCode": "Scanner le code QR",
+"joinEvent": "Rejoindre l'événement",
+"activeEvents": "Événements actifs",
+"ongoingEvents": "{count} en cours",
+"noActiveEvents": "Aucun événement actif",
+"joinEventToSeeHere": "Rejoignez un événement pour le voir ici !",
+"archivedEvents": "Événements archivés",
+"noArchivedEvents": "Aucun événement archivé",
+"archivedEventsEmpty": "Vos événements archivés apparaîtront ici.",
+"@ongoingEvents": {
+  "placeholders": {
+    "count": {}
+  }
+}
 }

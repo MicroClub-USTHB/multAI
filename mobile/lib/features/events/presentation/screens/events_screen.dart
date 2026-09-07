@@ -20,6 +20,7 @@ import '../widgets/active_events_card.dart';
 import '../widgets/archived_events_card.dart';
 import 'event_photos_screen.dart';
 import 'qr_scan_screen.dart';
+import 'package:multai_mobile/l10n/app_localizations.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -59,11 +60,12 @@ class _EventsScreenState extends State<EventsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocListener<EventsBloc, EventsState>(
       listener: (context, state) {
         if (state is JoinEventSuccess) {
           _eventCodeController.clear();
-          context.showSuccessSnackBar('Successfully joined event!');
+          context.showSuccessSnackBar(l10n.eventJoinedSuccess);
         }
         if (state is EventsFailure) {
           context.showErrorSnackBar(state.errorPresentation.description);
@@ -73,7 +75,7 @@ class _EventsScreenState extends State<EventsScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           title: Text(
-            'MultiAi Events',
+            l10n.eventsTitle,
             style: context.theme.appBarTheme.titleTextStyle?.copyWith(
               color: AppThemeColors.accent,
             ),
@@ -213,6 +215,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
   // ── Offline banner (showing cached data) ─────────────────────────────────
   Widget _buildOfflineBanner(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(
@@ -233,7 +236,7 @@ class _EventsScreenState extends State<EventsScreen> {
           SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
           Expanded(
             child: Text(
-              'Showing cached data. Connect to the internet to see the latest.',
+              l10n.cachedDataMessage,
               style: context.textTheme.bodySmall?.copyWith(
                 color: AppThemeColors.primaryAccent,
               ),
@@ -246,6 +249,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
   // ── Join section ───────────────────────────────────────────────────────────
   Widget _buildJoinSection(BuildContext context, EventsState state) {
+    final l10n = AppLocalizations.of(context)!;
     final tt = context.textTheme;
     final isJoining = state is JoinEventLoading;
 
@@ -268,7 +272,7 @@ class _EventsScreenState extends State<EventsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Join New Event',
+              l10n.joinNewEvent,
               style: tt.headlineSmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -277,7 +281,7 @@ class _EventsScreenState extends State<EventsScreen> {
               height: context.heightCalculated(AppThemeMetrics.spacingXs),
             ),
             Text(
-              'Have an invite? Enter the event code below to participate.',
+              l10n.joinEventDescription,
               style: tt.bodySmall,
             ),
             SizedBox(
@@ -289,7 +293,7 @@ class _EventsScreenState extends State<EventsScreen> {
                 hintText: 'e.g. Xk3p9QzL2A',
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.qr_code_scanner),
-                  tooltip: 'Scan QR code',
+                  tooltip: l10n.scanQrCode,
                   onPressed: _scanQrCode,
                 ),
               ),
@@ -330,7 +334,7 @@ class _EventsScreenState extends State<EventsScreen> {
                         child: const CircularProgressIndicator(strokeWidth: 2),
                       )
                     : Text(
-                        'Join Event',
+                        l10n.joinEvent,
                         style: tt.titleLarge?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -345,6 +349,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
   // ── Active section ─────────────────────────────────────────────────────────
   Widget _buildActiveSection(BuildContext context, EventsState state) {
+    final l10n = AppLocalizations.of(context)!;
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
     final activeEvents = state is EventsLoaded ? state.activeEvents : [];
@@ -376,7 +381,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   SizedBox(
                     width: context.widthCalculated(AppThemeMetrics.spacingSm),
                   ),
-                  Text('Active Events', style: tt.headlineSmall),
+                  Text(l10n.activeEvents, style: tt.headlineSmall),
                 ],
               ),
               Container(
@@ -391,7 +396,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
                 ),
                 child: Text(
-                  '${activeEvents.length} Ongoing',
+                  l10n.ongoingEvents(activeEvents.length),
                   style: tt.labelMedium?.copyWith(color: cs.primary),
                 ),
               ),
@@ -406,8 +411,8 @@ class _EventsScreenState extends State<EventsScreen> {
           _buildEmptyState(
             context: context,
             icon: Icons.event_busy,
-            title: 'No active events',
-            subtitle: 'Join an event to see it here!',
+            title: l10n.noActiveEvents,
+            subtitle: l10n.joinEventToSeeHere,
           )
         else
           LayoutBuilder(
@@ -463,6 +468,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
   // ── Archived section ───────────────────────────────────────────────────────
   Widget _buildArchivedSection(BuildContext context, EventsState state) {
+    final l10n = AppLocalizations.of(context)!;
     final tt = context.textTheme;
     final cs = context.theme.colorScheme;
     final archivedEvents = state is EventsLoaded ? state.archivedEvents : [];
@@ -478,7 +484,7 @@ class _EventsScreenState extends State<EventsScreen> {
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
-            Text('Archived Events', style: tt.headlineSmall),
+            Text(l10n.archivedEvents, style: tt.headlineSmall),
           ],
         ),
         SizedBox(height: context.heightCalculated(AppThemeMetrics.spacingLg)),
@@ -489,8 +495,8 @@ class _EventsScreenState extends State<EventsScreen> {
           _buildEmptyState(
             context: context,
             icon: Icons.archive_outlined,
-            title: 'No archived events',
-            subtitle: 'Your archived events will appear here.',
+            title: l10n.noArchivedEvents,
+            subtitle: l10n.archivedEventsEmpty,
           )
         else
           SingleChildScrollView(
