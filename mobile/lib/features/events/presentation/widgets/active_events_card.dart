@@ -3,6 +3,8 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/datetime_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_theme_colors_light.dart';
 
 class ActiveEventsCard extends StatelessWidget {
   const ActiveEventsCard({
@@ -23,6 +25,11 @@ class ActiveEventsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
+    final isDark = context.theme.brightness == Brightness.dark;
+
+    final borderColor = isDark
+        ? AppThemeColors.border
+        : AppThemeColorsLight.border;
 
     final dateLabel = endDate != null
         ? '${eventDate.toDisplayDate()} - ${endDate!.toDisplayDate()}'
@@ -35,10 +42,7 @@ class ActiveEventsCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outlineVariant,
-            width: 1,
-          ),
+          border: Border.all(color: borderColor, width: 1),
         ),
         padding: EdgeInsets.symmetric(
           horizontal: context.widthCalculated(AppThemeMetrics.spacingMd),

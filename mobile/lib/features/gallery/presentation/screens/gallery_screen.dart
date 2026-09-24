@@ -138,7 +138,7 @@ class _GalleryScreenState extends State<GalleryScreen>
                   controller: _tabController,
                   isScrollable: true,
                   indicatorColor: cs.primary,
-                  dividerColor: AppTheme.inputBorderColor,
+                  dividerColor: cs.outlineVariant,
                   indicatorSize: TabBarIndicatorSize.label,
                   labelPadding: EdgeInsets.symmetric(
                     vertical: context.heightCalculated(AppTheme.spacingSm),
@@ -195,6 +195,7 @@ class _GalleryScreenState extends State<GalleryScreen>
   }
 
   Widget _buildTab(String title, int count, int index) {
+    final cs = context.theme.colorScheme;
     return AnimatedBuilder(
       animation: _tabController,
       builder: (context, _) {
@@ -211,18 +212,14 @@ class _GalleryScreenState extends State<GalleryScreen>
               Text(
                 title,
                 style: tt.titleLarge?.copyWith(
-                  color: isSelected
-                      ? AppTheme.primaryTextColor
-                      : AppTheme.secondaryTextColor,
+                  color: isSelected ? cs.onSurface : cs.onSurfaceVariant,
                 ),
               ),
               SizedBox(width: context.widthCalculated(AppTheme.spacingSm)),
               Text(
                 '$count',
                 style: tt.bodyMedium?.copyWith(
-                  color: isSelected
-                      ? AppTheme.primaryTextColor
-                      : AppTheme.secondaryTextColor,
+                  color: isSelected ? cs.onSurface : cs.onSurfaceVariant,
                 ),
               ),
             ],
@@ -235,6 +232,7 @@ class _GalleryScreenState extends State<GalleryScreen>
   Widget _buildEmpty(BuildContext context) {
     final tt = context.textTheme;
     final l10n = AppLocalizations.of(context)!;
+    final cs = context.theme.colorScheme;
 
     return Center(
       child: Column(
@@ -243,13 +241,10 @@ class _GalleryScreenState extends State<GalleryScreen>
           Icon(
             Icons.photo_library_outlined,
             size: context.iconSize() * 3,
-            color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
+            color: cs.onSurfaceVariant.withValues(alpha: 0.4),
           ),
           SizedBox(height: context.heightCalculated(16)),
-          Text(
-            l10n.noPhotosYet,
-            style: tt.titleMedium?.copyWith(color: AppTheme.secondaryTextColor),
-          ),
+          Text(l10n.noPhotosYet, style: tt.titleMedium),
         ],
       ),
     );
