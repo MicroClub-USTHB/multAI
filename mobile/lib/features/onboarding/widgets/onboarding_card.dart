@@ -120,6 +120,7 @@ class OnboardingCard extends StatelessWidget {
               width: photoW,
               height: photoH,
               fit: BoxFit.cover,
+              gaplessPlayback: true,
             ),
           ),
         ),
@@ -245,6 +246,7 @@ class OnboardingCard extends StatelessWidget {
         width: size,
         height: size,
         fit: BoxFit.cover,
+        gaplessPlayback: true,
       ),
     );
   }

@@ -27,6 +27,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void initState() {
     super.initState();
     _slides = OnboardingItem.createSlides();
+    _preloadImages();
+  }
+
+  Future<void> _preloadImages() async {
+    final images = _slides
+        .expand((s) => [s.image, if (s.secondImage != null) s.secondImage!])
+        .toList();
+    for (final img in images) {
+      await precacheImage(AssetImage(img), context);
+    }
   }
 
   @override
