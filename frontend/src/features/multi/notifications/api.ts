@@ -36,7 +36,7 @@ const request = async <TResponse>(requestFn: () => Promise<TResponse>) => {
 
 export async function listMultiNotifications(): Promise<ListMultiNotificationsResponse> {
 	const response = await request(() =>
-		apiGet<unknown>('/stuff/notifications', {
+		apiGet<unknown>('/staff/notifications', {
 			credentials: 'include',
 			fallbackErrorMessage: 'Unable to load notifications.',
 		}),
@@ -52,7 +52,7 @@ export async function markMultiNotificationsAsRead(
 ): Promise<ListMultiNotificationsResponse> {
 	const response = await request(() =>
 		apiPost<unknown, MarkMultiNotificationsAsReadInput>(
-			'/stuff/notifications/read',
+			'/staff/notifications/read',
 			input,
 			{
 				credentials: 'include',
