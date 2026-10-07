@@ -1,10 +1,7 @@
 import { ApiError, apiGet, apiPost } from '@/shared/utils/api-client'
 
 import {
-	type AdminAuthRequest,
-	type AdminAuthResponse,
 	type AdminProfile,
-	toAdminAuthResponse,
 	toAdminProfile,
 } from './types'
 
@@ -32,22 +29,6 @@ const request = async <TResponse>(requestFn: () => Promise<TResponse>) => {
 	}
 }
 
-export async function loginAdmin(
-	input: AdminAuthRequest,
-): Promise<AdminAuthResponse> {
-	const payload = await request(() =>
-		apiPost<Parameters<typeof toAdminAuthResponse>[0]>(
-			'/admin/auth/login',
-			input,
-			{
-				fallbackErrorMessage: 'Unable to sign in.',
-				credentials: 'include',
-			},
-		),
-	)
-
-	return toAdminAuthResponse(payload)
-}
 
 export async function getAdminMe(): Promise<AdminProfile> {
 	const payload = await request(() =>

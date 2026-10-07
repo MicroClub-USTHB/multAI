@@ -4,12 +4,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 
 import type { AdminProfile } from '@/features/admin/auth/types';
-import type { LoginInput } from '@/features/common/auth/types';
 
 import {
-  AdminAuthApiError,
   getAdminMe,
-  loginAdmin,
   logoutAdmin,
 } from '@/features/admin/auth/api';
 import { AuthContext } from '@/hooks/useAuth';
@@ -52,41 +49,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     },
   });
 
-  const login = useMutation({
-    mutationFn: async (input: LoginInput) => {
-      const response = await loginAdmin({
-        email: input.email,
-        password: input.password,
-      });
-
-      if (!response.accessToken) {
-        throw new AdminAuthApiError('Login response did not include a token.', 500);
-      }
-
-      try {
-        const profile = await queryClient.fetchQuery({
-          queryKey: ['currentUser'] as const,
-          queryFn: getAdminMe,
-          staleTime: 5 * 60 * 1000,
-        });
-        queryClient.setQueryData(['currentUser'], profile);
-
-        return response;
-      } catch (error) {
-        clearSessionState();
-
-        if (error instanceof AdminAuthApiError) {
-          throw error;
-        }
-
-        throw new AdminAuthApiError(
-          'Unable to complete sign in.',
-          500,
-          error,
-        );
-      }
-    },
-  });
 
   const currentUser = (currentUserQuery.data as AdminProfile | null) ?? null;
 
@@ -96,7 +58,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user: currentUser,
     isAuthenticated: Boolean(currentUser),
     isLoading: isCheckingSession,
-    login,
     logout,
   };
 

@@ -20,7 +20,6 @@ describe('useAuth', () => {
       user: null,
       isAuthenticated: false,
       isLoading: false,
-      login: {} as never,
       logout: {} as never,
     };
 
