@@ -54,4 +54,5 @@ abstract class AppThemeColorsLight {
   // Shadows.
   static const Color shadowSoft = Color(0x0D000000);
   static const Color shadowMedium = Color(0x1A000000);
+  static const Color tabUnselectedText = neutral300;
 }

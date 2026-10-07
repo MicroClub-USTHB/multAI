@@ -26,6 +26,7 @@ abstract class AppThemeData {
         surfaceContainerHighest: AppThemeColors.surfaceHigh,
         error: AppThemeColors.error,
         outline: AppThemeColors.inputBorder,
+        outlineVariant: AppThemeColors.border,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: AppThemeColors.primaryText,
@@ -77,7 +78,11 @@ abstract class AppThemeData {
           textStyle: AppThemeTextStyles.buttonTextStyle,
         ),
       ),
-      textTheme: AppThemeTextStyles.textTheme,
+      textTheme: AppThemeTextStyles.textTheme(
+        primary: AppThemeColors.primaryText,
+        secondary: AppThemeColors.secondaryText,
+        hint: AppThemeColors.hintText,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         border: _inputBorder(AppThemeColors.inputBorder),
         enabledBorder: _inputBorder(AppThemeColors.inputBorder),
@@ -121,7 +126,11 @@ abstract class AppThemeData {
           color: AppThemeColors.inputBorder,
           width: AppThemeMetrics.borderHairline,
         ),
-        labelStyle: AppThemeTextStyles.textTheme.labelLarge,
+        labelStyle: AppThemeTextStyles.textTheme(
+          primary: AppThemeColors.primaryText,
+          secondary: AppThemeColors.secondaryText,
+          hint: AppThemeColors.hintText,
+        ).labelLarge,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppThemeMetrics.radiusPill),
         ),
@@ -129,7 +138,11 @@ abstract class AppThemeData {
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppThemeColors.surfaceHigh,
-        contentTextStyle: AppThemeTextStyles.textTheme.bodyMedium,
+        contentTextStyle: AppThemeTextStyles.textTheme(
+          primary: AppThemeColors.primaryText,
+          secondary: AppThemeColors.secondaryText,
+          hint: AppThemeColors.hintText,
+        ).bodyMedium,
         actionTextColor: AppThemeColors.primaryAccent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
@@ -153,8 +166,16 @@ abstract class AppThemeData {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppThemeMetrics.radiusXl),
         ),
-        titleTextStyle: AppThemeTextStyles.textTheme.headlineSmall,
-        contentTextStyle: AppThemeTextStyles.textTheme.bodyMedium,
+        titleTextStyle: AppThemeTextStyles.textTheme(
+          primary: AppThemeColors.primaryText,
+          secondary: AppThemeColors.secondaryText,
+          hint: AppThemeColors.hintText,
+        ).headlineSmall,
+        contentTextStyle: AppThemeTextStyles.textTheme(
+          primary: AppThemeColors.primaryText,
+          secondary: AppThemeColors.secondaryText,
+          hint: AppThemeColors.hintText,
+        ).bodyMedium,
       ),
       dividerTheme: const DividerThemeData(
         color: AppThemeColors.divider,
@@ -188,6 +209,7 @@ abstract class AppThemeData {
         surfaceContainerHighest: AppThemeColorsLight.surfaceHigh,
         error: AppThemeColorsLight.error,
         outline: AppThemeColorsLight.inputBorder,
+        outlineVariant: AppThemeColorsLight.border,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: AppThemeColorsLight.primaryText,

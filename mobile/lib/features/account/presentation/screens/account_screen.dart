@@ -10,7 +10,6 @@ import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/extensions/snackbar_extensions.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/widgets/app_error_view.dart';
 import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart'
     as auth;
@@ -272,16 +271,15 @@ class AccountScreen extends StatelessWidget {
         }
         if (state is AccountCacheCleared) {
           context.showSuccessSnackBar(
-            AppLocalizations.of(context)!.freedStorage(
-              state.storageFreed,
-              state.filesRemoved,
-            ),
+            AppLocalizations.of(
+              context,
+            )!.freedStorage(state.storageFreed, state.filesRemoved),
           );
         }
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: context.theme.scaffoldBackgroundColor,
           appBar: const AccountAppBar(),
           body: _buildBody(context, state),
         );
@@ -295,9 +293,7 @@ class AccountScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(
-              color: context.theme.colorScheme.primary,
-            ),
+            CircularProgressIndicator(color: context.theme.colorScheme.primary),
             if (state is AccountCacheClearing) ...[
               const SizedBox(height: 16),
               Text(
@@ -346,13 +342,13 @@ class AccountScreen extends StatelessWidget {
         onAction: p.action == ErrorAction.retry
             ? () => context.read<AccountBloc>().add(LoadAccountData())
             : p.action == ErrorAction.signIn
-                ? () {
-                    context.read<auth.AuthBloc>().add(auth.LogoutRequested());
-                    context.go(AppRoutes.login);
-                  }
-                : p.action == ErrorAction.goBack
-                    ? () => context.pop()
-                    : null,
+            ? () {
+                context.read<auth.AuthBloc>().add(auth.LogoutRequested());
+                context.go(AppRoutes.login);
+              }
+            : p.action == ErrorAction.goBack
+            ? () => context.pop()
+            : null,
       );
     }
 
@@ -368,19 +364,22 @@ class AccountScreen extends StatelessWidget {
     final name = state is AccountLoaded
         ? state.name
         : (state is AccountAvatarUploading
-            ? state.name
-            : (state is AccountProfileUpdating ? state.name : ''));
+              ? state.name
+              : (state is AccountProfileUpdating ? state.name : ''));
     final email = state is AccountLoaded
         ? state.email
         : (state is AccountAvatarUploading
-            ? state.email
-            : (state is AccountProfileUpdating ? state.email : ''));
-    final url = avatarUrl ??
+              ? state.email
+              : (state is AccountProfileUpdating ? state.email : ''));
+    final url =
+        avatarUrl ??
         (state is AccountLoaded
             ? state.avatarUrl
             : (state is AccountAvatarUploading
-                ? state.avatarUrl
-                : (state is AccountProfileUpdating ? state.avatarUrl : null)));
+                  ? state.avatarUrl
+                  : (state is AccountProfileUpdating
+                        ? state.avatarUrl
+                        : null)));
 
     final l10n = AppLocalizations.of(context)!;
     final themeMode = context.watch<ThemeCubit>().state;
@@ -486,9 +485,7 @@ class AccountScreen extends StatelessWidget {
             onPressed: () => context.read<AccountBloc>().add(LogoutRequested()),
           ),
           SizedBox(height: context.heightCalculated(12)),
-          DeleteAccountButton(
-            onPressed: () => _confirmDeleteAccount(context),
-          ),
+          DeleteAccountButton(onPressed: () => _confirmDeleteAccount(context)),
           SizedBox(height: context.heightCalculated(24)),
         ],
       ),
@@ -519,7 +516,10 @@ class _ThemeOption extends StatelessWidget {
       title: Text(label),
       trailing: selected
           ? Icon(Icons.check_circle, color: cs.primary)
-          : Icon(Icons.circle_outlined, color: cs.onSurface.withValues(alpha: 0.3)),
+          : Icon(
+              Icons.circle_outlined,
+              color: cs.onSurface.withValues(alpha: 0.3),
+            ),
       onTap: onTap,
     );
   }
@@ -546,7 +546,10 @@ class _LanguageOption extends StatelessWidget {
       title: Text(label),
       trailing: selected
           ? Icon(Icons.check_circle, color: cs.primary)
-          : Icon(Icons.circle_outlined, color: cs.onSurface.withValues(alpha: 0.3)),
+          : Icon(
+              Icons.circle_outlined,
+              color: cs.onSurface.withValues(alpha: 0.3),
+            ),
       onTap: onTap,
     );
   }

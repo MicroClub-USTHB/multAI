@@ -4,6 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../constants/nav_items.dart';
 import '../theme/app_theme_colors.dart';
+import '../theme/app_theme_colors_light.dart';
+import '../extensions/context_extensions.dart';
 import 'package:multai_mobile/l10n/app_localizations.dart';
 
 class AppBottomNavBar extends StatelessWidget {
@@ -33,24 +35,32 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.theme.brightness == Brightness.dark;
+
+    final tabUnselectedColor = isDark
+        ? AppThemeColors.tabUnselectedText
+        : AppThemeColorsLight.tabUnselectedText;
+
+    final tabSelectedColor = isDark
+        ? AppThemeColors.primaryAccent
+        : AppThemeColorsLight.primaryAccent;
+
+    final barColor = context.theme.colorScheme.surface;
+
     return AnimatedNotchBottomBar(
       notchBottomBarController: controller,
-      color: Colors.transparent,
+      color: barColor,
       showLabel: false,
-      notchColor: Colors.transparent,
+      notchColor: barColor,
       bottomBarItems: navItems
           .map(
             (data) => BottomBarItem(
               inActiveItem: FaIcon(
                 data.icon,
-                color: AppThemeColors.tabUnselectedText,
+                color: tabUnselectedColor,
                 size: 20,
               ),
-              activeItem: FaIcon(
-                data.icon,
-                color: AppThemeColors.primaryAccent,
-                size: 20,
-              ),
+              activeItem: FaIcon(data.icon, color: tabSelectedColor, size: 20),
               itemLabel: _getNavLabel(context, data.label),
             ),
           )

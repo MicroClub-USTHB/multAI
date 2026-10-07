@@ -76,12 +76,12 @@ class _EventsScreenState extends State<EventsScreen> {
       child: Stack(
         children: [
           Scaffold(
-            backgroundColor: AppThemeColors.background,
+            backgroundColor: context.theme.scaffoldBackgroundColor,
             appBar: AppBar(
               title: Text(
                 l10n.eventsTitle,
                 style: context.theme.appBarTheme.titleTextStyle?.copyWith(
-                  color: AppThemeColors.accent,
+                  color: context.theme.colorScheme.primary,
                 ),
               ),
               actions: [
@@ -96,7 +96,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       children: [
                         Icon(
                           Icons.notifications_none,
-                          color: AppThemeColors.secondaryText,
+                          color: context.theme.colorScheme.onSurfaceVariant,
                           size: context.iconSize(),
                         ),
                         BlocBuilder<NotificationBloc, NotificationState>(
@@ -120,7 +120,8 @@ class _EventsScreenState extends State<EventsScreen> {
                                 decoration: BoxDecoration(
                                   color: AppThemeColors.accent,
                                   border: Border.all(
-                                    color: AppThemeColors.background,
+                                    color:
+                                        context.theme.scaffoldBackgroundColor,
                                     width: 1,
                                   ),
                                   borderRadius: BorderRadius.circular(
@@ -203,13 +204,13 @@ class _EventsScreenState extends State<EventsScreen> {
       onAction: p.action == ErrorAction.retry
           ? () => context.read<EventsBloc>().add(EventsRetryRequested())
           : p.action == ErrorAction.signIn
-              ? () {
-                  context.read<AuthBloc>().add(LogoutRequested());
-                  context.go(AppRoutes.login);
-                }
-              : p.action == ErrorAction.goBack
-                  ? () => context.pop()
-                  : null,
+          ? () {
+              context.read<AuthBloc>().add(LogoutRequested());
+              context.go(AppRoutes.login);
+            }
+          : p.action == ErrorAction.goBack
+          ? () => context.pop()
+          : null,
     );
   }
 
@@ -220,8 +221,12 @@ class _EventsScreenState extends State<EventsScreen> {
         bottom: context.heightCalculated(AppThemeMetrics.spacingSm),
       ),
       child: LinearProgressIndicator(
-        backgroundColor: AppThemeColors.border.withValues(alpha: 0.2),
-        valueColor: const AlwaysStoppedAnimation<Color>(AppThemeColors.primaryAccent),
+        backgroundColor: context.theme.colorScheme.outline.withValues(
+          alpha: 0.2,
+        ),
+        valueColor: AlwaysStoppedAnimation<Color>(
+          context.theme.colorScheme.primary,
+        ),
       ),
     );
   }
@@ -237,7 +242,9 @@ class _EventsScreenState extends State<EventsScreen> {
       decoration: BoxDecoration(
         color: AppThemeColors.primaryAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
-        border: Border.all(color: AppThemeColors.primaryAccent.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: AppThemeColors.primaryAccent.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         children: [
@@ -272,24 +279,16 @@ class _EventsScreenState extends State<EventsScreen> {
         context.widthCalculated(AppThemeMetrics.spacingLg),
       ),
       decoration: BoxDecoration(
-        color: AppThemeColors.formCard,
+        color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
-        border: Border.all(
-          color: AppThemeColors.border.withValues(alpha: 0.1),
-          width: 1,
-        ),
+        border: Border.all(color: context.theme.dividerColor, width: 1),
       ),
       child: Form(
         key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.joinNewEvent,
-              style: tt.headlineSmall?.copyWith(
-                color: AppThemeColors.primaryText,
-              ),
-            ),
+            Text(l10n.joinNewEvent, style: tt.headlineSmall),
             SizedBox(
               height: context.heightCalculated(AppThemeMetrics.spacingXs),
             ),
@@ -343,12 +342,7 @@ class _EventsScreenState extends State<EventsScreen> {
                         ),
                         child: const CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Text(
-                        l10n.joinEvent,
-                        style: tt.titleLarge?.copyWith(
-                          color: AppThemeColors.primaryText,
-                        ),
-                      ),
+                    : Text(l10n.joinEvent, style: tt.titleLarge),
               ),
             ),
           ],
@@ -491,7 +485,7 @@ class _EventsScreenState extends State<EventsScreen> {
             Icon(
               Icons.archive_outlined,
               size: context.iconSize(),
-              color: AppThemeColors.secondaryText,
+              color: context.theme.colorScheme.onSurfaceVariant,
             ),
             SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
             Text(l10n.archivedEvents, style: tt.headlineSmall),
@@ -552,17 +546,12 @@ class _EventsScreenState extends State<EventsScreen> {
             Icon(
               icon,
               size: context.iconSize() * 2.5,
-              color: AppThemeColors.secondaryText,
+              color: context.theme.colorScheme.onSurfaceVariant,
             ),
             SizedBox(
               height: context.heightCalculated(AppThemeMetrics.spacingMd),
             ),
-            Text(
-              title,
-              style: tt.titleMedium?.copyWith(
-                color: AppThemeColors.secondaryText,
-              ),
-            ),
+            Text(title, style: tt.titleMedium),
             SizedBox(
               height: context.heightCalculated(AppThemeMetrics.spacingXs),
             ),
