@@ -35,7 +35,7 @@ class AppBottomNavBar extends StatelessWidget {
     return CurvedNavigationBar(
       index: currentIndex,
       color: barColor,
-      buttonBackgroundColor: barColor,
+      buttonBackgroundColor: tabSelectedColor,
       backgroundColor: backgroundColor,
       height: 64.0,
       animationCurve: Curves.easeOutCubic,
@@ -46,7 +46,7 @@ class AppBottomNavBar extends StatelessWidget {
         return FaIcon(
           navItems[index].icon,
           size: 22,
-          color: isSelected ? tabSelectedColor : tabUnselectedColor,
+          color: isSelected ? Colors.white : tabUnselectedColor,
         );
       }),
     );
