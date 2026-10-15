@@ -22,7 +22,4 @@ abstract class AppRoutes {
   static const String backup = '/backup';
   static const String albums = '/albums';
   static const String albumDetail = '/album-detail';
-
-  // ── Debug ─────────────────────────────────────────────────────────────────
-  static const String faceGuideDebug = '/debug/face-guide';
 }

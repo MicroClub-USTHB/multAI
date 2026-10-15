@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/features/onboarding/presentation/screens/onboarding_screen.dart';
@@ -9,7 +8,6 @@ import '../../di/injection_container.dart' as di;
 import '../../features/auth/presentation/screens/login/login_page.dart';
 import '../../features/auth/presentation/screens/register/register_page.dart';
 import '../../features/face_enrollment/presentation/screens/face_enrollment_screen.dart';
-import '../../features/face_enrollment/presentation/screens/face_guide_debug_preview.dart';
 import '../../features/face_enrollment/presentation/bloc/face_enrollment_bloc.dart';
 import '../../features/home/presentation/screens/home_shell.dart';
 import '../../features/events/presentation/screens/events_screen.dart';
@@ -55,13 +53,6 @@ final GoRouter appRouter = GoRouter(
         child: const FaceEnrollmentScreen(),
       ),
     ),
-
-    // ── Face Guide Debug Preview (debug only) ──────────────────────────────
-    if (kDebugMode)
-      GoRoute(
-        path: AppRoutes.faceGuideDebug,
-        builder: (context, state) => const FaceGuideDebugPreview(),
-      ),
 
     // ── Photo Approval ────────────────────────────────────────────────────────
     GoRoute(

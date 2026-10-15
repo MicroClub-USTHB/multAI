@@ -532,7 +532,7 @@ class _StepPage extends StatelessWidget {
       );
     }
 
-    // Show camera with 3D guide overlay
+    // Show camera
     if (permissionPermanentlyDenied) {
       return _PermissionDeniedView(onOpenSettings: onOpenSettings);
     }
