@@ -22,21 +22,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   late final List<OnboardingItem> _slides;
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _preloaded = false;
 
   @override
   void initState() {
     super.initState();
     _slides = OnboardingItem.createSlides();
-    _preloadImages();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_preloaded) {
+      _preloaded = true;
+      _preloadImages();
+    }
   }
 
   Future<void> _preloadImages() async {
     final images = _slides
         .expand((s) => [s.image, if (s.secondImage != null) s.secondImage!])
+        .toSet()
         .toList();
-    for (final img in images) {
-      await precacheImage(AssetImage(img), context);
-    }
+    await Future.wait([
+      for (final img in images) precacheImage(AssetImage(img), context),
+    ]);
   }
 
   @override
