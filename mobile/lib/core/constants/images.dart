@@ -23,18 +23,5 @@ class AppImages {
     '$onboardingPath/11.webp',
     '$onboardingPath/12.webp',
     '$onboardingPath/13.webp',
-    '$onboardingPath/14.webp',
-    '$onboardingPath/15.webp',
-    '$onboardingPath/16.webp',
-    '$onboardingPath/17.webp',
-    '$onboardingPath/18.webp',
-    '$onboardingPath/19.webp',
-    '$onboardingPath/20.webp',
-    '$onboardingPath/21.webp',
-    '$onboardingPath/22.webp',
-    '$onboardingPath/23.webp',
-    '$onboardingPath/24.webp',
-    '$onboardingPath/25.webp',
-    '$onboardingPath/26.webp',
   ];
 }
