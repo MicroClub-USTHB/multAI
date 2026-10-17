@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) async {
