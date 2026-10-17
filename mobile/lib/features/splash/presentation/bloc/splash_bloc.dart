@@ -86,19 +86,31 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
   ///   - Any other failure: there IS a session, we just couldn't verify it
   ///     (offline/server error) and have nothing cached either -> offline.
   Future<void> _resolveSessionAndEmit(Emitter<SplashState> emit) async {
+    final hasSeenOnboarding = await getOnboardingSeen();
+
+    // Debug builds skip the authentication flow, but onboarding must still be
+    // shown once so its seen flag is honoured.
     if (kDebugMode) {
-      emit(const SplashLoaded(route: AppRoutes.events));
+      emit(
+        SplashLoaded(
+          route: hasSeenOnboarding ? AppRoutes.events : AppRoutes.onboarding,
+        ),
+      );
       return;
     }
-
-    final hasSeenOnboarding = await getOnboardingSeen();
 
     final meResult = await getCurrentUserUseCase(NoParams());
     await meResult.fold(
       (failure) async {
         if (failure is UnauthorizedFailure) {
           await logoutUseCase(NoParams());
-          emit(const SplashLoaded(route: AppRoutes.onboarding));
+          emit(
+            SplashLoaded(
+              route: hasSeenOnboarding
+                  ? AppRoutes.login
+                  : AppRoutes.onboarding,
+            ),
+          );
         } else {
           emit(SplashOffline());
         }
