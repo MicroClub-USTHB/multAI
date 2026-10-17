@@ -11,7 +11,6 @@ import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/get_me_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
-import '../../domain/usecases/refresh_token_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/resend_otp_usecase.dart';
 import '../../domain/usecases/verify_register_usecase.dart';
@@ -25,7 +24,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase _registerUseCase;
   final ResendOtpUseCase _resendOtpUseCase;
   final VerifyRegisterUseCase _verifyRegisterUseCase;
-  final RefreshTokenUseCase _refreshTokenUseCase;
   final LogoutUseCase _logoutUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
   final PushNotificationService _pushNotificationService;
@@ -41,7 +39,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required RegisterUseCase registerUseCase,
     required ResendOtpUseCase resendOtpUseCase,
     required VerifyRegisterUseCase verifyRegisterUseCase,
-    required RefreshTokenUseCase refreshTokenUseCase,
     required LogoutUseCase logoutUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
     required PushNotificationService pushNotificationService,
@@ -51,7 +48,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _registerUseCase = registerUseCase,
        _resendOtpUseCase = resendOtpUseCase,
        _verifyRegisterUseCase = verifyRegisterUseCase,
-       _refreshTokenUseCase = refreshTokenUseCase,
        _logoutUseCase = logoutUseCase,
        _getCurrentUserUseCase = getCurrentUserUseCase,
        _pushNotificationService = pushNotificationService,
@@ -62,7 +58,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ResendOtpRequested>(_onResendOtpRequested);
     on<VerifyOtpRequested>(_onVerifyOtpRequested);
     on<LoginRequested>(_onLoginRequested);
-    on<RefreshTokenRequested>(_onRefreshTokenRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<GetCurrentUserRequested>(_onGetCurrentUserRequested);
     on<ResetAuth>(_onResetAuth);
@@ -181,25 +176,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e, s) {
       _logger.error('AuthBloc', 'Login failed', e, s);
       emit(AuthFailure(message: 'Sign in failed. Please try again.'));
-    }
-  }
-
-  Future<void> _onRefreshTokenRequested(
-    RefreshTokenRequested event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(AuthLoading());
-    try {
-      final result = await _refreshTokenUseCase(
-        RefreshTokenParams(refreshToken: event.refreshToken),
-      );
-      await result.fold(
-        (failure) async => _emitFailure(emit, failure),
-        (auth) async => _emitAuthenticatedState(auth, emit),
-      );
-    } catch (e, s) {
-      _logger.error('AuthBloc', 'Token refresh failed', e, s);
-      emit(AuthFailure(message: 'Session expired. Please sign in again.'));
     }
   }
 

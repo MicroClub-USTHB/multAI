@@ -32,7 +32,6 @@ import '../features/auth/domain/usecases/register_usecase.dart';
 import '../features/auth/domain/usecases/verify_register_usecase.dart';
 import '../features/auth/domain/usecases/resend_otp_usecase.dart';
 import '../features/auth/domain/usecases/logout_usecase.dart';
-import '../features/auth/domain/usecases/refresh_token_usecase.dart';
 import '../features/auth/domain/usecases/get_me_usecase.dart';
 import '../features/auth/presentation/blocs/auth_bloc.dart';
 
@@ -209,7 +208,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => VerifyRegisterUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => ResendOtpUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepository>()));
-  sl.registerLazySingleton(() => RefreshTokenUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl<AuthRepository>()));
 
   // ── Auth BLoC ───────────────────────────────────────────────────────────────
@@ -220,7 +218,6 @@ Future<void> init() async {
       resendOtpUseCase: sl<ResendOtpUseCase>(),
       verifyRegisterUseCase: sl<VerifyRegisterUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
-      refreshTokenUseCase: sl<RefreshTokenUseCase>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
       pushNotificationService: sl<PushNotificationService>(),
     ),
