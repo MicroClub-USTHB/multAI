@@ -72,6 +72,14 @@ class ApiClient {
     if (_accessToken != null) return true;
     final storage = _localStorage;
     if (storage == null) return false;
+    // Hydrate the in-memory access token from secure storage on first use so a
+    // cold start can go straight to an authenticated request instead of
+    // forcing a guaranteed 401 -> refresh round-trip on every launch.
+    final access = await storage.getSecureString(StorageKeys.accessToken);
+    if (access != null && access.isNotEmpty) {
+      _accessToken = access;
+      return true;
+    }
     final refreshToken = await storage.getSecureString(
       StorageKeys.refreshToken,
     );
@@ -166,7 +174,28 @@ class ApiClient {
     required List<String> fieldNames,
     bool requiresAuth = false,
   }) async {
-    await checkConnection();
+    // Goes through _executeWithAuthRaw so an expired access token triggers the
+    // usual refresh-and-retry instead of failing the upload outright.
+    final response = await _executeWithAuthRaw(
+      () => _sendMultipart(
+        endpoint,
+        files: files,
+        fieldNames: fieldNames,
+        requiresAuth: requiresAuth,
+      ),
+    );
+    return Map<String, dynamic>.from(jsonDecode(response.body) as Map);
+  }
+
+  /// Builds a FRESH multipart request on every invocation: an
+  /// [http.MultipartRequest] cannot be sent twice, and the auth wrapper may
+  /// retry after refreshing the access token.
+  Future<http.Response> _sendMultipart(
+    String endpoint, {
+    required List<File> files,
+    required List<String> fieldNames,
+    required bool requiresAuth,
+  }) async {
     final uri = Uri.parse('$baseUrl$endpoint');
     final request = http.MultipartRequest('POST', uri);
 
@@ -197,12 +226,7 @@ class ApiClient {
     }
 
     final streamedResponse = await request.send().timeout(_requestTimeout);
-    final response = await http.Response.fromStream(streamedResponse);
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return Map<String, dynamic>.from(jsonDecode(response.body) as Map);
-    }
-    return _throwForStatus(response);
+    return http.Response.fromStream(streamedResponse);
   }
 
   String _mimeTypeFromExtension(String ext) {
@@ -238,16 +262,13 @@ class ApiClient {
     Future<http.Response> Function() request,
   ) async {
     await checkConnection();
+    final tokenUsed = _accessToken;
     try {
       final response = await request().timeout(_requestTimeout);
       return _handleResponse(response);
     } on UnauthorizedFailure {
-      if (await _tryRefreshToken()) {
-        final response = await request().timeout(_requestTimeout);
-        return _handleResponse(response);
-      }
-      onUnauthorized?.call();
-      rethrow;
+      final response = await _recoverFromUnauthorized(tokenUsed, request);
+      return _handleResponse(response);
     } on TimeoutException {
       throw const NetworkFailure('Request timed out');
     }
@@ -257,17 +278,13 @@ class ApiClient {
     Future<http.Response> Function() request,
   ) async {
     await checkConnection();
+    final tokenUsed = _accessToken;
     try {
       final response = await request().timeout(_requestTimeout);
       _handleVoidResponse(response);
     } on UnauthorizedFailure {
-      if (await _tryRefreshToken()) {
-        final response = await request().timeout(_requestTimeout);
-        _handleVoidResponse(response);
-        return;
-      }
-      onUnauthorized?.call();
-      rethrow;
+      final response = await _recoverFromUnauthorized(tokenUsed, request);
+      _handleVoidResponse(response);
     } on TimeoutException {
       throw const NetworkFailure('Request timed out');
     }
@@ -277,6 +294,7 @@ class ApiClient {
     Future<http.Response> Function() request,
   ) async {
     await checkConnection();
+    final tokenUsed = _accessToken;
     try {
       final response = await request().timeout(_requestTimeout);
       if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -284,18 +302,37 @@ class ApiClient {
       }
       _throwForStatus(response);
     } on UnauthorizedFailure {
-      if (await _tryRefreshToken()) {
-        final response = await request().timeout(_requestTimeout);
-        if (response.statusCode >= 200 && response.statusCode < 300) {
-          return response;
-        }
-        _throwForStatus(response);
+      final response = await _recoverFromUnauthorized(tokenUsed, request);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response;
       }
-      onUnauthorized?.call();
-      rethrow;
+      _throwForStatus(response);
     } on TimeoutException {
       throw const NetworkFailure('Request timed out');
     }
+  }
+
+  /// Recovers from a 401.
+  ///
+  /// If another in-flight request already rotated the access token while this
+  /// one was in flight, we simply retry with the new token instead of
+  /// refreshing again. This keeps a burst of concurrent 401s down to a single
+  /// refresh (the first refresh wins; later 401s see a changed token).
+  ///
+  /// Otherwise we refresh once and retry. On failure we notify
+  /// [onUnauthorized] and rethrow so callers can surface a session-expired
+  /// error.
+  Future<http.Response> _recoverFromUnauthorized(
+    String? tokenUsed,
+    Future<http.Response> Function() request,
+  ) async {
+    final tokenAlreadyRotated =
+        _accessToken != null && _accessToken != tokenUsed;
+    if (!tokenAlreadyRotated && !await _tryRefreshToken()) {
+      onUnauthorized?.call();
+      throw const UnauthorizedFailure('Session expired. Please log in again.');
+    }
+    return request().timeout(_requestTimeout);
   }
 
   Future<bool>? _refreshInFlight;
