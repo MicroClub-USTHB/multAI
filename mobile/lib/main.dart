@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
@@ -17,7 +18,7 @@ import 'core/security/session_manager.dart';
 import 'core/storage/app_local_storage.dart';
 import 'core/theme/theme.dart';
 import 'features/auth/presentation/blocs/auth_bloc.dart';
-import 'features/events/presentation/bloc/events_bloc.dart';
+import 'features/events/presentation/bloc/events_bloc';
 import 'features/account/presentation/bloc/account_bloc.dart';
 import 'features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'features/notifications/services/push_notification_service.dart';
@@ -32,15 +33,15 @@ late final SessionManager sessionManager;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    await Firebase.initializeApp();
-  } catch (e) {
-    debugPrint('Firebase initialization skipped: $e');
-  }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   if (DeviceSecurity.isDebugMode()) {
     SecureLogger.warning('App', 'Running in debug mode');
   }
+
+  FlutterError.onError = FirebaseCrashlytics.instance.recordError;
 
   _setupGlobalErrorHandlers();
 
@@ -82,22 +83,14 @@ void main() async {
 }
 
 void _setupGlobalErrorHandlers() {
-  final errorHandler = ErrorHandler(errorMapper: const ErrorMapper());
-
-  FlutterError.onError = (details) {
-    final exception = errorHandler.wrapException(
-      details.exception,
-      stackTrace: details.stack,
-    );
-    errorHandler.handleException('FlutterError', exception);
-  };
+  FlutterError.onError = FirebaseCrashlytics.instance.recordError;
 
   PlatformDispatcher.instance.onError = (exception, stackTrace) {
-    final appException = errorHandler.wrapException(
+    FirebaseCrashlytics.instance.recordError(
       exception,
-      stackTrace: stackTrace,
+      stackTrace,
+      fatal: false,
     );
-    errorHandler.handleException('PlatformDispatcher', appException);
     return true;
   };
 }
