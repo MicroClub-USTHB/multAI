@@ -62,6 +62,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '653019524265',
     projectId: 'multai-mobile',
     storageBucket: 'multai-mobile.firebasestorage.app',
-    iosBundleId: 'com.wassla.dz.app',
+    iosBundleId: 'com.mc.multaiMobile',
   );
 }
