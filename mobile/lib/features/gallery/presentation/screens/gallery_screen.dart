@@ -93,41 +93,6 @@ class _GalleryScreenState extends State<GalleryScreen>
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
             title: Text(l10n.galleryTitle, style: tt.headlineMedium),
-            actions: [
-              // ── Search ──────────────────────────────────────────────
-              Container(
-                decoration: BoxDecoration(
-                  color: cs.primary.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.search,
-                    size: context.iconSize(),
-                    color: cs.primary,
-                  ),
-                  onPressed: () {},
-                ),
-              ),
-              // ── Filter ──────────────────────────────────────────────
-              Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: context.widthCalculated(AppTheme.spacingSm),
-                ),
-                decoration: BoxDecoration(
-                  color: cs.primary.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.tune,
-                    size: context.iconSize(),
-                    color: cs.primary,
-                  ),
-                  onPressed: () {},
-                ),
-              ),
-            ],
           ),
           body: Column(
             children: [

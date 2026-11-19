@@ -17,7 +17,6 @@ import 'package:multai_mobile/l10n/app_localizations.dart';
 
 import '../bloc/account_bloc.dart';
 import '../widgets/account_app_bar.dart';
-import '../widgets/delete_account_button.dart';
 import '../widgets/logout_button.dart';
 import '../widgets/profile_section.dart';
 import '../widgets/settings_section.dart';
@@ -94,33 +93,6 @@ class AccountScreen extends StatelessWidget {
               backgroundColor: context.theme.colorScheme.error,
             ),
             child: Text(l10n.clear),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _confirmDeleteAccount(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteAccount),
-        content: Text(l10n.deleteAccountConfirmation),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: context.theme.colorScheme.error,
-            ),
-            child: Text(l10n.deleteAccount),
           ),
         ],
       ),
@@ -480,12 +452,10 @@ class AccountScreen extends StatelessWidget {
           ),
           SizedBox(height: context.heightCalculated(32)),
 
-          // ── Logout / Delete ────────────────────────────────────────────
+          // ── Logout ────────────────────────────────────────────
           LogoutButton(
             onPressed: () => context.read<AccountBloc>().add(LogoutRequested()),
           ),
-          SizedBox(height: context.heightCalculated(12)),
-          DeleteAccountButton(onPressed: () => _confirmDeleteAccount(context)),
           SizedBox(height: context.heightCalculated(24)),
         ],
       ),

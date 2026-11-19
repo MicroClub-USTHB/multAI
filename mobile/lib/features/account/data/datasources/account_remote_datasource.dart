@@ -16,7 +16,7 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
 
   /// The backend returns `avatar_url` as a path relative to the API root
   /// (e.g. `/user/auth/me/avatar/image`), but the widget layer renders it with
-  /// `CachedNetworkImage`, which needs an absolute http(s) URL. Resolve it
+  /// `ExtendedImage`, which needs an absolute http(s) URL. Resolve it
   /// against [EndPoints.baseUrl] (the same base every API call uses) so the
   /// avatar actually loads.
   static String? toAbsoluteAvatarUrl(String? url) {

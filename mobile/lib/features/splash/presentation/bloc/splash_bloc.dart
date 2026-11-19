@@ -106,9 +106,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
           await logoutUseCase(NoParams());
           emit(
             SplashLoaded(
-              route: hasSeenOnboarding
-                  ? AppRoutes.login
-                  : AppRoutes.onboarding,
+              route: hasSeenOnboarding ? AppRoutes.login : AppRoutes.onboarding,
             ),
           );
         } else {

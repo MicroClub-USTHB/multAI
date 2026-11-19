@@ -189,7 +189,7 @@ class _RegisterPhotoComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenHeight = context.height;
     // Slightly shorter on the form step (3 fields) to give more room
     final height = screenHeight * (isOtpStep ? 0.34 : 0.28);
     final circleSize = height * 0.80;

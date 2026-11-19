@@ -452,12 +452,8 @@ Future<void> init() async {
   );
 
   // ── Backup ──────────────────────────────────────────────────────────────
-  sl.registerLazySingleton<BackupRepository>(
-    () => BackupRepositoryImpl(),
-  );
-  sl.registerLazySingleton(
-    () => CreateBackupUseCase(sl<BackupRepository>()),
-  );
+  sl.registerLazySingleton<BackupRepository>(() => BackupRepositoryImpl());
+  sl.registerLazySingleton(() => CreateBackupUseCase(sl<BackupRepository>()));
   sl.registerFactory<BackupBloc>(
     () => BackupBloc(
       createBackup: sl<CreateBackupUseCase>(),
@@ -469,12 +465,8 @@ Future<void> init() async {
   sl.registerLazySingleton<AlbumRepository>(
     () => AlbumRepositoryImpl(localStorage: sl<AppLocalStorage>()),
   );
-  sl.registerLazySingleton(
-    () => GetAlbumsUseCase(sl<AlbumRepository>()),
-  );
-  sl.registerLazySingleton(
-    () => CreateAlbumUseCase(sl<AlbumRepository>()),
-  );
+  sl.registerLazySingleton(() => GetAlbumsUseCase(sl<AlbumRepository>()));
+  sl.registerLazySingleton(() => CreateAlbumUseCase(sl<AlbumRepository>()));
   sl.registerLazySingleton(
     () => AddPhotosToAlbumUseCase(sl<AlbumRepository>()),
   );
