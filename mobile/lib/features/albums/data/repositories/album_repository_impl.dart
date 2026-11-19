@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dartz/dartz.dart';
-import 'package:gal/gal.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:multai_mobile/core/storage/app_local_storage.dart';
@@ -14,7 +13,7 @@ class AlbumRepositoryImpl implements AlbumRepository {
   static const String _albumsKey = 'user_albums';
 
   AlbumRepositoryImpl({required AppLocalStorage localStorage})
-      : _localStorage = localStorage;
+    : _localStorage = localStorage;
 
   @override
   Future<Either<Failure, List<AlbumEntity>>> getAlbums() async {
@@ -43,30 +42,27 @@ class AlbumRepositoryImpl implements AlbumRepository {
       }
 
       final existing = await getAlbums();
-      return existing.fold(
-        (failure) => Left(failure),
-        (albums) async {
-          final exists = albums.any(
-            (a) => a.name.toLowerCase() == name.trim().toLowerCase(),
+      return existing.fold((failure) => Left(failure), (albums) async {
+        final exists = albums.any(
+          (a) => a.name.toLowerCase() == name.trim().toLowerCase(),
+        );
+        if (exists) {
+          return const Left(
+            ValidationFailure('An album with this name already exists'),
           );
-          if (exists) {
-            return const Left(
-              ValidationFailure('An album with this name already exists'),
-            );
-          }
+        }
 
-          final album = AlbumEntity(
-            name: name.trim(),
-            photoCount: 0,
-            createdAt: DateTime.now(),
-          );
+        final album = AlbumEntity(
+          name: name.trim(),
+          photoCount: 0,
+          createdAt: DateTime.now(),
+        );
 
-          final updated = [album, ...albums];
-          await _saveAlbums(updated);
+        final updated = [album, ...albums];
+        await _saveAlbums(updated);
 
-          return Right(album);
-        },
-      );
+        return Right(album);
+      });
     } catch (e) {
       debugPrint('Failed to create album: $e');
       return Left(CacheFailure('Failed to create album: $e'));
@@ -79,46 +75,48 @@ class AlbumRepositoryImpl implements AlbumRepository {
     List<String> photoPaths,
   ) async {
     try {
-      final hasAccess = await Gal.hasAccess(toAlbum: true);
-      if (!hasAccess) {
-        final granted = await Gal.requestAccess(toAlbum: true);
-        if (!granted) {
-          return const Left(
-            ValidationFailure('Gallery permission is required'),
-          );
-        }
-      }
-
-      for (final path in photoPaths) {
-        final file = File(path);
-        if (!await file.exists()) continue;
-
-        final bytes = await file.readAsBytes();
-        await Gal.putImageBytes(
-          bytes,
-          album: 'MultAI/$albumName',
-        );
-      }
-
-      // Update album metadata
       final albumsResult = await getAlbums();
-      await albumsResult.fold(
-        (failure) {},
-        (albums) async {
-          final updated = albums.map((a) {
-            if (a.name == albumName) {
-              return a.copyWith(
-                photoCount: a.photoCount + photoPaths.length,
-                coverPhotoPath: a.coverPhotoPath ?? photoPaths.first,
-              );
-            }
-            return a;
-          }).toList();
-          await _saveAlbums(updated);
-        },
-      );
+      return await albumsResult.fold((failure) async => Left(failure), (
+        albums,
+      ) async {
+        final albumIndex = albums.indexWhere((a) => a.name == albumName);
+        if (albumIndex == -1) {
+          return const Left(ValidationFailure('Album not found'));
+        }
 
-      return const Right(null);
+        final dir = await _getAlbumDir(albumName);
+        if (!await dir.exists()) {
+          await dir.create(recursive: true);
+        }
+
+        final addedPaths = <String>[];
+        for (final path in photoPaths) {
+          final file = File(path);
+          if (!await file.exists()) continue;
+
+          final ext = path.contains('.')
+              ? path.split('.').last.toLowerCase()
+              : 'jpg';
+          final fileName =
+              '${DateTime.now().microsecondsSinceEpoch}_${addedPaths.length}.$ext';
+          final copy = await file.copy('${dir.path}/$fileName');
+          addedPaths.add(copy.path);
+        }
+
+        if (addedPaths.isEmpty) {
+          return const Left(ValidationFailure('No valid photos to add'));
+        }
+
+        final album = albums[albumIndex];
+        final updated = [...albums];
+        updated[albumIndex] = album.copyWith(
+          photoCount: album.photoCount + addedPaths.length,
+          coverPhotoPath: album.coverPhotoPath ?? addedPaths.first,
+        );
+        await _saveAlbums(updated);
+
+        return const Right(null);
+      });
     } catch (e) {
       debugPrint('Failed to add photos to album: $e');
       return Left(CacheFailure('Failed to add photos: $e'));
@@ -126,9 +124,7 @@ class AlbumRepositoryImpl implements AlbumRepository {
   }
 
   @override
-  Future<Either<Failure, List<String>>> getAlbumPhotos(
-    String albumName,
-  ) async {
+  Future<Either<Failure, List<String>>> getAlbumPhotos(String albumName) async {
     try {
       final dir = await _getAlbumDir(albumName);
       if (!await dir.exists()) return const Right([]);
@@ -150,23 +146,22 @@ class AlbumRepositoryImpl implements AlbumRepository {
   Future<Either<Failure, void>> deleteAlbum(String name) async {
     try {
       final albumsResult = await getAlbums();
-      return await albumsResult.fold(
-        (failure) async => Left(failure),
-        (albums) async {
-          final updated = albums.where((a) => a.name != name).toList();
-          await _saveAlbums(updated);
+      return await albumsResult.fold((failure) async => Left(failure), (
+        albums,
+      ) async {
+        final updated = albums.where((a) => a.name != name).toList();
+        await _saveAlbums(updated);
 
-          // Try to delete local album directory if it exists
-          try {
-            final dir = await _getAlbumDir(name);
-            if (await dir.exists()) {
-              await dir.delete(recursive: true);
-            }
-          } catch (_) {}
+        // Try to delete local album directory if it exists
+        try {
+          final dir = await _getAlbumDir(name);
+          if (await dir.exists()) {
+            await dir.delete(recursive: true);
+          }
+        } catch (_) {}
 
-          return const Right(null);
-        },
-      );
+        return const Right(null);
+      });
     } catch (e) {
       debugPrint('Failed to delete album: $e');
       return Left(CacheFailure('Failed to delete album: $e'));
@@ -179,9 +174,7 @@ class AlbumRepositoryImpl implements AlbumRepository {
   }
 
   Future<Directory> _getAlbumDir(String albumName) async {
-    final base = Platform.isIOS
-        ? await getApplicationDocumentsDirectory()
-        : await getApplicationCacheDirectory();
-    return Directory('${base.path}/album_${albumName.replaceAll(' ', '_')}');
+    final base = await getApplicationDocumentsDirectory();
+    return Directory('${base.path}/album_${Uri.encodeComponent(albumName)}');
   }
 }

@@ -24,12 +24,12 @@ class AlbumsBloc extends Bloc<AlbumsEvent, AlbumsState> {
     required AddPhotosToAlbumUseCase addPhotos,
     required AlbumRepository repository,
     FailureHandler? failureHandler,
-  })  : _getAlbums = getAlbums,
-        _createAlbum = createAlbum,
-        _addPhotos = addPhotos,
-        _repository = repository,
-        _failureHandler = failureHandler ?? FailureHandler.instance,
-        super(AlbumsInitial()) {
+  }) : _getAlbums = getAlbums,
+       _createAlbum = createAlbum,
+       _addPhotos = addPhotos,
+       _repository = repository,
+       _failureHandler = failureHandler ?? FailureHandler.instance,
+       super(AlbumsInitial()) {
     on<LoadAlbums>(_onLoadAlbums);
     on<CreateAlbum>(_onCreateAlbum);
     on<AddPhotosToAlbum>(_onAddPhotos);
@@ -43,17 +43,13 @@ class AlbumsBloc extends Bloc<AlbumsEvent, AlbumsState> {
   ) async {
     emit(AlbumsLoading());
     final result = await _getAlbums(NoParams());
-    result.fold(
-      (failure) {
-        emit(
-          AlbumsError(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
-          ),
-        );
-      },
-      (albums) => emit(AlbumsLoaded(albums: albums)),
-    );
+    result.fold((failure) {
+      emit(
+        AlbumsError(
+          errorPresentation: _failureHandler.getErrorPresentation(failure),
+        ),
+      );
+    }, (albums) => emit(AlbumsLoaded(albums: albums)));
   }
 
   Future<void> _onCreateAlbum(
@@ -61,19 +57,22 @@ class AlbumsBloc extends Bloc<AlbumsEvent, AlbumsState> {
     Emitter<AlbumsState> emit,
   ) async {
     final result = await _createAlbum(CreateAlbumParams(name: event.name));
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
         emit(
           AlbumsError(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
       (album) async {
         final albumsResult = await _getAlbums(NoParams());
         albumsResult.fold(
-          (failure) {},
+          (failure) => emit(
+            AlbumsError(
+              errorPresentation: _failureHandler.getErrorPresentation(failure),
+            ),
+          ),
           (albums) => emit(
             AlbumsOperationSuccess(
               message: 'Album "${album.name}" created',
@@ -91,24 +90,24 @@ class AlbumsBloc extends Bloc<AlbumsEvent, AlbumsState> {
   ) async {
     emit(AlbumsPhotoAdding(albumName: event.albumName));
     final result = await _addPhotos(
-      AddPhotosParams(
-        albumName: event.albumName,
-        photoPaths: event.photoPaths,
-      ),
+      AddPhotosParams(albumName: event.albumName, photoPaths: event.photoPaths),
     );
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
         emit(
           AlbumsError(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
       (_) async {
         final albumsResult = await _getAlbums(NoParams());
         albumsResult.fold(
-          (failure) {},
+          (failure) => emit(
+            AlbumsError(
+              errorPresentation: _failureHandler.getErrorPresentation(failure),
+            ),
+          ),
           (albums) => emit(
             AlbumsOperationSuccess(
               message:
@@ -126,19 +125,22 @@ class AlbumsBloc extends Bloc<AlbumsEvent, AlbumsState> {
     Emitter<AlbumsState> emit,
   ) async {
     final result = await _repository.deleteAlbum(event.name);
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
         emit(
           AlbumsError(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
       (_) async {
         final albumsResult = await _getAlbums(NoParams());
         albumsResult.fold(
-          (failure) {},
+          (failure) => emit(
+            AlbumsError(
+              errorPresentation: _failureHandler.getErrorPresentation(failure),
+            ),
+          ),
           (albums) => emit(
             AlbumsOperationSuccess(
               message: 'Album "${event.name}" deleted',
@@ -159,16 +161,12 @@ class AlbumsBloc extends Bloc<AlbumsEvent, AlbumsState> {
       (failure) {
         emit(
           AlbumsError(
-            errorPresentation:
-                _failureHandler.getErrorPresentation(failure),
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
           ),
         );
       },
       (photos) => emit(
-        AlbumPhotosLoaded(
-          albumName: event.albumName,
-          photoPaths: photos,
-        ),
+        AlbumPhotosLoaded(albumName: event.albumName, photoPaths: photos),
       ),
     );
   }

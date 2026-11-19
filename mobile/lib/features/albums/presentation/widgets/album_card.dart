@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
@@ -10,12 +11,7 @@ class AlbumCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
-  const AlbumCard({
-    super.key,
-    required this.album,
-    this.onTap,
-    this.onDelete,
-  });
+  const AlbumCard({super.key, required this.album, this.onTap, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -50,8 +46,8 @@ class AlbumCard extends StatelessWidget {
                         borderRadius: BorderRadius.vertical(
                           top: Radius.circular(AppThemeMetrics.radiusLg),
                         ),
-                        child: Image.asset(
-                          album.coverPhotoPath!,
+                        child: Image.file(
+                          File(album.coverPhotoPath!),
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stack) =>
                               _buildPlaceholder(context),
