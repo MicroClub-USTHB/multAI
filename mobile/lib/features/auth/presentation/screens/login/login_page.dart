@@ -60,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
     final screenHeight = context.height;
 
     return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) async {
+      listener: (context, state) {
         if (state is AuthAuthenticated) {
           context.read<AccountBloc>().add(ResetAccountData());
           context.go(AppRoutes.events);
@@ -68,7 +68,6 @@ class _LoginPageState extends State<LoginPage> {
           context.read<AccountBloc>().add(ResetAccountData());
           context.go(AppRoutes.faceEnrollment);
         }
-        // ignore: use_build_context_synchronously
         if (state is AuthFailure) {
           context.showErrorSnackBar(state.message);
         }
@@ -83,6 +82,8 @@ class _LoginPageState extends State<LoginPage> {
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const ClampingScrollPhysics(),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -221,52 +222,72 @@ class _LoginPhotoComposition extends StatelessWidget {
     final circleSize = height * 0.76;
     final photoSize = height * 0.70;
 
-    return SizedBox(
-      height: height,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Large accent circle — top-right, partially off-screen
-          Positioned(
-            top: -(height * 0.13),
-            right: -(height * 0.07),
-            child: Container(
-              width: circleSize,
-              height: circleSize,
-              decoration: const BoxDecoration(
-                color: AppThemeColors.primaryAccent,
-                shape: BoxShape.circle,
+    // Moving the viewport for the keyboard repaints the scroll content every
+    // frame; cache the static circle composition as its own layer.
+    return RepaintBoundary(
+      child: SizedBox(
+        height: height,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Large accent circle — top-right, partially off-screen
+            Positioned(
+              top: -(height * 0.13),
+              right: -(height * 0.07),
+              child: Container(
+                width: circleSize,
+                height: circleSize,
+                decoration: const BoxDecoration(
+                  color: AppThemeColors.primaryAccent,
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-          // Main photo circle — left, overlapping the accent circle
-          Positioned(
-            top: height * 0.07,
-            left: 28,
-            child: ClipOval(
-              child: Image.asset(
-                imagePath,
-                width: photoSize,
-                height: photoSize,
-                fit: BoxFit.cover,
+            // Main photo circle — left, overlapping the accent circle
+            Positioned(
+              top: height * 0.07,
+              left: 28,
+              child: ClipOval(
+                child: Image.asset(
+                  imagePath,
+                  width: photoSize,
+                  height: photoSize,
+                  fit: BoxFit.cover,
+                  frameBuilder: _fadeInFrame,
+                ),
               ),
             ),
-          ),
-          // Small accent dot — bottom-right
-          Positioned(
-            bottom: height * 0.08,
-            right: context.widthCalculated(56),
-            child: Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
-                shape: BoxShape.circle,
+            // Small accent dot — bottom-right
+            Positioned(
+              bottom: height * 0.08,
+              right: context.widthCalculated(56),
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+
+  static Widget _fadeInFrame(
+    BuildContext context,
+    Widget child,
+    int? frame,
+    bool wasSynchronouslyLoaded,
+  ) {
+    if (wasSynchronouslyLoaded) return child;
+    return AnimatedOpacity(
+      opacity: frame == null ? 0 : 1,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      child: child,
     );
   }
 }

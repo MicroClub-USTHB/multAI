@@ -44,8 +44,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         .expand((s) => [s.image, if (s.secondImage != null) s.secondImage!])
         .toSet()
         .toList();
+    // Precache independently: one missing asset must not abort the rest, and a
+    // failure must never escape as an unhandled async error.
     await Future.wait([
-      for (final img in images) precacheImage(AssetImage(img), context),
+      for (final img in images)
+        precacheImage(
+          AssetImage(img),
+          context,
+          onError: (exception, stackTrace) {
+            debugPrint('Onboarding image preload failed for $img: $exception');
+          },
+        ),
     ]);
   }
 

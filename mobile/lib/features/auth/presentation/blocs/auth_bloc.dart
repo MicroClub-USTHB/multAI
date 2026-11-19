@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/failure.dart';
@@ -183,22 +185,37 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     LogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    // Duplicate logout requests (e.g. a 401 racing a manual sign-out) must not
+    // start a second teardown.
+    if (_logoutInFlight) return;
     _logoutInFlight = true;
+    emit(AuthLoading());
+
+    // Push-token revocation is best-effort and runs while the local session is
+    // cleared, so it can never stall sign-out. The local session clear in the
+    // repository is what actually signs the user out.
+    unawaited(_revokePushTokenQuietly());
     try {
-      await _pushNotificationService.revokeToken();
       final result = await _logoutUseCase(NoParams());
+      result.fold(
+        (failure) => _failureHandler.logFailure(failure, 'AuthBloc'),
+        (_) {},
+      );
       await DeviceUtils.clearDeviceId();
-      result.fold((failure) {
-        _failureHandler.logFailure(failure, 'AuthBloc');
-        emit(Unauthenticated());
-      }, (_) => emit(Unauthenticated()));
     } catch (e, s) {
       _logger.error('AuthBloc', 'Logout failed', e, s);
-      emit(Unauthenticated());
     } finally {
       _logoutInFlight = false;
     }
+
+    if (emit.isDone) return;
+    emit(Unauthenticated());
+  }
+
+  Future<void> _revokePushTokenQuietly() async {
+    try {
+      await _pushNotificationService.revokeToken();
+    } catch (_) {}
   }
 
   Future<void> _onGetCurrentUserRequested(

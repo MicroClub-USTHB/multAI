@@ -27,6 +27,8 @@ class PasswordField extends StatelessWidget {
       controller: controller,
       obscureText: obscure,
       textInputAction: TextInputAction.done,
+      autocorrect: false,
+      enableSuggestions: false,
       style: context.textTheme.bodyMedium,
       onFieldSubmitted: (_) => onSubmit(),
       decoration: InputDecoration(

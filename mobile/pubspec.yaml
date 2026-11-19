@@ -79,6 +79,7 @@ flutter:
     - assets/images/
     - assets/images/onboarding/
     - assets/icons/
+    - assets/google_fonts/
     # NOTE: .env is included for development only.
     # Production builds MUST use --dart-define or CI/CD injection for secrets.
     # NEVER commit real credentials to version control.

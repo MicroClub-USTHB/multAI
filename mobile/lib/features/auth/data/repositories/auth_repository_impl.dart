@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/constants/storage_keys.dart';
@@ -191,20 +193,34 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, void>> logout() async {
+    // Local-first: capture the token for the server call, then clear the
+    // local session immediately. The remote revocation must never gate the
+    // sign-out UI (it used to wait up to the full request timeout).
+    var accessToken = apiClient.currentAccessToken;
     try {
-      await remoteDataSource.logout();
+      accessToken ??= await _loadAccessToken();
       await _clearTokens();
       await localDataSource.clearCachedMe();
-      return const Right(null);
-    } on Failure {
-      await _clearTokens();
-      await localDataSource.clearCachedMe();
-      return const Right(null);
     } catch (e) {
-      await _clearTokens();
-      await localDataSource.clearCachedMe();
-      return const Right(null);
+      FailureHandler.instance.logFailure(
+        UnknownFailure('Failed to clear local session: $e'),
+        'AuthRepository',
+      );
+      apiClient.clearAccessToken();
     }
+    unawaited(_revokeRemoteSession(accessToken));
+    return const Right(null);
+  }
+
+  /// Best-effort server-side revocation using the token captured before the
+  /// local session was cleared. Failures are ignored: the user is already out.
+  Future<void> _revokeRemoteSession(String? accessToken) async {
+    if (accessToken == null || accessToken.isEmpty) return;
+    try {
+      await remoteDataSource
+          .logout(accessToken: accessToken)
+          .timeout(const Duration(seconds: 5));
+    } catch (_) {}
   }
 
   @override

@@ -35,10 +35,14 @@ class ApiClient {
 
   String? get currentAccessToken => _accessToken;
 
-  Future<Map<String, String>> _getHeaders({bool requiresAuth = false}) async {
+  Future<Map<String, String>> _getHeaders({
+    bool requiresAuth = false,
+    String? accessToken,
+  }) async {
     final headers = <String, String>{'Content-Type': 'application/json'};
-    if (_accessToken != null && requiresAuth) {
-      headers['Authorization'] = 'Bearer $_accessToken';
+    final token = accessToken ?? _accessToken;
+    if (token != null && requiresAuth) {
+      headers['Authorization'] = 'Bearer $token';
     }
 
     try {
@@ -151,6 +155,24 @@ class ApiClient {
         body: requestBody,
       );
     });
+  }
+
+  /// Fire-and-forget POST authenticated with an explicit token.
+  ///
+  /// Unlike [postVoid] it never refreshes tokens or reports unauthorized: it
+  /// is meant for best-effort server cleanup (e.g. revoking a session during
+  /// sign-out) after the local credentials have already been cleared.
+  Future<void> postVoidDetached(
+    String endpoint, {
+    required String accessToken,
+  }) async {
+    final headers = await _getHeaders(
+      requiresAuth: true,
+      accessToken: accessToken,
+    );
+    await _client
+        .post(Uri.parse('$baseUrl$endpoint'), headers: headers)
+        .timeout(_requestTimeout);
   }
 
   Future<void> delete(String endpoint, {bool requiresAuth = true}) async {

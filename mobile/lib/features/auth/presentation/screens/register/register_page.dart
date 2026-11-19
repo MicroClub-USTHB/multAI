@@ -104,6 +104,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const ClampingScrollPhysics(),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -195,52 +197,72 @@ class _RegisterPhotoComposition extends StatelessWidget {
     final circleSize = height * 0.80;
     final photoSize = height * 0.74;
 
-    return SizedBox(
-      height: height,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Large accent circle — top-right, partially off-screen
-          Positioned(
-            top: -(height * 0.14),
-            right: -(height * 0.08),
-            child: Container(
-              width: circleSize,
-              height: circleSize,
-              decoration: const BoxDecoration(
-                color: AppThemeColors.primaryAccent,
-                shape: BoxShape.circle,
+    // Cache the static composition so keyboard-driven viewport movement does
+    // not re-rasterize the photo on every frame.
+    return RepaintBoundary(
+      child: SizedBox(
+        height: height,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Large accent circle — top-right, partially off-screen
+            Positioned(
+              top: -(height * 0.14),
+              right: -(height * 0.08),
+              child: Container(
+                width: circleSize,
+                height: circleSize,
+                decoration: const BoxDecoration(
+                  color: AppThemeColors.primaryAccent,
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-          // Main photo circle — left, overlapping the accent circle
-          Positioned(
-            top: height * 0.08,
-            left: context.hPadding(),
-            child: ClipOval(
-              child: Image.asset(
-                imagePath,
-                width: photoSize,
-                height: photoSize,
-                fit: BoxFit.cover,
+            // Main photo circle — left, overlapping the accent circle
+            Positioned(
+              top: height * 0.08,
+              left: context.hPadding(),
+              child: ClipOval(
+                child: Image.asset(
+                  imagePath,
+                  width: photoSize,
+                  height: photoSize,
+                  fit: BoxFit.cover,
+                  frameBuilder: _fadeInFrame,
+                ),
               ),
             ),
-          ),
-          // Small accent dot
-          Positioned(
-            bottom: height * 0.08,
-            right: context.widthCalculated(52),
-            child: Container(
-              width: 18,
-              height: 18,
-              decoration: BoxDecoration(
-                color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
-                shape: BoxShape.circle,
+            // Small accent dot
+            Positioned(
+              bottom: height * 0.08,
+              right: context.widthCalculated(52),
+              child: Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+
+  static Widget _fadeInFrame(
+    BuildContext context,
+    Widget child,
+    int? frame,
+    bool wasSynchronouslyLoaded,
+  ) {
+    if (wasSynchronouslyLoaded) return child;
+    return AnimatedOpacity(
+      opacity: frame == null ? 0 : 1,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      child: child,
     );
   }
 }
@@ -509,6 +531,9 @@ class _OtpFormContentState extends State<_OtpFormContent> {
             maxLength: 6,
             textAlign: TextAlign.center,
             autofocus: true,
+            autocorrect: false,
+            enableSuggestions: false,
+            autofillHints: const [AutofillHints.oneTimeCode],
             style: tt.displayMedium?.copyWith(
               letterSpacing: 14,
               color: AppThemeColors.primaryText,

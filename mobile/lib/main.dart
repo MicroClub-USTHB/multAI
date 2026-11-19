@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'core/cubits/locale_cubit.dart';
 import 'core/cubits/theme_cubit.dart';
 import 'core/errors/error_handler.dart';
@@ -78,7 +79,34 @@ void main() async {
   await pushService.init();
   di.sl<NotificationNavigationService>().init(appRouter);
 
+  await _preloadFonts();
+
   runApp(MyApp());
+}
+
+/// Fonts are bundled under `assets/google_fonts` so the UI never waits for a
+/// network round-trip (or re-lays out text when the font swaps in) on the
+/// onboarding, login or logout screens. Queue the variants used by both
+/// themes, then wait for them before the first frame.
+Future<void> _preloadFonts() async {
+  GoogleFonts.config.allowRuntimeFetching = false;
+  try {
+    for (final weight in const [
+      FontWeight.w400,
+      FontWeight.w500,
+      FontWeight.w600,
+      FontWeight.w700,
+    ]) {
+      GoogleFonts.dmSans(fontWeight: weight);
+      GoogleFonts.raleway(fontWeight: weight);
+    }
+    GoogleFonts.montserrat();
+    GoogleFonts.playfairDisplay();
+    GoogleFonts.playfairDisplay(fontStyle: FontStyle.italic);
+    await GoogleFonts.pendingFonts().timeout(const Duration(seconds: 3));
+  } catch (e) {
+    debugPrint('Font preload skipped: $e');
+  }
 }
 
 void _setupGlobalErrorHandlers() {

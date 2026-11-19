@@ -9,7 +9,7 @@ abstract class AuthRemoteDataSource {
   Future<AuthResponseModel> login(AuthRequestModel request);
   Future<AuthResponseModel> refreshToken(String refreshToken);
   Future<String> resendOtp(String pendingToken);
-  Future<void> logout();
+  Future<void> logout({String? accessToken});
   Future<void> revokeDevice(String deviceId);
   Future<MeResponseModel> getMe();
 }
@@ -66,8 +66,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> logout() async {
-    await apiClient.postVoid(EndPoints.logout, requiresAuth: true);
+  Future<void> logout({String? accessToken}) async {
+    if (accessToken == null || accessToken.isEmpty) {
+      await apiClient.postVoid(EndPoints.logout, requiresAuth: true);
+      return;
+    }
+    await apiClient.postVoidDetached(
+      EndPoints.logout,
+      accessToken: accessToken,
+    );
   }
 
   @override

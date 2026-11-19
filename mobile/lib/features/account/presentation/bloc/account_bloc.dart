@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:extended_image/extended_image.dart';
 
@@ -87,19 +89,33 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   ) async {
     emit(AccountLoading());
 
-    await _pushNotificationService.revokeToken();
+    // Best-effort cleanup must not delay the visible sign-out. The push token
+    // revoke is started first so it can still use the in-memory access token;
+    // the local session is cleared right after, and the photo cache is purged
+    // in the background once navigation has been requested.
+    unawaited(_revokePushTokenQuietly());
     final result = await _logoutUseCase(NoParams());
+    result.fold(
+      (failure) => _failureHandler.logFailure(failure, 'AccountBloc'),
+      (_) {},
+    );
     await DeviceUtils.clearDeviceId();
-    await _photoCacheService.clearCache();
 
-    result.fold((failure) {
-      _failureHandler.logFailure(failure, 'AccountBloc');
-      emit(
-        AccountError(
-          errorPresentation: _failureHandler.getErrorPresentation(failure),
-        ),
-      );
-    }, (_) => emit(AccountLoggedOut()));
+    if (emit.isDone) return;
+    emit(AccountLoggedOut());
+    unawaited(_clearPhotoCacheQuietly());
+  }
+
+  Future<void> _revokePushTokenQuietly() async {
+    try {
+      await _pushNotificationService.revokeToken();
+    } catch (_) {}
+  }
+
+  Future<void> _clearPhotoCacheQuietly() async {
+    try {
+      await _photoCacheService.clearCache();
+    } catch (_) {}
   }
 
   Future<void> _onClearImageCache(

@@ -16,15 +16,20 @@ class OnboardingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    // sizeOf avoids rebuilding every slide on each keyboard viewInsets frame.
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final compositionHeight = screenHeight * 0.54;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: compositionHeight,
-          child: _buildComposition(context, compositionHeight),
+        // The composition is static; cache its layer so page/text rebuilds
+        // don't re-rasterize the large images.
+        RepaintBoundary(
+          child: SizedBox(
+            height: compositionHeight,
+            child: _buildComposition(context, compositionHeight),
+          ),
         ),
         Expanded(
           child: Padding(
@@ -115,13 +120,7 @@ class OnboardingCard extends StatelessWidget {
           left: context.hPadding(),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Image.asset(
-              slide.image,
-              width: photoW,
-              height: photoH,
-              fit: BoxFit.cover,
-              gaplessPlayback: true,
-            ),
+            child: _photo(slide.image, width: photoW, height: photoH),
           ),
         ),
         // Small accent dot — bottom right of composition area
@@ -241,13 +240,32 @@ class OnboardingCard extends StatelessWidget {
 
   Widget _photoCircle(String imagePath, double size) {
     return ClipOval(
-      child: Image.asset(
-        imagePath,
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        gaplessPlayback: true,
-      ),
+      child: _photo(imagePath, width: size, height: size),
+    );
+  }
+
+  Widget _photo(
+    String imagePath, {
+    required double width,
+    required double height,
+  }) {
+    return Image.asset(
+      imagePath,
+      width: width,
+      height: height,
+      fit: BoxFit.cover,
+      gaplessPlayback: true,
+      // Fade the decoded image in instead of flashing a blank hole while the
+      // first frame is decoded.
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        if (wasSynchronouslyLoaded) return child;
+        return AnimatedOpacity(
+          opacity: frame == null ? 0 : 1,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          child: child,
+        );
+      },
     );
   }
 }
