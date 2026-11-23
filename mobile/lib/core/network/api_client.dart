@@ -196,6 +196,13 @@ class ApiClient {
     required List<String> fieldNames,
     bool requiresAuth = false,
   }) async {
+    // Match the other authenticated request helpers: hydrate a persisted
+    // access token before constructing the multipart request. Without this,
+    // the first avatar upload after a cold start is sent without its bearer
+    // token and depends on an avoidable 401/refresh retry.
+    if (requiresAuth && !await _hasValidCredentials()) {
+      throw const UnauthorizedFailure('No access token');
+    }
     // Goes through _executeWithAuthRaw so an expired access token triggers the
     // usual refresh-and-retry instead of failing the upload outright.
     final response = await _executeWithAuthRaw(
