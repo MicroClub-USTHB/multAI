@@ -272,4 +272,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get mcMember => 'عضو mc';
+
+  @override
+  String get changeProfilePhoto => 'تغيير صورة الملف الشخصي';
+
+  @override
+  String get photoUpdateFailed => 'تعذر تحديث صورتك. حاول مرة أخرى.';
 }

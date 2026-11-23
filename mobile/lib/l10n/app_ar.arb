@@ -95,5 +95,7 @@
   "downloadPhotosAsZip": "تنزيل جميع الصور كملف ZIP",
   "myAlbums": "ألبوماتي",
   "organizePhotosIntoAlbums": "تنظيم الصور في ألبومات",
-  "mcMember": "عضو mc"
+  "mcMember": "عضو mc",
+  "changeProfilePhoto": "تغيير صورة الملف الشخصي",
+  "photoUpdateFailed": "تعذر تحديث صورتك. حاول مرة أخرى."
 }

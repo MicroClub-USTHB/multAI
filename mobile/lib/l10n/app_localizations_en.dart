@@ -271,4 +271,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mcMember => 'mc-member';
+
+  @override
+  String get changeProfilePhoto => 'Change profile photo';
+
+  @override
+  String get photoUpdateFailed =>
+      'Couldn\'t update your photo. Please try again.';
 }
