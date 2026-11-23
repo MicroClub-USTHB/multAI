@@ -1,6 +1,5 @@
 import secrets
 import uuid
-from sqlalchemy.exc import IntegrityError
 from typing import List, Optional
 from app.core.exceptions import AppException
 from app.schema.request.internal.event import HrEventSync
@@ -49,10 +48,9 @@ class EventService:
             status="draft",
             external_id=req.external_id,
         )
-        try:
-            event = await self.e_querier.create_synced_event(params)
-        except IntegrityError:
-            # Concurrent sync of the same external_id won the race.
+        event = await self.e_querier.create_synced_event(params)
+        if not event:
+            # ON CONFLICT DO NOTHING: a concurrent sync of this external_id won.
             event = await self.e_querier.get_event_by_external_id(
                 external_id=req.external_id
             )

@@ -53,6 +53,7 @@ class CreateEventParams:
 CREATE_SYNCED_EVENT = """-- name: create_synced_event \\:one
 INSERT INTO events (name, event_code, event_date, end_date, status, external_id)
 VALUES (:p1, :p2, :p3, :p4, :p5, :p6)
+ON CONFLICT (external_id) DO NOTHING
 RETURNING id, name, event_code, event_date, status, created_by, created_at, archived_at, end_date, external_id
 """
 
@@ -106,7 +107,9 @@ WHERE id = (
     WHERE e.external_id IS NULL AND e.name = :p2 AND e.event_date = :p3
     ORDER BY e.created_at
     LIMIT 1
+    FOR UPDATE SKIP LOCKED
 )
+AND external_id IS NULL
 RETURNING id, name, event_code, event_date, status, created_by, created_at, archived_at, end_date, external_id
 """
 
