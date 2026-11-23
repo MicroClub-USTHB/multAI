@@ -1,7 +1,9 @@
 import secrets
 import uuid
+from sqlalchemy.exc import IntegrityError
 from typing import List, Optional
 from app.core.exceptions import AppException
+from app.schema.request.internal.event import HrEventSync
 from app.schema.request.web.event import EventCreate
 
 from app.schema.response.web.event import (
@@ -41,6 +43,39 @@ class EventService:
         event = await self.e_querier.create_event(params)
         if not event:
             raise AppException.internal_error("Failed to create event")
+        return EventResponse.model_validate(event)
+
+    async def sync_from_hr(self, req: HrEventSync) -> EventResponse:
+        """Idempotently create/link the MultiAi event for an HR-Events event."""
+        existing = await self.e_querier.get_event_by_external_id(
+            external_id=req.external_id
+        )
+        if existing:
+            return EventResponse.model_validate(existing)
+
+        linked = await self.e_querier.link_legacy_event(
+            external_id=req.external_id, name=req.name, event_date=req.starts_at
+        )
+        if linked:
+            return EventResponse.model_validate(linked)
+
+        params = event_queries.CreateSyncedEventParams(
+            name=req.name,
+            event_code=secrets.token_urlsafe(8),
+            event_date=req.starts_at,
+            end_date=req.ends_at,
+            status="draft",
+            external_id=req.external_id,
+        )
+        try:
+            event = await self.e_querier.create_synced_event(params)
+        except IntegrityError:
+            # Concurrent sync of the same external_id won the race.
+            event = await self.e_querier.get_event_by_external_id(
+                external_id=req.external_id
+            )
+        if not event:
+            raise AppException.internal_error("Failed to sync event")
         return EventResponse.model_validate(event)
 
     async def update_status(

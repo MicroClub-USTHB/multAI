@@ -13,9 +13,10 @@ class EventResponse(BaseModel):
     event_date: datetime
     end_date: Optional[datetime] = None
     status: str
-    created_by: uuid.UUID
+    created_by: Optional[uuid.UUID] = None
     created_at: datetime
     archived_at: Optional[datetime] = None
+    external_id: Optional[str] = None
 
 
 class ParticipantResponse(BaseModel):
