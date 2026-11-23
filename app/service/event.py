@@ -4,7 +4,6 @@ from sqlalchemy.exc import IntegrityError
 from typing import List, Optional
 from app.core.exceptions import AppException
 from app.schema.request.internal.event import HrEventSync
-from app.schema.request.web.event import EventCreate
 
 from app.schema.response.web.event import (
     EventResponse,
@@ -27,23 +26,6 @@ class EventService:
         self.p_querier = p_querier
 
     # --- Core Event Management ---
-
-    async def create_event(
-        self, req: EventCreate, creator_id: uuid.UUID
-    ) -> EventResponse:
-        code_created: str = secrets.token_urlsafe(8)
-        params = event_queries.CreateEventParams(
-            name=req.name,
-            event_code=code_created,
-            event_date=req.event_date,
-            end_date=req.end_date,
-            status=req.status or "draft",
-            created_by=creator_id,
-        )
-        event = await self.e_querier.create_event(params)
-        if not event:
-            raise AppException.internal_error("Failed to create event")
-        return EventResponse.model_validate(event)
 
     async def sync_from_hr(self, req: HrEventSync) -> EventResponse:
         """Idempotently create/link the MultiAi event for an HR-Events event."""
