@@ -1,16 +1,12 @@
 // Live E2E test of the push-notification / device-token flow against the
 // backend, plus the in-app notification list and mark-as-read round trip.
 //
-// IMPORTANT — KNOWN CONTRACT GAP (asserted below, not hidden):
-//   The app registers its FCM token with the device identifier produced by
-//   DeviceUtils.getDeviceData().deviceId, which is the *physical* device id it
-//   also sends to the backend as `physical_device_id` at login. The backend's
-//   POST /user/auth/devices/token and /devices/inactivate look the device up by
-//   its DB primary key (`id`), never by `physical_device_id`, and /user/auth/me
-//   does not return `physical_device_id` — so the app cannot correlate its own
-//   device row. The result is a 404 on every push-token registration, which
-//   PushNotificationService swallows silently. Push notifications therefore
-//   never register. See tests 4 and 5.
+// The app registers its FCM token with the device identifier produced by
+// DeviceUtils.getDeviceData().deviceId, which is the *physical* device id it
+// also sends to the backend as `physical_device_id` at login. The backend's
+// POST /user/auth/devices/token and /devices/inactivate now resolve the device
+// by physical_device_id when the DB id does not match, so that identifier is
+// the contract used below. See tests 4 and 5.
 //
 // Run:
 //   flutter test test/e2e/push_notifications_e2e_test.dart \
@@ -155,43 +151,40 @@ void main() {
             '(proves the backend endpoint itself is healthy): $failure');
   });
 
-  test('4) KNOWN BUG: the identifier the app actually uses (the physical '
-      'device id) is rejected by the backend', () async {
+  test('4) the identifier the app actually uses (the physical device id) '
+      'registers the push token', () async {
     // This is exactly what PushNotificationService.registerCurrentToken does:
     // it passes DeviceUtils.getDeviceData().deviceId, i.e. the physical id.
     final failure = await failureOf(
       () => stack.notifications.registerPushToken(
         deviceId: physicalDeviceId,
-        token: 'fcm-e2e-token',
+        token: 'fcm-e2e-token-${DateTime.now().millisecondsSinceEpoch}',
       ),
     );
     expect(
       failure,
-      isNotNull,
-      reason: 'CONTRACT GAP: the app sends physical_device_id but '
-          '/user/auth/devices/token looks the device up by its DB id and '
-          'returns 404 "Device not found". Push registration therefore always '
-          'fails (and PushNotificationService swallows the failure), so push '
-          'notifications never work. Needs a backend contract change: accept '
-          'physical_device_id, or return it from /user/auth/me.',
+      isNull,
+      reason: 'the app addresses its own device row with the physical device '
+          'id, so /user/auth/devices/token must accept it: $failure',
     );
   });
 
-  test('5) revoke (inactivate) has the same gap for the physical id, but '
-      'works with the DB device id', () async {
+  test('5) revoke (inactivate) works with both the physical and the DB id',
+      () async {
     final dbDeviceId = await dbDeviceIdForThisRun();
 
     final withPhysical = await failureOf(
       () => stack.notifications.revokePushToken(physicalDeviceId),
     );
-    expect(withPhysical, isNotNull,
-        reason: 'CONTRACT GAP: inactivate also keys on the DB id, so the '
-            'physical id the app sends 404s');
+    expect(withPhysical, isNull,
+        reason: 'inactivate with the physical device id must succeed: '
+            '$withPhysical');
 
     final withDbId = await failureOf(
       () => stack.notifications.revokePushToken(dbDeviceId),
     );
     expect(withDbId, isNull,
-        reason: 'inactivate with the DB device id must succeed: $withDbId');
+        reason: 'inactivate with the DB device id must still succeed: '
+            '$withDbId');
   });
 }

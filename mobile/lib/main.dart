@@ -26,6 +26,7 @@ import 'features/notifications/services/notification_navigation_service.dart';
 import 'features/gallery/presentation/bloc/gallery_bloc.dart';
 import 'di/injection_container.dart' as di;
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 
 late final SessionManager sessionManager;
@@ -34,7 +35,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await Firebase.initializeApp();
+    // Initialising from the generated options keeps FCM available on builds
+    // that do not ship android/app/google-services.json; without this the
+    // default app is never created and no push token is ever requested.
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
     debugPrint('Firebase initialization skipped: $e');
   }
