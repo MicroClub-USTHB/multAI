@@ -43,6 +43,13 @@ class _EventsScreenState extends State<EventsScreen> {
       if (state is EventsInitial || state is EventsFailure) {
         context.read<EventsBloc>().add(GetUserEventsRequested());
       }
+      // The bell badge is driven by NotificationBloc, which stays in its
+      // initial state until the notifications screen is opened. Fetch the
+      // list here so the unread dot is accurate as soon as events is shown.
+      final notificationState = context.read<NotificationBloc>().state;
+      if (notificationState is! NotificationLoaded) {
+        context.read<NotificationBloc>().add(LoadNotifications());
+      }
     });
   }
 
