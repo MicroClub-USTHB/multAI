@@ -201,6 +201,7 @@ class AuthRepositoryImpl implements AuthRepository {
       accessToken ??= await _loadAccessToken();
       await _clearTokens();
       await localDataSource.clearCachedMe();
+      await _clearAccountScopedCache();
     } catch (e) {
       FailureHandler.instance.logFailure(
         UnknownFailure('Failed to clear local session: $e'),
@@ -210,6 +211,18 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     unawaited(_revokeRemoteSession(accessToken));
     return const Right(null);
+  }
+
+  /// Clears per-account local state that would otherwise leak into the next
+  /// account signed in on this device: cached profile/avatar, cached events
+  /// and approvals, and the face-enrollment flag (which is device-wide, so a
+  /// new account would otherwise inherit the previous account's enrollment).
+  Future<void> _clearAccountScopedCache() async {
+    await localStorage.remove(StorageKeys.faceEnrollmentDone);
+    await localStorage.remove(StorageKeys.cachedEvents);
+    await localStorage.remove(StorageKeys.galleryCacheManifest);
+    await localStorage.removeSecure(StorageKeys.cachedAccount);
+    await localStorage.removeSecure(StorageKeys.cachedApprovals);
   }
 
   /// Best-effort server-side revocation using the token captured before the
