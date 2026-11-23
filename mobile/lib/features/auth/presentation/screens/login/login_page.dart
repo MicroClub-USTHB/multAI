@@ -7,6 +7,9 @@ import 'package:multai_mobile/core/constants/images.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/features/account/presentation/bloc/account_bloc.dart';
+import 'package:multai_mobile/features/events/presentation/bloc/events_bloc.dart';
+import 'package:multai_mobile/features/gallery/presentation/bloc/gallery_bloc.dart';
+import 'package:multai_mobile/features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
@@ -43,6 +46,16 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  /// Clears data belonging to the previous session from the app-level blocs,
+  /// which otherwise survive sign-out and would show the old account's
+  /// events/gallery/notifications to the newly signed-in user.
+  void _resetUserScopedBlocs() {
+    context.read<AccountBloc>().add(ResetAccountData());
+    context.read<EventsBloc>().add(ResetEvents());
+    context.read<GalleryBloc>().add(ResetGallery());
+    context.read<NotificationBloc>().add(ResetNotifications());
+  }
+
   void _onSignInPressed() {
     if (!_formKey.currentState!.validate()) return;
     context.unfocus();
@@ -62,10 +75,10 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          context.read<AccountBloc>().add(ResetAccountData());
+          _resetUserScopedBlocs();
           context.go(AppRoutes.events);
         } else if (state is AuthNeedsFaceEnrollment) {
-          context.read<AccountBloc>().add(ResetAccountData());
+          _resetUserScopedBlocs();
           context.go(AppRoutes.faceEnrollment);
         }
         if (state is AuthFailure) {

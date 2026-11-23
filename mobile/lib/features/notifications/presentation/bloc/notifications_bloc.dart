@@ -41,6 +41,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
        _failureHandler = failureHandler ?? FailureHandler.instance,
        super(NotificationInitial()) {
     on<LoadNotifications>(_onLoad);
+    on<ResetNotifications>(_onReset);
     on<MarkNotificationRead>(_onMarkRead);
     on<MarkSingleNotificationRead>(_onMarkSingleRead);
     on<MarkAllNotificationsRead>(_onMarkAllRead);
@@ -60,6 +61,10 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     _connectivitySub?.cancel();
     _notificationArrivedSub?.cancel();
     return super.close();
+  }
+
+  void _onReset(ResetNotifications event, Emitter<NotificationState> emit) {
+    emit(NotificationInitial());
   }
 
   Future<void> _onLoad(

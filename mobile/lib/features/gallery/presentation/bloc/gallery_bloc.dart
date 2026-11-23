@@ -38,6 +38,7 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     on<LoadEventPhotos>(_onLoadEvent);
     on<LoadPhotoImage>(_onLoadImage);
     on<RefreshGallery>(_onRefresh);
+    on<ResetGallery>(_onReset);
     _connectivitySub = _connectivityService.onStatusChanged.listen((online) {
       if (online) add(LoadAllPhotos());
     });
@@ -158,6 +159,11 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     } finally {
       _loadingImageIds.remove(event.photoId);
     }
+  }
+
+  void _onReset(ResetGallery event, Emitter<GalleryState> emit) {
+    _loadingImageIds.clear();
+    emit(GalleryInitial());
   }
 
   Future<void> _onRefresh(

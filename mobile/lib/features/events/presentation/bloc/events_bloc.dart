@@ -31,6 +31,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     on<GetUserEventsRequested>(_onGetUserEvents);
     on<JoinEventRequested>(_onJoinEvent);
     on<EventsRetryRequested>(_onEventsRetry);
+    on<ResetEvents>(_onResetEvents);
     _connectivitySub = _connectivityService.onStatusChanged.listen((online) {
       if (!online) return;
       if (state is EventsFailure ||
@@ -126,6 +127,10 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
         add(GetUserEventsRequested());
       },
     );
+  }
+
+  void _onResetEvents(ResetEvents event, Emitter<EventsState> emit) {
+    emit(EventsInitial());
   }
 
   Future<void> _onEventsRetry(

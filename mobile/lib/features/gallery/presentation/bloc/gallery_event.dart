@@ -21,3 +21,5 @@ class LoadPhotoImage extends GalleryEvent {
 }
 
 class RefreshGallery extends GalleryEvent {}
+
+class ResetGallery extends GalleryEvent {}

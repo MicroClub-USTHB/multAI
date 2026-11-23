@@ -8,6 +8,10 @@ import 'package:multai_mobile/core/constants/images.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/features/account/presentation/bloc/account_bloc.dart';
+import 'package:multai_mobile/features/events/presentation/bloc/events_bloc.dart';
+import 'package:multai_mobile/features/gallery/presentation/bloc/gallery_bloc.dart';
+import 'package:multai_mobile/features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
@@ -51,6 +55,15 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  /// Clears data left over from a previous account so a freshly registered
+  /// user never sees the previous session's events, photos or notifications.
+  void _resetUserScopedBlocs() {
+    context.read<AccountBloc>().add(ResetAccountData());
+    context.read<EventsBloc>().add(ResetEvents());
+    context.read<GalleryBloc>().add(ResetGallery());
+    context.read<NotificationBloc>().add(ResetNotifications());
+  }
+
   void _onSendOtpPressed() {
     if (!_formKey.currentState!.validate()) return;
     context.unfocus();
@@ -80,8 +93,10 @@ class _RegisterPageState extends State<RegisterPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
+          _resetUserScopedBlocs();
           context.go(AppRoutes.events);
         } else if (state is AuthNeedsFaceEnrollment) {
+          _resetUserScopedBlocs();
           context.go(AppRoutes.faceEnrollment);
         } else if (state is AuthOtpSent) {
           setState(() => _pendingToken = state.pendingToken);

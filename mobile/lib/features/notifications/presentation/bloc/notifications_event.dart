@@ -4,6 +4,8 @@ abstract class NotificationEvent {}
 
 class LoadNotifications extends NotificationEvent {}
 
+class ResetNotifications extends NotificationEvent {}
+
 class MarkNotificationRead extends NotificationEvent {
   final List<String> notificationIds;
   MarkNotificationRead({required this.notificationIds});
