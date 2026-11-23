@@ -101,9 +101,11 @@ void main() {
         predicate<FaceEnrollmentState>(
           (s) => s.status == EnrollmentStatus.submitting,
         ),
+        // A failed submit must stay editable so the user can retry; the
+        // terminal `failure` status would disable the submit button.
         predicate<FaceEnrollmentState>(
           (s) =>
-              s.status == EnrollmentStatus.failure &&
+              s.status == EnrollmentStatus.editing &&
               s.submitError != null,
         ),
       ],
@@ -129,7 +131,9 @@ void main() {
           (s) => s.status == EnrollmentStatus.submitting,
         ),
         predicate<FaceEnrollmentState>(
-          (s) => s.status == EnrollmentStatus.failure,
+          (s) =>
+              s.status == EnrollmentStatus.editing &&
+              s.submitError != null,
         ),
       ],
     );

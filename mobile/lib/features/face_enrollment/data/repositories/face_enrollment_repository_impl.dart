@@ -35,8 +35,29 @@ class FaceEnrollmentRepositoryImpl implements FaceEnrollmentRepository {
   }
 
   @override
-  Future<bool> isEnrollmentDone() {
-    return localDataSource.isEnrollmentDone();
+  Future<bool> isEnrollmentDone() async {
+    // Fast path: this account already completed enrollment on this device.
+    if (await localDataSource.isEnrollmentDone()) return true;
+
+    // The device flag is cleared on logout, but enrollment belongs to the
+    // account (it can have been completed on another device, before a
+    // reinstall, or by a different account on this device previously). Ask the
+    // backend, which reports it as `is_onboarded` on GET /user/auth/me, and
+    // cache a positive answer locally.
+    try {
+      final enrolled = await remoteDataSource.isEnrollmentDoneOnServer();
+      if (enrolled) {
+        // Caching is an optimisation only; never let a storage error change the
+        // answer we got from the server.
+        try {
+          await localDataSource.saveEnrollmentDone();
+        } catch (_) {}
+      }
+      return enrolled;
+    } on Failure {
+      // Offline or the request failed: fall back to what this device knows.
+      return false;
+    }
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -17,7 +18,12 @@ void main() {
 
   setUp(() {
     mockApiClient = MockApiClient();
-    dataSource = FaceEnrollmentRemoteDataSourceImpl(apiClient: mockApiClient);
+    dataSource = FaceEnrollmentRemoteDataSourceImpl(
+      apiClient: mockApiClient,
+      // File validation/compression is covered separately; these tests only
+      // exercise the upload contract (endpoint, fields, retry policy).
+      validatePhoto: (path) async => Right(File(path)),
+    );
   });
 
   group('uploadFacePhotos', () {
@@ -178,6 +184,42 @@ void main() {
           requiresAuth: any(named: 'requiresAuth'),
         ),
       ).called(1);
+    });
+  });
+
+  group('isEnrollmentDoneOnServer', () {
+    test('reads is_onboarded from GET /user/auth/me', () async {
+      when(() => mockApiClient.get(EndPoints.me)).thenAnswer(
+        (_) async => {
+          'user': {'id': 'u1', 'email': 'a@b.c', 'is_onboarded': true},
+          'devices': <dynamic>[],
+        },
+      );
+
+      expect(await dataSource.isEnrollmentDoneOnServer(), isTrue);
+      verify(() => mockApiClient.get(EndPoints.me)).called(1);
+    });
+
+    test('returns false when the account has no enrollment', () async {
+      when(() => mockApiClient.get(EndPoints.me)).thenAnswer(
+        (_) async => {
+          'user': {'id': 'u1', 'email': 'a@b.c', 'is_onboarded': false},
+          'devices': <dynamic>[],
+        },
+      );
+
+      expect(await dataSource.isEnrollmentDoneOnServer(), isFalse);
+    });
+
+    test('propagates failures from the API', () async {
+      when(
+        () => mockApiClient.get(EndPoints.me),
+      ).thenAnswer((_) async => throw const NetworkFailure());
+
+      await expectLater(
+        dataSource.isEnrollmentDoneOnServer(),
+        throwsA(isA<NetworkFailure>()),
+      );
     });
   });
 }
