@@ -37,6 +37,11 @@ class AuthRepositoryImpl implements AuthRepository {
       StorageKeys.refreshToken,
       result.refreshToken,
     );
+    // Remember which account the device-local data (albums, caches) belongs
+    // to, so a different account signing in on this device never reads it.
+    if (result.userId.isNotEmpty) {
+      await localStorage.setString(StorageKeys.currentUserId, result.userId);
+    }
   }
 
   Future<void> _clearTokens() async {
@@ -218,6 +223,7 @@ class AuthRepositoryImpl implements AuthRepository {
   /// and approvals, and the face-enrollment flag (which is device-wide, so a
   /// new account would otherwise inherit the previous account's enrollment).
   Future<void> _clearAccountScopedCache() async {
+    await localStorage.remove(StorageKeys.currentUserId);
     await localStorage.remove(StorageKeys.faceEnrollmentDone);
     await localStorage.remove(StorageKeys.cachedEvents);
     await localStorage.remove(StorageKeys.galleryCacheManifest);
@@ -241,6 +247,9 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final result = await remoteDataSource.getMe();
       await localDataSource.cacheMe(result);
+      if (result.id.isNotEmpty) {
+        await localStorage.setString(StorageKeys.currentUserId, result.id);
+      }
       return Right(result);
     } on Failure catch (f) {
       FailureHandler.instance.logFailure(f, 'AuthRepository');

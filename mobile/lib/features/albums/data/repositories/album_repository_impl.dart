@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
+import 'package:multai_mobile/core/constants/storage_keys.dart';
 import 'package:multai_mobile/core/storage/app_local_storage.dart';
 import '../../../../core/errors/failure.dart';
 import '../../domain/entities/album_entity.dart';
@@ -10,10 +11,24 @@ import '../../domain/repositories/album_repository.dart';
 
 class AlbumRepositoryImpl implements AlbumRepository {
   final AppLocalStorage _localStorage;
-  static const String _albumsKey = 'user_albums';
+  static const String _legacyAlbumsKey = 'user_albums';
 
   AlbumRepositoryImpl({required AppLocalStorage localStorage})
     : _localStorage = localStorage;
+
+  /// Albums are private to the account that created them, so both the index
+  /// and the album folders are namespaced by the signed-in user id. Without
+  /// this, a second account signing in on the same device saw the previous
+  /// account's albums (they are stored device-wide in shared preferences).
+  String? get _accountId {
+    final id = _localStorage.getString(StorageKeys.currentUserId);
+    return (id == null || id.isEmpty) ? null : id;
+  }
+
+  String get _albumsKey {
+    final id = _accountId;
+    return id == null ? _legacyAlbumsKey : '${_legacyAlbumsKey}_$id';
+  }
 
   @override
   Future<Either<Failure, List<AlbumEntity>>> getAlbums() async {
@@ -175,6 +190,10 @@ class AlbumRepositoryImpl implements AlbumRepository {
 
   Future<Directory> _getAlbumDir(String albumName) async {
     final base = await getApplicationDocumentsDirectory();
-    return Directory('${base.path}/album_${Uri.encodeComponent(albumName)}');
+    final id = _accountId;
+    final scope = id == null ? '' : '${id}_';
+    return Directory(
+      '${base.path}/album_$scope${Uri.encodeComponent(albumName)}',
+    );
   }
 }
