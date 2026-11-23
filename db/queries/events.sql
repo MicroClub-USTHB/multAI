@@ -65,3 +65,22 @@ WHERE status = 'scheduled'::event_status
   AND end_date IS NOT NULL
   AND end_date <= NOW()
 RETURNING id;
+-- name: GetEventByExternalId :one
+SELECT * FROM events
+WHERE external_id = $1;
+
+-- name: LinkLegacyEvent :one
+UPDATE events
+SET external_id = $1
+WHERE id = (
+    SELECT e.id FROM events e
+    WHERE e.external_id IS NULL AND e.name = $2 AND e.event_date = $3
+    ORDER BY e.created_at
+    LIMIT 1
+)
+RETURNING *;
+
+-- name: CreateSyncedEvent :one
+INSERT INTO events (name, event_code, event_date, end_date, status, external_id)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING *;
