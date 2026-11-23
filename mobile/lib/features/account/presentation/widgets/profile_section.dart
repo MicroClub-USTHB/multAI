@@ -10,6 +10,8 @@ class ProfileSection extends StatelessWidget {
   final String email;
   final String membershipType;
   final String? avatarUrl;
+  final String? avatarCacheKey;
+  final Map<String, String>? avatarHeaders;
   final VoidCallback? onAvatarTap;
   final VoidCallback? onEditName;
   final bool isUploading;
@@ -20,6 +22,8 @@ class ProfileSection extends StatelessWidget {
     required this.email,
     required this.membershipType,
     this.avatarUrl,
+    this.avatarCacheKey,
+    this.avatarHeaders,
     this.onAvatarTap,
     this.onEditName,
     this.isUploading = false,
@@ -53,10 +57,12 @@ class ProfileSection extends StatelessWidget {
                       ? ClipOval(
                           child: ExtendedImage.network(
                             avatarUrl!,
+                            headers: avatarHeaders,
+                            cacheKey: avatarCacheKey,
                             fit: BoxFit.cover,
                             cache: true,
-                            cacheWidth: 120,
-                            cacheHeight: 120,
+                            cacheWidth: 512,
+                            cacheHeight: 512,
                             loadStateChanged: (state) {
                               switch (state.extendedImageLoadState) {
                                 case LoadState.loading:

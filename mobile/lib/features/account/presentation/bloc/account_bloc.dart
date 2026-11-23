@@ -122,6 +122,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     ClearImageCacheRequested event,
     Emitter<AccountState> emit,
   ) async {
+    final previous = state;
     emit(AccountCacheClearing());
     try {
       final before = await _photoCacheService.getStats();
@@ -132,6 +133,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           filesRemoved: before.fileCount,
         ),
       );
+      emit(previous is AccountLoaded ? previous : AccountInitial());
     } catch (e) {
       _failureHandler.logFailure(
         UnknownFailure('Failed to clear cache: $e'),
@@ -158,6 +160,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           name: current.name,
           email: current.email,
           avatarUrl: current.avatarUrl,
+          avatarCacheKey: current.avatarCacheKey,
         ),
       );
     }
@@ -179,10 +182,33 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         );
       },
       (avatarUrl) async {
-        await ExtendedNetworkImageProvider(avatarUrl).evict();
-        await clearDiskCachedImage(avatarUrl);
+        final previousCacheKey = current is AccountLoaded
+            ? current.avatarCacheKey
+            : null;
+        // This must exactly match the provider used by ProfileSection. The
+        // previous bare provider used `cache: false` and no resize key, so it
+        // could not evict the decoded, cached 512x512 avatar that was on
+        // screen after an upload to the same URL.
+        await ExtendedResizeImage.resizeIfNeeded(
+          cacheWidth: 512,
+          cacheHeight: 512,
+          provider: ExtendedNetworkImageProvider(
+            avatarUrl,
+            cache: true,
+            cacheKey: previousCacheKey,
+          ),
+        ).evict();
+        await clearDiskCachedImage(avatarUrl, cacheKey: previousCacheKey);
         if (current is AccountLoaded) {
-          emit(current.copyWith(avatarUrl: avatarUrl));
+          emit(
+            current.copyWith(
+              avatarUrl: avatarUrl,
+              // The API always returns the same image endpoint. Changing the
+              // client cache key makes the visible avatar resolve fresh bytes
+              // immediately after every successful replacement.
+              avatarCacheKey: DateTime.now().microsecondsSinceEpoch.toString(),
+            ),
+          );
         }
       },
     );
@@ -199,6 +225,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           name: current.name,
           email: current.email,
           avatarUrl: current.avatarUrl,
+          avatarCacheKey: current.avatarCacheKey,
         ),
       );
     }
