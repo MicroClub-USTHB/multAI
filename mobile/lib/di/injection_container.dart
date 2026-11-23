@@ -219,6 +219,7 @@ Future<void> init() async {
       verifyRegisterUseCase: sl<VerifyRegisterUseCase>(),
       logoutUseCase: sl<LogoutUseCase>(),
       getCurrentUserUseCase: sl<GetCurrentUserUseCase>(),
+      checkEnrollmentDoneUseCase: sl<CheckEnrollmentDoneUseCase>(),
       pushNotificationService: sl<PushNotificationService>(),
     ),
   );

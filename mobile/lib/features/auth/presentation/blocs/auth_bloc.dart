@@ -16,6 +16,7 @@ import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/resend_otp_usecase.dart';
 import '../../domain/usecases/verify_register_usecase.dart';
+import '../../../face_enrollment/domain/usecases/check_enrollment_done_usecase.dart';
 import '../../utils/device_utils.dart';
 
 part 'auth_event.dart';
@@ -28,6 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final VerifyRegisterUseCase _verifyRegisterUseCase;
   final LogoutUseCase _logoutUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
+  final CheckEnrollmentDoneUseCase _checkEnrollmentDoneUseCase;
   final PushNotificationService _pushNotificationService;
   final FailureHandler _failureHandler;
   final Logger _logger;
@@ -43,6 +45,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required VerifyRegisterUseCase verifyRegisterUseCase,
     required LogoutUseCase logoutUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
+    required CheckEnrollmentDoneUseCase checkEnrollmentDoneUseCase,
     required PushNotificationService pushNotificationService,
     FailureHandler? failureHandler,
     Logger? logger,
@@ -52,6 +55,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _verifyRegisterUseCase = verifyRegisterUseCase,
        _logoutUseCase = logoutUseCase,
        _getCurrentUserUseCase = getCurrentUserUseCase,
+       _checkEnrollmentDoneUseCase = checkEnrollmentDoneUseCase,
        _pushNotificationService = pushNotificationService,
        _failureHandler = failureHandler ?? FailureHandler.instance,
        _logger = logger ?? Logger.create(),
@@ -69,7 +73,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthEntity auth,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthAuthenticated(auth: auth));
+    // A freshly authenticated user must finish face enrollment before they
+    // reach the app. The flag is device-local, which is why logout clears it
+    // (see AuthRepositoryImpl.logout) so the next account is checked fresh.
+    final enrollmentDone = await _checkEnrollmentDoneUseCase();
+    emit(
+      enrollmentDone
+          ? AuthAuthenticated(auth: auth)
+          : AuthNeedsFaceEnrollment(auth: auth),
+    );
   }
 
   void _emitFailure(Emitter<AuthState> emit, Failure failure) {

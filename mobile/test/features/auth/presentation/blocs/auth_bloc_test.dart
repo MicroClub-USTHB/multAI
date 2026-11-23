@@ -100,6 +100,7 @@ void main() {
       verifyRegisterUseCase: verifyRegisterUseCase,
       logoutUseCase: logoutUseCase,
       getCurrentUserUseCase: getCurrentUserUseCase,
+      checkEnrollmentDoneUseCase: checkEnrollmentDoneUseCase,
       pushNotificationService: pushNotificationService,
     );
   });
