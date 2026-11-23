@@ -71,6 +71,15 @@ class FakeEventQuerier:
             created_by=None,
         )
 
+    async def update_synced_event(self, arg: Any) -> Optional[models.Event]:
+        for r in self.rows:
+            if r.external_id == arg.external_id:
+                r.name = arg.name
+                r.event_date = arg.event_date
+                r.end_date = arg.end_date
+                return r
+        return None
+
 
 def make_service(q: FakeEventQuerier) -> EventService:
     return EventService(e_querier=q, p_querier=None)  # type: ignore[arg-type]
@@ -101,6 +110,25 @@ async def test_same_external_id_returns_existing_without_new_code() -> None:
     second = await svc.sync_from_hr(payload())
     assert second.id == first.id
     assert second.event_code == first.event_code
+    assert len(q.rows) == 1
+
+
+async def test_same_external_id_updates_name_and_dates() -> None:
+    q = FakeEventQuerier()
+    svc = make_service(q)
+    first = await svc.sync_from_hr(payload(name="Old Name", starts_at=T0, ends_at=T1))
+    assert first.name == "Old Name"
+    assert first.event_date == T0
+    assert first.end_date == T1
+
+    t2 = T0 + dt.timedelta(days=1)
+    t3 = T1 + dt.timedelta(days=1)
+    second = await svc.sync_from_hr(payload(name="New Name", starts_at=t2, ends_at=t3))
+    assert second.id == first.id
+    assert second.event_code == first.event_code
+    assert second.name == "New Name"
+    assert second.event_date == t2
+    assert second.end_date == t3
     assert len(q.rows) == 1
 
 

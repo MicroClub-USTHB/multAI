@@ -87,3 +87,11 @@ INSERT INTO events (name, event_code, event_date, end_date, status, external_id)
 VALUES ($1, $2, $3, $4, $5, $6)
 ON CONFLICT (external_id) DO NOTHING
 RETURNING *;
+
+-- name: UpdateSyncedEvent :one
+UPDATE events
+SET name = $2,
+    event_date = $3,
+    end_date = $4
+WHERE external_id = $1
+RETURNING *;

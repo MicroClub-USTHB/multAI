@@ -159,6 +159,24 @@ RETURNING id, name, event_code, event_date, status, created_by, created_at, arch
 """
 
 
+UPDATE_SYNCED_EVENT = """-- name: update_synced_event \\:one
+UPDATE events
+SET name = :p2,
+    event_date = :p3,
+    end_date = :p4
+WHERE external_id = :p1
+RETURNING id, name, event_code, event_date, status, created_by, created_at, archived_at, end_date, external_id
+"""
+
+
+@dataclasses.dataclass()
+class UpdateSyncedEventParams:
+    external_id: Optional[str]
+    name: str
+    event_date: datetime.datetime
+    end_date: Optional[datetime.datetime]
+
+
 class AsyncQuerier:
     def __init__(self, conn: sqlalchemy.ext.asyncio.AsyncConnection):
         self._conn = conn
@@ -334,6 +352,28 @@ class AsyncQuerier:
 
     async def update_event_status(self, *, id: uuid.UUID, status: Any) -> Optional[models.Event]:
         row = (await self._conn.execute(sqlalchemy.text(UPDATE_EVENT_STATUS), {"p1": id, "p2": status})).first()
+        if row is None:
+            return None
+        return models.Event(
+            id=row[0],
+            name=row[1],
+            event_code=row[2],
+            event_date=row[3],
+            status=row[4],
+            created_by=row[5],
+            created_at=row[6],
+            archived_at=row[7],
+            end_date=row[8],
+            external_id=row[9],
+        )
+
+    async def update_synced_event(self, arg: UpdateSyncedEventParams) -> Optional[models.Event]:
+        row = (await self._conn.execute(sqlalchemy.text(UPDATE_SYNCED_EVENT), {
+            "p1": arg.external_id,
+            "p2": arg.name,
+            "p3": arg.event_date,
+            "p4": arg.end_date,
+        })).first()
         if row is None:
             return None
         return models.Event(

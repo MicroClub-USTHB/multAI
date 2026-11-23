@@ -32,6 +32,21 @@ class EventService:
             external_id=req.external_id
         )
         if existing:
+            if (
+                existing.name != req.name
+                or existing.event_date != req.starts_at
+                or existing.end_date != req.ends_at
+            ):
+                updated = await self.e_querier.update_synced_event(
+                    event_queries.UpdateSyncedEventParams(
+                        external_id=req.external_id,
+                        name=req.name,
+                        event_date=req.starts_at,
+                        end_date=req.ends_at,
+                    )
+                )
+                if updated:
+                    return EventResponse.model_validate(updated)
             return EventResponse.model_validate(existing)
 
         linked = await self.e_querier.link_legacy_event(
