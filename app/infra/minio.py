@@ -26,13 +26,37 @@ WA_SIM_BUCKET_NAME = CORE_WA_SIM_BUCKET_NAME
 
 
 async def init_minio_client(
-    minio_host: str, minio_port: int, minio_root_user: str, minio_root_password: str
+    minio_host: str,
+    minio_port: int,
+    minio_root_user: str,
+    minio_root_password: str,
+    *,
+    public_endpoint: str = "",
+    public_secure: bool = True,
+    region: str = "us-east-1",
 ) -> None:
     Bucket.client = Minio(
         f"{minio_host}:{minio_port}",
         access_key=minio_root_user,
         secret_key=minio_root_password,
         secure=False,
+    )
+
+    # Presigned URLs are handed to browsers, so they must be signed for the
+    # host the browser reaches (SigV4 covers the Host header). That host is
+    # not the internal one, so a second client signs them. The region is passed
+    # explicitly: without it the client would call GetBucketLocation on the
+    # public host from inside the container before signing.
+    Bucket.signing_client = (
+        Minio(
+            public_endpoint,
+            access_key=minio_root_user,
+            secret_key=minio_root_password,
+            secure=public_secure,
+            region=region,
+        )
+        if public_endpoint
+        else None
     )
 
     for bucket_name in [IMAGES_BUCKET_NAME, DOCUMENTS_BUCKET_NAME, WA_SIM_BUCKET_NAME]:
@@ -50,6 +74,8 @@ class Bucket:
     bucket_name: str
     file_prefix: str
     client: Minio
+    # Only set when a public endpoint is configured; see init_minio_client.
+    signing_client: Minio | None = None
 
     def __init__(self, bucket_name: str, file_prefix: str):
         self.bucket_name = bucket_name
@@ -139,7 +165,8 @@ class Bucket:
         return target_object_name
 
     async def presigned_put_url(self, object_name: str, *, expires_seconds: int) -> str:
-        return await self.client.presigned_put_object(
+        signer = self.signing_client or self.client
+        return await signer.presigned_put_object(
             bucket_name=self.bucket_name,
             object_name=self._object_path(object_name),
             expires=timedelta(seconds=expires_seconds),

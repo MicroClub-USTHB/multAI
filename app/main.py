@@ -76,6 +76,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 minio_port=settings.MINIO_API_PORT,
                 minio_root_user=settings.MINIO_ROOT_USER,
                 minio_root_password=settings.MINIO_ROOT_PASSWORD,
+                public_endpoint=settings.MINIO_PUBLIC_ENDPOINT,
+                public_secure=settings.MINIO_PUBLIC_SECURE,
+                region=settings.MINIO_REGION,
             )
             break
         except Exception as e:

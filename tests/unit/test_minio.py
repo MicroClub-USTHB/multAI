@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi import UploadFile
+from miniopy_async.api import Minio
 from miniopy_async.error import S3Error
 
 from app.infra.minio import (
@@ -250,3 +251,123 @@ async def test_stat_returns_none_when_object_missing(mock_minio_client):
     result = await bucket.stat("staging/missing.jpg")
 
     assert result is None
+
+
+# ---------------------------------------------------------------------------
+# Public-endpoint signing (browser-facing presigned URLs)
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(autouse=True)
+def _reset_signing_client():
+    Bucket.signing_client = None
+    yield
+    Bucket.signing_client = None
+
+
+@pytest.mark.asyncio
+async def test_init_minio_client_without_public_endpoint_has_no_signing_client(
+    mock_minio_client,
+):
+    with patch("app.infra.minio.Minio", return_value=mock_minio_client) as minio_cls:
+        mock_minio_client.bucket_exists.return_value = True
+        await init_minio_client("minio", 9000, "root", "password")
+
+    assert minio_cls.call_count == 1
+    assert Bucket.signing_client is None
+
+
+@pytest.mark.asyncio
+async def test_init_minio_client_builds_public_signing_client_with_region(
+    mock_minio_client,
+):
+    signing = MagicMock(name="signing")
+    with patch(
+        "app.infra.minio.Minio", side_effect=[mock_minio_client, signing]
+    ) as minio_cls:
+        mock_minio_client.bucket_exists.return_value = True
+        await init_minio_client(
+            "minio",
+            9000,
+            "root",
+            "password",
+            public_endpoint="s3.example.test",
+            public_secure=True,
+            region="eu-west-3",
+        )
+
+    assert minio_cls.call_count == 2
+    args, kwargs = minio_cls.call_args_list[1]
+    assert args == ("s3.example.test",)
+    assert kwargs["access_key"] == "root"
+    assert kwargs["secret_key"] == "password"
+    assert kwargs["secure"] is True
+    # an explicit region is what keeps signing free of network round trips
+    assert kwargs["region"] == "eu-west-3"
+    assert Bucket.client == mock_minio_client
+    assert Bucket.signing_client == signing
+
+
+@pytest.mark.asyncio
+async def test_presigned_put_url_uses_internal_client_without_signing_client(
+    mock_minio_client,
+):
+    Bucket.client = mock_minio_client
+    mock_minio_client.presigned_put_object = AsyncMock(return_value="http://minio:9000/x")
+
+    url = await Bucket("images", "").presigned_put_url("a.jpg", expires_seconds=60)
+
+    assert url == "http://minio:9000/x"
+
+
+@pytest.mark.asyncio
+async def test_presigned_put_url_signs_for_the_public_host(mock_minio_client):
+    Bucket.client = mock_minio_client
+    mock_minio_client.presigned_put_object = AsyncMock(
+        side_effect=AssertionError("internal client must not sign public URLs")
+    )
+    Bucket.signing_client = Minio(
+        "s3.example.test",
+        access_key="root",
+        secret_key="password",
+        secure=True,
+        region="us-east-1",
+    )
+
+    url = await Bucket("images", "staging").presigned_put_url(
+        "req/photo.jpg", expires_seconds=900
+    )
+
+    assert url.startswith("https://s3.example.test/images/staging/req/photo.jpg?")
+    assert "X-Amz-Signature=" in url
+    assert "X-Amz-Expires=900" in url
+    assert "minio:9000" not in url
+
+
+@pytest.mark.asyncio
+async def test_public_signing_makes_no_network_call(mock_minio_client):
+    Bucket.client = mock_minio_client
+    Bucket.signing_client = Minio(
+        "s3.unreachable.invalid",
+        access_key="root",
+        secret_key="password",
+        secure=True,
+        region="us-east-1",
+    )
+
+    with patch.object(
+        Minio, "_url_open", AsyncMock(side_effect=AssertionError("network call"))
+    ):
+        url = await Bucket("images", "").presigned_put_url("a.jpg", expires_seconds=60)
+
+    assert isinstance(url, str)
+    assert url.startswith("https://s3.unreachable.invalid/images/a.jpg?")
+
+
+def test_public_signing_settings_default_to_current_behaviour():
+    from app.core.config import Settings
+
+    fields = Settings.model_fields
+    assert fields["MINIO_PUBLIC_ENDPOINT"].default == ""
+    assert fields["MINIO_PUBLIC_SECURE"].default is True
+    assert fields["MINIO_REGION"].default == "us-east-1"
