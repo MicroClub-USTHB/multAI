@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
@@ -8,8 +9,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/cubits/locale_cubit.dart';
 import 'core/cubits/theme_cubit.dart';
-import 'core/errors/error_handler.dart';
-import 'core/errors/error_mapper.dart';
 import 'core/router/app_router.dart';
 import 'core/security/env_validator.dart';
 import 'core/security/device_security.dart';
@@ -116,22 +115,20 @@ Future<void> _preloadFonts() async {
 }
 
 void _setupGlobalErrorHandlers() {
-  final errorHandler = ErrorHandler(errorMapper: const ErrorMapper());
-
   FlutterError.onError = (details) {
-    final exception = errorHandler.wrapException(
+    FirebaseCrashlytics.instance.recordError(
       details.exception,
-      stackTrace: details.stack,
+      details.stack,
+      fatal: true,
     );
-    errorHandler.handleException('FlutterError', exception);
   };
 
   PlatformDispatcher.instance.onError = (exception, stackTrace) {
-    final appException = errorHandler.wrapException(
+    FirebaseCrashlytics.instance.recordError(
       exception,
-      stackTrace: stackTrace,
+      stackTrace,
+      fatal: false,
     );
-    errorHandler.handleException('PlatformDispatcher', appException);
     return true;
   };
 }
