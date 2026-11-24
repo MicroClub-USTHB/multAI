@@ -11,12 +11,16 @@ class AccountLoaded extends AccountState {
   final String email;
   final String? avatarUrl;
   final String? avatarCacheKey;
+  final String cacheSize;
+  final int cacheFiles;
 
   AccountLoaded({
     required this.name,
     required this.email,
     this.avatarUrl,
     this.avatarCacheKey,
+    this.cacheSize = '0 B',
+    this.cacheFiles = 0,
   });
 
   AccountLoaded copyWith({
@@ -24,12 +28,16 @@ class AccountLoaded extends AccountState {
     String? email,
     String? avatarUrl,
     String? avatarCacheKey,
+    String? cacheSize,
+    int? cacheFiles,
   }) {
     return AccountLoaded(
       name: name ?? this.name,
       email: email ?? this.email,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       avatarCacheKey: avatarCacheKey ?? this.avatarCacheKey,
+      cacheSize: cacheSize ?? this.cacheSize,
+      cacheFiles: cacheFiles ?? this.cacheFiles,
     );
   }
 }

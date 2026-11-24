@@ -510,7 +510,9 @@ class AccountScreen extends StatelessWidget {
               SettingItemData(
                 icon: Icons.cleaning_services_outlined,
                 title: l10n.clearImageCache,
-                subtitle: l10n.freeUpStorage,
+                subtitle: state is AccountLoaded
+                    ? '${l10n.freeUpStorage} · ${state.cacheSize}'
+                    : l10n.freeUpStorage,
                 onTap: () => _confirmClearCache(context),
               ),
             ],

@@ -52,16 +52,12 @@ class BackupProgressView extends StatelessWidget {
         SizedBox(height: context.heightCalculated(24)),
         Text(
           'Creating backup...',
-          style: tt.titleMedium?.copyWith(
-            color: AppThemeColors.primaryText,
-          ),
+          style: tt.titleMedium?.copyWith(color: AppThemeColors.primaryText),
         ),
         SizedBox(height: context.heightCalculated(8)),
         Text(
           'Packaging $photoCount photos into ZIP',
-          style: tt.bodyMedium?.copyWith(
-            color: AppThemeColors.secondaryText,
-          ),
+          style: tt.bodyMedium?.copyWith(color: AppThemeColors.secondaryText),
         ),
       ],
     );

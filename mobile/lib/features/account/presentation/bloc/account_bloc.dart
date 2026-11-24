@@ -8,6 +8,7 @@ import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/error_presentation.dart';
 import '../../../../features/notifications/services/push_notification_service.dart';
 import '../../../../features/auth/utils/device_utils.dart';
+import '../../domain/entities/account_entity.dart';
 import '../../domain/usecases/get_account_data_usecase.dart';
 import '../../domain/usecases/upload_avatar_usecase.dart';
 import '../../domain/usecases/update_profile_usecase.dart';
@@ -60,21 +61,28 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
     final result = await _getAccountData(NoParams());
 
-    result.fold(
-      (failure) {
-        _failureHandler.logFailure(failure, 'AccountBloc');
-        emit(
-          AccountError(
-            errorPresentation: _failureHandler.getErrorPresentation(failure),
-          ),
-        );
-      },
-      (account) => emit(
-        AccountLoaded(
-          name: account.name,
-          email: account.email,
-          avatarUrl: account.avatarUrl,
+    result.fold((failure) {
+      _failureHandler.logFailure(failure, 'AccountBloc');
+      emit(
+        AccountError(
+          errorPresentation: _failureHandler.getErrorPresentation(failure),
         ),
+      );
+    }, (account) => _emitLoaded(account, emit));
+  }
+
+  Future<void> _emitLoaded(
+    AccountEntity account,
+    Emitter<AccountState> emit,
+  ) async {
+    final stats = await _photoCacheService.getStats();
+    emit(
+      AccountLoaded(
+        name: account.name,
+        email: account.email,
+        avatarUrl: account.avatarUrl,
+        cacheSize: stats.formattedSize,
+        cacheFiles: stats.fileCount,
       ),
     );
   }
@@ -127,13 +135,23 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     try {
       final before = await _photoCacheService.getStats();
       await _photoCacheService.clearCache();
+      // Photo-cache only covers gallery images. Avatar/network images live in
+      // extended_image's own disk + memory caches, so clear those too.
+      try {
+        clearMemoryImageCache();
+        await clearDiskCachedImages();
+      } catch (_) {}
       emit(
         AccountCacheCleared(
           storageFreed: before.formattedSize,
           filesRemoved: before.fileCount,
         ),
       );
-      emit(previous is AccountLoaded ? previous : AccountInitial());
+      emit(
+        previous is AccountLoaded
+            ? previous.copyWith(cacheSize: '0 B', cacheFiles: 0)
+            : AccountInitial(),
+      );
     } catch (e) {
       _failureHandler.logFailure(
         UnknownFailure('Failed to clear cache: $e'),
