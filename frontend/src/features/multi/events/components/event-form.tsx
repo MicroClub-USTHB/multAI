@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { CalendarPlus, ExternalLink } from 'lucide-react'
 
+import { env } from '@/env'
 import {
 	Button,
 	Card,
@@ -8,70 +8,41 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-	Input,
 } from '@/shared/ui'
 
 import type { CreateMultiEventInput } from '../types'
 
 interface EventFormProps {
-	onSubmit: (input: CreateMultiEventInput) => Promise<void>
-	isSubmitting: boolean
+	onSubmit?: (input: CreateMultiEventInput) => Promise<void>
+	isSubmitting?: boolean
 }
 
-export function EventForm({ onSubmit, isSubmitting }: EventFormProps) {
-	const [name, setName] = useState('')
-	const [eventDate, setEventDate] = useState('')
-
-	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault()
-		if (!name.trim() || !eventDate) return
-
-		await onSubmit({ name: name.trim(), eventDate: new Date(eventDate).toISOString() })
-		setName('')
-		setEventDate('')
-	}
+export function EventForm({}: EventFormProps) {
+	const hrEventsUrl = env.VITE_HR_EVENTS_URL || 'https://hr.microclub.info'
 
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className="flex items-center gap-2 text-base">
-					<Plus className="size-4" />
-					Create Event
+		<Card className="border-dashed border-primary/30 bg-primary/5">
+			<CardHeader className="pb-2">
+				<CardTitle className="flex items-center gap-2 text-base text-primary">
+					<CalendarPlus className="size-4" />
+					Create New Event
 				</CardTitle>
 			</CardHeader>
-			<form onSubmit={handleSubmit}>
-				<CardContent className="space-y-4">
-					<div className="space-y-1.5">
-						<label className="text-sm font-medium" htmlFor="event-name">
-							Event Name
-						</label>
-						<Input
-							id="event-name"
-							placeholder="e.g. HackOPS 2026"
-							value={name}
-							onChange={event => setName(event.target.value)}
-							required
-						/>
-					</div>
-					<div className="space-y-1.5">
-						<label className="text-sm font-medium" htmlFor="event-date">
-							Event Date
-						</label>
-						<Input
-							id="event-date"
-							type="datetime-local"
-							value={eventDate}
-							onChange={event => setEventDate(event.target.value)}
-							required
-						/>
-					</div>
-				</CardContent>
-				<CardFooter>
-					<Button type="submit" disabled={isSubmitting}>
-						{isSubmitting ? 'Creating...' : 'Create Event'}
-					</Button>
-				</CardFooter>
-			</form>
+			<CardContent className="space-y-2 text-sm text-muted-foreground">
+				<p>
+					Events are now managed centrally in <strong>HR-Events</strong>. 
+					New events created in HR-Events are automatically synced here for media uploads and attendee check-ins.
+				</p>
+			</CardContent>
+			<CardFooter>
+				<Button
+					type="button"
+					onClick={() => window.open(hrEventsUrl, '_blank')}
+				>
+					<ExternalLink className="mr-2 size-4" />
+					Open HR-Events
+				</Button>
+			</CardFooter>
 		</Card>
 	)
 }

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import type { UploadItem, UploadItemStatus, UploadStats } from './types'
+
 import {
 	confirmDirectUpload,
 	createDirectGroup,
@@ -9,7 +11,6 @@ import {
 	resumeDirectGroup,
 	type DirectFileInput,
 } from './api'
-import type { UploadItem, UploadItemStatus, UploadStats } from './types'
 import { putToPresignedUrlWithRetry, UploadAbortedError } from './upload-client'
 import { acquireUploadWakeLock, releaseUploadWakeLock } from './utils/wake-lock'
 
@@ -121,7 +122,6 @@ export function useBulkUpload(eventId: string | null) {
 			const nextId = queue.current.shift()
 			if (nextId) runOne(nextId)
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const runOne = useCallback(
@@ -163,7 +163,6 @@ export function useBulkUpload(eventId: string | null) {
 					drain()
 				})
 		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[updateItem],
 	)
 

@@ -22,6 +22,7 @@ export const env = createEnv({
     VITE_SITE_URL: z.string().url().optional(),
     VITE_API_BASE_URL: z.string().min(1).default('/api'),
     VITE_API_PROXY_TARGET: z.string().url().optional(),
+    VITE_HR_EVENTS_URL: z.string().url().optional(),
   },
 
   /**
