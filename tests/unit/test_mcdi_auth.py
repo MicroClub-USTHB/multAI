@@ -222,7 +222,7 @@ async def test_mcdi_callback_success() -> None:
     )
 
     assert isinstance(res, RedirectResponse)
-    assert "/admin" in res.headers["location"]
+    assert "/multi" in res.headers["location"]
     container.staff_user_querier.get_staff_user_by_email.assert_called_once_with(
         email="leader@microclub.info"
     )

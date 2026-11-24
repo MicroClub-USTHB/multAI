@@ -42,8 +42,9 @@ async def get_current_staff_user(
 
 
 def ensure_multi_team_lead_staff(current_staff_user: StaffUser) -> StaffUser:
-    if _role_value(current_staff_user.role) != StaffRole.MULTI_TEAM_LEAD.value:
-        raise AppException.forbidden("Multi team lead access required")
+    allowed_roles = {StaffRole.MULTI_TEAM_LEAD.value, StaffRole.ADMIN.value}
+    if _role_value(current_staff_user.role) not in allowed_roles:
+        raise AppException.forbidden("Multi team lead or admin access required")
     return current_staff_user
 
 

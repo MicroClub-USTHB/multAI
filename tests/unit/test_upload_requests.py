@@ -12,6 +12,7 @@ from app.schema.internal.uploads import UploadPhotoInput
 from app.service.staged_upload_storage import StoredObject
 from app.service.upload_requests import UploadRequestsService
 from db.generated.models import (
+    StaffRole,
     StaffUser,
     UploadRequest,
     UploadRequestGroup,
@@ -476,3 +477,205 @@ async def test_approve_request_without_side_effects(
     mock_staged_upload_storage.promote_to_final.assert_called_once()
     mock_photo_querier.create_photo.assert_called_once()
     mock_upload_request_querier.approve_upload_request.assert_called_once()
+
+
+def test_ensure_request_access(upload_requests_service: UploadRequestsService) -> None:
+    owner_id = uuid.uuid4()
+    req = UploadRequest(
+        id=uuid.uuid4(),
+        event_id=uuid.uuid4(),
+        group_id=None,
+        drive_file_id=None,
+        requested_by=owner_id,
+        photo_count=1,
+        status="pending",
+        approved_by=None,
+        rejection_reason=None,
+        created_at=datetime.now(timezone.utc),
+        approved_at=None,
+        source="drive",
+    )
+
+    owner_user = StaffUser(
+        id=owner_id,
+        email="owner@microclub.info",
+        password="hash",
+        role=StaffRole.MULTI,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    admin_user = StaffUser(
+        id=uuid.uuid4(),
+        email="admin@microclub.info",
+        password="hash",
+        role=StaffRole.ADMIN,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    lead_user = StaffUser(
+        id=uuid.uuid4(),
+        email="lead@microclub.info",
+        password="hash",
+        role=StaffRole.MULTI_TEAM_LEAD,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    other_user = StaffUser(
+        id=uuid.uuid4(),
+        email="other@microclub.info",
+        password="hash",
+        role=StaffRole.MULTI,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+
+    # Owner, Admin, and Multi Team Lead should not raise
+    upload_requests_service._ensure_request_access(
+        upload_request=req, current_staff_user=owner_user
+    )
+    upload_requests_service._ensure_request_access(
+        upload_request=req, current_staff_user=admin_user
+    )
+    upload_requests_service._ensure_request_access(
+        upload_request=req, current_staff_user=lead_user
+    )
+
+    # Other staff must raise 403
+    with pytest.raises(HTTPException) as exc_info:
+        upload_requests_service._ensure_request_access(
+            upload_request=req, current_staff_user=other_user
+        )
+    assert exc_info.value.status_code == 403
+
+
+def test_ensure_group_access(upload_requests_service: UploadRequestsService) -> None:
+    owner_id = uuid.uuid4()
+    group = UploadRequestGroup(
+        id=uuid.uuid4(),
+        event_id=uuid.uuid4(),
+        folder_id="folder_123",
+        requested_by=owner_id,
+        total_photo_count=0,
+        batch_count=0,
+        processed_photo_count=0,
+        failed_photo_count=0,
+        processing_status="completed",
+        error_message=None,
+        created_at=datetime.now(timezone.utc),
+        status="pending",
+        approved_by=None,
+        approved_at=None,
+        rejection_reason=None,
+        source="drive",
+    )
+
+    owner_user = StaffUser(
+        id=owner_id,
+        email="owner@microclub.info",
+        password="hash",
+        role=StaffRole.MULTI,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    admin_user = StaffUser(
+        id=uuid.uuid4(),
+        email="admin@microclub.info",
+        password="hash",
+        role=StaffRole.ADMIN,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    lead_user = StaffUser(
+        id=uuid.uuid4(),
+        email="lead@microclub.info",
+        password="hash",
+        role=StaffRole.MULTI_TEAM_LEAD,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    other_user = StaffUser(
+        id=uuid.uuid4(),
+        email="other@microclub.info",
+        password="hash",
+        role=StaffRole.MULTI,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+
+    # Owner, Admin, and Multi Team Lead should not raise
+    upload_requests_service._ensure_group_access(
+        upload_group=group, current_staff_user=owner_user
+    )
+    upload_requests_service._ensure_group_access(
+        upload_group=group, current_staff_user=admin_user
+    )
+    upload_requests_service._ensure_group_access(
+        upload_group=group, current_staff_user=lead_user
+    )
+
+    # Other staff must raise 403
+    with pytest.raises(HTTPException) as exc_info:
+        upload_requests_service._ensure_group_access(
+            upload_group=group, current_staff_user=other_user
+        )
+    assert exc_info.value.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_list_requests_scope_all_permissions(
+    upload_requests_service: UploadRequestsService,
+    mock_upload_request_querier: AsyncMock,
+    mock_upload_request_photo_querier: AsyncMock,
+) -> None:
+    async def mock_list(*args, **kwargs):
+        return
+        yield
+
+    mock_upload_request_querier.list_upload_requests = mock_list
+    mock_upload_request_photo_querier.list_upload_request_photos_by_upload_request_ids = (
+        mock_list
+    )
+
+    admin_user = StaffUser(
+        id=uuid.uuid4(),
+        email="admin@microclub.info",
+        password="hash",
+        role=StaffRole.ADMIN,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    lead_user = StaffUser(
+        id=uuid.uuid4(),
+        email="lead@microclub.info",
+        password="hash",
+        role=StaffRole.MULTI_TEAM_LEAD,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    other_user = StaffUser(
+        id=uuid.uuid4(),
+        email="photo@microclub.info",
+        password="hash",
+        role=StaffRole.MULTI,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+
+    # Admin and Lead can list all
+    res_admin = await upload_requests_service.list_requests(
+        current_staff_user=admin_user, scope="all", status=None
+    )
+    assert res_admin == []
+
+    res_lead = await upload_requests_service.list_requests(
+        current_staff_user=lead_user, scope="all", status=None
+    )
+    assert res_lead == []
+
+    # Other staff cannot list all
+    with pytest.raises(HTTPException) as exc_info:
+        await upload_requests_service.list_requests(
+            current_staff_user=other_user, scope="all", status=None
+        )
+    assert exc_info.value.status_code == 403
+

@@ -85,7 +85,7 @@ async def mcdi_callback(
     if not token:
         raise AppException.internal_error("MCDI did not return a session token")
 
-    redirect_res = RedirectResponse(url=f"{frontend_url}/admin")
+    redirect_res = RedirectResponse(url=f"{frontend_url}/multi")
     redirect_res.set_cookie(
         key="access_token",
         value=token,

@@ -470,7 +470,10 @@ class UploadRequestsService:
     ) -> None:
         if upload_request.requested_by == current_staff_user.id:
             return
-        if self._role_value(current_staff_user.role) == StaffRole.MULTI_TEAM_LEAD.value:
+        if self._role_value(current_staff_user.role) in (
+            StaffRole.MULTI_TEAM_LEAD.value,
+            StaffRole.ADMIN.value,
+        ):
             return
         raise AppException.forbidden(
             "You are not allowed to access this upload request"
@@ -484,7 +487,10 @@ class UploadRequestsService:
     ) -> None:
         if upload_group.requested_by == current_staff_user.id:
             return
-        if self._role_value(current_staff_user.role) == StaffRole.MULTI_TEAM_LEAD.value:
+        if self._role_value(current_staff_user.role) in (
+            StaffRole.MULTI_TEAM_LEAD.value,
+            StaffRole.ADMIN.value,
+        ):
             return
         raise AppException.forbidden(
             "You are not allowed to access this upload request group"
@@ -1179,9 +1185,9 @@ class UploadRequestsService:
         if (
             scope == "all"
             and self._role_value(current_staff_user.role)
-            != StaffRole.MULTI_TEAM_LEAD.value
+            not in (StaffRole.MULTI_TEAM_LEAD.value, StaffRole.ADMIN.value)
         ):
-            raise AppException.forbidden("Multi team lead access required")
+            raise AppException.forbidden("Multi team lead or admin access required")
 
         requested_by = current_staff_user.id if scope == "my" else None
         request_rows: list[UploadRequest] = []
@@ -1274,9 +1280,9 @@ class UploadRequestsService:
         if (
             scope == "all"
             and self._role_value(current_staff_user.role)
-            != StaffRole.MULTI_TEAM_LEAD.value
+            not in (StaffRole.MULTI_TEAM_LEAD.value, StaffRole.ADMIN.value)
         ):
-            raise AppException.forbidden("Multi team lead access required")
+            raise AppException.forbidden("Multi team lead or admin access required")
 
         requested_by = current_staff_user.id if scope == "my" else None
         groups: list[UploadRequestGroup] = []
