@@ -1,23 +1,15 @@
 export type AppRole = 'admin' | 'multi' | 'multi_team_lead';
 
 export const getRoleLandingPath = (role?: string | null) => {
-  if (role === 'admin') {
-    return '/admin';
-  }
-
-  if (role === 'multi' || role === 'multi_team_lead') {
+  if (role === 'admin' || role === 'multi' || role === 'multi_team_lead') {
     return '/multi';
   }
 
-  return '/admin';
+  return '/multi';
 };
 
 export const isPathAllowedForRole = (path: string, role?: string | null) => {
-  if (role === 'admin') {
-    return path === '/admin' || path.startsWith('/admin/');
-  }
-
-  if (role === 'multi' || role === 'multi_team_lead') {
+  if (role === 'admin' || role === 'multi' || role === 'multi_team_lead') {
     return path === '/multi' || path.startsWith('/multi/');
   }
 

@@ -3,7 +3,7 @@ import type React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 
-import type { AdminProfile } from '@/features/admin/auth/types';
+import type { AdminProfile } from '@/features/common/auth/session-types';
 import type { LoginInput } from '@/features/common/auth/types';
 
 import {
@@ -11,7 +11,7 @@ import {
   getAdminMe,
   loginAdmin,
   logoutAdmin,
-} from '@/features/admin/auth/api';
+} from '@/features/common/auth/session-api';
 import { AuthContext } from '@/hooks/useAuth';
 import { LoadingPage } from '@/shared/ui/loading';
 

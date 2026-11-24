@@ -6,7 +6,7 @@ import {
 	type AdminProfile,
 	toAdminAuthResponse,
 	toAdminProfile,
-} from './types'
+} from './session-types'
 
 export class AdminAuthApiError extends Error {
 	status: number

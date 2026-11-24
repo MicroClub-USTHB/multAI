@@ -50,9 +50,9 @@ export function LoginForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className='text-center'>
-          <CardTitle className='text-xl'>Admin sign in</CardTitle>
+          <CardTitle className='text-xl'>Sign in</CardTitle>
           <p className='text-sm text-muted-foreground'>
-            Use your admin credentials to access the dashboard.
+            Use your staff credentials to access the dashboard.
           </p>
         </CardHeader>
 

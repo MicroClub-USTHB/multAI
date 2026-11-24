@@ -4,42 +4,11 @@ import {
   LayoutDashboard,
   ListChecks,
   Megaphone,
-  ScrollText,
   UsersRound,
 } from 'lucide-react';
 
 import type { NavData } from './types';
 
-export const ADMIN_NAV_DATA: NavData = {
-  isAdmin: true,
-  main: [
-    {
-      title: 'Dashboard',
-      url: '/admin',
-      icon: LayoutDashboard,
-    },
-    {
-      title: 'Events',
-      url: '/admin/events',
-      icon: Megaphone,
-    },
-    {
-      title: 'Users',
-      url: '/admin/users',
-      icon: UsersRound,
-    },
-    {
-      title: 'Logs',
-      url: '/admin/logs',
-      icon: ScrollText,
-    },
-  ],
-  secondary: [],
-  user: {
-    name: 'Admin User',
-    avatar: '',
-  },
-};
 export const MULTI_NAV_LINKS: NavData = {
   main: [
     {
