@@ -76,8 +76,11 @@ class _EventsScreenState extends State<EventsScreen> {
           _eventCodeController.clear();
           setState(() => _showJoinAnimation = true);
         }
-        if (state is EventsFailure) {
-          context.showErrorSnackBar(state.errorPresentation.description);
+        if (state is JoinEventFailure || state is EventsFailure) {
+          final failure = state is JoinEventFailure
+              ? state.errorPresentation
+              : (state as EventsFailure).errorPresentation;
+          context.showErrorSnackBar(failure.description);
         }
       },
       child: Stack(
