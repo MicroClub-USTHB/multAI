@@ -13,6 +13,7 @@ from app.infra.minio import init_minio_client
 from app.infra.nats import NatsClient
 from app.infra.redis import RedisClient
 from app.router.mobile import router as mobile_router
+from app.router.internal import router as internal_router
 from app.router.staff import router as staff_router
 from app.router.web import router as web_router
 from app.deps.ai_deps import get_face_embedding_service
@@ -172,3 +173,4 @@ async def health_check(response: Response) -> dict:
 app.include_router(mobile_router)
 app.include_router(staff_router)
 app.include_router(web_router)
+app.include_router(internal_router)

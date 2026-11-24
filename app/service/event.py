@@ -2,7 +2,7 @@ import secrets
 import uuid
 from typing import List, Optional
 from app.core.exceptions import AppException
-from app.schema.request.web.event import EventCreate
+from app.schema.request.internal.event import HrEventSync
 
 from app.schema.response.web.event import (
     EventResponse,
@@ -26,21 +26,51 @@ class EventService:
 
     # --- Core Event Management ---
 
-    async def create_event(
-        self, req: EventCreate, creator_id: uuid.UUID
-    ) -> EventResponse:
-        code_created: str = secrets.token_urlsafe(8)
-        params = event_queries.CreateEventParams(
-            name=req.name,
-            event_code=code_created,
-            event_date=req.event_date,
-            end_date=req.end_date,
-            status=req.status or "draft",
-            created_by=creator_id,
+    async def sync_from_hr(self, req: HrEventSync) -> EventResponse:
+        """Idempotently create/link the MultiAi event for an HR-Events event."""
+        existing = await self.e_querier.get_event_by_external_id(
+            external_id=req.external_id
         )
-        event = await self.e_querier.create_event(params)
+        if existing:
+            if (
+                existing.name != req.name
+                or existing.event_date != req.starts_at
+                or existing.end_date != req.ends_at
+            ):
+                updated = await self.e_querier.update_synced_event(
+                    event_queries.UpdateSyncedEventParams(
+                        external_id=req.external_id,
+                        name=req.name,
+                        event_date=req.starts_at,
+                        end_date=req.ends_at,
+                    )
+                )
+                if updated:
+                    return EventResponse.model_validate(updated)
+            return EventResponse.model_validate(existing)
+
+        linked = await self.e_querier.link_legacy_event(
+            external_id=req.external_id, name=req.name, event_date=req.starts_at
+        )
+        if linked:
+            return EventResponse.model_validate(linked)
+
+        params = event_queries.CreateSyncedEventParams(
+            name=req.name,
+            event_code=secrets.token_urlsafe(8),
+            event_date=req.starts_at,
+            end_date=req.ends_at,
+            status="draft",
+            external_id=req.external_id,
+        )
+        event = await self.e_querier.create_synced_event(params)
         if not event:
-            raise AppException.internal_error("Failed to create event")
+            # ON CONFLICT DO NOTHING: a concurrent sync of this external_id won.
+            event = await self.e_querier.get_event_by_external_id(
+                external_id=req.external_id
+            )
+        if not event:
+            raise AppException.internal_error("Failed to sync event")
         return EventResponse.model_validate(event)
 
     async def update_status(

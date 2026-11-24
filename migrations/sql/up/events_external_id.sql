@@ -1,0 +1,2 @@
+ALTER TABLE events ADD COLUMN external_id text UNIQUE;
+ALTER TABLE events ALTER COLUMN created_by DROP NOT NULL;

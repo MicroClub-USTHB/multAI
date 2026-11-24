@@ -132,6 +132,9 @@ class Settings(BaseSettings):
     MCDI_SERVER_ID: str = ""
     MCDI_REDIRECT_URI_WEB: str = ""
 
+    # Shared key HR-Events uses to call /internal/* endpoints
+    HR_EVENTS_SERVICE_KEY: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",

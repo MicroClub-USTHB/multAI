@@ -1,13 +1,10 @@
 import uuid
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends
 from typing import List, Optional
 
 from app.container import get_container, Container
 
 from app.deps.cookie_auth import get_current_staff_user
-from app.schema.request.web.event import (
-    EventCreate,
-)
 from app.schema.response.web.event import (
     EventResponse,
 )
@@ -34,16 +31,6 @@ async def list_events(
     return await container.event_service.list_events(
         limit=limit, offset=offset, status=status
     )
-
-
-@router.post("/", response_model=EventResponse, status_code=status.HTTP_201_CREATED)
-async def create_event(
-    req: EventCreate,
-    container: Container = Depends(get_container),
-    current_staff: models.StaffUser = Depends(get_current_staff_user),
-) -> EventResponse:
-    """Staff Only: Create a new event."""
-    return await container.event_service.create_event(req, current_staff.id)
 
 
 @router.post("/{event_id}/archive", response_model=EventResponse)

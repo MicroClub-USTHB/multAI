@@ -71,10 +71,11 @@ class Event:
     event_code: str
     event_date: datetime.datetime
     status: Any
-    created_by: uuid.UUID
+    created_by: Optional[uuid.UUID]
     created_at: datetime.datetime
     archived_at: Optional[datetime.datetime]
     end_date: Optional[datetime.datetime]
+    external_id: Optional[str]
 
 
 @dataclasses.dataclass()
