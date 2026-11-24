@@ -1,5 +1,6 @@
 import { Fingerprint } from 'lucide-react';
 
+import { env } from '@/env';
 import {
   Button,
   Card,
@@ -13,7 +14,8 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const mcdiLoginUrl = `${import.meta.env.VITE_API_BASE_URL}/admin/auth/mcdi/login`;
+  const apiBase = (env.VITE_API_BASE_URL || '/api').replace(/\/+$/, '');
+  const mcdiLoginUrl = `${apiBase}/admin/auth/mcdi/login`;
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
