@@ -4,7 +4,6 @@ import * as React from 'react';
 import type { NavData } from '@/shared/utils/types';
 
 import { useAuth } from '@/hooks/useAuth';
-import { Badge } from '@/shared/ui';
 import { GlobalSearch } from '@/shared/ui';
 import {
   Sidebar,
@@ -29,9 +28,7 @@ export function AppSidebar({
   const [searchOpen, setSearchOpen] = React.useState(false);
   const { user } = useAuth();
 
-  const userLabel =
-    user?.email?.trim() ||
-    (navData.isAdmin ? 'Admin user' : 'Multi member');
+  const userLabel = user?.email?.trim() || 'Multi member';
 
   const userSubtitle =
     user?.role === 'admin'
@@ -40,9 +37,7 @@ export function AppSidebar({
         ? 'Multi team lead'
         : user?.role === 'multi'
           ? 'Multi member'
-          : navData.isAdmin
-            ? 'Admin'
-            : 'Multi member';
+          : 'Multi member';
 
   return (
     <>
@@ -53,11 +48,6 @@ export function AppSidebar({
               <SidebarMenuButton size="lg" render={<Link to="/" />}>
                 <div className="flex flex-1 items-center justify-center space-x-4 text-sm leading-tight">
                   <span className="truncate text-xl font-medium">MultAI</span>
-                  {navData.isAdmin && (
-                    <Badge variant="secondary" className="truncate text-xs">
-                      Admin
-                    </Badge>
-                  )}
                 </div>
               </SidebarMenuButton>
             </SidebarMenuItem>

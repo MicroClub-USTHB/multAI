@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const isItemActive = (href: string, pathname: string) => {
-  if (href === '/admin' || href === '/multi') {
+  if (href === '/multi') {
     return pathname === href;
   }
   return pathname === href || pathname.startsWith(href + '/');
