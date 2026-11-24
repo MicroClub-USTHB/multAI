@@ -15,7 +15,7 @@ export const Route = createFileRoute('/multi/requests')({
 
 function RouteComponent() {
   const { user } = useAuth();
-  const canModerate = user?.role === 'multi_team_lead';
+  const canModerate = user?.role === 'multi_team_lead' || user?.role === 'admin';
   const { groups, isLoading, isError } = useUploadGroups(
     canModerate ? 'all' : 'my',
   );

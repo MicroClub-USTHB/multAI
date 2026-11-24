@@ -12,7 +12,7 @@ export const Route = createFileRoute('/multi/events')({
 
 function RouteComponent() {
   const { user } = useAuth();
-  const isTeamLead = user?.role === 'multi_team_lead';
+  const isTeamLead = user?.role === 'multi_team_lead' || user?.role === 'admin';
   const { events, isLoading, isError, error } = useMultiEvents();
 
   const errorMessage = error instanceof Error ? error.message : 'Unknown error';
