@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/theme.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class BackupProgressView extends StatelessWidget {
   final double percent;
@@ -34,7 +34,7 @@ class BackupProgressView extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: percent,
                   strokeWidth: 8,
-                  backgroundColor: AppThemeColors.surface,
+                  backgroundColor: context.colors.surface,
                   color: cs.primary,
                   strokeCap: StrokeCap.round,
                 ),
@@ -42,7 +42,7 @@ class BackupProgressView extends StatelessWidget {
               Text(
                 '${(percent * 100).toInt()}%',
                 style: tt.headlineMedium?.copyWith(
-                  color: AppThemeColors.primaryText,
+                  color: context.colors.primaryText,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -52,12 +52,12 @@ class BackupProgressView extends StatelessWidget {
         SizedBox(height: context.heightCalculated(24)),
         Text(
           'Creating backup...',
-          style: tt.titleMedium?.copyWith(color: AppThemeColors.primaryText),
+          style: tt.titleMedium?.copyWith(color: context.colors.primaryText),
         ),
         SizedBox(height: context.heightCalculated(8)),
         Text(
           'Packaging $photoCount photos into ZIP',
-          style: tt.bodyMedium?.copyWith(color: AppThemeColors.secondaryText),
+          style: tt.bodyMedium?.copyWith(color: context.colors.secondaryText),
         ),
       ],
     );

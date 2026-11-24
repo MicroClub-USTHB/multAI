@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class EnrollmentProgress extends StatefulWidget {
   final int currentStep;
@@ -52,7 +52,7 @@ class _EnrollmentProgressState extends State<EnrollmentProgress> {
             key: ValueKey('step_${widget.currentStep}'),
             style: tt.labelLarge?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppThemeColors.secondaryText,
+              color: context.colors.secondaryText,
             ),
           ),
           const SizedBox(height: 8),
@@ -67,8 +67,8 @@ class _EnrollmentProgressState extends State<EnrollmentProgress> {
                 builder: (context, value, _) {
                   return LinearProgressIndicator(
                     value: value,
-                    backgroundColor: AppThemeColors.inputBorder,
-                    color: AppThemeColors.primaryAccent,
+                    backgroundColor: context.colors.inputBorder,
+                    color: context.colors.primaryAccent,
                     minHeight: 4,
                   );
                 },

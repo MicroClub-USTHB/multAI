@@ -5,6 +5,7 @@ import 'app_theme_data.dart';
 import 'app_theme_metrics.dart';
 import 'app_theme_text_styles.dart';
 
+export 'app_palette.dart';
 export 'app_theme_colors.dart';
 export 'app_theme_data.dart';
 export 'app_theme_metrics.dart';

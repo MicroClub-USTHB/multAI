@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class OnboardingButton extends StatelessWidget {
   final VoidCallback onTap;
@@ -18,12 +18,12 @@ class OnboardingButton extends StatelessWidget {
         height: context.widthCalculated(60),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: AppThemeColors.primaryAccent, width: 1.5),
-          color: isLast ? AppThemeColors.primaryAccent : Colors.transparent,
+          border: Border.all(color: context.colors.primaryAccent, width: 1.5),
+          color: isLast ? context.colors.primaryAccent : Colors.transparent,
         ),
         child: Icon(
           isLast ? Icons.check_rounded : Icons.arrow_forward_rounded,
-          color: isLast ? Colors.white : AppThemeColors.primaryAccent,
+          color: isLast ? Colors.white : context.colors.primaryAccent,
           size: context.iconSize(),
         ),
       ),

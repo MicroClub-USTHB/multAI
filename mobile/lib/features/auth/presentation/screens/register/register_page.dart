@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/core/constants/images.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/features/account/presentation/bloc/account_bloc.dart';
 import 'package:multai_mobile/features/events/presentation/bloc/events_bloc.dart';
@@ -19,6 +18,7 @@ import '../../../../../core/utils/validators.dart';
 import '../../blocs/auth_bloc.dart';
 import '../login/widgets/email_field.dart';
 import '../login/widgets/password_field.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -112,7 +112,7 @@ class _RegisterPageState extends State<RegisterPage> {
         final isOtpStep = state is AuthOtpSent;
 
         return Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: context.colors.background,
           body: SafeArea(
             child: Column(
               children: [
@@ -227,8 +227,8 @@ class _RegisterPhotoComposition extends StatelessWidget {
               child: Container(
                 width: circleSize,
                 height: circleSize,
-                decoration: const BoxDecoration(
-                  color: AppThemeColors.primaryAccent,
+                decoration: BoxDecoration(
+                  color: context.colors.primaryAccent,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -255,7 +255,7 @@ class _RegisterPhotoComposition extends StatelessWidget {
                 width: 18,
                 height: 18,
                 decoration: BoxDecoration(
-                  color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
+                  color: context.colors.primaryAccent.withValues(alpha: 0.28),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -327,7 +327,7 @@ class _RegisterFormContent extends StatelessWidget {
             width: 28,
             height: 2,
             decoration: BoxDecoration(
-              color: AppThemeColors.primaryAccent,
+              color: context.colors.primaryAccent,
               borderRadius: BorderRadius.circular(1),
             ),
           ),
@@ -337,14 +337,14 @@ class _RegisterFormContent extends StatelessWidget {
             style: tt.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
               height: 1.1,
-              color: AppThemeColors.primaryText,
+              color: context.colors.primaryText,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             'Join Micro Club. Your moments await.',
             style: tt.bodyMedium?.copyWith(
-              color: AppThemeColors.secondaryText,
+              color: context.colors.secondaryText,
               fontSize: 15,
             ),
           ),
@@ -352,7 +352,7 @@ class _RegisterFormContent extends StatelessWidget {
 
           Text(
             'Email',
-            style: tt.labelMedium?.copyWith(color: AppThemeColors.neutral200),
+            style: tt.labelMedium?.copyWith(color: context.colors.neutral200),
           ),
           const SizedBox(height: 8),
           EmailField(controller: emailController),
@@ -360,7 +360,7 @@ class _RegisterFormContent extends StatelessWidget {
 
           Text(
             'Password',
-            style: tt.labelMedium?.copyWith(color: AppThemeColors.neutral200),
+            style: tt.labelMedium?.copyWith(color: context.colors.neutral200),
           ),
           const SizedBox(height: 8),
           PasswordField(
@@ -376,7 +376,7 @@ class _RegisterFormContent extends StatelessWidget {
 
           Text(
             'Confirm Password',
-            style: tt.labelMedium?.copyWith(color: AppThemeColors.neutral200),
+            style: tt.labelMedium?.copyWith(color: context.colors.neutral200),
           ),
           const SizedBox(height: 8),
           PasswordField(
@@ -505,7 +505,7 @@ class _OtpFormContentState extends State<_OtpFormContent> {
             width: 28,
             height: 2,
             decoration: BoxDecoration(
-              color: AppThemeColors.primaryAccent,
+              color: context.colors.primaryAccent,
               borderRadius: BorderRadius.circular(1),
             ),
           ),
@@ -515,14 +515,14 @@ class _OtpFormContentState extends State<_OtpFormContent> {
             style: tt.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
               height: 1.1,
-              color: AppThemeColors.primaryText,
+              color: context.colors.primaryText,
             ),
           ),
           const SizedBox(height: 6),
           RichText(
             text: TextSpan(
               style: tt.bodyMedium?.copyWith(
-                color: AppThemeColors.secondaryText,
+                color: context.colors.secondaryText,
                 fontSize: 15,
               ),
               children: [
@@ -530,7 +530,7 @@ class _OtpFormContentState extends State<_OtpFormContent> {
                 TextSpan(
                   text: widget.email,
                   style: TextStyle(
-                    color: AppThemeColors.primaryAccent,
+                    color: context.colors.primaryAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -551,7 +551,7 @@ class _OtpFormContentState extends State<_OtpFormContent> {
             autofillHints: const [AutofillHints.oneTimeCode],
             style: tt.displayMedium?.copyWith(
               letterSpacing: 14,
-              color: AppThemeColors.primaryText,
+              color: context.colors.primaryText,
               fontWeight: FontWeight.bold,
             ),
             decoration: InputDecoration(
@@ -559,19 +559,19 @@ class _OtpFormContentState extends State<_OtpFormContent> {
               hintText: '------',
               hintStyle: tt.displayMedium?.copyWith(
                 letterSpacing: 14,
-                color: AppThemeColors.neutral300.withValues(alpha: 0.3),
+                color: context.colors.neutral300.withValues(alpha: 0.3),
                 fontWeight: FontWeight.bold,
               ),
               filled: true,
-              fillColor: AppThemeColors.inputFill,
+              fillColor: context.colors.inputFill,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
-                borderSide: const BorderSide(color: AppThemeColors.inputBorder),
+                borderSide: BorderSide(color: context.colors.inputBorder),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
-                borderSide: const BorderSide(
-                  color: AppThemeColors.primaryAccent,
+                borderSide: BorderSide(
+                  color: context.colors.primaryAccent,
                   width: 1.5,
                 ),
               ),
@@ -625,7 +625,7 @@ class _OtpFormContentState extends State<_OtpFormContent> {
               child: Text(
                 _countdown > 0 ? 'Resend code (${_countdown}s)' : 'Resend code',
                 style: tt.bodySmall?.copyWith(
-                  color: AppThemeColors.primaryAccent,
+                  color: context.colors.primaryAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -689,10 +689,10 @@ class _PasswordStrengthIndicatorState
   @override
   Widget build(BuildContext context) {
     final colors = [
-      AppThemeColors.error,
-      AppThemeColors.warning,
-      AppThemeColors.primaryAccent,
-      AppThemeColors.success,
+      context.colors.error,
+      context.colors.warning,
+      context.colors.primaryAccent,
+      context.colors.success,
     ];
     final segments = _strength == 0
         ? 1
@@ -700,7 +700,7 @@ class _PasswordStrengthIndicatorState
         ? 4
         : _strength;
     final activeColor = _strength == 0
-        ? AppThemeColors.neutral300.withValues(alpha: 0.3)
+        ? context.colors.neutral300.withValues(alpha: 0.3)
         : colors[(_strength - 1).clamp(0, 3)];
 
     return Row(
@@ -714,7 +714,7 @@ class _PasswordStrengthIndicatorState
               decoration: BoxDecoration(
                 color: isActive
                     ? activeColor
-                    : AppThemeColors.neutral300.withValues(alpha: 0.15),
+                    : context.colors.neutral300.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(1.5),
               ),
             ),
@@ -742,14 +742,14 @@ class _BottomLink extends StatelessWidget {
       children: [
         Text(
           isOtpStep ? 'Wrong email? ' : 'Already have an account? ',
-          style: tt.bodySmall?.copyWith(color: AppThemeColors.secondaryText),
+          style: tt.bodySmall?.copyWith(color: context.colors.secondaryText),
         ),
         GestureDetector(
           onTap: onTap,
           child: Text(
             isOtpStep ? 'Go back' : 'Sign In',
             style: tt.bodySmall?.copyWith(
-              color: AppThemeColors.primaryAccent,
+              color: context.colors.primaryAccent,
               fontWeight: FontWeight.w600,
             ),
           ),

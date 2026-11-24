@@ -48,15 +48,15 @@ class _AlbumsView extends StatelessWidget {
         final cs = context.theme.colorScheme;
 
         return Scaffold(
-          backgroundColor: AppTheme.backgroundColor,
+          backgroundColor: context.colors.background,
           appBar: AppBar(
-            backgroundColor: AppTheme.backgroundColor,
+            backgroundColor: context.colors.background,
             elevation: 0,
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back_ios,
                 size: context.iconSize(),
-                color: AppTheme.primaryTextColor,
+                color: context.colors.primaryText,
               ),
               onPressed: () => context.pop(),
             ),
@@ -149,17 +149,17 @@ class _AlbumsView extends StatelessWidget {
           Icon(
             Icons.photo_library_outlined,
             size: context.iconSize() * 3,
-            color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
+            color: context.colors.secondaryText.withValues(alpha: 0.4),
           ),
           SizedBox(height: context.heightCalculated(16)),
           Text(
             'No albums yet',
-            style: tt.titleMedium?.copyWith(color: AppTheme.secondaryTextColor),
+            style: tt.titleMedium?.copyWith(color: context.colors.secondaryText),
           ),
           SizedBox(height: context.heightCalculated(8)),
           Text(
             'Create your first album to organize photos',
-            style: tt.bodyMedium?.copyWith(color: AppTheme.hintTextColor),
+            style: tt.bodyMedium?.copyWith(color: context.colors.hintText),
           ),
           SizedBox(height: context.heightCalculated(24)),
           SizedBox(

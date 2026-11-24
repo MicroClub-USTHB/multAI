@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class OnboardingHeader extends StatelessWidget {
   final VoidCallback onSkip;
@@ -24,7 +24,7 @@ class OnboardingHeader extends StatelessWidget {
           child: Text(
             'Skip',
             style: TextStyle(
-              color: AppThemeColors.primaryAccent,
+              color: context.colors.primaryAccent,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),

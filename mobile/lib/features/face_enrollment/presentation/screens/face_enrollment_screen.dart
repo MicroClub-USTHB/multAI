@@ -10,7 +10,6 @@ import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/extensions/snackbar_extensions.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/features/face_enrollment/presentation/bloc/face_enrollment_bloc.dart';
 import 'package:multai_mobile/features/face_enrollment/domain/entities/face_photo_entity.dart';
@@ -19,6 +18,7 @@ import 'package:multai_mobile/features/face_enrollment/presentation/screens/widg
 import 'package:multai_mobile/features/face_enrollment/presentation/screens/widgets/enrollment_progress.dart';
 import 'package:multai_mobile/features/face_enrollment/presentation/screens/widgets/step_instructions.dart';
 import 'package:multai_mobile/features/face_enrollment/presentation/screens/widgets/step_navigation.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class FaceEnrollmentScreen extends StatefulWidget {
   /// When non-null, the screen uses this controller directly (useful for tests).
@@ -240,7 +240,7 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
   void _showPrivacySheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppThemeColors.surface,
+      backgroundColor: context.colors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -257,13 +257,13 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color:
-                          AppThemeColors.primaryAccent.withValues(alpha: 0.15),
+                          context.colors.primaryAccent.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.lock_outline,
                       size: 22,
-                      color: AppThemeColors.primaryAccent,
+                      color: context.colors.primaryAccent,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -271,7 +271,7 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
                     'Your data is protected',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppThemeColors.primaryText,
+                      color: context.colors.primaryText,
                     ),
                   ),
                 ],
@@ -283,7 +283,7 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
                 'Your face data is stored securely and used only '
                 'for identity verification.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppThemeColors.secondaryText,
+                  color: context.colors.secondaryText,
                   height: 1.5,
                 ),
               ),
@@ -311,7 +311,7 @@ class _FaceEnrollmentScreenState extends State<FaceEnrollmentScreen> {
         final canGoNext = currentPhoto != null || isOptional;
 
         return Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: context.colors.background,
           appBar: _AppBar(),
           body: Stack(
             children: [
@@ -479,7 +479,7 @@ class _StepPage extends StatelessWidget {
               type.label,
               style: tt.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppThemeColors.primaryText,
+                color: context.colors.primaryText,
               ),
             ),
           ),
@@ -488,7 +488,7 @@ class _StepPage extends StatelessWidget {
           Text(
             type.angleInstruction,
             style: tt.bodySmall?.copyWith(
-              color: AppThemeColors.primaryAccent,
+              color: context.colors.primaryAccent,
               fontWeight: FontWeight.w500,
             ),
             maxLines: 1,
@@ -563,7 +563,7 @@ class _PermissionDeniedView extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
         border: Border.all(
-          color: AppThemeColors.error.withValues(alpha: 0.3),
+          color: context.colors.error.withValues(alpha: 0.3),
           width: AppThemeMetrics.borderThin,
         ),
       ),
@@ -576,13 +576,13 @@ class _PermissionDeniedView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppThemeColors.error.withValues(alpha: 0.12),
+                  color: context.colors.error.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.camera_alt_outlined,
                   size: 32,
-                  color: AppThemeColors.error,
+                  color: context.colors.error,
                 ),
               ),
               const SizedBox(height: 16),
@@ -590,14 +590,14 @@ class _PermissionDeniedView extends StatelessWidget {
                 'Camera Permission Required',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppThemeColors.primaryText,
+                  color: context.colors.primaryText,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Camera access is needed to capture photos for face enrollment. Please enable it in your device settings.',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppThemeColors.secondaryText,
+                  color: context.colors.secondaryText,
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -606,7 +606,7 @@ class _PermissionDeniedView extends StatelessWidget {
               ElevatedButton(
                 onPressed: onOpenSettings,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppThemeColors.primaryAccent,
+                  backgroundColor: context.colors.primaryAccent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius:
@@ -640,7 +640,7 @@ class _CameraErrorView extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
         border: Border.all(
-          color: AppThemeColors.error.withValues(alpha: 0.3),
+          color: context.colors.error.withValues(alpha: 0.3),
           width: AppThemeMetrics.borderThin,
         ),
       ),
@@ -653,13 +653,13 @@ class _CameraErrorView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppThemeColors.error.withValues(alpha: 0.12),
+                  color: context.colors.error.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.error_outline,
                   size: 32,
-                  color: AppThemeColors.error,
+                  color: context.colors.error,
                 ),
               ),
               const SizedBox(height: 16),
@@ -667,14 +667,14 @@ class _CameraErrorView extends StatelessWidget {
                 'Camera Error',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppThemeColors.primaryText,
+                  color: context.colors.primaryText,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 error,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppThemeColors.secondaryText,
+                  color: context.colors.secondaryText,
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -710,13 +710,13 @@ class _PrivacyBar extends StatelessWidget {
             Icon(
               Icons.lock_outline,
               size: 12,
-              color: AppThemeColors.secondaryText.withValues(alpha: 0.5),
+              color: context.colors.secondaryText.withValues(alpha: 0.5),
             ),
             const SizedBox(width: 4),
             Text(
               'Encrypted & protected',
               style: tt.labelSmall?.copyWith(
-                color: AppThemeColors.secondaryText.withValues(alpha: 0.5),
+                color: context.colors.secondaryText.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -737,7 +737,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppThemeColors.background,
+      backgroundColor: context.colors.background,
       elevation: 0,
       automaticallyImplyLeading: false,
       title: Semantics(
@@ -746,7 +746,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
           'Face Enrollment',
           style: context.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppThemeColors.primaryText,
+            color: context.colors.primaryText,
           ),
         ),
       ),
@@ -815,7 +815,7 @@ class _LoadingOverlayState extends State<_LoadingOverlay> {
                     width: context.heightCalculated(48),
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
-                      color: AppThemeColors.primaryAccent,
+                      color: context.colors.primaryAccent,
                     ),
                   ),
                   SizedBox(height: context.heightCalculated(16)),
@@ -899,7 +899,7 @@ class _SuccessScreenState extends State<_SuccessScreen>
     return FadeTransition(
       opacity: _fadeAnim,
       child: Scaffold(
-        backgroundColor: AppThemeColors.background,
+        backgroundColor: context.colors.background,
         body: Semantics(
           label: 'Enrollment complete',
           child: Center(
@@ -912,13 +912,13 @@ class _SuccessScreenState extends State<_SuccessScreen>
                     width: context.widthCalculated(80),
                     height: context.widthCalculated(80),
                     decoration: BoxDecoration(
-                      color: AppThemeColors.success.withValues(alpha: 0.15),
+                      color: context.colors.success.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.check_circle,
                       size: context.widthCalculated(48),
-                      color: AppThemeColors.success,
+                      color: context.colors.success,
                     ),
                   ),
                 ),
@@ -931,7 +931,7 @@ class _SuccessScreenState extends State<_SuccessScreen>
                         'Enrollment Complete!',
                         style: tt.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: AppThemeColors.primaryText,
+                          color: context.colors.primaryText,
                         ),
                       ),
                       SizedBox(height: context.heightCalculated(8)),

@@ -8,7 +8,6 @@ import '../../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../../core/extensions/string_extensions.dart';
 import '../../../../../core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/widgets/app_error_view.dart';
 import 'package:multai_mobile/core/widgets/join_event_success_animation.dart';
 import 'package:multai_mobile/core/errors/error_presentation.dart';
@@ -22,6 +21,7 @@ import '../widgets/archived_events_card.dart';
 import 'event_photos_screen.dart';
 import 'qr_scan_screen.dart';
 import 'package:multai_mobile/l10n/app_localizations.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -125,7 +125,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                   AppThemeMetrics.notifDotSize,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppThemeColors.accent,
+                                  color: context.colors.accent,
                                   border: Border.all(
                                     color:
                                         context.theme.scaffoldBackgroundColor,
@@ -247,10 +247,10 @@ class _EventsScreenState extends State<EventsScreen> {
         context.widthCalculated(AppThemeMetrics.spacingSm),
       ),
       decoration: BoxDecoration(
-        color: AppThemeColors.primaryAccent.withValues(alpha: 0.1),
+        color: context.colors.primaryAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
         border: Border.all(
-          color: AppThemeColors.primaryAccent.withValues(alpha: 0.3),
+          color: context.colors.primaryAccent.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -258,14 +258,14 @@ class _EventsScreenState extends State<EventsScreen> {
           Icon(
             Icons.wifi_off_rounded,
             size: context.iconSize(),
-            color: AppThemeColors.primaryAccent,
+            color: context.colors.primaryAccent,
           ),
           SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingSm)),
           Expanded(
             child: Text(
               l10n.cachedDataMessage,
               style: context.textTheme.bodySmall?.copyWith(
-                color: AppThemeColors.primaryAccent,
+                color: context.colors.primaryAccent,
               ),
             ),
           ),
@@ -384,8 +384,8 @@ class _EventsScreenState extends State<EventsScreen> {
                     height: context.widthCalculated(
                       AppThemeMetrics.statusDotSize,
                     ),
-                    decoration: const BoxDecoration(
-                      color: AppThemeColors.activeEventDot,
+                    decoration: BoxDecoration(
+                      color: context.colors.activeEventDot,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -454,6 +454,7 @@ class _EventsScreenState extends State<EventsScreen> {
                 itemBuilder: (context, index) {
                   final event = activeEvents[index];
                   return ActiveEventsCard(
+                    eventId: event.id,
                     eventTitle: event.name,
                     eventStatus: EventStatusMapper.toDisplayStatus(
                       event.status,
@@ -515,6 +516,7 @@ class _EventsScreenState extends State<EventsScreen> {
             child: Row(
               children: archivedEvents.map((event) {
                 return ArchivedEventsCard(
+                  eventId: event.id,
                   eventTitle: event.name,
                   eventDate: event.eventDate,
                   onTap: () => Navigator.of(context).push(

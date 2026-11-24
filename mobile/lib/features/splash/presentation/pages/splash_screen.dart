@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/extensions/snackbar_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/di/injection_container.dart';
 import 'package:multai_mobile/features/splash/presentation/bloc/splash_bloc.dart';
@@ -11,6 +10,7 @@ import 'package:multai_mobile/features/splash/presentation/widget/splash_footer.
 import 'package:multai_mobile/features/splash/presentation/widget/splash_logo.dart';
 import 'package:multai_mobile/features/splash/presentation/widget/splash_progress_section.dart';
 import 'package:multai_mobile/l10n/app_localizations.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -97,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen>
             return _buildSecurityWarningScreen(context, state);
           }
           return Scaffold(
-            backgroundColor: AppThemeColors.splashBackground,
+            backgroundColor: context.colors.splashBackground,
             body: Stack(
               children: [
                 _buildGlow(Alignment.topLeft),
@@ -148,7 +148,7 @@ class _SplashScreenState extends State<SplashScreen>
     final tt = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppThemeColors.splashBackground,
+      backgroundColor: context.colors.splashBackground,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(AppThemeMetrics.spacingXl),
@@ -160,20 +160,20 @@ class _SplashScreenState extends State<SplashScreen>
               Icon(
                 Icons.security_rounded,
                 size: context.iconSize() * 3,
-                color: AppThemeColors.error.withValues(alpha: 0.8),
+                color: context.colors.error.withValues(alpha: 0.8),
               ),
               const SizedBox(height: AppThemeMetrics.spacingLg),
               Text(
                 l10n.securityAlert,
                 style: tt.headlineSmall?.copyWith(
-                  color: AppThemeColors.primaryText,
+                  color: context.colors.primaryText,
                 ),
               ),
               const SizedBox(height: AppThemeMetrics.spacingSm),
               Text(
                 state.message,
                 style: tt.bodySmall?.copyWith(
-                  color: AppThemeColors.secondaryText,
+                  color: context.colors.secondaryText,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -188,7 +188,7 @@ class _SplashScreenState extends State<SplashScreen>
     final tt = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppThemeColors.splashBackground,
+      backgroundColor: context.colors.splashBackground,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(AppThemeMetrics.spacingXl),
@@ -200,20 +200,20 @@ class _SplashScreenState extends State<SplashScreen>
               Icon(
                 Icons.wifi_off_rounded,
                 size: context.iconSize() * 3,
-                color: AppThemeColors.primaryAccent.withValues(alpha: 0.7),
+                color: context.colors.primaryAccent.withValues(alpha: 0.7),
               ),
               const SizedBox(height: AppThemeMetrics.spacingLg),
               Text(
                 l10n.noInternetConnection,
                 style: tt.headlineSmall?.copyWith(
-                  color: AppThemeColors.primaryText,
+                  color: context.colors.primaryText,
                 ),
               ),
               const SizedBox(height: AppThemeMetrics.spacingSm),
               Text(
                 l10n.checkConnectionAndRetry,
                 style: tt.bodySmall?.copyWith(
-                  color: AppThemeColors.secondaryText,
+                  color: context.colors.secondaryText,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -224,8 +224,8 @@ class _SplashScreenState extends State<SplashScreen>
                 icon: const Icon(Icons.refresh),
                 label: Text(l10n.retry),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: AppThemeColors.primaryText,
-                  backgroundColor: AppThemeColors.primaryAccent,
+                  foregroundColor: context.colors.primaryText,
+                  backgroundColor: context.colors.primaryAccent,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppThemeMetrics.spacingXl,
                     vertical: AppThemeMetrics.spacingMd,
@@ -252,7 +252,7 @@ class _SplashScreenState extends State<SplashScreen>
             center: alignment,
             radius: 0.6,
             colors: [
-              AppThemeColors.primaryAccent.withValues(alpha: 0.10),
+              context.colors.primaryAccent.withValues(alpha: 0.10),
               Colors.transparent,
             ],
           ),

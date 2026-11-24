@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/datetime_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors_light.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
+import 'event_cover_image.dart';
 
 class ArchivedEventsCard extends StatelessWidget {
   const ArchivedEventsCard({
     super.key,
+    required this.eventId,
     required this.eventTitle,
     required this.eventDate,
     this.onTap,
   });
 
+  final String eventId;
   final String eventTitle;
   final DateTime eventDate;
   final VoidCallback? onTap;
@@ -21,11 +23,7 @@ class ArchivedEventsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
-    final isDark = context.theme.brightness == Brightness.dark;
-
-    final borderColor = isDark
-        ? AppThemeColors.border
-        : AppThemeColorsLight.border;
+    final borderColor = context.colors.border;
 
     return GestureDetector(
       onTap: onTap,
@@ -46,8 +44,17 @@ class ArchivedEventsCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: context.heightCalculated(AppThemeMetrics.spacingMd),
+                Padding(
+                  padding: EdgeInsets.all(
+                    context.widthCalculated(AppThemeMetrics.spacingSm),
+                  ),
+                  child: EventCoverImage(
+                    eventId: eventId,
+                    width:
+                        context.widthCalculated(191) -
+                        context.widthCalculated(AppThemeMetrics.spacingSm) * 2,
+                    height: context.heightCalculated(80),
+                  ),
                 ),
 
                 // ── Title ────────────────────────────────────────────
@@ -60,7 +67,7 @@ class ArchivedEventsCard extends StatelessWidget {
                   child: Text(
                     eventTitle,
                     style: tt.labelMedium?.copyWith(
-                      color: AppThemeColors.archivedTitle,
+                      color: context.colors.archivedTitle,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -82,7 +89,7 @@ class ArchivedEventsCard extends StatelessWidget {
                   child: Text(
                     eventDate.toDisplayDate(),
                     style: tt.bodySmall?.copyWith(
-                      color: AppThemeColors.archivedDate,
+                      color: context.colors.archivedDate,
                     ),
                   ),
                 ),

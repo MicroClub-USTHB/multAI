@@ -1,3 +1,4 @@
+export 'app_palette.dart';
 export 'app_theme_colors.dart';
 export 'app_theme_data.dart';
 export 'app_theme_metrics.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../../../core/extensions/context_extensions.dart';
-import '../../../../../../core/theme/app_theme_colors.dart';
 import '../../../../../../core/validators/validators.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class PasswordField extends StatelessWidget {
   final TextEditingController controller;
@@ -36,7 +36,7 @@ class PasswordField extends StatelessWidget {
         suffixIcon: IconButton(
           icon: Icon(
             obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-            color: AppThemeColors.neutral300,
+            color: context.colors.neutral300,
             size: 20,
           ),
           onPressed: onToggle,

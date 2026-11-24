@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 /// A full-screen overlay that plays a liquid-ripple celebration
 /// when the user successfully joins an event.
@@ -49,7 +49,7 @@ class _JoinEventSuccessAnimationState extends State<JoinEventSuccessAnimation>
           child: Opacity(
             opacity: (1.0 - t).clamp(0.0, 1.0),
             child: CustomPaint(
-              painter: _LiquidRipplePainter(progress: t),
+              painter: _LiquidRipplePainter(progress: t, colors: context.colors),
               size: MediaQuery.of(context).size,
             ),
           ),
@@ -61,8 +61,9 @@ class _JoinEventSuccessAnimationState extends State<JoinEventSuccessAnimation>
 
 class _LiquidRipplePainter extends CustomPainter {
   final double progress;
+  final AppPalette colors;
 
-  _LiquidRipplePainter({required this.progress});
+  _LiquidRipplePainter({required this.progress, required this.colors});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -88,13 +89,13 @@ class _LiquidRipplePainter extends CustomPainter {
       final opacity = (1.0 - p) * 0.35;
 
       final glowPaint = Paint()
-        ..color = AppThemeColors.primaryAccent.withValues(alpha: opacity * 0.5)
+        ..color = colors.primaryAccent.withValues(alpha: opacity * 0.5)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 12.0 * (1.0 - p);
       canvas.drawCircle(center, radius + 6, glowPaint);
 
       final ringPaint = Paint()
-        ..color = AppThemeColors.primaryAccent.withValues(alpha: opacity)
+        ..color = colors.primaryAccent.withValues(alpha: opacity)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3.0 * (1.0 - p * 0.5);
       canvas.drawCircle(center, radius, ringPaint);
@@ -109,8 +110,8 @@ class _LiquidRipplePainter extends CustomPainter {
       final glowPaint = Paint()
         ..shader = RadialGradient(
           colors: [
-            AppThemeColors.primaryAccent.withValues(alpha: 0.4 * blobOpacity),
-            AppThemeColors.primaryAccent.withValues(alpha: 0.0),
+            colors.primaryAccent.withValues(alpha: 0.4 * blobOpacity),
+            colors.primaryAccent.withValues(alpha: 0.0),
           ],
         ).createShader(
           Rect.fromCircle(center: center, radius: blobRadius * 2),
@@ -119,7 +120,7 @@ class _LiquidRipplePainter extends CustomPainter {
 
       final blobPath = _createBlobPath(center, blobRadius, progress);
       final blobPaint = Paint()
-        ..color = AppThemeColors.primaryAccent.withValues(alpha: blobOpacity)
+        ..color = colors.primaryAccent.withValues(alpha: blobOpacity)
         ..style = PaintingStyle.fill;
       canvas.drawPath(blobPath, blobPaint);
 
@@ -187,8 +188,8 @@ class _LiquidRipplePainter extends CustomPainter {
         );
         final sparkleSize = 2.0 + rng.nextDouble() * 2.0;
         sparklePaint.color = [
-          AppThemeColors.primaryAccent,
-          AppThemeColors.accent,
+          colors.primaryAccent,
+          colors.accent,
           Colors.white,
         ][i % 3].withValues(
           alpha: sparkleOpacity * (0.5 + rng.nextDouble() * 0.5),
@@ -229,6 +230,6 @@ class _LiquidRipplePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _LiquidRipplePainter oldDelegate) {
-    return oldDelegate.progress != progress;
+    return oldDelegate.progress != progress || oldDelegate.colors != colors;
   }
 }

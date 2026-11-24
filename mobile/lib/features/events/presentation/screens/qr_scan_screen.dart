@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/l10n/app_localizations.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class QrScanScreen extends StatefulWidget {
   const QrScanScreen({super.key});
@@ -62,7 +62,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
               height: 240,
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: AppThemeColors.primaryAccent,
+                  color: context.colors.primaryAccent,
                   width: 3,
                 ),
                 borderRadius: BorderRadius.circular(16),

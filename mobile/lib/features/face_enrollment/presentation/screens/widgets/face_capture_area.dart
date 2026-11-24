@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../domain/entities/face_photo_entity.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class FaceCaptureArea extends StatelessWidget {
   final CameraController? cameraController;
@@ -27,7 +27,7 @@ class FaceCaptureArea extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
         border: Border.all(
-          color: AppThemeColors.primaryAccent.withValues(alpha: 0.3),
+          color: context.colors.primaryAccent.withValues(alpha: 0.3),
           width: AppThemeMetrics.borderThin,
         ),
       ),
@@ -35,7 +35,7 @@ class FaceCaptureArea extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          _buildCameraLayer(),
+          _buildCameraLayer(context),
 
           // Capture button
           Positioned(
@@ -57,15 +57,15 @@ class FaceCaptureArea extends StatelessWidget {
     );
   }
 
-  Widget _buildCameraLayer() {
+  Widget _buildCameraLayer(BuildContext context) {
     if (cameraController == null || !cameraController!.value.isInitialized) {
       return Container(
-        color: AppThemeColors.photoSlot,
-        child: const Center(
+        color: context.colors.photoSlot,
+        child: Center(
           child: Icon(
             Icons.camera_alt_outlined,
             size: 48,
-            color: AppThemeColors.secondaryText,
+            color: context.colors.secondaryText,
           ),
         ),
       );
@@ -103,7 +103,7 @@ class _CaptureButton extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: isProcessing
-                ? AppThemeColors.primaryAccent.withValues(alpha: 0.5)
+                ? context.colors.primaryAccent.withValues(alpha: 0.5)
                 : Colors.white,
           ),
           child: isProcessing
@@ -114,9 +114,9 @@ class _CaptureButton extends StatelessWidget {
                     color: Colors.white,
                   ),
                 )
-              : const Icon(
+              : Icon(
                   Icons.camera,
-                  color: AppThemeColors.background,
+                  color: context.colors.background,
                   size: 28,
                 ),
         ),

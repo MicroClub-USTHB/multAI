@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/constants/onboarding_content.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class OnboardingCard extends StatelessWidget {
   final OnboardingItem slide;
@@ -47,7 +47,7 @@ class OnboardingCard extends StatelessWidget {
                   width: 28,
                   height: 2,
                   decoration: BoxDecoration(
-                    color: AppThemeColors.primaryAccent,
+                    color: context.colors.primaryAccent,
                     borderRadius: BorderRadius.circular(1),
                   ),
                 ),
@@ -57,14 +57,14 @@ class OnboardingCard extends StatelessWidget {
                   style: context.textTheme.displaySmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     height: 1.1,
-                    color: AppThemeColors.primaryText,
+                    color: context.colors.primaryText,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   slide.description,
                   style: context.textTheme.bodyMedium?.copyWith(
-                    color: AppThemeColors.secondaryText,
+                    color: context.colors.secondaryText,
                     height: 1.55,
                     fontSize: 15,
                   ),
@@ -108,8 +108,8 @@ class OnboardingCard extends StatelessWidget {
           child: Container(
             width: circleSize,
             height: circleSize,
-            decoration: const BoxDecoration(
-              color: AppThemeColors.primaryAccent,
+            decoration: BoxDecoration(
+              color: context.colors.primaryAccent,
               shape: BoxShape.circle,
             ),
           ),
@@ -131,7 +131,7 @@ class OnboardingCard extends StatelessWidget {
             width: 26,
             height: 26,
             decoration: BoxDecoration(
-              color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
+              color: context.colors.primaryAccent.withValues(alpha: 0.28),
               shape: BoxShape.circle,
             ),
           ),
@@ -156,7 +156,7 @@ class OnboardingCard extends StatelessWidget {
             width: height * 0.66,
             height: height * 0.66,
             decoration: BoxDecoration(
-              color: AppThemeColors.primaryAccent.withValues(alpha: 0.10),
+              color: context.colors.primaryAccent.withValues(alpha: 0.10),
               shape: BoxShape.circle,
             ),
           ),
@@ -182,10 +182,10 @@ class OnboardingCard extends StatelessWidget {
             width: 16,
             height: 16,
             decoration: BoxDecoration(
-              color: AppThemeColors.surface,
+              color: context.colors.surface,
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppThemeColors.primaryAccent.withValues(alpha: 0.3),
+                color: context.colors.primaryAccent.withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -209,7 +209,7 @@ class OnboardingCard extends StatelessWidget {
             width: height * 0.70,
             height: height * 0.70,
             decoration: BoxDecoration(
-              color: AppThemeColors.primaryAccent.withValues(alpha: 0.12),
+              color: context.colors.primaryAccent.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
           ),
@@ -228,8 +228,8 @@ class OnboardingCard extends StatelessWidget {
           child: Container(
             width: 20,
             height: 20,
-            decoration: const BoxDecoration(
-              color: AppThemeColors.primaryAccent,
+            decoration: BoxDecoration(
+              color: context.colors.primaryAccent,
               shape: BoxShape.circle,
             ),
           ),

@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/core/constants/images.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/features/account/presentation/bloc/account_bloc.dart';
 import 'package:multai_mobile/features/events/presentation/bloc/events_bloc.dart';
 import 'package:multai_mobile/features/gallery/presentation/bloc/gallery_bloc.dart';
@@ -17,6 +16,7 @@ import '../../blocs/auth_bloc.dart';
 import 'widgets/email_field.dart';
 import 'widgets/password_field.dart';
 import 'widgets/sign_in_button.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context, state) {
         final isLoading = state is AuthLoading;
         return Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: context.colors.background,
           body: SafeArea(
             child: Column(
               children: [
@@ -123,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                                   width: 28,
                                   height: 2,
                                   decoration: BoxDecoration(
-                                    color: AppThemeColors.primaryAccent,
+                                    color: context.colors.primaryAccent,
                                     borderRadius: BorderRadius.circular(1),
                                   ),
                                 ),
@@ -133,14 +133,14 @@ class _LoginPageState extends State<LoginPage> {
                                   style: tt.displaySmall?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     height: 1.1,
-                                    color: AppThemeColors.primaryText,
+                                    color: context.colors.primaryText,
                                   ),
                                 ),
                                 SizedBox(height: context.heightCalculated(6)),
                                 Text(
                                   'Sign in to your account.',
                                   style: tt.bodyMedium?.copyWith(
-                                    color: AppThemeColors.secondaryText,
+                                    color: context.colors.secondaryText,
                                     fontSize: 15,
                                   ),
                                 ),
@@ -150,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Text(
                                   'Email',
                                   style: tt.labelMedium?.copyWith(
-                                    color: AppThemeColors.neutral200,
+                                    color: context.colors.neutral200,
                                   ),
                                 ),
                                 SizedBox(height: context.heightCalculated(8)),
@@ -161,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Text(
                                   'Password',
                                   style: tt.labelMedium?.copyWith(
-                                    color: AppThemeColors.neutral200,
+                                    color: context.colors.neutral200,
                                   ),
                                 ),
                                 SizedBox(height: context.heightCalculated(8)),
@@ -200,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         "Don't have an account? ",
                         style: tt.bodySmall?.copyWith(
-                          color: AppThemeColors.secondaryText,
+                          color: context.colors.secondaryText,
                         ),
                       ),
                       GestureDetector(
@@ -208,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: Text(
                           'Sign Up',
                           style: tt.bodySmall?.copyWith(
-                            color: AppThemeColors.primaryAccent,
+                            color: context.colors.primaryAccent,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -250,8 +250,8 @@ class _LoginPhotoComposition extends StatelessWidget {
               child: Container(
                 width: circleSize,
                 height: circleSize,
-                decoration: const BoxDecoration(
-                  color: AppThemeColors.primaryAccent,
+                decoration: BoxDecoration(
+                  color: context.colors.primaryAccent,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -278,7 +278,7 @@ class _LoginPhotoComposition extends StatelessWidget {
                 width: 20,
                 height: 20,
                 decoration: BoxDecoration(
-                  color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
+                  color: context.colors.primaryAccent.withValues(alpha: 0.28),
                   shape: BoxShape.circle,
                 ),
               ),

@@ -8,12 +8,12 @@ import '../../../../core/extensions/snackbar_extensions.dart';
 import '../../../../core/errors/error_presentation.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/app_error_view.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../../../auth/presentation/blocs/auth_bloc.dart';
 import '../bloc/photo_approval_bloc.dart';
 import 'widgets/header_section.dart';
 import 'widgets/photo_approval_card.dart';
 import 'widgets/recent_decisions_section.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class PhotoApprovalPage extends StatefulWidget {
   const PhotoApprovalPage({super.key});
@@ -53,7 +53,7 @@ class _PhotoApprovalPageState extends State<PhotoApprovalPage> {
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: context.colors.background,
           body: SafeArea(
             child: Column(
               children: [
@@ -164,7 +164,7 @@ class _PhotoApprovalPageState extends State<PhotoApprovalPage> {
             Text(
               'Processing decision...',
               style: context.textTheme.bodySmall?.copyWith(
-                color: AppThemeColors.secondaryText,
+                color: context.colors.secondaryText,
               ),
             ),
           ],
@@ -185,17 +185,17 @@ class _PhotoApprovalPageState extends State<PhotoApprovalPage> {
           Icon(
             Icons.check_circle_outline,
             size: context.iconSize() * 3,
-            color: AppThemeColors.success.withValues(alpha: 0.5),
+            color: context.colors.success.withValues(alpha: 0.5),
           ),
           SizedBox(height: context.heightCalculated(16)),
           Text(
             'All caught up!',
-            style: tt.titleMedium?.copyWith(color: AppThemeColors.primaryText),
+            style: tt.titleMedium?.copyWith(color: context.colors.primaryText),
           ),
           SizedBox(height: context.heightCalculated(8)),
           Text(
             'No pending photo approvals',
-            style: tt.bodySmall?.copyWith(color: AppThemeColors.secondaryText),
+            style: tt.bodySmall?.copyWith(color: context.colors.secondaryText),
           ),
         ],
       ),

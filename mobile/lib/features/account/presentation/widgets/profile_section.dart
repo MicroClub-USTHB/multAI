@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class ProfileSection extends StatelessWidget {
   final String name;
@@ -80,7 +80,7 @@ class ProfileSection extends StatelessWidget {
                                   return Icon(
                                     Icons.person,
                                     size: context.widthCalculated(48),
-                                    color: AppThemeColors.secondaryText,
+                                    color: context.colors.secondaryText,
                                   );
                                 case LoadState.completed:
                                   return null;
@@ -96,7 +96,7 @@ class ProfileSection extends StatelessWidget {
                           child: Icon(
                             Icons.person,
                             size: context.widthCalculated(48),
-                            color: AppThemeColors.secondaryText,
+                            color: context.colors.secondaryText,
                           ),
                         ),
                 ),

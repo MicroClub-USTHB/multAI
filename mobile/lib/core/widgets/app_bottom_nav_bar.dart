@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../constants/nav_items.dart';
-import '../theme/app_theme_colors.dart';
-import '../theme/app_theme_colors_light.dart';
 import '../extensions/context_extensions.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -19,15 +18,8 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.theme.brightness == Brightness.dark;
-
-    final tabUnselectedColor = isDark
-        ? AppThemeColors.tabUnselectedText
-        : AppThemeColorsLight.tabUnselectedText;
-
-    final tabSelectedColor = isDark
-        ? AppThemeColors.primaryAccent
-        : AppThemeColorsLight.primaryAccent;
+    final tabUnselectedColor = context.colors.tabUnselectedText;
+    final tabSelectedColor = context.colors.primaryAccent;
 
     final barColor = context.theme.colorScheme.surface;
     final backgroundColor = context.theme.scaffoldBackgroundColor;

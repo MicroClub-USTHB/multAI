@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class OnboardingIndicator extends StatelessWidget {
   final int currentPage;
@@ -28,8 +28,8 @@ class OnboardingIndicator extends StatelessWidget {
               : context.widthCalculated(12),
           decoration: BoxDecoration(
             color: isActive
-                ? AppThemeColors.primaryAccent
-                : AppThemeColors.subtitleText.withValues(alpha: 0.3),
+                ? context.colors.primaryAccent
+                : context.colors.subtitleText.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(1),
           ),
         );
