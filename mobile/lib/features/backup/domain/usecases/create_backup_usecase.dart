@@ -10,17 +10,17 @@ class CreateBackupUseCase extends UseCase<File, NoParams> {
   CreateBackupUseCase(this._repository);
 
   @override
-  Future<Either<Failure, File>> call(NoParams params) async {
+  Future<Either<Failure, File>> call(
+    NoParams params, {
+    void Function(int completed, int total)? onProgress,
+  }) async {
     final pathsResult = await _repository.getCachedPhotoPaths();
 
-    return pathsResult.fold(
-      (failure) => Left(failure),
-      (paths) async {
-        if (paths.isEmpty) {
-          return const Left(CacheFailure('No cached photos to backup'));
-        }
-        return _repository.createBackupZip(paths);
-      },
-    );
+    return pathsResult.fold((failure) => Left(failure), (paths) async {
+      if (paths.isEmpty) {
+        return const Left(CacheFailure('No cached photos to backup'));
+      }
+      return _repository.createBackupZip(paths, onProgress: onProgress);
+    });
   }
 }

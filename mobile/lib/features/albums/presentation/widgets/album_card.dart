@@ -1,21 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../domain/entities/album_entity.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class AlbumCard extends StatelessWidget {
   final AlbumEntity album;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
-  const AlbumCard({
-    super.key,
-    required this.album,
-    this.onTap,
-    this.onDelete,
-  });
+  const AlbumCard({super.key, required this.album, this.onTap, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +22,10 @@ class AlbumCard extends StatelessWidget {
       onLongPress: onDelete,
       child: Container(
         decoration: BoxDecoration(
-          color: AppThemeColors.surface,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
           border: Border.all(
-            color: AppThemeColors.border.withValues(alpha: 0.3),
+            color: context.colors.border.withValues(alpha: 0.3),
             width: AppThemeMetrics.borderHairline,
           ),
         ),
@@ -40,7 +36,7 @@ class AlbumCard extends StatelessWidget {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppThemeColors.surfaceHigh,
+                  color: context.colors.surfaceHigh,
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(AppThemeMetrics.radiusLg),
                   ),
@@ -50,8 +46,8 @@ class AlbumCard extends StatelessWidget {
                         borderRadius: BorderRadius.vertical(
                           top: Radius.circular(AppThemeMetrics.radiusLg),
                         ),
-                        child: Image.asset(
-                          album.coverPhotoPath!,
+                        child: Image.file(
+                          File(album.coverPhotoPath!),
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stack) =>
                               _buildPlaceholder(context),
@@ -70,7 +66,7 @@ class AlbumCard extends StatelessWidget {
                   Text(
                     album.name,
                     style: tt.titleMedium?.copyWith(
-                      color: AppThemeColors.primaryText,
+                      color: context.colors.primaryText,
                       fontWeight: FontWeight.w600,
                     ),
                     maxLines: 1,
@@ -80,7 +76,7 @@ class AlbumCard extends StatelessWidget {
                   Text(
                     '${album.photoCount} ${album.photoCount == 1 ? 'photo' : 'photos'}',
                     style: tt.bodySmall?.copyWith(
-                      color: AppThemeColors.secondaryText,
+                      color: context.colors.secondaryText,
                     ),
                   ),
                 ],
@@ -97,7 +93,7 @@ class AlbumCard extends StatelessWidget {
       child: Icon(
         Icons.photo_library_outlined,
         size: context.iconSize() * 2,
-        color: AppThemeColors.secondaryText.withValues(alpha: 0.3),
+        color: context.colors.secondaryText.withValues(alpha: 0.3),
       ),
     );
   }

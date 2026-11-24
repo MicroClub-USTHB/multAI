@@ -13,6 +13,8 @@ class EmailField extends StatelessWidget {
       controller: controller,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
+      autocorrect: false,
+      enableSuggestions: false,
       style: context.textTheme.bodyMedium,
       autofillHints: const [AutofillHints.email],
       decoration: const InputDecoration(hintText: 'name@example.com'),

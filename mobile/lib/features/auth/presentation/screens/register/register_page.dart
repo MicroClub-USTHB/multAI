@@ -6,8 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/core/constants/images.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/features/account/presentation/bloc/account_bloc.dart';
+import 'package:multai_mobile/features/events/presentation/bloc/events_bloc.dart';
+import 'package:multai_mobile/features/gallery/presentation/bloc/gallery_bloc.dart';
+import 'package:multai_mobile/features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
@@ -15,6 +18,7 @@ import '../../../../../core/utils/validators.dart';
 import '../../blocs/auth_bloc.dart';
 import '../login/widgets/email_field.dart';
 import '../login/widgets/password_field.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -51,6 +55,15 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  /// Clears data left over from a previous account so a freshly registered
+  /// user never sees the previous session's events, photos or notifications.
+  void _resetUserScopedBlocs() {
+    context.read<AccountBloc>().add(ResetAccountData());
+    context.read<EventsBloc>().add(ResetEvents());
+    context.read<GalleryBloc>().add(ResetGallery());
+    context.read<NotificationBloc>().add(ResetNotifications());
+  }
+
   void _onSendOtpPressed() {
     if (!_formKey.currentState!.validate()) return;
     context.unfocus();
@@ -80,8 +93,10 @@ class _RegisterPageState extends State<RegisterPage> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
+          _resetUserScopedBlocs();
           context.go(AppRoutes.events);
         } else if (state is AuthNeedsFaceEnrollment) {
+          _resetUserScopedBlocs();
           context.go(AppRoutes.faceEnrollment);
         } else if (state is AuthOtpSent) {
           setState(() => _pendingToken = state.pendingToken);
@@ -97,13 +112,15 @@ class _RegisterPageState extends State<RegisterPage> {
         final isOtpStep = state is AuthOtpSent;
 
         return Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: context.colors.background,
           body: SafeArea(
             child: Column(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const ClampingScrollPhysics(),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -189,58 +206,78 @@ class _RegisterPhotoComposition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = context.height;
     // Slightly shorter on the form step (3 fields) to give more room
     final height = screenHeight * (isOtpStep ? 0.34 : 0.28);
     final circleSize = height * 0.80;
     final photoSize = height * 0.74;
 
-    return SizedBox(
-      height: height,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Large accent circle — top-right, partially off-screen
-          Positioned(
-            top: -(height * 0.14),
-            right: -(height * 0.08),
-            child: Container(
-              width: circleSize,
-              height: circleSize,
-              decoration: const BoxDecoration(
-                color: AppThemeColors.primaryAccent,
-                shape: BoxShape.circle,
+    // Cache the static composition so keyboard-driven viewport movement does
+    // not re-rasterize the photo on every frame.
+    return RepaintBoundary(
+      child: SizedBox(
+        height: height,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Large accent circle — top-right, partially off-screen
+            Positioned(
+              top: -(height * 0.14),
+              right: -(height * 0.08),
+              child: Container(
+                width: circleSize,
+                height: circleSize,
+                decoration: BoxDecoration(
+                  color: context.colors.primaryAccent,
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-          // Main photo circle — left, overlapping the accent circle
-          Positioned(
-            top: height * 0.08,
-            left: context.hPadding(),
-            child: ClipOval(
-              child: Image.asset(
-                imagePath,
-                width: photoSize,
-                height: photoSize,
-                fit: BoxFit.cover,
+            // Main photo circle — left, overlapping the accent circle
+            Positioned(
+              top: height * 0.08,
+              left: context.hPadding(),
+              child: ClipOval(
+                child: Image.asset(
+                  imagePath,
+                  width: photoSize,
+                  height: photoSize,
+                  fit: BoxFit.cover,
+                  frameBuilder: _fadeInFrame,
+                ),
               ),
             ),
-          ),
-          // Small accent dot
-          Positioned(
-            bottom: height * 0.08,
-            right: context.widthCalculated(52),
-            child: Container(
-              width: 18,
-              height: 18,
-              decoration: BoxDecoration(
-                color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
-                shape: BoxShape.circle,
+            // Small accent dot
+            Positioned(
+              bottom: height * 0.08,
+              right: context.widthCalculated(52),
+              child: Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: context.colors.primaryAccent.withValues(alpha: 0.28),
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+
+  static Widget _fadeInFrame(
+    BuildContext context,
+    Widget child,
+    int? frame,
+    bool wasSynchronouslyLoaded,
+  ) {
+    if (wasSynchronouslyLoaded) return child;
+    return AnimatedOpacity(
+      opacity: frame == null ? 0 : 1,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      child: child,
     );
   }
 }
@@ -290,7 +327,7 @@ class _RegisterFormContent extends StatelessWidget {
             width: 28,
             height: 2,
             decoration: BoxDecoration(
-              color: AppThemeColors.primaryAccent,
+              color: context.colors.primaryAccent,
               borderRadius: BorderRadius.circular(1),
             ),
           ),
@@ -300,14 +337,14 @@ class _RegisterFormContent extends StatelessWidget {
             style: tt.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
               height: 1.1,
-              color: AppThemeColors.primaryText,
+              color: context.colors.primaryText,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             'Join Micro Club. Your moments await.',
             style: tt.bodyMedium?.copyWith(
-              color: AppThemeColors.secondaryText,
+              color: context.colors.secondaryText,
               fontSize: 15,
             ),
           ),
@@ -315,7 +352,7 @@ class _RegisterFormContent extends StatelessWidget {
 
           Text(
             'Email',
-            style: tt.labelMedium?.copyWith(color: AppThemeColors.neutral200),
+            style: tt.labelMedium?.copyWith(color: context.colors.neutral200),
           ),
           const SizedBox(height: 8),
           EmailField(controller: emailController),
@@ -323,7 +360,7 @@ class _RegisterFormContent extends StatelessWidget {
 
           Text(
             'Password',
-            style: tt.labelMedium?.copyWith(color: AppThemeColors.neutral200),
+            style: tt.labelMedium?.copyWith(color: context.colors.neutral200),
           ),
           const SizedBox(height: 8),
           PasswordField(
@@ -339,7 +376,7 @@ class _RegisterFormContent extends StatelessWidget {
 
           Text(
             'Confirm Password',
-            style: tt.labelMedium?.copyWith(color: AppThemeColors.neutral200),
+            style: tt.labelMedium?.copyWith(color: context.colors.neutral200),
           ),
           const SizedBox(height: 8),
           PasswordField(
@@ -468,7 +505,7 @@ class _OtpFormContentState extends State<_OtpFormContent> {
             width: 28,
             height: 2,
             decoration: BoxDecoration(
-              color: AppThemeColors.primaryAccent,
+              color: context.colors.primaryAccent,
               borderRadius: BorderRadius.circular(1),
             ),
           ),
@@ -478,14 +515,14 @@ class _OtpFormContentState extends State<_OtpFormContent> {
             style: tt.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
               height: 1.1,
-              color: AppThemeColors.primaryText,
+              color: context.colors.primaryText,
             ),
           ),
           const SizedBox(height: 6),
           RichText(
             text: TextSpan(
               style: tt.bodyMedium?.copyWith(
-                color: AppThemeColors.secondaryText,
+                color: context.colors.secondaryText,
                 fontSize: 15,
               ),
               children: [
@@ -493,7 +530,7 @@ class _OtpFormContentState extends State<_OtpFormContent> {
                 TextSpan(
                   text: widget.email,
                   style: TextStyle(
-                    color: AppThemeColors.primaryAccent,
+                    color: context.colors.primaryAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -509,9 +546,12 @@ class _OtpFormContentState extends State<_OtpFormContent> {
             maxLength: 6,
             textAlign: TextAlign.center,
             autofocus: true,
+            autocorrect: false,
+            enableSuggestions: false,
+            autofillHints: const [AutofillHints.oneTimeCode],
             style: tt.displayMedium?.copyWith(
               letterSpacing: 14,
-              color: AppThemeColors.primaryText,
+              color: context.colors.primaryText,
               fontWeight: FontWeight.bold,
             ),
             decoration: InputDecoration(
@@ -519,19 +559,19 @@ class _OtpFormContentState extends State<_OtpFormContent> {
               hintText: '------',
               hintStyle: tt.displayMedium?.copyWith(
                 letterSpacing: 14,
-                color: AppThemeColors.neutral300.withValues(alpha: 0.3),
+                color: context.colors.neutral300.withValues(alpha: 0.3),
                 fontWeight: FontWeight.bold,
               ),
               filled: true,
-              fillColor: AppThemeColors.inputFill,
+              fillColor: context.colors.inputFill,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
-                borderSide: const BorderSide(color: AppThemeColors.inputBorder),
+                borderSide: BorderSide(color: context.colors.inputBorder),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
-                borderSide: const BorderSide(
-                  color: AppThemeColors.primaryAccent,
+                borderSide: BorderSide(
+                  color: context.colors.primaryAccent,
                   width: 1.5,
                 ),
               ),
@@ -585,7 +625,7 @@ class _OtpFormContentState extends State<_OtpFormContent> {
               child: Text(
                 _countdown > 0 ? 'Resend code (${_countdown}s)' : 'Resend code',
                 style: tt.bodySmall?.copyWith(
-                  color: AppThemeColors.primaryAccent,
+                  color: context.colors.primaryAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -649,10 +689,10 @@ class _PasswordStrengthIndicatorState
   @override
   Widget build(BuildContext context) {
     final colors = [
-      AppThemeColors.error,
-      AppThemeColors.warning,
-      AppThemeColors.primaryAccent,
-      AppThemeColors.success,
+      context.colors.error,
+      context.colors.warning,
+      context.colors.primaryAccent,
+      context.colors.success,
     ];
     final segments = _strength == 0
         ? 1
@@ -660,7 +700,7 @@ class _PasswordStrengthIndicatorState
         ? 4
         : _strength;
     final activeColor = _strength == 0
-        ? AppThemeColors.neutral300.withValues(alpha: 0.3)
+        ? context.colors.neutral300.withValues(alpha: 0.3)
         : colors[(_strength - 1).clamp(0, 3)];
 
     return Row(
@@ -674,7 +714,7 @@ class _PasswordStrengthIndicatorState
               decoration: BoxDecoration(
                 color: isActive
                     ? activeColor
-                    : AppThemeColors.neutral300.withValues(alpha: 0.15),
+                    : context.colors.neutral300.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(1.5),
               ),
             ),
@@ -702,14 +742,14 @@ class _BottomLink extends StatelessWidget {
       children: [
         Text(
           isOtpStep ? 'Wrong email? ' : 'Already have an account? ',
-          style: tt.bodySmall?.copyWith(color: AppThemeColors.secondaryText),
+          style: tt.bodySmall?.copyWith(color: context.colors.secondaryText),
         ),
         GestureDetector(
           onTap: onTap,
           child: Text(
             isOtpStep ? 'Go back' : 'Sign In',
             style: tt.bodySmall?.copyWith(
-              color: AppThemeColors.primaryAccent,
+              color: context.colors.primaryAccent,
               fontWeight: FontWeight.w600,
             ),
           ),

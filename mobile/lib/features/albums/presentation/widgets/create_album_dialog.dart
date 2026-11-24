@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class CreateAlbumDialog extends StatefulWidget {
   final void Function(String name) onCreate;
@@ -28,14 +28,14 @@ class _CreateAlbumDialogState extends State<CreateAlbumDialog> {
     final cs = context.theme.colorScheme;
 
     return AlertDialog(
-      backgroundColor: AppThemeColors.surface,
+      backgroundColor: context.colors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
       ),
       title: Text(
         'Create Album',
         style: tt.titleLarge?.copyWith(
-          color: AppThemeColors.primaryText,
+          color: context.colors.primaryText,
         ),
       ),
       content: Form(
@@ -45,27 +45,27 @@ class _CreateAlbumDialogState extends State<CreateAlbumDialog> {
           autofocus: true,
           maxLength: 50,
           style: tt.bodyLarge?.copyWith(
-            color: AppThemeColors.primaryText,
+            color: context.colors.primaryText,
           ),
           decoration: InputDecoration(
             hintText: 'Album name',
             hintStyle: tt.bodyLarge?.copyWith(
-              color: AppThemeColors.hintText,
+              color: context.colors.hintText,
             ),
             filled: true,
-            fillColor: AppThemeColors.inputFill,
+            fillColor: context.colors.inputFill,
             border: OutlineInputBorder(
               borderRadius:
                   BorderRadius.circular(AppThemeMetrics.radiusMd),
               borderSide: BorderSide(
-                color: AppThemeColors.inputBorder,
+                color: context.colors.inputBorder,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius:
                   BorderRadius.circular(AppThemeMetrics.radiusMd),
               borderSide: BorderSide(
-                color: AppThemeColors.inputBorder,
+                color: context.colors.inputBorder,
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -91,7 +91,7 @@ class _CreateAlbumDialogState extends State<CreateAlbumDialog> {
           child: Text(
             'Cancel',
             style: tt.bodyMedium?.copyWith(
-              color: AppThemeColors.secondaryText,
+              color: context.colors.secondaryText,
             ),
           ),
         ),

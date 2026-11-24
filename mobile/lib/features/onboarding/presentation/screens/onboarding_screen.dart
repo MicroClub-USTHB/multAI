@@ -4,12 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/core/constants/onboarding_content.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/di/injection_container.dart';
 import 'package:multai_mobile/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:multai_mobile/features/onboarding/widgets/onboarding_button.dart';
 import 'package:multai_mobile/features/onboarding/widgets/onboarding_card.dart';
 import 'package:multai_mobile/features/onboarding/widgets/onboarding_indicatore.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -22,11 +22,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   late final List<OnboardingItem> _slides;
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _preloaded = false;
 
   @override
   void initState() {
     super.initState();
     _slides = OnboardingItem.createSlides();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_preloaded) {
+      _preloaded = true;
+      _preloadImages();
+    }
+  }
+
+  Future<void> _preloadImages() async {
+    final images = _slides
+        .expand((s) => [s.image, if (s.secondImage != null) s.secondImage!])
+        .toSet()
+        .toList();
+    // Precache independently: one missing asset must not abort the rest, and a
+    // failure must never escape as an unhandled async error.
+    await Future.wait([
+      for (final img in images)
+        precacheImage(
+          AssetImage(img),
+          context,
+          onError: (exception, stackTrace) {
+            debugPrint('Onboarding image preload failed for $img: $exception');
+          },
+        ),
+    ]);
   }
 
   @override
@@ -57,7 +86,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           if (state is OnboardingComplete) context.go(state.route);
         },
         child: Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: context.colors.background,
           body: Builder(
             builder: (ctx) {
               return Stack(
@@ -91,7 +120,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             child: Text(
                               'Skip',
                               style: context.textTheme.labelLarge?.copyWith(
-                                color: AppThemeColors.primaryAccent,
+                                color: context.colors.primaryAccent,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

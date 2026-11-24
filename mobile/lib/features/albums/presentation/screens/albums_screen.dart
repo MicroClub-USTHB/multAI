@@ -7,6 +7,7 @@ import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
 import 'package:multai_mobile/core/theme/theme.dart';
 import 'package:multai_mobile/di/injection_container.dart' as di;
+import '../../domain/entities/album_entity.dart';
 import '../bloc/albums_bloc.dart';
 import '../widgets/album_card.dart';
 import '../widgets/create_album_dialog.dart';
@@ -47,15 +48,15 @@ class _AlbumsView extends StatelessWidget {
         final cs = context.theme.colorScheme;
 
         return Scaffold(
-          backgroundColor: AppTheme.backgroundColor,
+          backgroundColor: context.colors.background,
           appBar: AppBar(
-            backgroundColor: AppTheme.backgroundColor,
+            backgroundColor: context.colors.background,
             elevation: 0,
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back_ios,
                 size: context.iconSize(),
-                color: AppTheme.primaryTextColor,
+                color: context.colors.primaryText,
               ),
               onPressed: () => context.pop(),
             ),
@@ -86,21 +87,21 @@ class _AlbumsView extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(
-    BuildContext context,
-    AlbumsState state,
-    ColorScheme cs,
-  ) {
+  Widget _buildBody(BuildContext context, AlbumsState state, ColorScheme cs) {
     final tt = context.textTheme;
 
     if (state is AlbumsLoading) {
-      return Center(
-        child: CircularProgressIndicator(color: cs.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: cs.primary));
     }
 
-    final albums =
-        state is AlbumsLoaded ? state.albums : <dynamic>[];
+    final List<AlbumEntity> albums;
+    if (state is AlbumsLoaded) {
+      albums = state.albums;
+    } else if (state is AlbumsOperationSuccess) {
+      albums = state.albums ?? const [];
+    } else {
+      albums = const [];
+    }
 
     if (albums.isEmpty) {
       return _buildEmpty(context, tt, cs);
@@ -108,8 +109,7 @@ class _AlbumsView extends StatelessWidget {
 
     return RefreshIndicator(
       color: cs.primary,
-      onRefresh: () async =>
-          context.read<AlbumsBloc>().add(LoadAlbums()),
+      onRefresh: () async => context.read<AlbumsBloc>().add(LoadAlbums()),
       child: GridView.builder(
         padding: EdgeInsets.symmetric(
           horizontal: context.hPadding(),
@@ -126,10 +126,13 @@ class _AlbumsView extends StatelessWidget {
           final album = albums[index];
           return AlbumCard(
             album: album,
-            onTap: () {
-              context.push(
+            onTap: () async {
+              await context.push(
                 '${AppRoutes.albumDetail}?name=${Uri.encodeComponent(album.name)}',
               );
+              if (context.mounted) {
+                context.read<AlbumsBloc>().add(LoadAlbums());
+              }
             },
             onDelete: () => _confirmDelete(context, album),
           );
@@ -146,21 +149,17 @@ class _AlbumsView extends StatelessWidget {
           Icon(
             Icons.photo_library_outlined,
             size: context.iconSize() * 3,
-            color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
+            color: context.colors.secondaryText.withValues(alpha: 0.4),
           ),
           SizedBox(height: context.heightCalculated(16)),
           Text(
             'No albums yet',
-            style: tt.titleMedium?.copyWith(
-              color: AppTheme.secondaryTextColor,
-            ),
+            style: tt.titleMedium?.copyWith(color: context.colors.secondaryText),
           ),
           SizedBox(height: context.heightCalculated(8)),
           Text(
             'Create your first album to organize photos',
-            style: tt.bodyMedium?.copyWith(
-              color: AppTheme.hintTextColor,
-            ),
+            style: tt.bodyMedium?.copyWith(color: context.colors.hintText),
           ),
           SizedBox(height: context.heightCalculated(24)),
           SizedBox(
@@ -172,8 +171,7 @@ class _AlbumsView extends StatelessWidget {
               style: FilledButton.styleFrom(
                 backgroundColor: cs.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppThemeMetrics.radiusMd),
+                  borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
                 ),
               ),
             ),
@@ -194,7 +192,7 @@ class _AlbumsView extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, dynamic album) {
+  void _confirmDelete(BuildContext context, AlbumEntity album) {
     final tt = context.textTheme;
     showDialog(
       context: context,
@@ -213,9 +211,7 @@ class _AlbumsView extends StatelessWidget {
           FilledButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              context
-                  .read<AlbumsBloc>()
-                  .add(DeleteAlbum(name: album.name));
+              context.read<AlbumsBloc>().add(DeleteAlbum(name: album.name));
             },
             style: FilledButton.styleFrom(
               backgroundColor: context.theme.colorScheme.error,

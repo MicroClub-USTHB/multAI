@@ -7,13 +7,13 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
 import '../../../../core/extensions/datetime_extensions.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_theme_colors.dart';
 import '../../../../core/theme/app_theme_metrics.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../auth/presentation/blocs/auth_bloc.dart';
 import '../../domain/entities/event_entity.dart';
 import '../bloc/events_bloc.dart';
 import 'event_photos_screen.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class EventGridScreen extends StatefulWidget {
   const EventGridScreen({super.key});
@@ -162,7 +162,7 @@ class _EventGridTile extends StatelessWidget {
           children: [
             Icon(
               Icons.event_rounded,
-              color: AppThemeColors.primaryAccent,
+              color: context.colors.primaryAccent,
               size: context.iconSize() * 1.4,
             ),
             Column(

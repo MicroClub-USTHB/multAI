@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class BackupStatsCard extends StatelessWidget {
   final int photoCount;
@@ -17,10 +17,10 @@ class BackupStatsCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(context.widthCalculated(20)),
       decoration: BoxDecoration(
-        color: AppThemeColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
         border: Border.all(
-          color: AppThemeColors.border.withValues(alpha: 0.3),
+          color: context.colors.border.withValues(alpha: 0.3),
           width: AppThemeMetrics.borderHairline,
         ),
       ),
@@ -46,7 +46,7 @@ class BackupStatsCard extends StatelessWidget {
                 Text(
                   '$photoCount',
                   style: tt.headlineMedium?.copyWith(
-                    color: AppThemeColors.primaryText,
+                    color: context.colors.primaryText,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -54,7 +54,7 @@ class BackupStatsCard extends StatelessWidget {
                 Text(
                   photoCount == 1 ? 'photo cached' : 'photos cached',
                   style: tt.bodyMedium?.copyWith(
-                    color: AppThemeColors.secondaryText,
+                    color: context.colors.secondaryText,
                   ),
                 ),
               ],

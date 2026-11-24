@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../extensions/context_extensions.dart';
 import '../extensions/responsive_extensions.dart';
-import '../theme/app_theme_colors.dart';
 import '../theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class ErrorStateView extends StatelessWidget {
   final String title;
@@ -33,7 +33,7 @@ class ErrorStateView extends StatelessWidget {
             Icon(
               illustration,
               size: context.iconSize() * 3,
-              color: AppThemeColors.secondaryText,
+              color: context.colors.secondaryText,
             ),
             SizedBox(
               height: context.heightCalculated(AppThemeMetrics.spacingLg),
@@ -41,7 +41,7 @@ class ErrorStateView extends StatelessWidget {
             Text(
               title,
               style: context.textTheme.headlineSmall?.copyWith(
-                color: AppThemeColors.primaryText,
+                color: context.colors.primaryText,
               ),
               textAlign: TextAlign.center,
             ),
@@ -64,8 +64,8 @@ class ErrorStateView extends StatelessWidget {
                 ),
                 label: Text(actionLabel!),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: AppThemeColors.primaryText,
-                  backgroundColor: AppThemeColors.primaryAccent,
+                  foregroundColor: context.colors.primaryText,
+                  backgroundColor: context.colors.primaryAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
                       AppThemeMetrics.radiusSm,

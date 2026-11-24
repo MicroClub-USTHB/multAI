@@ -5,8 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:multai_mobile/core/constants/images.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/features/account/presentation/bloc/account_bloc.dart';
+import 'package:multai_mobile/features/events/presentation/bloc/events_bloc.dart';
+import 'package:multai_mobile/features/gallery/presentation/bloc/gallery_bloc.dart';
+import 'package:multai_mobile/features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/snackbar_extensions.dart';
@@ -14,6 +16,7 @@ import '../../blocs/auth_bloc.dart';
 import 'widgets/email_field.dart';
 import 'widgets/password_field.dart';
 import 'widgets/sign_in_button.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -43,6 +46,16 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  /// Clears data belonging to the previous session from the app-level blocs,
+  /// which otherwise survive sign-out and would show the old account's
+  /// events/gallery/notifications to the newly signed-in user.
+  void _resetUserScopedBlocs() {
+    context.read<AccountBloc>().add(ResetAccountData());
+    context.read<EventsBloc>().add(ResetEvents());
+    context.read<GalleryBloc>().add(ResetGallery());
+    context.read<NotificationBloc>().add(ResetNotifications());
+  }
+
   void _onSignInPressed() {
     if (!_formKey.currentState!.validate()) return;
     context.unfocus();
@@ -57,18 +70,17 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = context.height;
 
     return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) async {
+      listener: (context, state) {
         if (state is AuthAuthenticated) {
-          context.read<AccountBloc>().add(ResetAccountData());
+          _resetUserScopedBlocs();
           context.go(AppRoutes.events);
         } else if (state is AuthNeedsFaceEnrollment) {
-          context.read<AccountBloc>().add(ResetAccountData());
+          _resetUserScopedBlocs();
           context.go(AppRoutes.faceEnrollment);
         }
-        // ignore: use_build_context_synchronously
         if (state is AuthFailure) {
           context.showErrorSnackBar(state.message);
         }
@@ -76,13 +88,15 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context, state) {
         final isLoading = state is AuthLoading;
         return Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: context.colors.background,
           body: SafeArea(
             child: Column(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const ClampingScrollPhysics(),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -109,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                                   width: 28,
                                   height: 2,
                                   decoration: BoxDecoration(
-                                    color: AppThemeColors.primaryAccent,
+                                    color: context.colors.primaryAccent,
                                     borderRadius: BorderRadius.circular(1),
                                   ),
                                 ),
@@ -119,14 +133,14 @@ class _LoginPageState extends State<LoginPage> {
                                   style: tt.displaySmall?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     height: 1.1,
-                                    color: AppThemeColors.primaryText,
+                                    color: context.colors.primaryText,
                                   ),
                                 ),
                                 SizedBox(height: context.heightCalculated(6)),
                                 Text(
                                   'Sign in to your account.',
                                   style: tt.bodyMedium?.copyWith(
-                                    color: AppThemeColors.secondaryText,
+                                    color: context.colors.secondaryText,
                                     fontSize: 15,
                                   ),
                                 ),
@@ -136,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Text(
                                   'Email',
                                   style: tt.labelMedium?.copyWith(
-                                    color: AppThemeColors.neutral200,
+                                    color: context.colors.neutral200,
                                   ),
                                 ),
                                 SizedBox(height: context.heightCalculated(8)),
@@ -147,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Text(
                                   'Password',
                                   style: tt.labelMedium?.copyWith(
-                                    color: AppThemeColors.neutral200,
+                                    color: context.colors.neutral200,
                                   ),
                                 ),
                                 SizedBox(height: context.heightCalculated(8)),
@@ -186,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         "Don't have an account? ",
                         style: tt.bodySmall?.copyWith(
-                          color: AppThemeColors.secondaryText,
+                          color: context.colors.secondaryText,
                         ),
                       ),
                       GestureDetector(
@@ -194,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: Text(
                           'Sign Up',
                           style: tt.bodySmall?.copyWith(
-                            color: AppThemeColors.primaryAccent,
+                            color: context.colors.primaryAccent,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -221,52 +235,72 @@ class _LoginPhotoComposition extends StatelessWidget {
     final circleSize = height * 0.76;
     final photoSize = height * 0.70;
 
-    return SizedBox(
-      height: height,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Large accent circle — top-right, partially off-screen
-          Positioned(
-            top: -(height * 0.13),
-            right: -(height * 0.07),
-            child: Container(
-              width: circleSize,
-              height: circleSize,
-              decoration: const BoxDecoration(
-                color: AppThemeColors.primaryAccent,
-                shape: BoxShape.circle,
+    // Moving the viewport for the keyboard repaints the scroll content every
+    // frame; cache the static circle composition as its own layer.
+    return RepaintBoundary(
+      child: SizedBox(
+        height: height,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Large accent circle — top-right, partially off-screen
+            Positioned(
+              top: -(height * 0.13),
+              right: -(height * 0.07),
+              child: Container(
+                width: circleSize,
+                height: circleSize,
+                decoration: BoxDecoration(
+                  color: context.colors.primaryAccent,
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-          // Main photo circle — left, overlapping the accent circle
-          Positioned(
-            top: height * 0.07,
-            left: 28,
-            child: ClipOval(
-              child: Image.asset(
-                imagePath,
-                width: photoSize,
-                height: photoSize,
-                fit: BoxFit.cover,
+            // Main photo circle — left, overlapping the accent circle
+            Positioned(
+              top: height * 0.07,
+              left: 28,
+              child: ClipOval(
+                child: Image.asset(
+                  imagePath,
+                  width: photoSize,
+                  height: photoSize,
+                  fit: BoxFit.cover,
+                  frameBuilder: _fadeInFrame,
+                ),
               ),
             ),
-          ),
-          // Small accent dot — bottom-right
-          Positioned(
-            bottom: height * 0.08,
-            right: context.widthCalculated(56),
-            child: Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: AppThemeColors.primaryAccent.withValues(alpha: 0.28),
-                shape: BoxShape.circle,
+            // Small accent dot — bottom-right
+            Positioned(
+              bottom: height * 0.08,
+              right: context.widthCalculated(56),
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: context.colors.primaryAccent.withValues(alpha: 0.28),
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+
+  static Widget _fadeInFrame(
+    BuildContext context,
+    Widget child,
+    int? frame,
+    bool wasSynchronouslyLoaded,
+  ) {
+    if (wasSynchronouslyLoaded) return child;
+    return AnimatedOpacity(
+      opacity: frame == null ? 0 : 1,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      child: child,
     );
   }
 }

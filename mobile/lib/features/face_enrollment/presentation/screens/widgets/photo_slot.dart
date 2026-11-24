@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../domain/entities/face_photo_entity.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 enum _SlotState { empty, loading, completed, error }
 
@@ -78,7 +78,7 @@ class PhotoSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = context.theme.colorScheme;
+    final colors = context.colors;
 
     return Semantics(
       label: _semanticsLabel,
@@ -93,9 +93,12 @@ class PhotoSlot extends StatelessWidget {
           curve: AppThemeMetrics.curveStandard,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: _backgroundColor,
+            color: _backgroundColor(colors),
             borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
-            border: Border.all(color: _borderColor(cs), width: _borderWidth),
+            border: Border.all(
+              color: _borderColor(colors),
+              width: _borderWidth,
+            ),
           ),
           clipBehavior: Clip.hardEdge,
           child: AnimatedSwitcher(
@@ -117,28 +120,28 @@ class PhotoSlot extends StatelessWidget {
     return '$name, empty';
   }
 
-  Color get _backgroundColor {
+  Color _backgroundColor(AppPalette colors) {
     switch (_state) {
       case _SlotState.completed:
         return Colors.transparent;
       case _SlotState.error:
-        return AppThemeColors.error.withValues(alpha: 0.08);
+        return colors.error.withValues(alpha: 0.08);
       case _SlotState.loading:
       case _SlotState.empty:
-        return AppThemeColors.photoSlot;
+        return colors.photoSlot;
     }
   }
 
-  Color _borderColor(ColorScheme cs) {
+  Color _borderColor(AppPalette colors) {
     switch (_state) {
       case _SlotState.completed:
-        return AppThemeColors.success;
+        return colors.success;
       case _SlotState.error:
-        return AppThemeColors.error;
+        return colors.error;
       case _SlotState.loading:
-        return AppThemeColors.primaryAccent;
+        return colors.primaryAccent;
       case _SlotState.empty:
-        return AppThemeColors.inputBorder;
+        return colors.inputBorder;
     }
   }
 
@@ -190,13 +193,13 @@ class _EmptyContent extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppThemeColors.neutral500.withValues(alpha: 0.3),
+                  color: context.colors.neutral500.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.camera_alt_outlined,
                   size: context.iconSize() * 1.8,
-                  color: AppThemeColors.secondaryText.withValues(alpha: 0.7),
+                  color: context.colors.secondaryText.withValues(alpha: 0.7),
                 ),
               ),
             ),
@@ -204,7 +207,7 @@ class _EmptyContent extends StatelessWidget {
             Text(
               'Tap to capture your face',
               style: context.textTheme.labelLarge?.copyWith(
-                color: AppThemeColors.secondaryText.withValues(alpha: 0.7),
+                color: context.colors.secondaryText.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -234,14 +237,14 @@ class _LoadingContent extends StatelessWidget {
               width: context.iconSize() * 1.4,
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
-                color: AppThemeColors.primaryAccent,
+                color: context.colors.primaryAccent,
               ),
             ),
             const SizedBox(height: 12),
             Text(
               'Processing...',
               style: context.textTheme.labelMedium?.copyWith(
-                color: AppThemeColors.secondaryText,
+                color: context.colors.secondaryText,
               ),
             ),
           ],
@@ -271,20 +274,20 @@ class _ErrorContent extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppThemeColors.error.withValues(alpha: 0.12),
+                  color: context.colors.error.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.error_outline,
                   size: context.iconSize() * 1.3,
-                  color: AppThemeColors.error,
+                  color: context.colors.error,
                 ),
               ),
               const SizedBox(height: 10),
               Text(
                 'Upload failed',
                 style: context.textTheme.labelMedium?.copyWith(
-                  color: AppThemeColors.error,
+                  color: context.colors.error,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -292,7 +295,7 @@ class _ErrorContent extends StatelessWidget {
               Text(
                 error,
                 style: context.textTheme.labelSmall?.copyWith(
-                  color: AppThemeColors.error.withValues(alpha: 0.7),
+                  color: context.colors.error.withValues(alpha: 0.7),
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,
@@ -302,12 +305,12 @@ class _ErrorContent extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.refresh, size: 14, color: AppThemeColors.error),
+                  Icon(Icons.refresh, size: 14, color: context.colors.error),
                   const SizedBox(width: 4),
                   Text(
                     'Tap to retry',
                     style: context.textTheme.labelSmall?.copyWith(
-                      color: AppThemeColors.error.withValues(alpha: 0.8),
+                      color: context.colors.error.withValues(alpha: 0.8),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -366,7 +369,7 @@ class _CompletedContent extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: AppThemeColors.success,
+                  color: context.colors.success,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

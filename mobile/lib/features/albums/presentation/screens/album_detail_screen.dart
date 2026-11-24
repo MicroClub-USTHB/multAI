@@ -43,9 +43,7 @@ class _AlbumDetailView extends StatelessWidget {
         }
         if (state is AlbumsOperationSuccess) {
           context.showSuccessSnackBar(state.message);
-          context
-              .read<AlbumsBloc>()
-              .add(LoadAlbumPhotos(albumName: albumName));
+          context.read<AlbumsBloc>().add(LoadAlbumPhotos(albumName: albumName));
         }
       },
       builder: (context, state) {
@@ -53,15 +51,15 @@ class _AlbumDetailView extends StatelessWidget {
         final cs = context.theme.colorScheme;
 
         return Scaffold(
-          backgroundColor: AppTheme.backgroundColor,
+          backgroundColor: context.colors.background,
           appBar: AppBar(
-            backgroundColor: AppTheme.backgroundColor,
+            backgroundColor: context.colors.background,
             elevation: 0,
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back_ios,
                 size: context.iconSize(),
-                color: AppTheme.primaryTextColor,
+                color: context.colors.primaryText,
               ),
               onPressed: () => context.pop(),
             ),
@@ -81,11 +79,7 @@ class _AlbumDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(
-    BuildContext context,
-    AlbumsState state,
-    ColorScheme cs,
-  ) {
+  Widget _buildBody(BuildContext context, AlbumsState state, ColorScheme cs) {
     final tt = context.textTheme;
 
     if (state is AlbumsPhotoAdding) {
@@ -98,7 +92,7 @@ class _AlbumDetailView extends StatelessWidget {
             Text(
               'Adding photos...',
               style: tt.bodyMedium?.copyWith(
-                color: AppTheme.secondaryTextColor,
+                color: context.colors.secondaryText,
               ),
             ),
           ],
@@ -127,10 +121,10 @@ class _AlbumDetailView extends StatelessWidget {
             File(photos[index]),
             fit: BoxFit.cover,
             errorBuilder: (context, error, stack) => Container(
-              color: AppThemeColors.surface,
+              color: context.colors.surface,
               child: Icon(
                 Icons.broken_image_outlined,
-                color: AppThemeColors.secondaryText,
+                color: context.colors.secondaryText,
               ),
             ),
           ),
@@ -147,21 +141,17 @@ class _AlbumDetailView extends StatelessWidget {
           Icon(
             Icons.add_photo_alternate_outlined,
             size: context.iconSize() * 3,
-            color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
+            color: context.colors.secondaryText.withValues(alpha: 0.4),
           ),
           SizedBox(height: context.heightCalculated(16)),
           Text(
             'This album is empty',
-            style: tt.titleMedium?.copyWith(
-              color: AppTheme.secondaryTextColor,
-            ),
+            style: tt.titleMedium?.copyWith(color: context.colors.secondaryText),
           ),
           SizedBox(height: context.heightCalculated(8)),
           Text(
             'Tap + to add photos from your device',
-            style: tt.bodyMedium?.copyWith(
-              color: AppTheme.hintTextColor,
-            ),
+            style: tt.bodyMedium?.copyWith(color: context.colors.hintText),
           ),
         ],
       ),
@@ -169,22 +159,23 @@ class _AlbumDetailView extends StatelessWidget {
   }
 
   Future<void> _pickPhotos(BuildContext context) async {
-    final picker = ImagePicker();
-    final picked = await picker.pickMultiImage(
-      imageQuality: 85,
-      maxWidth: 1920,
-      maxHeight: 1920,
-    );
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickMultiImage(
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1920,
+      );
 
-    if (picked.isNotEmpty) {
-      final paths = picked.map((f) => f.path).toList();
-      if (context.mounted) {
+      if (picked.isNotEmpty && context.mounted) {
+        final paths = picked.map((f) => f.path).toList();
         context.read<AlbumsBloc>().add(
-              AddPhotosToAlbum(
-                albumName: albumName,
-                photoPaths: paths,
-              ),
-            );
+          AddPhotosToAlbum(albumName: albumName, photoPaths: paths),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        context.showErrorSnackBar('Could not pick photos: $e');
       }
     }
   }

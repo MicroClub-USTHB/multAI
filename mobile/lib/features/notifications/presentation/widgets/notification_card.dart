@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../notifications/domain/entities/notification_entity.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class NotificationCard extends StatelessWidget {
   final NotificationEntity notification;
@@ -27,12 +27,12 @@ class NotificationCard extends StatelessWidget {
         padding: EdgeInsets.all(context.widthCalculated(14)),
         decoration: BoxDecoration(
           color: notification.isRead
-              ? AppThemeColors.surface
+              ? context.colors.surface
               : cs.primary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
           border: Border.all(
             color: notification.isRead
-                ? AppThemeColors.inputBorder
+                ? context.colors.inputBorder
                 : cs.primary.withValues(alpha: 0.3),
             width: 0.5,
           ),
@@ -44,13 +44,13 @@ class NotificationCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(context.widthCalculated(10)),
               decoration: BoxDecoration(
-                color: _iconBgColor(notification.type, cs),
+                color: _iconBgColor(notification.type, cs, context.colors),
                 borderRadius: BorderRadius.circular(AppThemeMetrics.radiusSm),
               ),
               child: Icon(
                 _iconFor(notification.type),
                 size: context.iconSize(),
-                color: _iconColor(notification.type, cs),
+                color: _iconColor(notification.type, cs, context.colors),
               ),
             ),
             SizedBox(width: context.widthCalculated(12)),
@@ -66,7 +66,7 @@ class NotificationCard extends StatelessWidget {
                       fontWeight: notification.isRead
                           ? FontWeight.w500
                           : FontWeight.bold,
-                      color: AppThemeColors.primaryText,
+                      color: context.colors.primaryText,
                     ),
                   ),
                   if (notification.body.isNotEmpty) ...[
@@ -74,7 +74,7 @@ class NotificationCard extends StatelessWidget {
                     Text(
                       notification.body,
                       style: tt.labelSmall?.copyWith(
-                        color: AppThemeColors.secondaryText,
+                        color: context.colors.secondaryText,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -108,7 +108,7 @@ class NotificationCard extends StatelessWidget {
                   Text(
                     _timeAgo(notification.createdAt),
                     style: tt.labelSmall?.copyWith(
-                      color: AppThemeColors.hintText,
+                      color: context.colors.hintText,
                     ),
                   ),
                 ],
@@ -147,23 +147,27 @@ class NotificationCard extends StatelessWidget {
     }
   }
 
-  Color _iconBgColor(NotificationType type, ColorScheme cs) {
+  Color _iconBgColor(
+    NotificationType type,
+    ColorScheme cs,
+    AppPalette colors,
+  ) {
     switch (type) {
       case NotificationType.photoApproval:
-        return AppThemeColors.warning.withValues(alpha: 0.15);
+        return colors.warning.withValues(alpha: 0.15);
       case NotificationType.photoDistributed:
-        return AppThemeColors.success.withValues(alpha: 0.15);
+        return colors.success.withValues(alpha: 0.15);
       default:
         return cs.primary.withValues(alpha: 0.15);
     }
   }
 
-  Color _iconColor(NotificationType type, ColorScheme cs) {
+  Color _iconColor(NotificationType type, ColorScheme cs, AppPalette colors) {
     switch (type) {
       case NotificationType.photoApproval:
-        return AppThemeColors.warning;
+        return colors.warning;
       case NotificationType.photoDistributed:
-        return AppThemeColors.success;
+        return colors.success;
       default:
         return cs.primary;
     }

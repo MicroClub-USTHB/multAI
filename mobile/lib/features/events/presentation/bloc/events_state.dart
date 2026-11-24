@@ -26,11 +26,39 @@ class EventsOffline extends EventsState {
   EventsOffline({this.cachedEvents = const []});
 }
 
-class JoinEventSuccess extends EventsState {}
-
 class EventsFailure extends EventsState {
   final ErrorPresentation errorPresentation;
   EventsFailure({required this.errorPresentation});
 }
 
-class JoinEventLoading extends EventsState {}
+// Join flow states extend EventsLoaded so the events list (and the rest of the
+// screen) stays visible while joining or when the code is rejected.
+class JoinEventLoading extends EventsLoaded {
+  JoinEventLoading({
+    super.activeEvents = const [],
+    super.archivedEvents = const [],
+    super.isOffline = false,
+    super.isRefreshing = false,
+  });
+}
+
+class JoinEventSuccess extends EventsLoaded {
+  JoinEventSuccess({
+    super.activeEvents = const [],
+    super.archivedEvents = const [],
+    super.isOffline = false,
+    super.isRefreshing = false,
+  });
+}
+
+class JoinEventFailure extends EventsLoaded {
+  final ErrorPresentation errorPresentation;
+
+  JoinEventFailure({
+    required this.errorPresentation,
+    super.activeEvents = const [],
+    super.archivedEvents = const [],
+    super.isOffline = false,
+    super.isRefreshing = false,
+  });
+}

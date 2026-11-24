@@ -14,7 +14,6 @@ import 'package:multai_mobile/features/auth/domain/repositories/auth_repository.
 import 'package:multai_mobile/features/auth/domain/usecases/get_me_usecase.dart';
 import 'package:multai_mobile/features/auth/domain/usecases/login_usecase.dart';
 import 'package:multai_mobile/features/auth/domain/usecases/logout_usecase.dart';
-import 'package:multai_mobile/features/auth/domain/usecases/refresh_token_usecase.dart';
 import 'package:multai_mobile/features/auth/domain/usecases/register_usecase.dart';
 import 'package:multai_mobile/features/auth/domain/usecases/resend_otp_usecase.dart';
 import 'package:multai_mobile/features/auth/domain/usecases/verify_register_usecase.dart';
@@ -29,8 +28,6 @@ class MockVerifyRegisterUseCase extends Mock implements VerifyRegisterUseCase {}
 class MockLoginUseCase extends Mock implements LoginUseCase {}
 
 class MockLogoutUseCase extends Mock implements LogoutUseCase {}
-
-class MockRefreshTokenUseCase extends Mock implements RefreshTokenUseCase {}
 
 class MockGetCurrentUserUseCase extends Mock implements GetCurrentUserUseCase {}
 
@@ -48,7 +45,6 @@ void main() {
   late MockLoginUseCase loginUseCase;
   late MockResendOtpUseCase resendOtpUseCase;
   late MockLogoutUseCase logoutUseCase;
-  late MockRefreshTokenUseCase refreshTokenUseCase;
   late MockGetCurrentUserUseCase getCurrentUserUseCase;
   late MockCheckEnrollmentDoneUseCase checkEnrollmentDoneUseCase;
   late MockPushNotificationService pushNotificationService;
@@ -76,7 +72,6 @@ void main() {
         otp: '123456',
       ),
     );
-    registerFallbackValue(RefreshTokenParams(refreshToken: 'token'));
     registerFallbackValue(NoParams());
   });
 
@@ -90,7 +85,6 @@ void main() {
     loginUseCase = MockLoginUseCase();
     resendOtpUseCase = MockResendOtpUseCase();
     logoutUseCase = MockLogoutUseCase();
-    refreshTokenUseCase = MockRefreshTokenUseCase();
     getCurrentUserUseCase = MockGetCurrentUserUseCase();
     checkEnrollmentDoneUseCase = MockCheckEnrollmentDoneUseCase();
     pushNotificationService = MockPushNotificationService();
@@ -105,8 +99,8 @@ void main() {
       resendOtpUseCase: resendOtpUseCase,
       verifyRegisterUseCase: verifyRegisterUseCase,
       logoutUseCase: logoutUseCase,
-      refreshTokenUseCase: refreshTokenUseCase,
       getCurrentUserUseCase: getCurrentUserUseCase,
+      checkEnrollmentDoneUseCase: checkEnrollmentDoneUseCase,
       pushNotificationService: pushNotificationService,
     );
   });

@@ -23,13 +23,13 @@ class AlbumPhotoGrid extends StatelessWidget {
             Icon(
               Icons.add_photo_alternate_outlined,
               size: context.iconSize() * 3,
-              color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
+              color: context.colors.secondaryText.withValues(alpha: 0.4),
             ),
             const SizedBox(height: 16),
             Text(
               'This album is empty',
               style: TextStyle(
-                color: AppTheme.secondaryTextColor,
+                color: context.colors.secondaryText,
                 fontSize: 16,
               ),
             ),
@@ -53,10 +53,10 @@ class AlbumPhotoGrid extends StatelessWidget {
             File(photoPaths[index]),
             fit: BoxFit.cover,
             errorBuilder: (context, error, stack) => Container(
-              color: AppTheme.surfaceColor,
+              color: context.colors.surface,
               child: Icon(
                 Icons.broken_image_outlined,
-                color: AppTheme.secondaryTextColor,
+                color: context.colors.secondaryText,
               ),
             ),
           ),

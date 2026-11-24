@@ -23,13 +23,13 @@ class OnboardingItem {
     final pool = AppImages.onboardingImages;
     if (pool.isEmpty) return [];
 
-    final random = Random();
+    final random = Random.secure();
     final shuffled = List<String>.of(pool)..shuffle(random);
     final images = shuffled.take(count.clamp(0, shuffled.length)).toList();
 
     final safe = images.length >= 3
         ? images
-        : [...images, ...images, ...images].take(3).toList();
+        : List.generate(3, (i) => images[i % images.length]);
 
     return [
       OnboardingItem(

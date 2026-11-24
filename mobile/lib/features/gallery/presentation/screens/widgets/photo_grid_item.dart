@@ -48,7 +48,7 @@ class PhotoGridItem extends StatelessWidget {
 
   Widget _loading(BuildContext context) {
     return Container(
-      color: AppTheme.surfaceColor,
+      color: context.colors.surface,
       child: Center(
         child: SizedBox(
           width: context.widthCalculated(20),
@@ -64,10 +64,10 @@ class PhotoGridItem extends StatelessWidget {
 
   Widget _placeholder(BuildContext context) {
     return Container(
-      color: AppTheme.surfaceColor,
+      color: context.colors.surface,
       child: Icon(
         Icons.image_outlined,
-        color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
+        color: context.colors.secondaryText.withValues(alpha: 0.4),
         size: context.iconSize() * 1.5,
       ),
     );

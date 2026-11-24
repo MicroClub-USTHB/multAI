@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class ProfileSection extends StatelessWidget {
   final String name;
   final String email;
   final String membershipType;
   final String? avatarUrl;
+  final String? avatarCacheKey;
+  final Map<String, String>? avatarHeaders;
   final VoidCallback? onAvatarTap;
   final VoidCallback? onEditName;
   final bool isUploading;
@@ -20,6 +22,8 @@ class ProfileSection extends StatelessWidget {
     required this.email,
     required this.membershipType,
     this.avatarUrl,
+    this.avatarCacheKey,
+    this.avatarHeaders,
     this.onAvatarTap,
     this.onEditName,
     this.isUploading = false,
@@ -51,26 +55,37 @@ class ProfileSection extends StatelessWidget {
                   ),
                   child: avatarUrl != null
                       ? ClipOval(
-                          child: CachedNetworkImage(
-                            imageUrl: avatarUrl!,
+                          child: ExtendedImage.network(
+                            avatarUrl!,
+                            headers: avatarHeaders,
+                            cacheKey: avatarCacheKey,
                             fit: BoxFit.cover,
-                            memCacheWidth: 120,
-                            memCacheHeight: 120,
-                            placeholder: (_, _) => Center(
-                              child: SizedBox(
-                                width: context.widthCalculated(24),
-                                height: context.widthCalculated(24),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: cs.primary,
-                                ),
-                              ),
-                            ),
-                            errorWidget: (_, _, _) => Icon(
-                              Icons.person,
-                              size: context.widthCalculated(48),
-                              color: AppThemeColors.secondaryText,
-                            ),
+                            cache: true,
+                            cacheWidth: 512,
+                            cacheHeight: 512,
+                            loadStateChanged: (state) {
+                              switch (state.extendedImageLoadState) {
+                                case LoadState.loading:
+                                  return Center(
+                                    child: SizedBox(
+                                      width: context.widthCalculated(24),
+                                      height: context.widthCalculated(24),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: cs.primary,
+                                      ),
+                                    ),
+                                  );
+                                case LoadState.failed:
+                                  return Icon(
+                                    Icons.person,
+                                    size: context.widthCalculated(48),
+                                    color: context.colors.secondaryText,
+                                  );
+                                case LoadState.completed:
+                                  return null;
+                              }
+                            },
                           ),
                         )
                       : CircleAvatar(
@@ -81,7 +96,7 @@ class ProfileSection extends StatelessWidget {
                           child: Icon(
                             Icons.person,
                             size: context.widthCalculated(48),
-                            color: AppThemeColors.secondaryText,
+                            color: context.colors.secondaryText,
                           ),
                         ),
                 ),

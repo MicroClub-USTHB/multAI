@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/constants/storage_keys.dart';
@@ -35,6 +37,11 @@ class AuthRepositoryImpl implements AuthRepository {
       StorageKeys.refreshToken,
       result.refreshToken,
     );
+    // Remember which account the device-local data (albums, caches) belongs
+    // to, so a different account signing in on this device never reads it.
+    if (result.userId.isNotEmpty) {
+      await localStorage.setString(StorageKeys.currentUserId, result.userId);
+    }
   }
 
   Future<void> _clearTokens() async {
@@ -191,20 +198,48 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, void>> logout() async {
+    // Local-first: capture the token for the server call, then clear the
+    // local session immediately. The remote revocation must never gate the
+    // sign-out UI (it used to wait up to the full request timeout).
+    var accessToken = apiClient.currentAccessToken;
     try {
-      await remoteDataSource.logout();
+      accessToken ??= await _loadAccessToken();
       await _clearTokens();
       await localDataSource.clearCachedMe();
-      return const Right(null);
-    } on Failure {
-      await _clearTokens();
-      await localDataSource.clearCachedMe();
-      return const Right(null);
+      await _clearAccountScopedCache();
     } catch (e) {
-      await _clearTokens();
-      await localDataSource.clearCachedMe();
-      return const Right(null);
+      FailureHandler.instance.logFailure(
+        UnknownFailure('Failed to clear local session: $e'),
+        'AuthRepository',
+      );
+      apiClient.clearAccessToken();
     }
+    unawaited(_revokeRemoteSession(accessToken));
+    return const Right(null);
+  }
+
+  /// Clears per-account local state that would otherwise leak into the next
+  /// account signed in on this device: cached profile/avatar, cached events
+  /// and approvals, and the face-enrollment flag (which is device-wide, so a
+  /// new account would otherwise inherit the previous account's enrollment).
+  Future<void> _clearAccountScopedCache() async {
+    await localStorage.remove(StorageKeys.currentUserId);
+    await localStorage.remove(StorageKeys.faceEnrollmentDone);
+    await localStorage.remove(StorageKeys.cachedEvents);
+    await localStorage.remove(StorageKeys.galleryCacheManifest);
+    await localStorage.removeSecure(StorageKeys.cachedAccount);
+    await localStorage.removeSecure(StorageKeys.cachedApprovals);
+  }
+
+  /// Best-effort server-side revocation using the token captured before the
+  /// local session was cleared. Failures are ignored: the user is already out.
+  Future<void> _revokeRemoteSession(String? accessToken) async {
+    if (accessToken == null || accessToken.isEmpty) return;
+    try {
+      await remoteDataSource
+          .logout(accessToken: accessToken)
+          .timeout(const Duration(seconds: 5));
+    } catch (_) {}
   }
 
   @override
@@ -212,6 +247,9 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final result = await remoteDataSource.getMe();
       await localDataSource.cacheMe(result);
+      if (result.id.isNotEmpty) {
+        await localStorage.setString(StorageKeys.currentUserId, result.id);
+      }
       return Right(result);
     } on Failure catch (f) {
       FailureHandler.instance.logFailure(f, 'AuthRepository');

@@ -34,12 +34,6 @@ class LoginRequested extends AuthEvent {
   LoginRequested({required this.email, required this.password});
 }
 
-class RefreshTokenRequested extends AuthEvent {
-  final String refreshToken;
-
-  RefreshTokenRequested({required this.refreshToken});
-}
-
 class LogoutRequested extends AuthEvent {}
 
 class GetCurrentUserRequested extends AuthEvent {}

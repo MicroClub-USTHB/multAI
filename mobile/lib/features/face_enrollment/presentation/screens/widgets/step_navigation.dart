@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'package:multai_mobile/l10n/app_localizations.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class StepNavigation extends StatelessWidget {
   final bool canGoPrevious;
@@ -45,9 +45,9 @@ class StepNavigation extends StatelessWidget {
         vertical: 12,
       ),
       decoration: BoxDecoration(
-        color: AppThemeColors.background,
+        color: context.colors.background,
         border: Border(
-          top: BorderSide(color: AppThemeColors.divider.withValues(alpha: 0.3)),
+          top: BorderSide(color: context.colors.divider.withValues(alpha: 0.3)),
         ),
       ),
       child: SafeArea(
@@ -126,13 +126,13 @@ class StepNavigation extends StatelessWidget {
                         onPressed: canSubmit ? onSubmit : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: canSubmit
-                              ? AppThemeColors.primaryAccent
-                              : AppThemeColors.enrollDisabled,
+                              ? context.colors.primaryAccent
+                              : context.colors.enrollDisabled,
                           foregroundColor: canSubmit
                               ? Colors.black
                               : Colors.white,
                           disabledBackgroundColor:
-                              AppThemeColors.enrollDisabled,
+                              context.colors.enrollDisabled,
                           disabledForegroundColor: Colors.white.withValues(
                             alpha: 0.6,
                           ),
@@ -187,13 +187,13 @@ class StepNavigation extends StatelessWidget {
                         onPressed: canGoNext && !isSubmitting ? onNext : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: canGoNext
-                              ? AppThemeColors.primaryAccent
-                              : AppThemeColors.enrollDisabled,
+                              ? context.colors.primaryAccent
+                              : context.colors.enrollDisabled,
                           foregroundColor: canGoNext
                               ? Colors.black
                               : Colors.white,
                           disabledBackgroundColor:
-                              AppThemeColors.enrollDisabled,
+                              context.colors.enrollDisabled,
                           disabledForegroundColor: Colors.white.withValues(
                             alpha: 0.6,
                           ),

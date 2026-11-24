@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import '../../../../../core/extensions/context_extensions.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class DecisionTile extends StatelessWidget {
   final String photoId;
@@ -21,12 +21,12 @@ class DecisionTile extends StatelessWidget {
     final tt = context.textTheme;
 
     final badgeColor = isApproved
-        ? AppThemeColors.success.withValues(alpha: 0.15)
-        : AppThemeColors.error.withValues(alpha: 0.15);
+        ? context.colors.success.withValues(alpha: 0.15)
+        : context.colors.error.withValues(alpha: 0.15);
 
     final badgeTextColor = isApproved
-        ? AppThemeColors.success
-        : AppThemeColors.error;
+        ? context.colors.success
+        : context.colors.error;
 
     return Container(
       margin: EdgeInsets.only(bottom: context.heightCalculated(8)),
@@ -35,7 +35,7 @@ class DecisionTile extends StatelessWidget {
         vertical: context.heightCalculated(12),
       ),
       decoration: BoxDecoration(
-        color: AppThemeColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
       ),
       child: Row(
@@ -46,11 +46,11 @@ class DecisionTile extends StatelessWidget {
             child: Container(
               width: context.widthCalculated(48),
               height: context.widthCalculated(48),
-              color: AppThemeColors.card,
+              color: context.colors.card,
               child: Icon(
                 Icons.image_outlined,
                 size: context.iconSize(),
-                color: AppThemeColors.secondaryText,
+                color: context.colors.secondaryText,
               ),
             ),
           ),
@@ -64,7 +64,7 @@ class DecisionTile extends StatelessWidget {
                 Text(
                   'Photo #${photoId.substring(0, 8)}',
                   style: tt.titleSmall?.copyWith(
-                    color: AppThemeColors.primaryText,
+                    color: context.colors.primaryText,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -73,7 +73,7 @@ class DecisionTile extends StatelessWidget {
                   Text(
                     _timeAgo(decidedAt!),
                     style: tt.labelSmall?.copyWith(
-                      color: AppThemeColors.secondaryText,
+                      color: context.colors.secondaryText,
                     ),
                   ),
                 ],

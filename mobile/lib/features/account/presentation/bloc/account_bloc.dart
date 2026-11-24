@@ -1,11 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 
 import '../../../../core/errors/failure_handler.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/error_presentation.dart';
 import '../../../../features/notifications/services/push_notification_service.dart';
 import '../../../../features/auth/utils/device_utils.dart';
+import '../../domain/entities/account_entity.dart';
 import '../../domain/usecases/get_account_data_usecase.dart';
 import '../../domain/usecases/upload_avatar_usecase.dart';
 import '../../domain/usecases/update_profile_usecase.dart';
@@ -58,21 +61,28 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
     final result = await _getAccountData(NoParams());
 
-    result.fold(
-      (failure) {
-        _failureHandler.logFailure(failure, 'AccountBloc');
-        emit(
-          AccountError(
-            errorPresentation: _failureHandler.getErrorPresentation(failure),
-          ),
-        );
-      },
-      (account) => emit(
-        AccountLoaded(
-          name: account.name,
-          email: account.email,
-          avatarUrl: account.avatarUrl,
+    result.fold((failure) {
+      _failureHandler.logFailure(failure, 'AccountBloc');
+      emit(
+        AccountError(
+          errorPresentation: _failureHandler.getErrorPresentation(failure),
         ),
+      );
+    }, (account) => _emitLoaded(account, emit));
+  }
+
+  Future<void> _emitLoaded(
+    AccountEntity account,
+    Emitter<AccountState> emit,
+  ) async {
+    final stats = await _photoCacheService.getStats();
+    emit(
+      AccountLoaded(
+        name: account.name,
+        email: account.email,
+        avatarUrl: account.avatarUrl,
+        cacheSize: stats.formattedSize,
+        cacheFiles: stats.fileCount,
       ),
     );
   }
@@ -87,34 +97,60 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   ) async {
     emit(AccountLoading());
 
-    await _pushNotificationService.revokeToken();
+    // Best-effort cleanup must not delay the visible sign-out. The push token
+    // revoke is started first so it can still use the in-memory access token;
+    // the local session is cleared right after, and the photo cache is purged
+    // in the background once navigation has been requested.
+    unawaited(_revokePushTokenQuietly());
     final result = await _logoutUseCase(NoParams());
+    result.fold(
+      (failure) => _failureHandler.logFailure(failure, 'AccountBloc'),
+      (_) {},
+    );
     await DeviceUtils.clearDeviceId();
-    await _photoCacheService.clearCache();
 
-    result.fold((failure) {
-      _failureHandler.logFailure(failure, 'AccountBloc');
-      emit(
-        AccountError(
-          errorPresentation: _failureHandler.getErrorPresentation(failure),
-        ),
-      );
-    }, (_) => emit(AccountLoggedOut()));
+    if (emit.isDone) return;
+    emit(AccountLoggedOut());
+    unawaited(_clearPhotoCacheQuietly());
+  }
+
+  Future<void> _revokePushTokenQuietly() async {
+    try {
+      await _pushNotificationService.revokeToken();
+    } catch (_) {}
+  }
+
+  Future<void> _clearPhotoCacheQuietly() async {
+    try {
+      await _photoCacheService.clearCache();
+    } catch (_) {}
   }
 
   Future<void> _onClearImageCache(
     ClearImageCacheRequested event,
     Emitter<AccountState> emit,
   ) async {
+    final previous = state;
     emit(AccountCacheClearing());
     try {
       final before = await _photoCacheService.getStats();
       await _photoCacheService.clearCache();
+      // Photo-cache only covers gallery images. Avatar/network images live in
+      // extended_image's own disk + memory caches, so clear those too.
+      try {
+        clearMemoryImageCache();
+        await clearDiskCachedImages();
+      } catch (_) {}
       emit(
         AccountCacheCleared(
           storageFreed: before.formattedSize,
           filesRemoved: before.fileCount,
         ),
+      );
+      emit(
+        previous is AccountLoaded
+            ? previous.copyWith(cacheSize: '0 B', cacheFiles: 0)
+            : AccountInitial(),
       );
     } catch (e) {
       _failureHandler.logFailure(
@@ -142,6 +178,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           name: current.name,
           email: current.email,
           avatarUrl: current.avatarUrl,
+          avatarCacheKey: current.avatarCacheKey,
         ),
       );
     }
@@ -163,9 +200,33 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         );
       },
       (avatarUrl) async {
-        await CachedNetworkImage.evictFromCache(avatarUrl);
+        final previousCacheKey = current is AccountLoaded
+            ? current.avatarCacheKey
+            : null;
+        // This must exactly match the provider used by ProfileSection. The
+        // previous bare provider used `cache: false` and no resize key, so it
+        // could not evict the decoded, cached 512x512 avatar that was on
+        // screen after an upload to the same URL.
+        await ExtendedResizeImage.resizeIfNeeded(
+          cacheWidth: 512,
+          cacheHeight: 512,
+          provider: ExtendedNetworkImageProvider(
+            avatarUrl,
+            cache: true,
+            cacheKey: previousCacheKey,
+          ),
+        ).evict();
+        await clearDiskCachedImage(avatarUrl, cacheKey: previousCacheKey);
         if (current is AccountLoaded) {
-          emit(current.copyWith(avatarUrl: avatarUrl));
+          emit(
+            current.copyWith(
+              avatarUrl: avatarUrl,
+              // The API always returns the same image endpoint. Changing the
+              // client cache key makes the visible avatar resolve fresh bytes
+              // immediately after every successful replacement.
+              avatarCacheKey: DateTime.now().microsecondsSinceEpoch.toString(),
+            ),
+          );
         }
       },
     );
@@ -182,6 +243,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           name: current.name,
           email: current.email,
           avatarUrl: current.avatarUrl,
+          avatarCacheKey: current.avatarCacheKey,
         ),
       );
     }

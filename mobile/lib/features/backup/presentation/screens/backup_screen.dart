@@ -42,15 +42,15 @@ class _BackupView extends StatelessWidget {
         final cs = context.theme.colorScheme;
 
         return Scaffold(
-          backgroundColor: AppTheme.backgroundColor,
+          backgroundColor: context.colors.background,
           appBar: AppBar(
-            backgroundColor: AppTheme.backgroundColor,
+            backgroundColor: context.colors.background,
             elevation: 0,
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back_ios,
                 size: context.iconSize(),
-                color: AppTheme.primaryTextColor,
+                color: context.colors.primaryText,
               ),
               onPressed: () => context.pop(),
             ),
@@ -64,14 +64,10 @@ class _BackupView extends StatelessWidget {
                   ),
                 )
               : state is BackupCompleted
-                  ? _buildCompleted(context, state, cs)
-                  : state is BackupLoading
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            color: cs.primary,
-                          ),
-                        )
-                      : _buildContent(context, state, cs),
+              ? _buildCompleted(context, state, cs)
+              : state is BackupLoading
+              ? Center(child: CircularProgressIndicator(color: cs.primary))
+              : _buildContent(context, state, cs),
         );
       },
     );
@@ -83,8 +79,7 @@ class _BackupView extends StatelessWidget {
     ColorScheme cs,
   ) {
     final tt = context.textTheme;
-    final photoCount =
-        state is BackupInfoLoaded ? state.photoCount : 0;
+    final photoCount = state is BackupInfoLoaded ? state.photoCount : 0;
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
@@ -115,7 +110,7 @@ class _BackupView extends StatelessWidget {
           Text(
             'Download Your Photos',
             style: tt.headlineMedium?.copyWith(
-              color: AppTheme.primaryTextColor,
+              color: context.colors.primaryText,
             ),
             textAlign: TextAlign.center,
           ),
@@ -123,9 +118,7 @@ class _BackupView extends StatelessWidget {
           Text(
             'Create a ZIP archive of all your cached photos. '
             'You can share it or save it to your device.',
-            style: tt.bodyMedium?.copyWith(
-              color: AppTheme.secondaryTextColor,
-            ),
+            style: tt.bodyMedium?.copyWith(color: context.colors.secondaryText),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.heightCalculated(32)),
@@ -145,8 +138,7 @@ class _BackupView extends StatelessWidget {
                 backgroundColor: cs.primary,
                 disabledBackgroundColor: cs.primary.withValues(alpha: 0.3),
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppThemeMetrics.radiusMd),
+                  borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
                 ),
               ),
               child: Row(
@@ -179,9 +171,7 @@ class _BackupView extends StatelessWidget {
           if (photoCount == 0)
             Text(
               'No cached photos to backup. Photos are cached when you view them in the gallery.',
-              style: tt.bodySmall?.copyWith(
-                color: AppTheme.hintTextColor,
-              ),
+              style: tt.bodySmall?.copyWith(color: context.colors.hintText),
               textAlign: TextAlign.center,
             ),
         ],
@@ -211,13 +201,13 @@ class _BackupView extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(context.widthCalculated(24)),
               decoration: BoxDecoration(
-                color: AppThemeColors.success.withValues(alpha: 0.15),
+                color: context.colors.success.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.check_circle_outline,
                 size: context.iconSize() * 2.5,
-                color: AppThemeColors.success,
+                color: context.colors.success,
               ),
             ),
           ),
@@ -226,23 +216,21 @@ class _BackupView extends StatelessWidget {
           Text(
             'Backup Ready!',
             style: tt.headlineMedium?.copyWith(
-              color: AppTheme.primaryTextColor,
+              color: context.colors.primaryText,
             ),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.heightCalculated(8)),
           Text(
             '${state.photoCount} photos · $fileSizeStr',
-            style: tt.bodyMedium?.copyWith(
-              color: AppTheme.secondaryTextColor,
-            ),
+            style: tt.bodyMedium?.copyWith(color: context.colors.secondaryText),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: context.heightCalculated(8)),
           Text(
             state.zipFile.path.split('/').last,
             style: tt.bodySmall?.copyWith(
-              color: AppTheme.hintTextColor,
+              color: context.colors.hintText,
               fontFamily: 'monospace',
             ),
             textAlign: TextAlign.center,
@@ -253,14 +241,13 @@ class _BackupView extends StatelessWidget {
           SizedBox(
             height: context.heightCalculated(56),
             child: FilledButton(
-              onPressed: () => context
-                  .read<BackupBloc>()
-                  .add(ShareBackup(zipFile: state.zipFile)),
+              onPressed: () => context.read<BackupBloc>().add(
+                ShareBackup(zipFile: state.zipFile),
+              ),
               style: FilledButton.styleFrom(
                 backgroundColor: cs.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppThemeMetrics.radiusMd),
+                  borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
                 ),
               ),
               child: Row(
@@ -289,13 +276,11 @@ class _BackupView extends StatelessWidget {
           SizedBox(
             height: context.heightCalculated(56),
             child: OutlinedButton(
-              onPressed: () =>
-                  context.read<BackupBloc>().add(LoadBackupInfo()),
+              onPressed: () => context.read<BackupBloc>().add(LoadBackupInfo()),
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: cs.primary),
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppThemeMetrics.radiusMd),
+                  borderRadius: BorderRadius.circular(AppThemeMetrics.radiusMd),
                 ),
               ),
               child: Text(

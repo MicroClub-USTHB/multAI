@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/features/face_enrollment/domain/entities/face_photo_entity.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class StepInstructions extends StatelessWidget {
   final FacePhotoType type;
@@ -25,7 +25,7 @@ class StepInstructions extends StatelessWidget {
                 child: Icon(
                   Icons.check_circle_outline,
                   size: 14,
-                  color: AppThemeColors.success,
+                  color: context.colors.success,
                 ),
               ),
               const SizedBox(width: 6),
@@ -33,7 +33,7 @@ class StepInstructions extends StatelessWidget {
                 child: Text(
                   tip,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: AppThemeColors.secondaryText,
+                    color: context.colors.secondaryText,
                     height: 1.3,
                   ),
                 ),

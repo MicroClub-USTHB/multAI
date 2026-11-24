@@ -10,3 +10,5 @@ class JoinEventRequested extends EventsEvent {
 }
 
 class EventsRetryRequested extends EventsEvent {}
+
+class ResetEvents extends EventsEvent {}

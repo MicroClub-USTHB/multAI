@@ -8,10 +8,10 @@ import '../../../../core/errors/error_presentation.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import '../bloc/notifications_bloc.dart';
 import '../../domain/entities/notification_entity.dart';
 import '../widgets/notification_card.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -48,16 +48,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         final cs = context.theme.colorScheme;
 
         return Scaffold(
-          backgroundColor: AppThemeColors.background,
+          backgroundColor: context.colors.background,
           appBar: AppBar(
-            backgroundColor: AppThemeColors.background,
+            backgroundColor: context.colors.background,
             elevation: 0,
             centerTitle: true,
             title: Text(
               'Notifications',
               style: tt.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppThemeColors.primaryText,
+                color: context.colors.primaryText,
               ),
             ),
             actions: [
@@ -182,19 +182,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           Icon(
             Icons.notifications_none_outlined,
             size: context.iconSize() * 3,
-            color: AppThemeColors.secondaryText.withValues(alpha: 0.4),
+            color: context.colors.secondaryText.withValues(alpha: 0.4),
           ),
           SizedBox(height: context.heightCalculated(16)),
           Text(
             'No notifications yet',
             style: tt.titleMedium?.copyWith(
-              color: AppThemeColors.secondaryText,
+              color: context.colors.secondaryText,
             ),
           ),
           SizedBox(height: context.heightCalculated(8)),
           Text(
             "We'll notify you when something happens",
-            style: tt.bodySmall?.copyWith(color: AppThemeColors.hintText),
+            style: tt.bodySmall?.copyWith(color: context.colors.hintText),
           ),
         ],
       ),

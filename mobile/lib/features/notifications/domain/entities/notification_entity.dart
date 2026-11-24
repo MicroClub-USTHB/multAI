@@ -56,7 +56,11 @@ class NotificationEntity {
   bool get isRead => readAt != null;
 
   String get title => payload['title'] as String? ?? type.label;
-  String get body => payload['body'] as String? ?? '';
+  // The backend stores the human-readable text under `message` (see
+  // app/service/stats.py), while push payloads use `body`. Accept either so
+  // notification text is not silently dropped.
+  String get body =>
+      payload['body'] as String? ?? payload['message'] as String? ?? '';
 
   NotificationEntity copyWith({
     String? id,

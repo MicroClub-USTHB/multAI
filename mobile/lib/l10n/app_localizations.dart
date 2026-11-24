@@ -609,6 +609,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'mc-member'**
   String get mcMember;
+
+  /// No description provided for @changeProfilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change profile photo'**
+  String get changeProfilePhoto;
+
+  /// No description provided for @photoUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t update your photo. Please try again.'**
+  String get photoUpdateFailed;
 }
 
 class _AppLocalizationsDelegate

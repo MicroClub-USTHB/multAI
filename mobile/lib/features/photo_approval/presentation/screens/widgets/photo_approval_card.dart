@@ -6,10 +6,10 @@ import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../di/injection_container.dart';
 import '../../../../gallery/domain/usecases/get_photo_image_usecase.dart';
 
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
 import 'decision_action_buttons.dart';
 import 'info_banner.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class PhotoApprovalCard extends StatelessWidget {
   final PhotoApprovalEntity approval;
@@ -33,9 +33,9 @@ class PhotoApprovalCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(context.widthCalculated(16)),
       decoration: BoxDecoration(
-        color: AppThemeColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppThemeMetrics.radiusLg),
-        border: Border.all(color: AppThemeColors.inputBorder, width: 0.5),
+        border: Border.all(color: context.colors.inputBorder, width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,13 +46,13 @@ class PhotoApprovalCard extends StatelessWidget {
               Icon(
                 Icons.verified_outlined,
                 size: context.iconSize() * 0.85,
-                color: AppThemeColors.warning,
+                color: context.colors.warning,
               ),
               SizedBox(width: context.widthCalculated(6)),
               Text(
                 'PHOTO APPROVAL',
                 style: tt.labelSmall?.copyWith(
-                  color: AppThemeColors.warning,
+                  color: context.colors.warning,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
                 ),
@@ -77,7 +77,7 @@ class PhotoApprovalCard extends StatelessWidget {
             'You appeared in this photo',
             style: tt.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: AppThemeColors.primaryText,
+              color: context.colors.primaryText,
             ),
             textAlign: TextAlign.center,
           ),
@@ -145,7 +145,7 @@ class _ApprovalPhotoState extends State<_ApprovalPhoto> {
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return Container(
-            color: AppThemeColors.card,
+            color: context.colors.card,
             child: Center(
               child: CircularProgressIndicator(
                 color: context.theme.colorScheme.primary,
@@ -157,11 +157,11 @@ class _ApprovalPhotoState extends State<_ApprovalPhoto> {
         final path = snapshot.data;
         if (path == null) {
           return Container(
-            color: AppThemeColors.card,
+            color: context.colors.card,
             child: Icon(
               Icons.image_outlined,
               size: context.iconSize() * 3,
-              color: AppThemeColors.secondaryText.withValues(alpha: 0.3),
+              color: context.colors.secondaryText.withValues(alpha: 0.3),
             ),
           );
         }
@@ -170,11 +170,11 @@ class _ApprovalPhotoState extends State<_ApprovalPhoto> {
           File(path),
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) => Container(
-            color: AppThemeColors.card,
+            color: context.colors.card,
             child: Icon(
               Icons.image_outlined,
               size: context.iconSize() * 3,
-              color: AppThemeColors.secondaryText.withValues(alpha: 0.3),
+              color: context.colors.secondaryText.withValues(alpha: 0.3),
             ),
           ),
         );

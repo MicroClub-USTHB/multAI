@@ -31,6 +31,7 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     on<GetUserEventsRequested>(_onGetUserEvents);
     on<JoinEventRequested>(_onJoinEvent);
     on<EventsRetryRequested>(_onEventsRetry);
+    on<ResetEvents>(_onResetEvents);
     _connectivitySub = _connectivityService.onStatusChanged.listen((online) {
       if (!online) return;
       if (state is EventsFailure ||
@@ -108,24 +109,50 @@ class EventsBloc extends Bloc<EventsEvent, EventsState> {
     JoinEventRequested event,
     Emitter<EventsState> emit,
   ) async {
-    emit(JoinEventLoading());
+    final previous = state is EventsLoaded ? state as EventsLoaded : null;
+    emit(
+      JoinEventLoading(
+        activeEvents: previous?.activeEvents ?? const [],
+        archivedEvents: previous?.archivedEvents ?? const [],
+        isOffline: previous?.isOffline ?? false,
+        isRefreshing: previous?.isRefreshing ?? false,
+      ),
+    );
     final result = await _joinEventUseCase(
       JoinEventParams(eventCode: event.eventCode),
     );
     result.fold(
       (failure) {
         _failureHandler.logFailure(failure, 'EventsBloc');
+        final current = state is EventsLoaded
+            ? state as EventsLoaded
+            : previous;
         emit(
-          EventsFailure(
+          JoinEventFailure(
             errorPresentation: _failureHandler.getErrorPresentation(failure),
+            activeEvents: current?.activeEvents ?? const [],
+            archivedEvents: current?.archivedEvents ?? const [],
+            isOffline: current?.isOffline ?? false,
+            isRefreshing: current?.isRefreshing ?? false,
           ),
         );
       },
       (_) {
-        emit(JoinEventSuccess());
+        emit(
+          JoinEventSuccess(
+            activeEvents: previous?.activeEvents ?? const [],
+            archivedEvents: previous?.archivedEvents ?? const [],
+            isOffline: previous?.isOffline ?? false,
+            isRefreshing: previous?.isRefreshing ?? false,
+          ),
+        );
         add(GetUserEventsRequested());
       },
     );
+  }
+
+  void _onResetEvents(ResetEvents event, Emitter<EventsState> emit) {
+    emit(EventsInitial());
   }
 
   Future<void> _onEventsRetry(

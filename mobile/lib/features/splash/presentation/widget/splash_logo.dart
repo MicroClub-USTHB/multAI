@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:multai_mobile/core/constants/images.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class SplashLogo extends StatelessWidget {
   const SplashLogo({super.key});
@@ -23,7 +23,7 @@ class SplashLogo extends StatelessWidget {
           'Your moments, found automatically',
           textAlign: TextAlign.center,
           style: context.textTheme.bodyMedium?.copyWith(
-            color: AppThemeColors.subtitleText,
+            color: context.colors.subtitleText,
           ),
         ),
       ],

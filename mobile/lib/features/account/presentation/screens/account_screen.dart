@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:multai_mobile/core/cubits/locale_cubit.dart';
@@ -9,15 +10,16 @@ import 'package:multai_mobile/core/errors/error_presentation.dart';
 import 'package:multai_mobile/core/extensions/context_extensions.dart';
 import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
 import 'package:multai_mobile/core/extensions/snackbar_extensions.dart';
+import 'package:multai_mobile/core/network/api_client.dart';
 import 'package:multai_mobile/core/router/app_routes.dart';
 import 'package:multai_mobile/core/widgets/app_error_view.dart';
+import 'package:multai_mobile/di/injection_container.dart' as di;
 import 'package:multai_mobile/features/auth/presentation/blocs/auth_bloc.dart'
     as auth;
 import 'package:multai_mobile/l10n/app_localizations.dart';
 
 import '../bloc/account_bloc.dart';
 import '../widgets/account_app_bar.dart';
-import '../widgets/delete_account_button.dart';
 import '../widgets/logout_button.dart';
 import '../widgets/profile_section.dart';
 import '../widgets/settings_section.dart';
@@ -26,17 +28,76 @@ import '../widgets/settings_tile.dart';
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
+  Future<ImageSource?> _chooseImageSource(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: Text(l10n.camera),
+              onTap: () => Navigator.of(ctx).pop(ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: Text(l10n.galleryPicker),
+              onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _pickAndUploadAvatar(BuildContext context) async {
     final bloc = context.read<AccountBloc>();
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 85,
-      maxWidth: 512,
-      maxHeight: 512,
-    );
-    if (picked == null) return;
-    bloc.add(UploadAvatar(filePath: picked.path));
+    final l10n = AppLocalizations.of(context)!;
+
+    try {
+      final source = await _chooseImageSource(context);
+      if (source == null || !context.mounted) return;
+
+      final picked = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 100,
+        maxWidth: 2048,
+        maxHeight: 2048,
+      );
+      if (picked == null || !context.mounted) return;
+
+      final cropped = await ImageCropper().cropImage(
+        sourcePath: picked.path,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        compressFormat: ImageCompressFormat.jpg,
+        compressQuality: 100,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: l10n.changeProfilePhoto,
+            lockAspectRatio: true,
+            initAspectRatio: CropAspectRatioPreset.square,
+            aspectRatioPresets: const [CropAspectRatioPreset.square],
+            hideBottomControls: true,
+          ),
+          IOSUiSettings(
+            title: l10n.changeProfilePhoto,
+            aspectRatioLockEnabled: true,
+            resetAspectRatioEnabled: false,
+          ),
+        ],
+      );
+      if (cropped == null || !context.mounted) return;
+
+      bloc.add(UploadAvatar(filePath: cropped.path));
+    } catch (_) {
+      if (!context.mounted) return;
+      context.showErrorSnackBar(l10n.photoUpdateFailed);
+    }
   }
 
   void _editName(BuildContext context, String currentName) {
@@ -94,33 +155,6 @@ class AccountScreen extends StatelessWidget {
               backgroundColor: context.theme.colorScheme.error,
             ),
             child: Text(l10n.clear),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _confirmDeleteAccount(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteAccount),
-        content: Text(l10n.deleteAccountConfirmation),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: context.theme.colorScheme.error,
-            ),
-            child: Text(l10n.deleteAccount),
           ),
         ],
       ),
@@ -359,6 +393,7 @@ class AccountScreen extends StatelessWidget {
     BuildContext context,
     AccountState state, {
     String? avatarUrl,
+    String? avatarCacheKey,
     bool isUploading = false,
   }) {
     final name = state is AccountLoaded
@@ -380,10 +415,23 @@ class AccountScreen extends StatelessWidget {
                   : (state is AccountProfileUpdating
                         ? state.avatarUrl
                         : null)));
+    final cacheKey =
+        avatarCacheKey ??
+        (state is AccountLoaded
+            ? state.avatarCacheKey
+            : (state is AccountAvatarUploading
+                  ? state.avatarCacheKey
+                  : (state is AccountProfileUpdating
+                        ? state.avatarCacheKey
+                        : null)));
 
     final l10n = AppLocalizations.of(context)!;
     final themeMode = context.watch<ThemeCubit>().state;
     final currentLocale = context.watch<LocaleCubit>().state;
+    final accessToken = di.sl<ApiClient>().currentAccessToken;
+    final avatarHeaders = accessToken == null
+        ? null
+        : <String, String>{'Authorization': 'Bearer $accessToken'};
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
@@ -399,6 +447,8 @@ class AccountScreen extends StatelessWidget {
             email: email,
             membershipType: l10n.mcMember,
             avatarUrl: url,
+            avatarCacheKey: cacheKey,
+            avatarHeaders: avatarHeaders,
             isUploading: isUploading,
             onAvatarTap: () => _pickAndUploadAvatar(context),
             onEditName: state is AccountProfileUpdating
@@ -460,7 +510,9 @@ class AccountScreen extends StatelessWidget {
               SettingItemData(
                 icon: Icons.cleaning_services_outlined,
                 title: l10n.clearImageCache,
-                subtitle: l10n.freeUpStorage,
+                subtitle: state is AccountLoaded
+                    ? '${l10n.freeUpStorage} · ${state.cacheSize}'
+                    : l10n.freeUpStorage,
                 onTap: () => _confirmClearCache(context),
               ),
             ],
@@ -480,12 +532,10 @@ class AccountScreen extends StatelessWidget {
           ),
           SizedBox(height: context.heightCalculated(32)),
 
-          // ── Logout / Delete ────────────────────────────────────────────
+          // ── Logout ────────────────────────────────────────────
           LogoutButton(
             onPressed: () => context.read<AccountBloc>().add(LogoutRequested()),
           ),
-          SizedBox(height: context.heightCalculated(12)),
-          DeleteAccountButton(onPressed: () => _confirmDeleteAccount(context)),
           SizedBox(height: context.heightCalculated(24)),
         ],
       ),

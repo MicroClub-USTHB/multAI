@@ -10,6 +10,7 @@ import '../../../../core/theme/theme.dart';
 import '../../../gallery/domain/entities/photo_entity.dart';
 import '../../../gallery/presentation/bloc/gallery_bloc.dart';
 import '../../../gallery/presentation/screens/widgets/pictures_grid.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
 
 class EventPhotosScreen extends StatefulWidget {
   final String eventId;
@@ -38,9 +39,9 @@ class _EventPhotosScreenState extends State<EventPhotosScreen> {
     final cs = context.theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.backgroundColor,
+        backgroundColor: context.colors.background,
         elevation: 0,
         title: Text(widget.eventName, style: tt.headlineMedium),
       ),
@@ -87,13 +88,13 @@ class _EventPhotosScreenState extends State<EventPhotosScreen> {
                   Icon(
                     Icons.photo_library_outlined,
                     size: context.iconSize() * 3,
-                    color: AppTheme.secondaryTextColor.withValues(alpha: 0.4),
+                    color: context.colors.secondaryText.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No photos for this event yet',
                     style: tt.titleMedium?.copyWith(
-                      color: AppTheme.secondaryTextColor,
+                      color: context.colors.secondaryText,
                     ),
                   ),
                 ],

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/failure.dart';
@@ -11,10 +13,10 @@ import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/get_me_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
-import '../../domain/usecases/refresh_token_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/resend_otp_usecase.dart';
 import '../../domain/usecases/verify_register_usecase.dart';
+import '../../../face_enrollment/domain/usecases/check_enrollment_done_usecase.dart';
 import '../../utils/device_utils.dart';
 
 part 'auth_event.dart';
@@ -25,9 +27,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase _registerUseCase;
   final ResendOtpUseCase _resendOtpUseCase;
   final VerifyRegisterUseCase _verifyRegisterUseCase;
-  final RefreshTokenUseCase _refreshTokenUseCase;
   final LogoutUseCase _logoutUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
+  final CheckEnrollmentDoneUseCase _checkEnrollmentDoneUseCase;
   final PushNotificationService _pushNotificationService;
   final FailureHandler _failureHandler;
   final Logger _logger;
@@ -41,9 +43,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required RegisterUseCase registerUseCase,
     required ResendOtpUseCase resendOtpUseCase,
     required VerifyRegisterUseCase verifyRegisterUseCase,
-    required RefreshTokenUseCase refreshTokenUseCase,
     required LogoutUseCase logoutUseCase,
     required GetCurrentUserUseCase getCurrentUserUseCase,
+    required CheckEnrollmentDoneUseCase checkEnrollmentDoneUseCase,
     required PushNotificationService pushNotificationService,
     FailureHandler? failureHandler,
     Logger? logger,
@@ -51,9 +53,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _registerUseCase = registerUseCase,
        _resendOtpUseCase = resendOtpUseCase,
        _verifyRegisterUseCase = verifyRegisterUseCase,
-       _refreshTokenUseCase = refreshTokenUseCase,
        _logoutUseCase = logoutUseCase,
        _getCurrentUserUseCase = getCurrentUserUseCase,
+       _checkEnrollmentDoneUseCase = checkEnrollmentDoneUseCase,
        _pushNotificationService = pushNotificationService,
        _failureHandler = failureHandler ?? FailureHandler.instance,
        _logger = logger ?? Logger.create(),
@@ -62,7 +64,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ResendOtpRequested>(_onResendOtpRequested);
     on<VerifyOtpRequested>(_onVerifyOtpRequested);
     on<LoginRequested>(_onLoginRequested);
-    on<RefreshTokenRequested>(_onRefreshTokenRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<GetCurrentUserRequested>(_onGetCurrentUserRequested);
     on<ResetAuth>(_onResetAuth);
@@ -72,7 +73,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthEntity auth,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthAuthenticated(auth: auth));
+    // A freshly authenticated user must finish face enrollment before they
+    // reach the app. The flag is device-local, which is why logout clears it
+    // (see AuthRepositoryImpl.logout) so the next account is checked fresh.
+    final enrollmentDone = await _checkEnrollmentDoneUseCase();
+    emit(
+      enrollmentDone
+          ? AuthAuthenticated(auth: auth)
+          : AuthNeedsFaceEnrollment(auth: auth),
+    );
   }
 
   void _emitFailure(Emitter<AuthState> emit, Failure failure) {
@@ -184,45 +193,41 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onRefreshTokenRequested(
-    RefreshTokenRequested event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(AuthLoading());
-    try {
-      final result = await _refreshTokenUseCase(
-        RefreshTokenParams(refreshToken: event.refreshToken),
-      );
-      await result.fold(
-        (failure) async => _emitFailure(emit, failure),
-        (auth) async => _emitAuthenticatedState(auth, emit),
-      );
-    } catch (e, s) {
-      _logger.error('AuthBloc', 'Token refresh failed', e, s);
-      emit(AuthFailure(message: 'Session expired. Please sign in again.'));
-    }
-  }
-
   Future<void> _onLogoutRequested(
     LogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    // Duplicate logout requests (e.g. a 401 racing a manual sign-out) must not
+    // start a second teardown.
+    if (_logoutInFlight) return;
     _logoutInFlight = true;
+    emit(AuthLoading());
+
+    // Push-token revocation is best-effort and runs while the local session is
+    // cleared, so it can never stall sign-out. The local session clear in the
+    // repository is what actually signs the user out.
+    unawaited(_revokePushTokenQuietly());
     try {
-      await _pushNotificationService.revokeToken();
       final result = await _logoutUseCase(NoParams());
+      result.fold(
+        (failure) => _failureHandler.logFailure(failure, 'AuthBloc'),
+        (_) {},
+      );
       await DeviceUtils.clearDeviceId();
-      result.fold((failure) {
-        _failureHandler.logFailure(failure, 'AuthBloc');
-        emit(Unauthenticated());
-      }, (_) => emit(Unauthenticated()));
     } catch (e, s) {
       _logger.error('AuthBloc', 'Logout failed', e, s);
-      emit(Unauthenticated());
     } finally {
       _logoutInFlight = false;
     }
+
+    if (emit.isDone) return;
+    emit(Unauthenticated());
+  }
+
+  Future<void> _revokePushTokenQuietly() async {
+    try {
+      await _pushNotificationService.revokeToken();
+    } catch (_) {}
   }
 
   Future<void> _onGetCurrentUserRequested(

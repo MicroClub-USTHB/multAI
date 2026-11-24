@@ -3,12 +3,13 @@ import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/extensions/responsive_extensions.dart';
 import '../../../../../core/extensions/datetime_extensions.dart';
 import 'package:multai_mobile/core/theme/app_theme_metrics.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors.dart';
-import 'package:multai_mobile/core/theme/app_theme_colors_light.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
+import 'event_cover_image.dart';
 
 class ActiveEventsCard extends StatelessWidget {
   const ActiveEventsCard({
     super.key,
+    required this.eventId,
     required this.eventTitle,
     required this.eventStatus,
     required this.eventDate,
@@ -16,6 +17,7 @@ class ActiveEventsCard extends StatelessWidget {
     this.onTap,
   });
 
+  final String eventId;
   final String eventTitle;
   final String eventStatus;
   final DateTime eventDate;
@@ -25,11 +27,7 @@ class ActiveEventsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = context.textTheme;
-    final isDark = context.theme.brightness == Brightness.dark;
-
-    final borderColor = isDark
-        ? AppThemeColors.border
-        : AppThemeColorsLight.border;
+    final borderColor = context.colors.border;
 
     final dateLabel = endDate != null
         ? '${eventDate.toDisplayDate()} - ${endDate!.toDisplayDate()}'
@@ -48,56 +46,76 @@ class ActiveEventsCard extends StatelessWidget {
           horizontal: context.widthCalculated(AppThemeMetrics.spacingMd),
           vertical: context.heightCalculated(AppThemeMetrics.spacingMd),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Row(
           children: [
-            // ── Title + status ─────────────────────────────────────────
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    eventTitle,
-                    style: tt.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // ── Title + status ───────────────────────────────────
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          eventTitle,
+                          style: tt.titleMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      SizedBox(
+                        width: context.widthCalculated(
+                          AppThemeMetrics.spacingSm,
+                        ),
+                      ),
+                      Text(
+                        eventStatus,
+                        style: tt.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(
-                  width: context.widthCalculated(AppThemeMetrics.spacingSm),
-                ),
-                Text(
-                  eventStatus,
-                  style: tt.labelSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
 
-            // ── Date ────────────────────────────────────────────────────
-            Row(
-              children: [
-                Icon(
-                  Icons.calendar_month,
-                  size: context.iconSize() * 0.8,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-                SizedBox(
-                  width: context.widthCalculated(AppThemeMetrics.spacingXs),
-                ),
-                Expanded(
-                  child: Text(
-                    dateLabel,
-                    style: tt.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                  // ── Date ─────────────────────────────────────────────
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_month,
+                        size: context.iconSize() * 0.8,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant,
+                      ),
+                      SizedBox(
+                        width: context.widthCalculated(
+                          AppThemeMetrics.spacingXs,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          dateLabel,
+                          style: tt.labelSmall?.copyWith(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
+            ),
+            SizedBox(width: context.widthCalculated(AppThemeMetrics.spacingMd)),
+            EventCoverImage(
+              eventId: eventId,
+              width: context.widthCalculated(64),
+              height: context.heightCalculated(64),
             ),
           ],
         ),

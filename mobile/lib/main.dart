@@ -6,10 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'core/cubits/locale_cubit.dart';
 import 'core/cubits/theme_cubit.dart';
-import 'core/errors/error_handler.dart';
-import 'core/errors/error_mapper.dart';
 import 'core/router/app_router.dart';
 import 'core/security/env_validator.dart';
 import 'core/security/device_security.dart';
@@ -18,7 +17,7 @@ import 'core/security/session_manager.dart';
 import 'core/storage/app_local_storage.dart';
 import 'core/theme/theme.dart';
 import 'features/auth/presentation/blocs/auth_bloc.dart';
-import 'features/events/presentation/bloc/events_bloc';
+import 'features/events/presentation/bloc/events_bloc.dart';
 import 'features/account/presentation/bloc/account_bloc.dart';
 import 'features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'features/notifications/services/push_notification_service.dart';
@@ -26,6 +25,7 @@ import 'features/notifications/services/notification_navigation_service.dart';
 import 'features/gallery/presentation/bloc/gallery_bloc.dart';
 import 'di/injection_container.dart' as di;
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 
 late final SessionManager sessionManager;
@@ -33,15 +33,20 @@ late final SessionManager sessionManager;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    // Initialising from the generated options keeps FCM available on builds
+    // that do not ship android/app/google-services.json; without this the
+    // default app is never created and no push token is ever requested.
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint('Firebase initialization skipped: $e');
+  }
 
   if (DeviceSecurity.isDebugMode()) {
     SecureLogger.warning('App', 'Running in debug mode');
   }
-
-  FlutterError.onError = FirebaseCrashlytics.instance.recordError;
 
   _setupGlobalErrorHandlers();
 
@@ -79,11 +84,44 @@ void main() async {
   await pushService.init();
   di.sl<NotificationNavigationService>().init(appRouter);
 
+  await _preloadFonts();
+
   runApp(MyApp());
 }
 
+/// Fonts are bundled under `assets/google_fonts` so the UI never waits for a
+/// network round-trip (or re-lays out text when the font swaps in) on the
+/// onboarding, login or logout screens. Queue the variants used by both
+/// themes, then wait for them before the first frame.
+Future<void> _preloadFonts() async {
+  GoogleFonts.config.allowRuntimeFetching = false;
+  try {
+    for (final weight in const [
+      FontWeight.w400,
+      FontWeight.w500,
+      FontWeight.w600,
+      FontWeight.w700,
+    ]) {
+      GoogleFonts.dmSans(fontWeight: weight);
+      GoogleFonts.raleway(fontWeight: weight);
+    }
+    GoogleFonts.montserrat();
+    GoogleFonts.playfairDisplay();
+    GoogleFonts.playfairDisplay(fontStyle: FontStyle.italic);
+    await GoogleFonts.pendingFonts().timeout(const Duration(seconds: 3));
+  } catch (e) {
+    debugPrint('Font preload skipped: $e');
+  }
+}
+
 void _setupGlobalErrorHandlers() {
-  FlutterError.onError = FirebaseCrashlytics.instance.recordError;
+  FlutterError.onError = (details) {
+    FirebaseCrashlytics.instance.recordError(
+      details.exception,
+      details.stack,
+      fatal: true,
+    );
+  };
 
   PlatformDispatcher.instance.onError = (exception, stackTrace) {
     FirebaseCrashlytics.instance.recordError(

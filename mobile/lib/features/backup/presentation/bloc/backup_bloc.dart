@@ -20,10 +20,10 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
     required CreateBackupUseCase createBackup,
     required BackupRepository repository,
     FailureHandler? failureHandler,
-  })  : _createBackup = createBackup,
-        _repository = repository,
-        _failureHandler = failureHandler ?? FailureHandler.instance,
-        super(BackupInitial()) {
+  }) : _createBackup = createBackup,
+       _repository = repository,
+       _failureHandler = failureHandler ?? FailureHandler.instance,
+       super(BackupInitial()) {
     on<LoadBackupInfo>(_onLoadInfo);
     on<StartBackup>(_onStartBackup);
     on<ShareBackup>(_onShareBackup);
@@ -76,26 +76,33 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
           return;
         }
 
-        emit(BackupProgress(percent: 0.3, photoCount: paths.length));
+        emit(BackupProgress(percent: 0.0, photoCount: paths.length));
 
-        final result = await _createBackup(NoParams());
+        final result = await _createBackup(
+          NoParams(),
+          onProgress: (completed, total) {
+            if (emit.isDone || total == 0) return;
+            emit(
+              BackupProgress(
+                percent: (completed / total).clamp(0.0, 1.0),
+                photoCount: total,
+              ),
+            );
+          },
+        );
 
         result.fold(
           (failure) {
             emit(
               BackupError(
-                errorPresentation:
-                    _failureHandler.getErrorPresentation(failure),
+                errorPresentation: _failureHandler.getErrorPresentation(
+                  failure,
+                ),
               ),
             );
           },
           (zipFile) {
-            emit(
-              BackupCompleted(
-                zipFile: zipFile,
-                photoCount: paths.length,
-              ),
-            );
+            emit(BackupCompleted(zipFile: zipFile, photoCount: paths.length));
           },
         );
       },
@@ -107,10 +114,9 @@ class BackupBloc extends Bloc<BackupEvent, BackupState> {
     Emitter<BackupState> emit,
   ) async {
     try {
-      await Share.shareXFiles(
-        [XFile(event.zipFile.path)],
-        subject: 'MultAI Photo Backup',
-      );
+      await Share.shareXFiles([
+        XFile(event.zipFile.path),
+      ], subject: 'MultAI Photo Backup');
     } catch (e) {
       debugPrint('Share failed: $e');
     }

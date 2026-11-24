@@ -18,38 +18,10 @@ rootProject.layout.buildDirectory.value(newBuildDir)
 subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
-
-    // Force all Android subprojects/plugins to use Java 17.
-    tasks.withType<JavaCompile>().configureEach {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
-    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        compilerOptions {
-            jvmTarget.set(
-                org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
-            )
-        }
-    }
 }
 
 subprojects {
     project.evaluationDependsOn(":app")
-}
-
-gradle.projectsEvaluated {
-    subprojects {
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-            compilerOptions {
-                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
-            }
-        }
-        tasks.withType<JavaCompile>().configureEach {
-            sourceCompatibility = "21"
-            targetCompatibility = "21"
-        }
-    }
 }
 
 tasks.register<Delete>("clean") {

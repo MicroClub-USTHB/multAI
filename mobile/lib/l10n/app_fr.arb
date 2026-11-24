@@ -95,5 +95,7 @@
   "downloadPhotosAsZip": "Télécharger toutes les photos en fichier ZIP",
   "myAlbums": "Mes albums",
   "organizePhotosIntoAlbums": "Organiser les photos en albums",
-  "mcMember": "membre mc"
+  "mcMember": "membre mc",
+  "changeProfilePhoto": "Changer la photo de profil",
+  "photoUpdateFailed": "Impossible de mettre à jour votre photo. Réessayez."
 }
