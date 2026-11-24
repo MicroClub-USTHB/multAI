@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     MINIO_HOST: str
     MINIO_RETRY_ATTEMPTS: int = 3
     MINIO_RETRY_BASE_SECONDS: float = 0.5
+    # Host the BROWSER uses to reach MinIO (e.g. "s3.example.com" or "host:port"),
+    # used only to sign presigned URLs. Empty keeps the internal host in the URLs.
+    MINIO_PUBLIC_ENDPOINT: str = ""
+    MINIO_PUBLIC_SECURE: bool = True
+    # Passed to the signing client so signing never calls the public host.
+    MINIO_REGION: str = "us-east-1"
 
     # PostgreSQL
     POSTGRES_USER: str
