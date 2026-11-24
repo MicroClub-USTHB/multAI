@@ -7,7 +7,6 @@ export type NavLink = {
 };
 
 export type NavData = {
-  isAdmin?: boolean;
   user: {
     name: string;
     avatar: string;

@@ -1,13 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { CheckCircle2 } from 'lucide-react';
 
-import type { SyncInterval } from '@/features/admin/drive/types';
+import type { SyncInterval } from '@/features/multi/drive/types';
 
-import { GoogleDriveAuthCard } from '@/features/admin/drive/components/google-auth-card';
-import { OutputFolderCard } from '@/features/admin/drive/components/output-folder-card';
-import { SyncFrequencyCard } from '@/features/admin/drive/components/sync-frequency-card';
-import { useDriveSettings } from '@/features/admin/drive/hooks';
-import { driveSettingsQueryOptions } from '@/features/admin/drive/query-options';
+import { GoogleDriveAuthCard } from '@/features/multi/drive/components/google-auth-card';
+import { OutputFolderCard } from '@/features/multi/drive/components/output-folder-card';
+import { SyncFrequencyCard } from '@/features/multi/drive/components/sync-frequency-card';
+import { useDriveSettings } from '@/features/multi/drive/hooks';
+import { driveSettingsQueryOptions } from '@/features/multi/drive/query-options';
 
 import DriveSettingsError from './-error';
 import DriveSettingsPending from './-pending';

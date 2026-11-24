@@ -1,4 +1,3 @@
-import { splitTimestamp } from '@/features/admin/logs/utils'
 import {
   Badge,
   Button,
@@ -9,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/ui'
+import { splitTimestamp } from '@/shared/utils/helpers/timestamp'
 
 import type { UploadRequestGroupSummary } from '../types'
 

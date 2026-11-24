@@ -1,0 +1,29 @@
+# Build context: only what `npm ci` + `vite build` need.
+.git
+.github
+.vscode
+.cta.json
+.tanstack
+.content-collections
+node_modules
+dist
+dist-ssr
+.output
+.nitro
+
+# Env files can hold secrets: keep only the committed production defaults.
+.env
+.env.*
+!.env.production
+
+# Not part of the web build
+docs
+backend-runtime
+mobile-quickstart
+*.md
+-c
+-d
+deploy/*.yml
+deploy/README.md
+Dockerfile
+.dockerignore

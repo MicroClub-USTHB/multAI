@@ -7,9 +7,9 @@ import {
   X,
 } from 'lucide-react';
 
-import type { Alert as AlertType } from '@/features/admin/stats/types';
+import type { Alert as AlertType } from '@/features/common/components/alert-utils';
 
-import { formatTimeAgo } from '@/features/admin/stats/types';
+import { formatTimeAgo } from '@/features/common/components/alert-utils';
 import { Badge } from '@/shared/ui';
 import { Button } from '@/shared/ui';
 import { cn } from '@/shared/utils/helpers';

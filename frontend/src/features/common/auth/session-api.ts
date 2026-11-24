@@ -3,7 +3,7 @@ import { ApiError, apiGet, apiPost } from '@/shared/utils/api-client'
 import {
 	type AdminProfile,
 	toAdminProfile,
-} from './types'
+} from './session-types'
 
 export class AdminAuthApiError extends Error {
 	status: number

@@ -4,7 +4,7 @@ import { MainLayout } from '@/components/Layouts/MainLayout';
 import { AuthGuard } from '@/features/common/auth/components/auth-guard';
 import { MULTI_NAV_LINKS } from '@/shared/utils/constants';
 
-const MULTI_ALLOWED_ROLES = ['multi', 'multi_team_lead'] as const;
+const MULTI_ALLOWED_ROLES = ['admin', 'multi', 'multi_team_lead'] as const;
 
 export const Route = createFileRoute('/multi')({
   component: RouteComponent,

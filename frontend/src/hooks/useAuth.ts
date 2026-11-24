@@ -2,7 +2,7 @@ import type { UseMutationResult } from '@tanstack/react-query';
 
 import { createContext, useContext } from 'react';
 
-import type { AdminProfile } from '@/features/admin/auth/types';
+import type { AdminProfile } from '@/features/common/auth/session-types';
 
 interface AuthContextType {
   user: AdminProfile | null;

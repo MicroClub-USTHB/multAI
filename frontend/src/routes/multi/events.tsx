@@ -13,8 +13,7 @@ export const Route = createFileRoute('/multi/events')({
 function RouteComponent() {
   const { user } = useAuth();
   const isTeamLead = user?.role === 'multi_team_lead';
-  const { events, isLoading, isError, error, createEvent, isMutating } =
-    useMultiEvents();
+  const { events, isLoading, isError, error } = useMultiEvents();
 
   const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
@@ -28,14 +27,7 @@ function RouteComponent() {
         </p>
       </div>
 
-      {isTeamLead ? (
-        <EventForm
-          isSubmitting={isMutating}
-          onSubmit={async (input) => {
-            await createEvent(input);
-          }}
-        />
-      ) : null}
+      {isTeamLead ? <EventForm /> : null}
 
       {isError ? (
         <Alert variant="destructive">
