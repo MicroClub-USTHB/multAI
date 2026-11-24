@@ -72,12 +72,24 @@ def _wait_ready(url: str, seconds: int = 40) -> None:
 
 
 @pytest.fixture(scope="module")
-def minio_port():
+def docker_net():
+    """A private network so Caddy reaches MinIO by name on any host (Linux CI and Docker Desktop)."""
+    name = f"multai-test-net-{uuid.uuid4().hex[:8]}"
+    _run(["docker", "network", "create", name])
+    try:
+        yield name
+    finally:
+        subprocess.run(["docker", "network", "rm", name], capture_output=True)
+
+
+@pytest.fixture(scope="module")
+def minio_port(docker_net):
     port = _free_port()
     name = f"multai-minio-test-{uuid.uuid4().hex[:8]}"
     _run(
         [
             "docker", "run", "-d", "--rm", "--name", name,
+            "--network", docker_net, "--network-alias", "minio",
             "-p", f"127.0.0.1:{port}:9000",
             "-e", f"MINIO_ROOT_USER={ROOT_USER}",
             "-e", f"MINIO_ROOT_PASSWORD={ROOT_PASSWORD}",
@@ -93,19 +105,19 @@ def minio_port():
 
 
 @pytest.fixture
-def caddy_port(minio_port, tmp_path):
+def caddy_port(minio_port, docker_net, tmp_path):
     """Caddy on a different host:port than MinIO; Host header passes through."""
     port = _free_port()
     caddyfile = tmp_path / "Caddyfile"
     caddyfile.write_text(
         "{\n  auto_https off\n  admin off\n}\n"
-        f":{port} {{\n  reverse_proxy host.docker.internal:{minio_port}\n}}\n"
+        f":{port} {{\n  reverse_proxy minio:9000\n}}\n"
     )
     name = f"multai-caddy-test-{uuid.uuid4().hex[:8]}"
     _run(
         [
             "docker", "run", "-d", "--rm", "--name", name,
-            "--add-host", "host.docker.internal:host-gateway",
+            "--network", docker_net,
             "-p", f"127.0.0.1:{port}:{port}",
             "-v", f"{caddyfile}:/etc/caddy/Caddyfile:ro",
             CADDY_IMAGE,
