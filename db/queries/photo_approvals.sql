@@ -35,8 +35,14 @@ WHERE id IN (SELECT id FROM stale_photos)
 RETURNING id;
 
 -- name: ListApprovalsByUserAndStatus :many
-SELECT * FROM photo_approvals
-WHERE user_id = $1
-  AND (sqlc.narg('status')::varchar IS NULL OR decision = sqlc.narg('status'))
-ORDER BY decided_at DESC
+SELECT pa.id, pa.photo_id, pa.user_id, pa.decision, pa.decided_at
+FROM photo_approvals pa
+JOIN photos p ON p.id = pa.photo_id
+WHERE pa.user_id = $1
+  AND p.status <> 'rejected'
+  AND (sqlc.narg('status')::varchar IS NULL OR pa.decision = sqlc.narg('status'))
+ORDER BY pa.decided_at DESC
 LIMIT $2 OFFSET $3;
+
+-- name: DeletePhotoApprovalsByPhotoId :exec
+DELETE FROM photo_approvals WHERE photo_id = $1;

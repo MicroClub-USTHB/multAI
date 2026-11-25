@@ -47,11 +47,19 @@ SELECT id, photo_id, user_id, decision, decided_at FROM photo_approvals WHERE ph
 """
 
 
+DELETE_PHOTO_APPROVALS_BY_PHOTO_ID = """-- name: delete_photo_approvals_by_photo_id \\:exec
+DELETE FROM photo_approvals WHERE photo_id = :p1
+"""
+
+
 LIST_APPROVALS_BY_USER_AND_STATUS = """-- name: list_approvals_by_user_and_status \\:many
-SELECT id, photo_id, user_id, decision, decided_at FROM photo_approvals
-WHERE user_id = :p1
-  AND (:p4\\:\\:varchar IS NULL OR decision = :p4)
-ORDER BY decided_at DESC
+SELECT pa.id, pa.photo_id, pa.user_id, pa.decision, pa.decided_at
+FROM photo_approvals pa
+JOIN photos p ON p.id = pa.photo_id
+WHERE pa.user_id = :p1
+  AND p.status <> 'rejected'
+  AND (:p4\\:\\:varchar IS NULL OR pa.decision = :p4)
+ORDER BY pa.decided_at DESC
 LIMIT :p2 OFFSET :p3
 """
 
@@ -79,6 +87,9 @@ class AsyncQuerier:
             decision=row[3],
             decided_at=row[4],
         )
+
+    async def delete_photo_approvals_by_photo_id(self, *, photo_id: uuid.UUID) -> None:
+        await self._conn.execute(sqlalchemy.text(DELETE_PHOTO_APPROVALS_BY_PHOTO_ID), {"p1": photo_id})
 
     async def expire_stale_approvals(self, *, timeout_days: int) -> AsyncIterator[uuid.UUID]:
         result = await self._conn.stream(sqlalchemy.text(EXPIRE_STALE_APPROVALS), {"p1": timeout_days})

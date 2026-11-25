@@ -275,3 +275,197 @@ async def test_group_photo_rejection_deletes_storage(
             text(f"DELETE FROM staff_users WHERE id = '{event_creator_id}'")
         )
         await db_conn.commit()
+
+
+@pytest.mark.asyncio
+async def test_rejection_removes_photo_from_every_user(
+    approval_service: PhotoApprovalService,
+    mock_storage: AsyncMock,
+    db_conn,
+) -> None:
+    """A rejection must delete all approval rows and hide the photo from lists."""
+    event_id = uuid.uuid4()
+    photo_id = uuid.uuid4()
+
+    sq = staff_queries.AsyncQuerier(db_conn)
+    uq = user_queries.AsyncQuerier(db_conn)
+    eq = event_queries.AsyncQuerier(db_conn)
+    pq = photo_queries.AsyncQuerier(db_conn)
+    aq = approval_queries.AsyncQuerier(db_conn)
+
+    staff = await sq.create_admin(
+        email=f"admin-{uuid.uuid4()}@test.com", password="hash"
+    )
+    event_creator_id = staff.id
+
+    user_ids = []
+    for _ in range(3):
+        u = await uq.create_user(
+            email=f"reject-all-{uuid.uuid4()}@test.com", hashed_password="hash"
+        )
+        user_ids.append(u.id)
+
+    uploader_id, rejecter_id, other_id = user_ids
+
+    event = await eq.create_event(
+        event_queries.CreateEventParams(
+            name="Reject All Test Event",
+            event_code=f"RA{str(event_id)[:6]}",
+            event_date=datetime.datetime.now(datetime.timezone.utc),
+            end_date=datetime.datetime.now(datetime.timezone.utc)
+            + datetime.timedelta(days=1),
+            status="scheduled",
+            created_by=event_creator_id,
+        )
+    )
+    event_id = event.id
+
+    await pq.create_photo(
+        photo_queries.CreatePhotoParams(
+            event_id=event_id,
+            storage_key="test/reject-all.jpg",
+            source="direct",
+            taken_at=None,
+            day_number=None,
+            visibility="public",
+        )
+    )
+    await db_conn.execute(
+        text(
+            f"UPDATE photos SET id = '{photo_id}', status = 'pending', "
+            f"uploaded_by = '{uploader_id}' WHERE storage_key = 'test/reject-all.jpg'"
+        )
+    )
+
+    for uid in user_ids:
+        await aq.create_photo_approval(
+            photo_id=photo_id, user_id=uid, decision="pending"
+        )
+
+    try:
+        result = await approval_service.decide(
+            photo_id=photo_id, user_id=rejecter_id, decision="rejected"
+        )
+        assert result == "rejected"
+
+        # Photo is rejected.
+        photo = await pq.get_photo_by_id(id=photo_id)
+        assert photo is not None and photo.status == "rejected"
+
+        # No approval rows remain for anyone.
+        remaining = [
+            a
+            async for a in aq.get_photo_approvals_by_photo_id(photo_id=photo_id)
+        ]
+        assert remaining == []
+
+        # Neither the rejecter nor the other pending user see it anymore.
+        for uid in (rejecter_id, other_id):
+            listed = [
+                a
+                async for a in aq.list_approvals_by_user_and_status(
+                    user_id=uid, limit=50, offset=0, status="pending"
+                )
+            ]
+            assert listed == []
+
+        # The rejection is idempotent from the API's point of view: a second
+        # decision no longer finds an approval row.
+        with pytest.raises(Exception):
+            await approval_service.decide(
+                photo_id=photo_id, user_id=other_id, decision="rejected"
+            )
+    finally:
+        await db_conn.execute(
+            text(f"DELETE FROM photo_approvals WHERE photo_id = '{photo_id}'")
+        )
+        await db_conn.execute(text(f"DELETE FROM photos WHERE id = '{photo_id}'"))
+        await db_conn.execute(text(f"DELETE FROM events WHERE id = '{event_id}'"))
+        await db_conn.execute(
+            text(
+                "DELETE FROM users WHERE id IN "
+                f"('{uploader_id}', '{rejecter_id}', '{other_id}')"
+            )
+        )
+        await db_conn.execute(
+            text(f"DELETE FROM staff_users WHERE id = '{event_creator_id}'")
+        )
+        await db_conn.commit()
+
+
+@pytest.mark.asyncio
+async def test_list_excludes_rejected_photos_even_with_leftover_rows(
+    db_conn,
+) -> None:
+    """Defense in depth: the list query itself must hide rejected photos."""
+    event_id = uuid.uuid4()
+    photo_id = uuid.uuid4()
+
+    sq = staff_queries.AsyncQuerier(db_conn)
+    uq = user_queries.AsyncQuerier(db_conn)
+    eq = event_queries.AsyncQuerier(db_conn)
+    pq = photo_queries.AsyncQuerier(db_conn)
+    aq = approval_queries.AsyncQuerier(db_conn)
+
+    staff = await sq.create_admin(
+        email=f"admin-{uuid.uuid4()}@test.com", password="hash"
+    )
+    event_creator_id = staff.id
+
+    user = await uq.create_user(
+        email=f"list-rejected-{uuid.uuid4()}@test.com", hashed_password="hash"
+    )
+    user_id = user.id
+
+    event = await eq.create_event(
+        event_queries.CreateEventParams(
+            name="List Rejected Test Event",
+            event_code=f"LR{str(event_id)[:6]}",
+            event_date=datetime.datetime.now(datetime.timezone.utc),
+            end_date=datetime.datetime.now(datetime.timezone.utc)
+            + datetime.timedelta(days=1),
+            status="scheduled",
+            created_by=event_creator_id,
+        )
+    )
+    event_id = event.id
+
+    await pq.create_photo(
+        photo_queries.CreatePhotoParams(
+            event_id=event_id,
+            storage_key="test/list-rejected.jpg",
+            source="direct",
+            taken_at=None,
+            day_number=None,
+            visibility="public",
+        )
+    )
+    await db_conn.execute(
+        text(
+            f"UPDATE photos SET id = '{photo_id}', status = 'rejected', "
+            f"uploaded_by = '{user_id}' WHERE storage_key = 'test/list-rejected.jpg'"
+        )
+    )
+    await aq.create_photo_approval(
+        photo_id=photo_id, user_id=user_id, decision="pending"
+    )
+
+    try:
+        listed = [
+            a
+            async for a in aq.list_approvals_by_user_and_status(
+                user_id=user_id, limit=50, offset=0, status=None
+            )
+        ]
+        assert listed == []
+    finally:
+        await db_conn.execute(
+            text(f"DELETE FROM photo_approvals WHERE photo_id = '{photo_id}'")
+        )
+        await db_conn.execute(text(f"DELETE FROM photos WHERE id = '{photo_id}'"))
+        await db_conn.execute(text(f"DELETE FROM events WHERE id = '{event_id}'"))
+        await db_conn.execute(text(f"DELETE FROM users WHERE id = '{user_id}'"))
+        await db_conn.execute(
+            text(f"DELETE FROM staff_users WHERE id = '{event_creator_id}'")
+        )
+        await db_conn.commit()
