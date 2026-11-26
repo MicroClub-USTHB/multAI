@@ -1,15 +1,16 @@
 # MultiAI backend: production deployment
 
 One compose project (`multai`) on the shared VPS, fronted by the host Caddy.
-CD builds an amd64 image on every push to `main`/`develop` and deploys `main`.
+CD builds the amd64 images on every push to `main`/`develop`; the host-wide Watchtower on the
+VPS (`/opt/watchtower`) pulls them and recreates the containers. Nothing deploys over SSH.
 
 | File | Goes to | Purpose |
 |---|---|---|
-| `compose.prod.yml` | `/opt/multai/compose.yml` (CD copies it) | the whole stack: api, web, 9 workers, postgres, redis, nats, minio |
-| `deploy.sh` | `/opt/multai/deploy.sh` (CD copies it) | `deploy.sh <sha-tag>` backend, `deploy.sh web <tag>` frontend, with rollback |
+| `compose.prod.yml` | `/opt/multai/compose.yml` (copy it by hand when it changes) | the whole stack: api, web, 9 workers, postgres, redis, nats, minio |
+| `deploy.sh` | `/opt/multai/deploy.sh` (optional) | manual first start and manual pin or rollback: `deploy.sh <tag>` backend, `deploy.sh web <tag>` frontend |
 | `.env.production.example` | `/opt/multai/.env` (you fill it, `chmod 600`) | every variable, placeholders only |
 | `multai.caddy` | `/etc/caddy/sites/multai.caddy` (once) | TLS + routing |
-| `../.github/workflows/cd.yml` | repo | build, push, deploy |
+| `../.github/workflows/cd.yml` | repo | build and push both images (no deploy job) |
 
 ## Layout
 
@@ -45,13 +46,19 @@ chmod 600 .env && $EDITOR .env
 # 3. Caddy site (see the note below if Caddy is managed by Ansible)
 # from your machine: scp deploy/multai.caddy root@<vps>:/etc/caddy/sites/multai.caddy
 caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
-# 4. a deploy-only SSH key for CD
-ssh-keygen -t ed25519 -f ./cd_key -N '' -C multai-cd   # append cd_key.pub to ~/.ssh/authorized_keys (or the deploy user's)
+# 4. the compose file, then the first start
+scp deploy/compose.prod.yml root@<vps>:/opt/multai/compose.yml
+# on the VPS: log in to GHCR once (a token with read:packages) so it can pull the private images
+echo <token> | docker login ghcr.io -u <github-user> --password-stdin
+cd /opt/multai && docker compose --project-name multai -f compose.yml --env-file .env up -d --wait
 ```
 
-First deploy: push to `main` (or run the CD workflow). `compose.yml` and
-`deploy.sh` do not exist yet on a fresh server; CD copies them, so only `.env`
-needs to be there beforehand.
+Set `IMAGE_TAG` and `MULTAI_FRONT_TAG` in `.env` to the tag the server should follow (`latest` is
+`main`, `develop` is `develop`); Watchtower keeps that tag current. The first start downloads the
+face model: run `docker compose ... --profile tools run --rm models-init` once beforehand.
+
+The host-wide Watchtower must be running (`/opt/watchtower`); it only touches containers that carry
+the `com.centurylinklabs.watchtower.enable` label, and the data services never do.
 
 Caddy on this server is Ansible-managed (`/etc/caddy/Caddyfile` imports
 `/etc/caddy/sites/*.caddy`). Add `multai.caddy` to the same role so a later
@@ -64,44 +71,44 @@ Register in the external consoles, **exact URLs**:
 
 ## GitHub setup
 
-Repository secrets (Settings, Secrets and variables, Actions):
+No secrets and no SSH key: CD only builds and pushes images, using the run's `GITHUB_TOKEN`.
 
-| Secret | Value |
-|---|---|
-| `VPS_HOST` | the server address |
-| `VPS_USER` | SSH user allowed to run `docker` |
-| `VPS_SSH_KEY` | the **private** deploy key from step 4 |
-| `VPS_KNOWN_HOSTS` | optional: `ssh-keyscan -t ed25519 <host>` from a trusted machine (otherwise the host key is trusted on first use, with a warning) |
-
-Create the environment `production` (Settings, Environments); add required
-reviewers there if you want a manual gate before each deploy.
-
-The deploy job logs the server into GHCR with the run's short-lived
-`GITHUB_TOKEN` (sent over stdin, never printed), so private images pull without
-a stored personal token. If you prefer a long-lived login, run
-`docker login ghcr.io` once on the server with a `read:packages` PAT.
+- Repository variables for the web build (all optional): `VITE_API_BASE_URL` (default `/api`),
+  `VITE_APP_TITLE` (default `MultAI`), `MULTAI_PUBLIC_URL`.
+- Both GHCR packages, `multai-back` and `multai-front`, must allow this repository to write:
+  Package settings, Manage Actions access, add this repository with the Write role. A package keeps
+  the repository it was first published from linked, so after a repository move or rename this
+  needs doing once.
 
 ## What a deploy does
 
-`deploy.sh sha-<fullsha>`: pull; start postgres/redis/nats/minio; fetch the
-face model once (`models-init`); **run migrations (a failure stops here, the
-running app is untouched)**; roll api + workers (`up -d --wait`); check
-`/health`; on failure restart the previous good tag. State lives in
-`/opt/multai/.last_tag` and `.prev_tag` (backend), `.last_web_tag` and
-`.prev_web_tag` (web). Migrations are not rolled back: keep them additive.
+1. A push to `main` or `develop` runs the CD workflow: it builds `backend/` and `frontend/` and
+   pushes `multai-back` and `multai-front` as `sha-<commit>` plus `latest` (main) or `develop`.
+2. Watchtower checks the registry every minute. For each labelled container whose tag has a new
+   image it pulls, stops and recreates the container with the settings in `compose.yml`. The
+   workers are labelled `depends-on: api`, so they are recreated after the API.
+3. The API applies pending database migrations (`alembic upgrade head`) before it starts serving
+   (`MIGRATE_ON_START`, default `true`). Migrations are not rolled back: keep them additive.
+4. Data services (postgres, redis, nats, minio) are never touched by Watchtower.
 
-`deploy.sh web sha-<fullsha>` (run by the CD right after the backend deploy): sets
-`MULTAI_FRONT_TAG` in `.env`, pulls and restarts only `web`, checks
-`/healthz`, restores the previous web tag on failure. The backend deploy leaves
-`web` out of the stack until the first front deploy has recorded `.last_web_tag`.
+A migration that fails keeps the new API container from becoming healthy; check
+`docker logs multai-api-1` and, if needed, pin the previous tag (below).
 
 ## Roll back
 
-- From GitHub: Actions, CD, Run workflow on `main` with `rollback_sha` = an older
-  commit whose image was built. No build; that tag is redeployed.
-- By hand: `ssh vps '/opt/multai/deploy.sh sha-<fullsha>'` (backend) or
-  `... deploy.sh web sha-<fullsha>`. `.prev_tag` / `.prev_web_tag` hold the last one.
-- Database: restore from backup; there is no automatic schema rollback.
+Watchtower has no health-check rollback. Pin the previous images (a tag that does not move is never
+updated) and recreate:
+
+```bash
+cd /opt/multai
+IMAGE_TAG=sha-<older-fullsha> MULTAI_FRONT_TAG=sha-<older-fullsha> \
+  docker compose --project-name multai -f compose.yml --env-file .env up -d api web
+```
+
+Put the tags back to `latest` (or `develop`) in `.env` to follow the branch again. The manual
+`deploy.sh <tag>` and `deploy.sh web <tag>` still work, and also run the migrations and the
+health checks, if you prefer a guarded rollout. Database: restore from backup; there is no
+automatic schema rollback.
 
 ## Resource budget
 

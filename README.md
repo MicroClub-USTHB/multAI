@@ -16,8 +16,8 @@ Each app keeps its own tooling, lockfile and README; run its commands from insid
 - `backend-ci.yml`: lint, type check, tests and a Docker build, when `backend/` changes.
 - `frontend-ci.yml`: build, lint, type check and tests, when `frontend/` changes.
 - `cd.yml`: on every push to `main` or `develop` it builds both images, tagged `sha-<commit>` plus `latest` (main) or the branch name:
-  `ghcr.io/microclub-usthb/multai-back` and `ghcr.io/microclub-usthb/multai-front`. On `main` it then deploys the backend and the web to the VPS.
-  The image names are fixed, so renaming this repository does not move them.
+  `ghcr.io/microclub-usthb/multai-back` and `ghcr.io/microclub-usthb/multai-front`. It does not deploy: the Watchtower on the VPS pulls the new images and
+  recreates the containers (see [`deploy/README.md`](deploy/README.md)). The image names are fixed, so renaming this repository does not move them.
 
 The mobile app has no CI yet.
 
