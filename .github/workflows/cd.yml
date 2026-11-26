@@ -1,57 +1,67 @@
 name: CD
 
-# Builds the amd64 image on every push to main/develop, and deploys main to the VPS.
+# Builds the backend and web images (linux/amd64) on every push to main/develop and
+# pushes them to GHCR. Nothing deploys from here: Watchtower on the VPS pulls the new
+# image of each running container and recreates it (see deploy/README.md).
+# One commit builds BOTH images, so sha-<commit> exists for the backend and the web.
 #
-# Repository secrets (Settings > Secrets and variables > Actions), environment
-# "production" (Settings > Environments, add required reviewers if you want a gate):
-#   VPS_HOST         server address (IP or DNS name)
-#   VPS_USER         SSH user that may run docker (e.g. deploy, or root)
-#   VPS_SSH_KEY      PRIVATE key of a deploy-only keypair (public half in the
-#                    server's ~/.ssh/authorized_keys)
-#   VPS_KNOWN_HOSTS  OPTIONAL, output of `ssh-keyscan -t ed25519 <host>` taken from a
-#                    trusted machine. If unset the host key is trusted on first use.
+# Tags: sha-<commit> always, plus `latest` (main) or the branch name (develop, ...).
 #
-# Roll back from the Actions tab: Run workflow on main with `rollback_sha` set to a
-# commit whose image was built before. No build happens; that tag is redeployed.
+# The image names are fixed on purpose (not derived from the repository name), so
+# renaming this repository does not move the images or break the server:
+#   ghcr.io/microclub-usthb/multai-back   (backend/)
+#   ghcr.io/microclub-usthb/multai-front  (frontend/)
+#
+# Repository variables for the web build (all optional): VITE_API_BASE_URL (default /api),
+# VITE_APP_TITLE (default MultAI), MULTAI_PUBLIC_URL.
+#
+# The two GHCR packages (multai-back, multai-front) must allow this repository to
+# write: Package settings > Manage Actions access > add this repository (Write).
 
 on:
   push:
     branches: [main, develop]
   workflow_dispatch:
-    inputs:
-      rollback_sha:
-        description: "Redeploy the already-built image of this commit sha (skips the build)"
-        required: false
-        type: string
 
 permissions:
   contents: read
 
 env:
   REGISTRY: ghcr.io
-  APP_DIR: /opt/multai
 
 jobs:
   build:
-    if: ${{ inputs.rollback_sha == '' || inputs.rollback_sha == null }}
+    name: build ${{ matrix.app }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    strategy:
+      # One image failing to push (for example a missing package permission) must not cancel the other.
+      fail-fast: false
+      matrix:
+        include:
+          - app: backend
+            context: backend
+            image: ghcr.io/microclub-usthb/multai-back
+          - app: frontend
+            context: frontend
+            image: ghcr.io/microclub-usthb/multai-front
     steps:
       - uses: actions/checkout@v4
 
-      - name: Compute image name and tags
+      - name: Compute image tags
         id: meta
         shell: bash
+        env:
+          IMAGE: ${{ matrix.image }}
         run: |
-          image="${REGISTRY}/${GITHUB_REPOSITORY,,}"
           branch_tag="${GITHUB_REF_NAME//\//-}"
           [ "$GITHUB_REF_NAME" = "main" ] && branch_tag="latest"
           {
             echo "tags<<EOF"
-            echo "${image}:sha-${GITHUB_SHA}"
-            echo "${image}:${branch_tag}"
+            echo "${IMAGE}:sha-${GITHUB_SHA}"
+            echo "${IMAGE}:${branch_tag}"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
@@ -66,82 +76,14 @@ jobs:
       - name: Build and push (linux/amd64)
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ${{ matrix.context }}
           platforms: linux/amd64
           push: true
           provenance: false
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  deploy:
-    needs: build
-    # Runs after a successful build, or alone for a rollback (build skipped).
-    if: >-
-      ${{ always()
-      && github.ref == 'refs/heads/main'
-      && (needs.build.result == 'success' || needs.build.result == 'skipped') }}
-    runs-on: ubuntu-latest
-    environment: production
-    permissions:
-      contents: read
-      packages: read
-    # Never two deploys at once; a newer one waits instead of cancelling a running one.
-    concurrency:
-      group: deploy-multai-production
-      cancel-in-progress: false
-    env:
-      DEPLOY_SHA: ${{ inputs.rollback_sha || github.sha }}
-    steps:
-      - name: Validate the sha
-        run: |
-          case "$DEPLOY_SHA" in
-            *[!0-9a-f]*|"") echo "invalid sha" >&2; exit 1;;
-          esac
-          [ "${#DEPLOY_SHA}" -ge 7 ] && [ "${#DEPLOY_SHA}" -le 40 ]
-
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.DEPLOY_SHA }}
-          sparse-checkout: deploy
-          sparse-checkout-cone-mode: true
-
-      - name: Configure SSH
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
-        run: |
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          if [ -n "$VPS_KNOWN_HOSTS" ]; then
-            printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          else
-            echo "::warning::VPS_KNOWN_HOSTS is not set; trusting the host key seen now"
-            ssh-keyscan -T 10 -t ed25519 "$VPS_HOST" > ~/.ssh/known_hosts
-          fi
-          chmod 644 ~/.ssh/known_hosts
-
-      - name: Ship deploy files
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-        run: |
-          opts=(-i "$HOME/.ssh/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes)
-          scp "${opts[@]}" deploy/compose.prod.yml "$VPS_USER@$VPS_HOST:$APP_DIR/compose.yml"
-          scp "${opts[@]}" deploy/deploy.sh "$VPS_USER@$VPS_HOST:$APP_DIR/deploy.sh"
-
-      - name: Deploy
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          GHCR_USER: ${{ github.actor }}
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          opts=(-i "$HOME/.ssh/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes)
-          # The token goes over stdin: it never appears in a command line or log.
-          # Client-side expansion is intended: DEPLOY_SHA is validated hex, the rest are constants.
-          # shellcheck disable=SC2029
-          printf '%s' "$GHCR_TOKEN" | ssh "${opts[@]}" "$VPS_USER@$VPS_HOST" \
-            "docker login ghcr.io -u '$GHCR_USER' --password-stdin >/dev/null && chmod +x '$APP_DIR/deploy.sh' && '$APP_DIR/deploy.sh' 'sha-$DEPLOY_SHA'"
+          build-args: |
+            ${{ matrix.app == 'frontend' && format('VITE_API_BASE_URL={0}', vars.VITE_API_BASE_URL || '/api') || '' }}
+            ${{ matrix.app == 'frontend' && format('VITE_APP_TITLE={0}', vars.VITE_APP_TITLE || 'MultAI') || '' }}
+            ${{ matrix.app == 'frontend' && format('VITE_SITE_URL={0}', vars.MULTAI_PUBLIC_URL) || '' }}
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}

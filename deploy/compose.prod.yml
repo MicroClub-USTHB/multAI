@@ -51,9 +51,17 @@ x-app: &app
   security_opt: ["no-new-privileges:true"]
   cap_drop: ["ALL"]
   stop_grace_period: 30s
+  # The host-wide Watchtower (/opt/watchtower) only touches labelled containers: it pulls
+  # the new image of the same tag and recreates them. Data services are never labelled.
+  labels:
+    com.centurylinklabs.watchtower.enable: "true"
 
 x-worker: &worker
   <<: *app
+  # Updated after the API (which applies the migrations on start).
+  labels:
+    com.centurylinklabs.watchtower.enable: "true"
+    com.centurylinklabs.watchtower.depends-on: "api"
   cpus: 0.5
   mem_limit: 192m
   pids_limit: 64
@@ -192,6 +200,14 @@ services:
       MINIO_PUBLIC_ENDPOINT: ${S3_HOST:?set S3_HOST in .env}
       MINIO_PUBLIC_SECURE: "true"
       MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      # Watchtower cannot run a migration step, so the API applies pending migrations
+      # (alembic upgrade head) before it starts serving. false = skip.
+      MIGRATE_ON_START: ${MIGRATE_ON_START:-true}
+    # Same server as the image CMD, preceded by the optional migration.
+    command:
+      - sh
+      - -c
+      - 'if [ "$${MIGRATE_ON_START}" = true ]; then alembic upgrade head; fi && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1 --proxy-headers --forwarded-allow-ips "*"'
     networks: [backend, egress]
     ports:
       - "127.0.0.1:18000:8000"
@@ -218,9 +234,8 @@ services:
       retries: 5
       start_period: 45s
 
-  # The multAI-front SSR server. Its image is released by the multAI-front repo
-  # (`deploy.sh web <tag>`), independently of the backend tag. Not started until
-  # the first front deploy has written .last_web_tag (see deploy.sh).
+  # The web SSR server (frontend/). Its image is built by the same CD run as the backend;
+  # its tag (MULTAI_FRONT_TAG) is independent of the backend tag (IMAGE_TAG).
   web:
     image: ghcr.io/microclub-usthb/multai-front:${MULTAI_FRONT_TAG:-latest}
     restart: unless-stopped
@@ -232,6 +247,8 @@ services:
     ports:
       - "127.0.0.1:13000:3000"
     networks: [backend, egress]
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
     mem_limit: 256m
     memswap_limit: 256m
     cpus: 0.5
