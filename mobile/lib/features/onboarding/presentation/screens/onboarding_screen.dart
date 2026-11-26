@@ -1,0 +1,168 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:multai_mobile/core/constants/onboarding_content.dart';
+import 'package:multai_mobile/core/extensions/context_extensions.dart';
+import 'package:multai_mobile/core/extensions/responsive_extensions.dart';
+import 'package:multai_mobile/di/injection_container.dart';
+import 'package:multai_mobile/features/onboarding/presentation/bloc/onboarding_bloc.dart';
+import 'package:multai_mobile/features/onboarding/widgets/onboarding_button.dart';
+import 'package:multai_mobile/features/onboarding/widgets/onboarding_card.dart';
+import 'package:multai_mobile/features/onboarding/widgets/onboarding_indicatore.dart';
+import 'package:multai_mobile/core/theme/app_palette.dart';
+
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  late final List<OnboardingItem> _slides;
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  bool _preloaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _slides = OnboardingItem.createSlides();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_preloaded) {
+      _preloaded = true;
+      _preloadImages();
+    }
+  }
+
+  Future<void> _preloadImages() async {
+    final images = _slides
+        .expand((s) => [s.image, if (s.secondImage != null) s.secondImage!])
+        .toSet()
+        .toList();
+    // Precache independently: one missing asset must not abort the rest, and a
+    // failure must never escape as an unhandled async error.
+    await Future.wait([
+      for (final img in images)
+        precacheImage(
+          AssetImage(img),
+          context,
+          onError: (exception, stackTrace) {
+            debugPrint('Onboarding image preload failed for $img: $exception');
+          },
+        ),
+    ]);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _nextPage(BuildContext ctx) {
+    if (_currentPage < _slides.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+      );
+    } else {
+      ctx.read<OnboardingBloc>().add(CompleteOnboarding());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isLast = _currentPage == _slides.length - 1;
+
+    return BlocProvider(
+      create: (_) => sl<OnboardingBloc>(),
+      child: BlocListener<OnboardingBloc, OnboardingState>(
+        listener: (context, state) {
+          if (state is OnboardingComplete) context.go(state.route);
+        },
+        child: Scaffold(
+          backgroundColor: context.colors.background,
+          body: Builder(
+            builder: (ctx) {
+              return Stack(
+                children: [
+                  SafeArea(
+                    bottom: false,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (i) => setState(() => _currentPage = i),
+                      itemCount: _slides.length,
+                      itemBuilder: (_, i) =>
+                          OnboardingCard(slide: _slides[i], slideIndex: i),
+                    ),
+                  ),
+
+                  SafeArea(
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.hPadding(),
+                          vertical: context.heightCalculated(14),
+                        ),
+                        child: AnimatedOpacity(
+                          opacity: isLast ? 0 : 1,
+                          duration: const Duration(milliseconds: 200),
+                          child: GestureDetector(
+                            onTap: () => ctx.read<OnboardingBloc>().add(
+                              CompleteOnboarding(),
+                            ),
+                            child: Text(
+                              'Skip',
+                              style: context.textTheme.labelLarge?.copyWith(
+                                color: context.colors.primaryAccent,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SafeArea(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          context.hPadding(),
+                          0,
+                          context.hPadding(),
+                          context.heightCalculated(36),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            OnboardingIndicator(
+                              currentPage: _currentPage,
+                              itemCount: _slides.length,
+                            ),
+                            OnboardingButton(
+                              isLast: isLast,
+                              onTap: () => _nextPage(ctx),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}

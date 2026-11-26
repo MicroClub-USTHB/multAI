@@ -1,0 +1,9 @@
+import '../entities/account_entity.dart';
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failure.dart';
+
+abstract class AccountRepository {
+  Future<Either<Failure, AccountEntity>> getAccountData();
+  Future<Either<Failure, String>> uploadAvatar(String filePath);
+  Future<Either<Failure, AccountEntity>> updateProfile(String name);
+}

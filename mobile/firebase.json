@@ -1,0 +1,22 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "multai-mobile",
+          "appId": "1:653019524265:android:78ee94f323c92d5beb4db8",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "multai-mobile",
+          "configurations": {
+            "android": "1:653019524265:android:78ee94f323c92d5beb4db8",
+            "ios": "1:653019524265:ios:c6813f04f8bf1abbeb4db8"
+          }
+        }
+      }
+    }
+  }
+}
