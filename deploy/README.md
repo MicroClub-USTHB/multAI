@@ -14,7 +14,7 @@ CD builds an amd64 image on every push to `main`/`develop` and deploys `main`.
 ## Layout
 
 ```
-https://<MULTAI_HOST>/            -> web   127.0.0.1:13000   (multAI-front, own repo + CD)
+https://<MULTAI_HOST>/            -> web   127.0.0.1:13000   (frontend/, built by the same CD)
 https://<MULTAI_HOST>/api/*       -> api   127.0.0.1:18000   (prefix stripped by Caddy)
 https://<MULTAI_HOST>/api/internal/*  -> 404 (never public)
 https://<S3_HOST>/                -> minio 127.0.0.1:19000   (S3 API only, for direct browser uploads)
@@ -90,7 +90,7 @@ running app is untouched)**; roll api + workers (`up -d --wait`); check
 `/opt/multai/.last_tag` and `.prev_tag` (backend), `.last_web_tag` and
 `.prev_web_tag` (web). Migrations are not rolled back: keep them additive.
 
-`deploy.sh web sha-<fullsha>` (called by the multAI-front CD): sets
+`deploy.sh web sha-<fullsha>` (run by the CD right after the backend deploy): sets
 `MULTAI_FRONT_TAG` in `.env`, pulls and restarts only `web`, checks
 `/healthz`, restores the previous web tag on failure. The backend deploy leaves
 `web` out of the stack until the first front deploy has recorded `.last_web_tag`.

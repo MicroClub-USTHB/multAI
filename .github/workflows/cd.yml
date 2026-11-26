@@ -1,6 +1,13 @@
 name: CD
 
-# Builds the amd64 image on every push to main/develop, and deploys main to the VPS.
+# Builds the backend and web images (linux/amd64) on every push to main/develop and
+# deploys main to the VPS. One commit builds BOTH images, so sha-<commit> exists for
+# the backend and the web and a rollback to a commit works for both.
+#
+# The image names are fixed on purpose (not derived from the repository name), so
+# renaming this repository does not move the images or break the server:
+#   ghcr.io/microclub-usthb/multai-back   (backend/)
+#   ghcr.io/microclub-usthb/multai-front  (frontend/)
 #
 # Repository secrets (Settings > Secrets and variables > Actions), environment
 # "production" (Settings > Environments, add required reviewers if you want a gate):
@@ -10,9 +17,14 @@ name: CD
 #                    server's ~/.ssh/authorized_keys)
 #   VPS_KNOWN_HOSTS  OPTIONAL, output of `ssh-keyscan -t ed25519 <host>` taken from a
 #                    trusted machine. If unset the host key is trusted on first use.
+# Repository variables for the web build (all optional): VITE_API_BASE_URL (default /api),
+# VITE_APP_TITLE (default MultAI), MULTAI_PUBLIC_URL.
+#
+# The two GHCR packages (multai-back, multai-front) must allow this repository to
+# write: Package settings > Manage Actions access > add this repository (Write).
 #
 # Roll back from the Actions tab: Run workflow on main with `rollback_sha` set to a
-# commit whose image was built before. No build happens; that tag is redeployed.
+# commit whose images were built before. No build happens; that tag is redeployed.
 
 on:
   push:
@@ -20,7 +32,7 @@ on:
   workflow_dispatch:
     inputs:
       rollback_sha:
-        description: "Redeploy the already-built image of this commit sha (skips the build)"
+        description: "Redeploy the already-built images of this commit sha (skips the build)"
         required: false
         type: string
 
@@ -33,25 +45,37 @@ env:
 
 jobs:
   build:
+    name: build ${{ matrix.app }}
     if: ${{ inputs.rollback_sha == '' || inputs.rollback_sha == null }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - app: backend
+            context: backend
+            image: ghcr.io/microclub-usthb/multai-back
+          - app: frontend
+            context: frontend
+            image: ghcr.io/microclub-usthb/multai-front
     steps:
       - uses: actions/checkout@v4
 
-      - name: Compute image name and tags
+      - name: Compute image tags
         id: meta
         shell: bash
+        env:
+          IMAGE: ${{ matrix.image }}
         run: |
-          image="${REGISTRY}/${GITHUB_REPOSITORY,,}"
           branch_tag="${GITHUB_REF_NAME//\//-}"
           [ "$GITHUB_REF_NAME" = "main" ] && branch_tag="latest"
           {
             echo "tags<<EOF"
-            echo "${image}:sha-${GITHUB_SHA}"
-            echo "${image}:${branch_tag}"
+            echo "${IMAGE}:sha-${GITHUB_SHA}"
+            echo "${IMAGE}:${branch_tag}"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
@@ -66,13 +90,17 @@ jobs:
       - name: Build and push (linux/amd64)
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ${{ matrix.context }}
           platforms: linux/amd64
           push: true
           provenance: false
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          build-args: |
+            ${{ matrix.app == 'frontend' && format('VITE_API_BASE_URL={0}', vars.VITE_API_BASE_URL || '/api') || '' }}
+            ${{ matrix.app == 'frontend' && format('VITE_APP_TITLE={0}', vars.VITE_APP_TITLE || 'MultAI') || '' }}
+            ${{ matrix.app == 'frontend' && format('VITE_SITE_URL={0}', vars.MULTAI_PUBLIC_URL) || '' }}
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}
 
   deploy:
     needs: build
@@ -132,7 +160,8 @@ jobs:
           scp "${opts[@]}" deploy/compose.prod.yml "$VPS_USER@$VPS_HOST:$APP_DIR/compose.yml"
           scp "${opts[@]}" deploy/deploy.sh "$VPS_USER@$VPS_HOST:$APP_DIR/deploy.sh"
 
-      - name: Deploy
+      # Backend first (data services, migrations, api + workers), then the web.
+      - name: Deploy backend and web
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
@@ -144,4 +173,4 @@ jobs:
           # Client-side expansion is intended: DEPLOY_SHA is validated hex, the rest are constants.
           # shellcheck disable=SC2029
           printf '%s' "$GHCR_TOKEN" | ssh "${opts[@]}" "$VPS_USER@$VPS_HOST" \
-            "docker login ghcr.io -u '$GHCR_USER' --password-stdin >/dev/null && chmod +x '$APP_DIR/deploy.sh' && '$APP_DIR/deploy.sh' 'sha-$DEPLOY_SHA'"
+            "docker login ghcr.io -u '$GHCR_USER' --password-stdin >/dev/null && chmod +x '$APP_DIR/deploy.sh' && '$APP_DIR/deploy.sh' 'sha-$DEPLOY_SHA' && '$APP_DIR/deploy.sh' web 'sha-$DEPLOY_SHA'"

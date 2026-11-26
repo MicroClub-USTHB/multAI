@@ -1,4 +1,4 @@
-# The `web` service for /opt/multai/compose.yml (owned by the multAI-back repo).
+# The `web` service for /opt/multai/compose.yml (owned by the repo-root deploy/ folder).
 # Merge this block under `services:` there; it is not a standalone compose file.
 #
 # - `backend` is the compose network the API container is on (service `api`).

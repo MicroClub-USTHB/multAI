@@ -1,10 +1,16 @@
-name: CI
+name: Backend CI
 
 on:
   push:
     branches: ["main", "develop"]
+    paths: ["backend/**", ".github/workflows/backend-ci.yml"]
   pull_request:
     branches: ["main", "develop"]
+    paths: ["backend/**", ".github/workflows/backend-ci.yml"]
+
+defaults:
+  run:
+    working-directory: backend
 
 jobs:
   lint-and-typecheck:
@@ -17,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version-file: "pyproject.toml"
+          python-version-file: "backend/pyproject.toml"
       - name: Install dependencies
         run: uv sync --locked --all-extras --dev
       - name: Lint
@@ -99,7 +105,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version-file: "pyproject.toml"
+          python-version-file: "backend/pyproject.toml"
       - name: Install dependencies
         run: uv sync --locked --all-extras --dev
       - name: Run Migrations

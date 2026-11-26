@@ -7,7 +7,7 @@
 #                       host loopback (127.0.0.1:18000), never through the internet.
 #   /api/*           -> FastAPI on 127.0.0.1:18000, prefix stripped
 #                       (/api/staff/x reaches the app as /staff/x)
-#   everything else  -> multAI-front on 127.0.0.1:13000
+#   everything else  -> the web app (frontend/) on 127.0.0.1:13000
 #
 # A second site below serves the S3 API so browsers can PUT photos straight to
 # MinIO with the presigned URLs the API hands out.

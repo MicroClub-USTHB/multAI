@@ -1,8 +1,8 @@
-# deploy: multAI-front
+# deploy: frontend
 
-Container image and CD for the MultiAi web app. The compose stack, Caddy site and `deploy.sh`
-live in the **multAI-back** repo (`/opt/multai` on the VPS); this repo only builds the image and
-asks that stack to roll the `web` service.
+Container image for the MultiAi web app. The compose stack, Caddy site and `deploy.sh`
+live in the repo-root `deploy/` folder (`/opt/multai` on the VPS); the repo-level CD workflow
+(`.github/workflows/cd.yml`) builds this image and asks that stack to roll the `web` service.
 
 ```
 browser ──https──> host Caddy (multai.<ip>.sslip.io)
@@ -40,7 +40,7 @@ Measured locally: ~57 MiB idle, ~60 MiB after 120 SSR renders, `docker stop` in 
 Today nothing renders data on the server (the only `loader` calls a mock server function), so `SERVER_URL` is a safety net. Server-side
 requests carry no browser cookie: authenticated data has to be fetched in the browser, as the app already does.
 
-## Plug into /opt/multai (multAI-back)
+## Plug into /opt/multai
 
 1. Merge the `web` service from `deploy/web-service.example.yml` into `/opt/multai/compose.yml`
    (it joins the `backend` network where the API service is named `api`; if the backend compose names them differently, change `API_PROXY_TARGET` and `networks`).

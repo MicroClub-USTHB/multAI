@@ -218,7 +218,7 @@ services:
       retries: 5
       start_period: 45s
 
-  # The multAI-front SSR server. Its image is released by the multAI-front repo
+  # The web SSR server (frontend/). Its image is built by the same CD run as the backend
   # (`deploy.sh web <tag>`), independently of the backend tag. Not started until
   # the first front deploy has written .last_web_tag (see deploy.sh).
   web:

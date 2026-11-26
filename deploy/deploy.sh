@@ -2,10 +2,10 @@
 # Deploy (or roll back) the MultiAI stack on the VPS. Two forms:
 #
 #   /opt/multai/deploy.sh <backend-tag>        e.g. sha-<fullsha> (a bare sha works too)
-#   /opt/multai/deploy.sh web <web-tag>        e.g. sha-<fullsha>, the multAI-front image
+#   /opt/multai/deploy.sh web <web-tag>        e.g. sha-<fullsha>, the frontend/ image
 #
 # Backend CD copies compose.prod.yml -> /opt/multai/compose.yml and this file to
-# /opt/multai/deploy.sh, then runs the first form. The multAI-front CD runs the
+# /opt/multai/deploy.sh, then runs the first form. The CD runs the
 # second one. Both are idempotent: re-running the same tag is a no-op rollout.
 #
 # Backend order (a failure at 4 aborts BEFORE the running app is touched):
