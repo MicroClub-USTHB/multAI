@@ -1,0 +1,42 @@
+# The `web` service for /opt/multai/compose.yml (owned by the multAI-back repo).
+# Merge this block under `services:` there; it is not a standalone compose file.
+#
+# - `backend` is the compose network the API container is on (service `api`).
+# - Published on 127.0.0.1 only: host Caddy routes `/` here and `/api/*` to the API.
+services:
+  web:
+    image: ghcr.io/microclub-usthb/multai-front:${MULTAI_FRONT_TAG:-latest}
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      # Server-side (SSR) calls build their URL from SERVER_URL + VITE_API_BASE_URL (/api).
+      # Point SERVER_URL at this container itself and let it proxy /api to the API on the
+      # private network: no hairpin through the public IP, no TLS, no extra hop through Caddy.
+      SERVER_URL: http://127.0.0.1:3000
+      API_PROXY_TARGET: http://api:8000
+    ports:
+      - "127.0.0.1:13000:3000"
+    networks:
+      - backend
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 0.5
+    pids_limit: 128
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/healthz"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
