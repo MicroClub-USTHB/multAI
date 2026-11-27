@@ -24,6 +24,9 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          # Pinned: pubspec.lock was solved with this version, and a newer stable
+          # cannot resolve bloc_test with injectable_generator.
+          flutter-version: 3.41.6
           channel: stable
           cache: true
 
