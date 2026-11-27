@@ -7,6 +7,11 @@ class AppImages {
   // Existing images
   static const String mcLogoWhite = '$imagesPath/MC_white.png';
 
+  // Brand logos
+  static const String logoDark = '$imagesPath/logo_dark.png';
+  static const String logoLight = '$imagesPath/logo_light.png';
+  static const String logoMark = '$imagesPath/logo_mark.png';
+
   /// Pool of all available onboarding images.
   /// Add new entries here when you drop images into [onboardingPath].
   static const List<String> onboardingImages = [
