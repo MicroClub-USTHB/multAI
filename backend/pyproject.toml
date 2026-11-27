@@ -81,4 +81,5 @@ asyncio_mode = "auto"
 markers = [
     "e2e: tests that require a running backend and infrastructure services",
     "docker: tests that start throwaway containers with docker run (skipped without docker)",
+    "integration: tests that need the infrastructure containers (Postgres, Redis, NATS, MinIO)",
 ]

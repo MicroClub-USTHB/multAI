@@ -111,13 +111,19 @@ Suggested flow:
 
 ## 8. Setup Instructions
 
-1. Install dependencies:
+1. Create your local config. `pubspec.yaml` lists `.env` as an asset, so `flutter run`, `flutter analyze` and `flutter test` all fail until the file exists (it is gitignored):
+
+```bash
+cp .env.example .env
+```
+
+2. Install dependencies:
 
 ```bash
 flutter pub get
 ```
 
-2. Run the app:
+3. Run the app:
 
 ```bash
 flutter run
@@ -125,7 +131,7 @@ flutter run
 
 Notes for local configuration:
 
-- If the app requires environment variables, copy from `.env.example` to `.env` (and keep secrets out of version control).
+- Point `BASE_URL` in `.env` at your backend (the example uses `http://localhost:8000`). Keep secrets out of version control.
 
 ## 9. Contribution Rules
 
