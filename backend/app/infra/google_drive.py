@@ -329,8 +329,33 @@ class GoogleDriveClient:
         *,
         access_token: str,
         folder_id: str,
+        recursive: bool = False,
     ) -> list[GoogleDriveFileMetadata]:
+        """List files in a folder; with recursive=True also walks subfolders."""
         files: list[GoogleDriveFileMetadata] = []
+        pending_folders = [folder_id]
+        seen_folders = {folder_id}
+        while pending_folders:
+            current = pending_folders.pop(0)
+            subfolders = await GoogleDriveClient._list_single_folder(
+                access_token=access_token, folder_id=current, files_out=files
+            )
+            if recursive:
+                for sub in subfolders:
+                    if sub not in seen_folders:
+                        seen_folders.add(sub)
+                        pending_folders.append(sub)
+        return files
+
+    @staticmethod
+    async def _list_single_folder(
+        *,
+        access_token: str,
+        folder_id: str,
+        files_out: list[GoogleDriveFileMetadata],
+    ) -> list[str]:
+        """Append the folder's files to files_out and return its subfolder ids."""
+        subfolder_ids: list[str] = []
         next_page_token: str | None = None
 
         while True:
@@ -364,8 +389,9 @@ class GoogleDriveClient:
                     )
                 metadata = GoogleDriveClient._file_metadata_from_dict(raw_file)
                 if metadata.mime_type == GoogleDriveClient._drive_folder_mime_type:
+                    subfolder_ids.append(metadata.id)
                     continue
-                files.append(metadata)
+                files_out.append(metadata)
 
             next_page_token_raw = data.get("nextPageToken")
             if next_page_token_raw is None:
@@ -376,7 +402,7 @@ class GoogleDriveClient:
                 )
             next_page_token = next_page_token_raw
 
-        return files
+        return subfolder_ids
 
     @staticmethod
     async def list_folder_contents(

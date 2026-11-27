@@ -657,6 +657,8 @@ class UploadRequestsService:
         visibility: str,
         day_number: int | None,
         requested_by: StaffUser,
+        recursive: bool = False,
+        auto_approve: bool = False,
     ) -> UploadRequestGroupDetails:
         await self.staff_drive_service.get_access_token_for_staff_user(requested_by.id)
         try:
@@ -687,6 +689,8 @@ class UploadRequestsService:
                 requested_by=requested_by.id,
                 visibility=visibility,
                 day_number=day_number,
+                recursive=recursive,
+                auto_approve=auto_approve,
                 submitted_at=datetime.now(timezone.utc),
             ).model_dump(mode="json"),
         )
@@ -951,6 +955,7 @@ class UploadRequestsService:
         group_id: uuid.UUID,
         visibility: str,
         day_number: int | None,
+        recursive: bool = False,
     ) -> UploadRequestGroupDetails | None:
         upload_group = await self.upload_request_group_querier.start_upload_request_group_processing(
             id=group_id
@@ -1002,6 +1007,7 @@ class UploadRequestsService:
             folder_files = await GoogleDriveClient.list_folder_files(
                 access_token=access_token,
                 folder_id=upload_group.folder_id,
+                recursive=recursive,
             )
             folder_files = sorted(
                 folder_files, key=lambda file: (file.name.lower(), file.id)
