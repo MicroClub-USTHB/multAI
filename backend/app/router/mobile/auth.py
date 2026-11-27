@@ -1,0 +1,324 @@
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Request, UploadFile
+from fastapi.responses import Response
+from app.core.image_validation import build_image_payload
+from app.core.exceptions import AppException
+from uuid import UUID
+
+from app.container import get_container, Container
+from app.core.constant import AuditEventType
+from app.deps.client_ip import get_client_ip
+from app.deps.token_auth import MobileUserSchema, get_current_mobile_user
+from app.deps.rate_limit import RateLimiter
+
+from app.schema.request.mobile.auth import (
+    MobileLoginRequest,
+    MobileRegisterRequest,
+    RegisterVerifyRequest,
+    ResendOtpRequest,
+    RefreshTokenRequest,
+    UpdateDeviceTokenRequest,
+    InactivateDeviceRequest,
+    UpdateProfileRequest,
+)
+from app.schema.response.mobile.auth import (
+    MeResponse,
+    DeviceSchema,
+    MobileAuthResponse,
+    SessionSchema,
+    UserSchema,
+    RegisterPendingResponse,
+)
+
+router = APIRouter(prefix="/auth")
+
+
+@router.post(
+    "/register",
+    response_model=RegisterPendingResponse | MobileAuthResponse,
+    dependencies=[Depends(RateLimiter(requests=5, window=60))],
+)
+async def mobile_register(
+    req: MobileRegisterRequest,
+    request: Request,
+    container: Container = Depends(get_container),
+) -> RegisterPendingResponse | MobileAuthResponse:
+    client_ip = get_client_ip(request)
+    result = await container.auth_service.mobile_register(
+        container.redis, req, client_ip=client_ip
+    )
+    if isinstance(result, MobileAuthResponse):
+        await container.audit_service.create_record(
+            event_type=AuditEventType.USER_SIGNUP,
+            user_id=result.user_id,
+            metadata={"endpoint": "register", "otp_activated": False},
+        )
+    return result
+
+
+@router.post(
+    "/register/resend-otp",
+    response_model=RegisterPendingResponse,
+    dependencies=[Depends(RateLimiter(requests=5, window=60))],
+)
+async def mobile_register_resend_otp(
+    req: ResendOtpRequest,
+    request: Request,
+    container: Container = Depends(get_container),
+) -> RegisterPendingResponse:
+    client_ip = get_client_ip(request)
+    result = await container.auth_service.mobile_register_resend_otp(
+        container.redis, req.email, client_ip=client_ip
+    )
+    return result
+
+
+@router.post(
+    "/register/verify",
+    response_model=MobileAuthResponse,
+    dependencies=[Depends(RateLimiter(requests=10, window=60))],
+)
+async def mobile_register_verify(
+    req: RegisterVerifyRequest,
+    request: Request,
+    container: Container = Depends(get_container),
+) -> MobileAuthResponse:
+    client_ip = get_client_ip(request)
+    result = await container.auth_service.verify_mobile_register(
+        container.redis, req, client_ip=client_ip
+    )
+    await container.audit_service.create_record(
+        event_type=AuditEventType.USER_SIGNUP,
+        user_id=result.user_id,
+        metadata={"endpoint": "register_verify"},
+    )
+    return result
+
+
+@router.post(
+    "/login",
+    response_model=MobileAuthResponse,
+    dependencies=[Depends(RateLimiter(requests=5, window=60))],
+)
+async def mobile_login(
+    req: MobileLoginRequest,
+    request: Request,
+    container: Container = Depends(get_container),
+) -> MobileAuthResponse:
+    client_ip = get_client_ip(request)
+    result = await container.auth_service.mobile_login(
+        container.redis, req, client_ip=client_ip
+    )
+    await container.audit_service.create_record(
+        event_type=AuditEventType.USER_LOGIN,
+        user_id=result.user_id,
+        metadata={"endpoint": "login"},
+    )
+    return result
+
+
+@router.post(
+    "/refresh",
+    response_model=MobileAuthResponse,
+    dependencies=[Depends(RateLimiter(requests=10, window=60))],
+)
+async def refresh_token(
+    req: RefreshTokenRequest,
+    container: Container = Depends(get_container),
+) -> MobileAuthResponse:
+    return await container.auth_service.refresh_token(
+        container.redis, req.refresh_token
+    )
+
+
+@router.post("/logout")
+async def logout(
+    container: Container = Depends(get_container),
+    current_user: MobileUserSchema = Depends(get_current_mobile_user),
+) -> dict[str, str]:
+    result = await container.auth_service.logout(
+        container.redis,
+        str(current_user.user_id),
+        str(current_user.session_id),
+    )
+    await container.audit_service.create_record(
+        event_type=AuditEventType.USER_LOGOUT,
+        user_id=current_user.user_id,
+    )
+    return result
+
+
+@router.post("/revoke-device")
+async def revoke_device(
+    device_id: UUID,
+    container: Container = Depends(get_container),
+    current_user: MobileUserSchema = Depends(get_current_mobile_user),
+) -> dict[str, str]:
+
+    device = await container.device_service.get_device_by_id(
+        device_id=device_id, user_id=current_user.user_id
+    )
+    if device is None or device.user_id != current_user.user_id:
+        raise AppException.not_found("Device not found")
+
+    session = (
+        await container.session_service.session_querier.get_session_by_device_for_user(
+            device_id=device_id, user_id=current_user.user_id
+        )
+    )
+
+    await container.device_service.revoke_device(
+        device_id=device_id,
+        user_id=current_user.user_id,
+    )
+
+    if session:
+        await container.session_service.delete_session_cache(
+            container.redis, session.id
+        )
+
+    return {"message": "Device revoked successfully"}
+
+
+@router.post("/devices/token")
+async def update_device_token(
+    req: UpdateDeviceTokenRequest,
+    container: Container = Depends(get_container),
+    current_user: MobileUserSchema = Depends(get_current_mobile_user),
+) -> dict[str, str]:
+
+    await container.device_service.update_device_push_token(
+        device_id=req.device_id,
+        user_id=current_user.user_id,
+        push_token=req.push_token,
+    )
+
+    return {"message": "Device token updated"}
+
+
+@router.post("/devices/inactivate")
+async def inactivate_device(
+    req: InactivateDeviceRequest,
+    container: Container = Depends(get_container),
+    current_user: MobileUserSchema = Depends(get_current_mobile_user),
+) -> dict[str, str]:
+
+    await container.device_service.inactivate_device(
+        device_id=req.device_id,
+        user_id=current_user.user_id,
+    )
+
+    return {"message": "Device marked as inactive"}
+
+
+@router.get("/me", response_model=MeResponse)
+async def get_me(
+    current_user: MobileUserSchema = Depends(get_current_mobile_user),
+    container: Container = Depends(get_container),
+) -> MeResponse:
+    user = await container.auth_service.get_user(user_id=current_user.user_id)
+
+    devices, _ = await container.device_service.get_all_devices(current_user.user_id)
+    device_list = [
+        DeviceSchema(
+            id=d.id,
+            device_name=d.device_name or "unknown",
+            device_type=d.device_type or "unknown",
+            totp_secret=d.totp_secret,
+        )
+        for d in devices
+    ]
+
+    session_schema: Optional[SessionSchema] = None
+    sessions_objs = await container.session_service.session_querier.get_session_by_id(
+        id=current_user.session_id
+    )
+
+    if sessions_objs:
+        session_schema = SessionSchema(
+            session_id=sessions_objs.id,
+            device_id=sessions_objs.device_id,
+            last_active=sessions_objs.last_active,
+            idle_expires_at=sessions_objs.idle_expires_at,
+            absolute_expires_at=sessions_objs.absolute_expires_at,
+        )
+
+    return MeResponse(
+        user=UserSchema(
+            id=user.id,
+            email=user.email,
+            name=user.display_name,
+            avatar_url="/user/auth/me/avatar/image" if user.avatar_key else None,
+            is_onboarded=user.face_embedding is not None,
+        ),
+        devices=device_list,
+        sessions=session_schema,
+    )
+
+
+@router.patch("/me/profile", response_model=UserSchema)
+async def update_profile(
+    req: UpdateProfileRequest,
+    current_user: MobileUserSchema = Depends(get_current_mobile_user),
+    container: Container = Depends(get_container),
+) -> UserSchema:
+    user = await container.auth_service.update_user(
+        user_id=current_user.user_id,
+        display_name=req.name.strip(),
+    )
+    return UserSchema(
+        id=user.id,
+        email=user.email,
+        name=user.display_name,
+        avatar_url="/user/auth/me/avatar/image" if user.avatar_key else None,
+        is_onboarded=user.face_embedding is not None,
+    )
+
+
+@router.post("/me/avatar", response_model=UserSchema)
+async def upload_avatar(
+    file: UploadFile,
+    current_user: MobileUserSchema = Depends(get_current_mobile_user),
+    container: Container = Depends(get_container),
+) -> UserSchema:
+    payload = await build_image_payload(file)
+    object_name = str(current_user.user_id)
+
+    await container.auth_service.upload_avatar_bytes(
+        avatar_key=object_name,
+        data=payload.bytes,
+        content_type=payload.content_type,
+        filename=payload.filename,
+    )
+    try:
+        user = await container.auth_service.update_avatar(
+            user_id=current_user.user_id,
+            avatar_key=object_name,
+        )
+    except Exception:
+        await container.auth_service.delete_avatar_bytes(avatar_key=object_name)
+        raise
+
+    return UserSchema(
+        id=user.id,
+        email=user.email,
+        name=user.display_name,
+        avatar_url="/user/auth/me/avatar/image",
+        is_onboarded=user.face_embedding is not None,
+    )
+
+
+@router.get("/me/avatar/image")
+async def get_avatar_image(
+    current_user: MobileUserSchema = Depends(get_current_mobile_user),
+    container: Container = Depends(get_container),
+) -> Response:
+    data, filename, content_type = await container.auth_service.get_avatar_bytes(
+        user_id=current_user.user_id,
+    )
+    return Response(
+        content=data,
+        media_type=content_type,
+        headers={"Content-Disposition": f'inline; filename="{filename}"'},
+    )

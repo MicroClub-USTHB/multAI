@@ -1,0 +1,45 @@
+name: Mobile CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+    paths: [ "mobile/**", ".github/workflows/mobile-ci.yml" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+    paths: [ "mobile/**", ".github/workflows/mobile-ci.yml" ]
+
+defaults:
+  run:
+    working-directory: mobile
+
+jobs:
+  analyze_and_test:
+    name: Analyze and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          # Pinned: pubspec.lock was solved with this version, and a newer stable
+          # cannot resolve bloc_test with injectable_generator.
+          flutter-version: 3.41.6
+          channel: stable
+          cache: true
+
+      # pubspec.yaml lists .env as an asset, so the bundle cannot build without it.
+      # The example holds placeholders only; no secret is involved.
+      - name: Create .env from the example
+        run: cp .env.example .env
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test

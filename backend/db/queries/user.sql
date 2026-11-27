@@ -1,0 +1,92 @@
+-- name: CreateUser :one
+INSERT INTO users (email, hashed_password, discord_id)
+VALUES ($1, $2, $3)
+RETURNING *;
+
+-- name: GetUserById :one
+SELECT *
+FROM users
+WHERE id = $1;
+
+-- name: GetUserByIdForUpdate :one
+SELECT *
+FROM users
+WHERE id = $1
+FOR UPDATE;
+
+-- name: GetUserByEmail :one
+SELECT *
+FROM users
+WHERE email = $1;
+
+-- name: GetUserByDiscordId :one
+SELECT *
+FROM users
+WHERE discord_id = $1;
+
+-- name: UpdateUserDiscordId :one
+UPDATE users
+SET discord_id = $1,
+    updated_at = NOW()
+WHERE id = $2
+RETURNING *;
+
+-- name: UpdateUserPassword :one
+UPDATE users
+SET hashed_password = $1,
+    updated_at = NOW()
+WHERE id = $2
+RETURNING *;
+
+-- name: UpdateUserAvatar :one
+UPDATE users
+SET avatar_key = $1,
+    updated_at = NOW()
+WHERE id = $2
+RETURNING *;
+
+-- name: UpdateUser :one
+UPDATE users
+SET email = COALESCE($1, email),
+    display_name = COALESCE($2, display_name),
+    blocked = COALESCE($3, blocked),
+    updated_at = NOW()
+WHERE id = $4
+RETURNING *;
+
+-- name: SetUserBlocked :one
+UPDATE users
+SET blocked = $1,
+    updated_at = NOW()
+WHERE id = $2
+RETURNING *;
+
+-- name: DeleteUser :exec
+DELETE FROM users
+WHERE id = $1;
+
+-- name: ListUsers :many
+SELECT *
+FROM users
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2;
+
+-- name: SetUserEmbedding :one
+UPDATE users
+SET face_embedding = $1::vector,
+    updated_at = NOW()
+WHERE id = $2
+RETURNING *;
+
+-- name: FindClosestUserByEmbedding :one
+SELECT id,
+       (face_embedding <=> $1::vector) AS distance
+FROM users
+WHERE face_embedding IS NOT NULL
+ORDER BY distance ASC
+LIMIT 1;
+-- name: ListUsersWithEmbedding :many
+SELECT id, face_embedding
+FROM users
+WHERE face_embedding IS NOT NULL
+AND deleted_at IS NULL;
