@@ -1,0 +1,42 @@
+services:
+  migrate:
+    build:
+      context: /home/tyjfre/Projects/multAI-back
+      dockerfile: Dockerfile
+    image: multai-back-local:dev
+
+  fastapi:
+    build:
+      context: /home/tyjfre/Projects/multAI-back
+      dockerfile: Dockerfile
+    image: multai-back-local:dev
+
+  email-worker:
+    build:
+      context: /home/tyjfre/Projects/multAI-back
+      dockerfile: Dockerfile
+    image: multai-back-local:dev
+
+  photo-worker:
+    build:
+      context: /home/tyjfre/Projects/multAI-back
+      dockerfile: Dockerfile
+    image: multai-back-local:dev
+
+  upload-group-worker:
+    build:
+      context: /home/tyjfre/Projects/multAI-back
+      dockerfile: Dockerfile
+    image: multai-back-local:dev
+
+  audit-worker:
+    build:
+      context: /home/tyjfre/Projects/multAI-back
+      dockerfile: Dockerfile
+    image: multai-back-local:dev
+
+  storage-cleaner:
+    build:
+      context: /home/tyjfre/Projects/multAI-back
+      dockerfile: Dockerfile
+    image: multai-back-local:dev
