@@ -45,6 +45,7 @@ def approval_querier() -> AsyncMock:
 
     q = MagicMock(spec=pa_queries.AsyncQuerier)
     q.update_photo_approval_decision = AsyncMock()
+    q.delete_photo_approvals_by_photo_id = AsyncMock()
     q.get_photo_approvals_by_photo_id = MagicMock()  # async generator
     return q
 
@@ -186,6 +187,9 @@ class TestRejectDecision:
         photo_querier.update_photo_status.assert_called_once_with(
             id=photo_id, status="rejected"
         )
+        approval_querier.delete_photo_approvals_by_photo_id.assert_awaited_once_with(
+            photo_id=photo_id
+        )
 
     @pytest.mark.asyncio
     async def test_rejection_triggers_storage_deletion(
@@ -211,6 +215,9 @@ class TestRejectDecision:
         await service.decide(photo_id=photo_id, user_id=user_id, decision="rejected")
 
         storage_service.delete_storage_key.assert_called_once_with(storage_key)
+        approval_querier.delete_photo_approvals_by_photo_id.assert_awaited_once_with(
+            photo_id=photo_id
+        )
 
     @pytest.mark.asyncio
     async def test_storage_deletion_failure_does_not_raise(
@@ -236,6 +243,149 @@ class TestRejectDecision:
             photo_id=photo_id, user_id=user_id, decision="rejected"
         )
         assert result == "rejected"
+
+
+# ===========================================================================
+# 2b. A rejection must remove the photo from EVERY user's approval list
+# ===========================================================================
+
+
+class TestRejectionRemovesApprovalsForAllUsers:
+    @pytest.mark.asyncio
+    async def test_rejection_deletes_all_approval_rows(
+        self,
+        approval_querier: AsyncMock,
+        photo_querier: AsyncMock,
+        storage_service: AsyncMock,
+    ) -> None:
+        """Even with a mix of approved/pending/rejected rows, all are deleted."""
+        photo_id = uuid.uuid4()
+        approvals = [
+            _make_approval("approved"),
+            _make_approval("pending"),
+            _make_approval("rejected"),
+        ]
+
+        approval_querier.update_photo_approval_decision.return_value = MagicMock()
+        approval_querier.get_photo_approvals_by_photo_id.return_value = (
+            _mock_async_iter(approvals)
+        )
+
+        service = _make_service(approval_querier, photo_querier, storage_service)
+        await service.decide(
+            photo_id=photo_id, user_id=uuid.uuid4(), decision="rejected"
+        )
+
+        approval_querier.delete_photo_approvals_by_photo_id.assert_awaited_once_with(
+            photo_id=photo_id
+        )
+        photo_querier.update_photo_status.assert_called_once_with(
+            id=photo_id, status="rejected"
+        )
+
+    @pytest.mark.asyncio
+    async def test_rejection_deletes_approvals_even_if_storage_fails(
+        self,
+        approval_querier: AsyncMock,
+        photo_querier: AsyncMock,
+        storage_service: AsyncMock,
+    ) -> None:
+        """Storage cleanup is best-effort; approvals must still be removed."""
+        photo_id = uuid.uuid4()
+        approval_querier.update_photo_approval_decision.return_value = MagicMock()
+        approval_querier.get_photo_approvals_by_photo_id.return_value = (
+            _mock_async_iter([_make_approval("rejected")])
+        )
+        storage_service.delete_storage_key.side_effect = Exception("MinIO down")
+
+        service = _make_service(approval_querier, photo_querier, storage_service)
+        result = await service.decide(
+            photo_id=photo_id, user_id=uuid.uuid4(), decision="rejected"
+        )
+
+        assert result == "rejected"
+        approval_querier.delete_photo_approvals_by_photo_id.assert_awaited_once_with(
+            photo_id=photo_id
+        )
+
+    @pytest.mark.asyncio
+    async def test_second_rejection_after_cleanup_returns_404(
+        self,
+        approval_querier: AsyncMock,
+        photo_querier: AsyncMock,
+        storage_service: AsyncMock,
+    ) -> None:
+        """Once approvals are deleted, another decision finds nothing (404)."""
+        photo_id = uuid.uuid4()
+        approval_querier.update_photo_approval_decision.return_value = None
+
+        service = _make_service(approval_querier, photo_querier, storage_service)
+        with pytest.raises(HTTPException) as exc_info:
+            await service.decide(
+                photo_id=photo_id, user_id=uuid.uuid4(), decision="rejected"
+            )
+
+        assert exc_info.value.status_code == 404
+        approval_querier.delete_photo_approvals_by_photo_id.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_approval_does_not_delete_approval_rows(
+        self,
+        approval_querier: AsyncMock,
+        photo_querier: AsyncMock,
+        storage_service: AsyncMock,
+    ) -> None:
+        approval_querier.update_photo_approval_decision.return_value = MagicMock()
+        approval_querier.get_photo_approvals_by_photo_id.return_value = (
+            _mock_async_iter([_make_approval("approved")])
+        )
+
+        service = _make_service(approval_querier, photo_querier, storage_service)
+        await service.decide(
+            photo_id=uuid.uuid4(), user_id=uuid.uuid4(), decision="approved"
+        )
+
+        approval_querier.delete_photo_approvals_by_photo_id.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_pending_does_not_delete_approval_rows(
+        self,
+        approval_querier: AsyncMock,
+        photo_querier: AsyncMock,
+        storage_service: AsyncMock,
+    ) -> None:
+        approval_querier.update_photo_approval_decision.return_value = MagicMock()
+        approval_querier.get_photo_approvals_by_photo_id.return_value = (
+            _mock_async_iter([_make_approval("approved"), _make_approval("pending")])
+        )
+
+        service = _make_service(approval_querier, photo_querier, storage_service)
+        await service.decide(
+            photo_id=uuid.uuid4(), user_id=uuid.uuid4(), decision="approved"
+        )
+
+        approval_querier.delete_photo_approvals_by_photo_id.assert_not_awaited()
+
+
+# ===========================================================================
+# 2c. Generated SQL guards rejected photos from the approval list
+# ===========================================================================
+
+
+def test_list_approvals_sql_excludes_rejected_photos() -> None:
+    from db.generated import photo_approvals as pa_queries
+
+    sql = pa_queries.LIST_APPROVALS_BY_USER_AND_STATUS
+    assert "JOIN photos" in sql
+    assert "p.status <> 'rejected'" in sql
+
+
+def test_delete_approvals_sql_targets_photo_id() -> None:
+    from db.generated import photo_approvals as pa_queries
+
+    sql = pa_queries.DELETE_PHOTO_APPROVALS_BY_PHOTO_ID
+    assert "DELETE FROM photo_approvals" in sql
+    assert "photo_id = :p1" in sql
 
 
 # ===========================================================================

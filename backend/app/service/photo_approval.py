@@ -59,6 +59,11 @@ class PhotoApprovalService:
                 id=photo_id, status="rejected"
             )
             await self._delete_photo_storage(photo_id)
+            # A rejection removes the photo for everyone: clear the remaining
+            # approvals so it no longer appears in any user's approval list.
+            await self._approval_querier.delete_photo_approvals_by_photo_id(
+                photo_id=photo_id
+            )
             return "rejected"
 
         pending = [a for a in approvals if a.decision == "pending"]
