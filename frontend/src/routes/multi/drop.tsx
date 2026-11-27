@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
+import { PageHeader } from '@/components/PageHeader'
 import { DriveDropForm } from '@/features/multi/drive-drop/components/drive-drop-form'
 import { DriveDropProgress } from '@/features/multi/drive-drop/components/drive-drop-progress'
 import { useDropDriveFolder, useDropProgress } from '@/features/multi/drive-drop/hooks'
@@ -15,14 +16,12 @@ function RouteComponent() {
   const progress = useDropProgress(groupId)
 
   return (
-    <div className="mx-auto w-full max-w-xl flex-1 space-y-6 p-4 md:p-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Drop a Drive</h1>
-        <p className="text-sm text-muted-foreground">
-          Paste a folder link. Every photo is imported, checked for faces, and sent to the people
-          in them. No review step. Admin only.
-        </p>
-      </div>
+    <div className="space-y-6 p-4 md:p-6">
+      <PageHeader
+        eyebrow="Admin only"
+        title="Drop a Drive"
+        description="Paste a folder link. Every photo is imported, checked for faces, and sent to the people in them. There is no review step."
+      />
 
       {groupId ? (
         <DriveDropProgress

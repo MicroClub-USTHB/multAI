@@ -45,7 +45,7 @@ export function DriveDropForm({ isSubmitting, error, onSubmit }: DriveDropFormPr
   }
 
   return (
-    <form onSubmit={submit} className="space-y-6 rounded-xl border bg-card p-6">
+    <form onSubmit={submit} className="border-border space-y-6 rounded-2xl border bg-card p-6 shadow-[0_1px_0_rgba(0,1,44,0.04),0_24px_48px_-28px_rgba(0,1,44,0.28)] md:p-8">
       <div className="space-y-2">
         <label htmlFor="folder-url" className="text-sm font-medium">
           Google Drive folder link
@@ -59,7 +59,7 @@ export function DriveDropForm({ isSubmitting, error, onSubmit }: DriveDropFormPr
           autoComplete="off"
         />
         <p className="text-xs text-muted-foreground">
-          Share the folder with the Google account connected in Drive settings. Subfolders are
+          Share the folder with the Google account connected to MultiAI. Subfolders are
           included.
         </p>
       </div>

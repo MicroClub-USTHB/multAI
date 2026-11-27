@@ -16,7 +16,7 @@ export function MultiHeader() {
   const multiSegments = useBreadcrumbs('/multi');
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 px-4">
+    <header className="border-border/60 flex h-14 shrink-0 items-center justify-between gap-2 border-b px-4">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="-ml-1" />
         <Separator
@@ -60,6 +60,9 @@ export function MultiHeader() {
         </Breadcrumb>
       </div>
 
+      <span className="border-border bg-card text-muted-foreground hidden rounded-full border px-3 py-1 text-xs font-medium sm:inline-flex">
+        Staff dashboard
+      </span>
     </header>
   );
 }

@@ -4,9 +4,9 @@ import { cn } from '@/shared/utils/helpers'
 import type { UploadStatus } from '../types'
 
 const STATUS_CLASSES: Record<UploadStatus, string> = {
-  pending: 'border-yellow-500/90 text-yellow-300',
-  approved: 'border-emerald-500/90 text-emerald-400',
-  rejected: 'border-red-500/90 text-red-400',
+  pending: 'border-yellow-600/70 text-yellow-700 dark:text-yellow-300',
+  approved: 'border-emerald-600/70 text-emerald-700 dark:text-emerald-400',
+  rejected: 'border-red-500/70 text-red-600 dark:text-red-400',
 }
 
 const STATUS_LABELS: Record<UploadStatus, string> = {

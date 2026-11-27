@@ -17,7 +17,9 @@ export default function MainLayout({
       <AppSidebar navData={navData} />
       <SidebarInset className="h-svh overflow-hidden">
         <MultiHeader />
-        <main className="flex-1 overflow-y-auto p-4">{children}</main>
+        <main className="app-dots flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-[1320px] p-2 md:p-4">{children}</div>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

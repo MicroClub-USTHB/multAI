@@ -1,4 +1,5 @@
-import { Calendar, CalendarX, Check, Copy, Download, QrCode } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Calendar, Check, Copy, Download, QrCode, Upload } from 'lucide-react'
 import { useState } from 'react'
 import QRCode from 'react-qr-code'
 
@@ -70,24 +71,23 @@ export function EventCard({ event }: EventCardProps) {
 	}
 
 	return (
-		<Card>
-			<CardHeader className="flex flex-row items-start justify-between gap-2">
-				<CardTitle className="text-base">{event.name}</CardTitle>
+		<Card className="border-border bg-card gap-0 rounded-2xl border py-0 shadow-[0_1px_0_rgba(0,1,44,0.04),0_24px_48px_-28px_rgba(0,1,44,0.28)] transition-shadow hover:shadow-[0_1px_0_rgba(0,1,44,0.04),0_28px_56px_-24px_rgba(0,1,44,0.38)]">
+			<CardHeader className="flex flex-row items-start justify-between gap-2 p-5 pb-3">
+				<CardTitle className="text-lg leading-snug font-semibold tracking-[-0.02em]">
+					{event.name}
+				</CardTitle>
 				<EventStatusBadge status={event.status} />
 			</CardHeader>
-			<CardContent className="space-y-3">
+			<CardContent className="space-y-4 px-5 pb-5">
 				<div className="text-muted-foreground flex items-center gap-2 text-sm">
 					<Calendar className="size-4" />
-					<span>Starts {formatDateTime(event.eventDate)}</span>
-				</div>
-				<div className="text-muted-foreground flex items-center gap-2 text-sm">
-					<CalendarX className="size-4" />
 					<span>
-						{event.endDate ? `Ends ${formatDateTime(event.endDate)}` : 'No end date set'}
+						{formatDateTime(event.eventDate)}
+						{event.endDate ? ` to ${formatDateTime(event.endDate)}` : ''}
 					</span>
 				</div>
-				<div className="flex items-center justify-between gap-2 rounded-md border border-border/70 bg-muted/30 px-3 py-2">
-					<span className="font-mono text-sm">{event.eventCode}</span>
+				<div className="bg-muted/60 flex items-center justify-between gap-2 rounded-xl px-3 py-2">
+					<span className="font-mono text-sm tracking-wider">{event.eventCode}</span>
 					<div className="flex items-center gap-1">
 						<Button
 							variant="ghost"
@@ -113,6 +113,15 @@ export function EventCard({ event }: EventCardProps) {
 						</Button>
 					</div>
 				</div>
+				{event.status !== 'archived' ? (
+					<Button
+						render={<Link to="/multi/upload" search={{ event: event.id }} />}
+						className="w-full"
+					>
+						<Upload className="mr-2 size-4" />
+						Upload photos
+					</Button>
+				) : null}
 			</CardContent>
 
 			<Dialog open={isQrOpen} onOpenChange={setIsQrOpen}>
