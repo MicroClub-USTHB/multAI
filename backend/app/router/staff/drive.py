@@ -8,6 +8,7 @@ from app.core.exceptions import AppException
 from app.deps.cookie_auth import get_current_staff_user
 from app.infra.google_drive import GoogleDriveClient
 from app.schema.request.staff.drive import GoogleDriveImportRequest
+from app.schema.request.staff.drive_import import DriveImportUrlsRequest
 from app.schema.response.staff.drive import (
     DriveBrowseResponse,
     DriveItemSchema,
@@ -18,6 +19,8 @@ from app.schema.response.staff.drive import (
     GoogleDriveImportFileResult,
     GoogleDriveImportResponse,
 )
+from app.schema.response.staff.drive_import import DriveImportUrlsResponse
+from app.schema.response.staff.uploads import UploadRequestSchema
 from app.service.staff_drive import SelectedDriveFile
 from db.generated.models import StaffUser
 
@@ -196,4 +199,35 @@ async def import_drive_files(
             )
             for r in results
         ]
+    )
+
+
+@router.post("/import-urls", response_model=DriveImportUrlsResponse)
+async def import_drive_urls(
+    req: DriveImportUrlsRequest,
+    current_staff_user: StaffUser = Depends(get_current_staff_user),
+    container: Container = Depends(get_container),
+) -> DriveImportUrlsResponse:
+    """Create an event from individual Google Drive file links.
+
+    Downloads each file into MinIO staging with the connected staff Drive
+    account, then auto-approves it so photos are promoted to final storage and
+    face processing is queued.
+    """
+    event, upload_request = (
+        await container.drive_import_service.import_to_new_event(
+            event_name=req.event.name,
+            event_date=req.event.event_date,
+            end_date=req.event.end_date,
+            file_urls=req.file_urls,
+            visibility=req.visibility,
+            day_number=req.day_number,
+            taken_at=req.taken_at,
+            requested_by=current_staff_user,
+        )
+    )
+    return DriveImportUrlsResponse(
+        event=event,
+        upload_request=UploadRequestSchema.from_details(upload_request),
+        imported_photo_count=len(upload_request.photos),
     )
