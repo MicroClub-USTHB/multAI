@@ -20,7 +20,6 @@ import { Route as MultiEventsRouteImport } from './routes/multi/events'
 import { Route as MultiDropRouteImport } from './routes/multi/drop'
 import { Route as MultiAnalyticsRouteImport } from './routes/multi/analytics'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as MultiDriveSettingsIndexRouteImport } from './routes/multi/drive-settings/index'
 
 const RssDotxmlRoute = RssDotxmlRouteImport.update({
   id: '/rss.xml',
@@ -77,11 +76,6 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MultiDriveSettingsIndexRoute = MultiDriveSettingsIndexRouteImport.update({
-  id: '/drive-settings/',
-  path: '/drive-settings/',
-  getParentRoute: () => MultiRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -95,7 +89,6 @@ export interface FileRoutesByFullPath {
   '/multi/requests': typeof MultiRequestsRoute
   '/multi/upload': typeof MultiUploadRoute
   '/multi/': typeof MultiIndexRoute
-  '/multi/drive-settings/': typeof MultiDriveSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -108,7 +101,6 @@ export interface FileRoutesByTo {
   '/multi/requests': typeof MultiRequestsRoute
   '/multi/upload': typeof MultiUploadRoute
   '/multi': typeof MultiIndexRoute
-  '/multi/drive-settings': typeof MultiDriveSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -123,7 +115,6 @@ export interface FileRoutesById {
   '/multi/requests': typeof MultiRequestsRoute
   '/multi/upload': typeof MultiUploadRoute
   '/multi/': typeof MultiIndexRoute
-  '/multi/drive-settings/': typeof MultiDriveSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,7 +130,6 @@ export interface FileRouteTypes {
     | '/multi/requests'
     | '/multi/upload'
     | '/multi/'
-    | '/multi/drive-settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -152,7 +142,6 @@ export interface FileRouteTypes {
     | '/multi/requests'
     | '/multi/upload'
     | '/multi'
-    | '/multi/drive-settings'
   id:
     | '__root__'
     | '/'
@@ -166,7 +155,6 @@ export interface FileRouteTypes {
     | '/multi/requests'
     | '/multi/upload'
     | '/multi/'
-    | '/multi/drive-settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -255,13 +243,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/multi/drive-settings/': {
-      id: '/multi/drive-settings/'
-      path: '/drive-settings'
-      fullPath: '/multi/drive-settings/'
-      preLoaderRoute: typeof MultiDriveSettingsIndexRouteImport
-      parentRoute: typeof MultiRoute
-    }
   }
 }
 
@@ -273,7 +254,6 @@ interface MultiRouteChildren {
   MultiRequestsRoute: typeof MultiRequestsRoute
   MultiUploadRoute: typeof MultiUploadRoute
   MultiIndexRoute: typeof MultiIndexRoute
-  MultiDriveSettingsIndexRoute: typeof MultiDriveSettingsIndexRoute
 }
 
 const MultiRouteChildren: MultiRouteChildren = {
@@ -284,7 +264,6 @@ const MultiRouteChildren: MultiRouteChildren = {
   MultiRequestsRoute: MultiRequestsRoute,
   MultiUploadRoute: MultiUploadRoute,
   MultiIndexRoute: MultiIndexRoute,
-  MultiDriveSettingsIndexRoute: MultiDriveSettingsIndexRoute,
 }
 
 const MultiRouteWithChildren = MultiRoute._addFileChildren(MultiRouteChildren)

@@ -3,7 +3,6 @@ import {
   ChartNoAxesColumn,
   CloudUpload,
   FolderInput,
-  HardDrive,
   ListChecks,
   Megaphone,
 } from 'lucide-react';
@@ -37,11 +36,6 @@ export const MULTI_NAV_LINKS: NavData = {
       title: 'Analytics',
       url: '/multi/analytics',
       icon: ChartNoAxesColumn,
-    },
-    {
-      title: 'Drive settings',
-      url: '/multi/drive-settings',
-      icon: HardDrive,
     },
   ],
   secondary: [
