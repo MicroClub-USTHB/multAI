@@ -12,6 +12,9 @@ import {
 import { AuthContext } from '@/hooks/useAuth';
 import { LoadingPage } from '@/shared/ui/loading';
 
+/** Minimum time the first-load splash stays up, just over one full hop. */
+const SPLASH_MIN_MS = 1800;
+
 interface AuthProviderProps {
   children: React.ReactNode;
 }
@@ -24,8 +27,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [queryClient]);
   const [isMounted, setIsMounted] = useState(false);
 
+  // The session check is quick, so hold the splash a moment so it can be seen.
+  const [splashElapsed, setSplashElapsed] = useState(false);
+
   useEffect(() => {
     setIsMounted(true);
+    const timer = setTimeout(() => setSplashElapsed(true), SPLASH_MIN_MS);
+    return () => clearTimeout(timer);
   }, []);
 
   const currentUserQuery = useQuery({
@@ -63,8 +71,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {isCheckingSession ? (
-        <LoadingPage message='Initializing...' />
+      {isCheckingSession || !splashElapsed ? (
+        <LoadingPage message='Signing you in' />
       ) : (
         children
       )}

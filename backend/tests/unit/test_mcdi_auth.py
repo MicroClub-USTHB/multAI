@@ -144,11 +144,12 @@ async def test_cookie_auth_get_current_staff_user_success_normalized_email() -> 
     # Discord returns email with mixed case
     container.mcdi_service.validate_token_cached.return_value = {
         "member": {"email": "Admin.User@Microclub.info", "id": "111"},
-        "roles": [{"roleName": "Admin"}],
+        "roles": [{"roleName": "Dev Leads"}],
     }
 
     mock_staff = MagicMock()
     mock_staff.email = "admin.user@microclub.info"
+    mock_staff.role = "admin"
     container.staff_user_querier.get_staff_user_by_email.return_value = mock_staff
 
     staff = await get_current_staff_user(container=container, token="valid_staff_tok")
@@ -160,7 +161,7 @@ async def test_cookie_auth_get_current_staff_user_success_normalized_email() -> 
 
 
 @pytest.mark.asyncio
-async def test_cookie_auth_get_current_staff_user_unauthorized_if_not_staff() -> None:
+async def test_cookie_auth_forbidden_without_multimedia_or_dev_role() -> None:
     from app.deps.cookie_auth import get_current_staff_user
 
     container = MagicMock()
@@ -170,15 +171,36 @@ async def test_cookie_auth_get_current_staff_user_unauthorized_if_not_staff() ->
 
     container.mcdi_service.validate_token_cached.return_value = {
         "member": {"email": "stranger@discord.com", "id": "999"},
-        "roles": [],
+        "roles": [{"roleName": "Design"}],
     }
-
-    container.staff_user_querier.get_staff_user_by_email.return_value = None
 
     with pytest.raises(HTTPException) as exc_info:
         await get_current_staff_user(container=container, token="valid_mcdi_tok")
-    assert exc_info.value.status_code == 401
-    assert "not authorized" in exc_info.value.detail.lower()
+    assert exc_info.value.status_code == 403
+    container.staff_user_querier.upsert_staff_user_from_sso.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_cookie_auth_provisions_profile_from_multimedia_role() -> None:
+    from app.deps.cookie_auth import get_current_staff_user
+
+    container = MagicMock()
+    container.redis = AsyncMock()
+    container.mcdi_service = AsyncMock()
+    container.staff_user_querier = AsyncMock()
+    container.mcdi_service.validate_token_cached.return_value = {
+        "member": {"email": "Lead@Microclub.info"},
+        "roles": [{"roleName": "multimedia leads"}],
+    }
+    container.staff_user_querier.get_staff_user_by_email.return_value = None
+    created = MagicMock()
+    container.staff_user_querier.upsert_staff_user_from_sso.return_value = created
+
+    staff = await get_current_staff_user(container=container, token="tok")
+    assert staff is created
+    container.staff_user_querier.upsert_staff_user_from_sso.assert_called_once_with(
+        email="lead@microclub.info", role="multi_team_lead"
+    )
 
 
 @pytest.mark.asyncio
@@ -208,11 +230,9 @@ async def test_mcdi_callback_success() -> None:
     container.mcdi_service.exchange_code.return_value = {
         "token": "new_mcdi_session_token",
         "member": {"email": "Leader@microclub.info"},
+        "roles": [{"roleName": "Multimedia"}],
     }
-
-    mock_staff = MagicMock()
-    mock_staff.email = "leader@microclub.info"
-    container.staff_user_querier.get_staff_user_by_email = AsyncMock(return_value=mock_staff)
+    container.staff_user_querier.upsert_staff_user_from_sso = AsyncMock()
 
     res = await mcdi_callback(
         request=request,
@@ -223,8 +243,8 @@ async def test_mcdi_callback_success() -> None:
 
     assert isinstance(res, RedirectResponse)
     assert "/multi" in res.headers["location"]
-    container.staff_user_querier.get_staff_user_by_email.assert_called_once_with(
-        email="leader@microclub.info"
+    container.staff_user_querier.upsert_staff_user_from_sso.assert_called_once_with(
+        email="leader@microclub.info", role="multi"
     )
 
 

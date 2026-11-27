@@ -1,3 +1,4 @@
+from datetime import datetime
 import secrets
 import uuid
 from typing import List, Optional
@@ -25,6 +26,29 @@ class EventService:
         self.p_querier = p_querier
 
     # --- Core Event Management ---
+
+    async def create_event(
+        self,
+        *,
+        name: str,
+        event_date: datetime,
+        end_date: datetime | None = None,
+        created_by: uuid.UUID | None = None,
+        status: str = "draft",
+    ) -> EventResponse:
+        event = await self.e_querier.create_event(
+            event_queries.CreateEventParams(
+                name=name,
+                event_code=secrets.token_urlsafe(8),
+                event_date=event_date,
+                end_date=end_date,
+                status=status,
+                created_by=created_by,
+            )
+        )
+        if event is None:
+            raise AppException.internal_error("Failed to create event")
+        return EventResponse.model_validate(event)
 
     async def sync_from_hr(self, req: HrEventSync) -> EventResponse:
         """Idempotently create/link the MultiAi event for an HR-Events event."""

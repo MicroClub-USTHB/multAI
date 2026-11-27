@@ -24,10 +24,25 @@ async def _handle_message(data: bytes) -> None:
 
     async with engine.begin() as conn:
         container = Container(conn)
-        await container.upload_requests_service.process_group_import(
+        details = await container.upload_requests_service.process_group_import(
             group_id=event.group_id,
             visibility=event.visibility,
             day_number=event.day_number,
+            recursive=event.recursive,
+        )
+        if not event.auto_approve or details is None:
+            return
+        if not details.requests:
+            return  # import failed or found nothing; nothing to approve
+        approver = await container.staff_user_querier.get_staff_user_by_id(
+            id=event.requested_by
+        )
+        if approver is None:
+            logger.warning("Auto-approve skipped: staff user %s gone", event.requested_by)
+            return
+        await container.upload_requests_service.approve_group(
+            group_id=event.group_id,
+            approved_by=approver,
         )
 
 

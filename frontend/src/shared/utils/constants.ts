@@ -1,10 +1,10 @@
 import {
   Bell,
+  ChartNoAxesColumn,
   CloudUpload,
-  LayoutDashboard,
+  FolderInput,
   ListChecks,
   Megaphone,
-  UsersRound,
 } from 'lucide-react';
 
 import type { NavData } from './types';
@@ -12,24 +12,20 @@ import type { NavData } from './types';
 export const MULTI_NAV_LINKS: NavData = {
   main: [
     {
-      title: 'Dashboard',
-      url: '/multi',
-      icon: LayoutDashboard,
-    },
-    {
       title: 'Events',
       url: '/multi/events',
       icon: Megaphone,
     },
     {
-      title: 'Upload & Storage',
+      title: 'Upload photos',
       url: '/multi/upload',
       icon: CloudUpload,
     },
     {
-      title: 'Drive Settings',
-      url: '/multi/drive-settings',
-      icon: CloudUpload,
+      title: 'Drop a Drive',
+      url: '/multi/drop',
+      icon: FolderInput,
+      adminOnly: true,
     },
     {
       title: 'Requests',
@@ -37,9 +33,9 @@ export const MULTI_NAV_LINKS: NavData = {
       icon: ListChecks,
     },
     {
-      title: 'Team Management',
-      url: '/multi/team',
-      icon: UsersRound,
+      title: 'Analytics',
+      url: '/multi/analytics',
+      icon: ChartNoAxesColumn,
     },
   ],
   secondary: [

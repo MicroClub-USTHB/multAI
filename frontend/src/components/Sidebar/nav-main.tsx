@@ -25,7 +25,7 @@ export function NavMain({ items }: { items: NavLink[] }) {
   const { pathname } = useLocation();
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Main</SidebarGroupLabel>
+      <SidebarGroupLabel className="text-[11px] tracking-[0.14em] uppercase">Menu</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible

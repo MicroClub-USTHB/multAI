@@ -13,4 +13,6 @@ class UploadGroupImportRequestedEvent(BaseModel):
     requested_by: uuid.UUID
     visibility: str
     day_number: int | None = None
+    recursive: bool = False
+    auto_approve: bool = False
     submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
