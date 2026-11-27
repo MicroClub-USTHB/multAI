@@ -1,6 +1,7 @@
 import { useRouter } from '@tanstack/react-router';
 import { AlertTriangle } from 'lucide-react';
 
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/shared/ui';
 
 interface DriveSettingsErrorProps {
@@ -14,9 +15,9 @@ export default function DriveSettingsError({ error }: DriveSettingsErrorProps) {
   };
 
   return (
-    <div className="bg-sidebar text-sidebar-foreground">
-      <div className="space-y-6 p-6">
-        <h1 className="text-3xl font-bold">Drive Settings</h1>
+    <div>
+      <div className="space-y-6 p-4 md:p-6">
+        <PageHeader eyebrow="Staff dashboard" title="Drive Settings" />
 
         <div className="border-destructive/40 bg-destructive/10 text-destructive rounded-lg border p-4 text-sm">
           <div className="mb-3 flex items-center gap-2 font-medium">

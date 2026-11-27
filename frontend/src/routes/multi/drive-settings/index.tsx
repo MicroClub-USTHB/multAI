@@ -3,6 +3,7 @@ import { CheckCircle2 } from 'lucide-react';
 
 import type { SyncInterval } from '@/features/multi/drive/types';
 
+import { PageHeader } from '@/components/PageHeader';
 import { GoogleDriveAuthCard } from '@/features/multi/drive/components/google-auth-card';
 import { OutputFolderCard } from '@/features/multi/drive/components/output-folder-card';
 import { SyncFrequencyCard } from '@/features/multi/drive/components/sync-frequency-card';
@@ -46,14 +47,13 @@ function RouteComponent() {
   };
 
   return (
-    <div className="bg-sidebar text-sidebar-foreground">
-      <div className="space-y-6 p-6">
-        <div>
-          <h1 className="text-3xl font-bold">Drive Settings</h1>
-          <p className="text-muted-foreground mt-1">
-            Configure Google Drive integration and synchronization.
-          </p>
-        </div>
+    <div>
+      <div className="space-y-6 p-4 md:p-6">
+        <PageHeader
+          eyebrow="Staff dashboard"
+          title="Drive Settings"
+          description="Configure Google Drive integration and synchronization."
+        />
 
         {actionFeedback?.tone === 'error' ? (
           <div className="border-destructive/40 bg-destructive/10 text-destructive rounded-lg border p-4 text-sm">

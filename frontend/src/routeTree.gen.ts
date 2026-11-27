@@ -14,11 +14,11 @@ import { Route as MultiRouteImport } from './routes/multi'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MultiIndexRouteImport } from './routes/multi/index'
 import { Route as MultiUploadRouteImport } from './routes/multi/upload'
-import { Route as MultiTeamRouteImport } from './routes/multi/team'
 import { Route as MultiRequestsRouteImport } from './routes/multi/requests'
 import { Route as MultiNotificationsRouteImport } from './routes/multi/notifications'
 import { Route as MultiEventsRouteImport } from './routes/multi/events'
 import { Route as MultiDropRouteImport } from './routes/multi/drop'
+import { Route as MultiAnalyticsRouteImport } from './routes/multi/analytics'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as MultiDriveSettingsIndexRouteImport } from './routes/multi/drive-settings/index'
 
@@ -47,11 +47,6 @@ const MultiUploadRoute = MultiUploadRouteImport.update({
   path: '/upload',
   getParentRoute: () => MultiRoute,
 } as any)
-const MultiTeamRoute = MultiTeamRouteImport.update({
-  id: '/team',
-  path: '/team',
-  getParentRoute: () => MultiRoute,
-} as any)
 const MultiRequestsRoute = MultiRequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
@@ -72,6 +67,11 @@ const MultiDropRoute = MultiDropRouteImport.update({
   path: '/drop',
   getParentRoute: () => MultiRoute,
 } as any)
+const MultiAnalyticsRoute = MultiAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => MultiRoute,
+} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
@@ -88,11 +88,11 @@ export interface FileRoutesByFullPath {
   '/multi': typeof MultiRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
   '/auth/login': typeof AuthLoginRoute
+  '/multi/analytics': typeof MultiAnalyticsRoute
   '/multi/drop': typeof MultiDropRoute
   '/multi/events': typeof MultiEventsRoute
   '/multi/notifications': typeof MultiNotificationsRoute
   '/multi/requests': typeof MultiRequestsRoute
-  '/multi/team': typeof MultiTeamRoute
   '/multi/upload': typeof MultiUploadRoute
   '/multi/': typeof MultiIndexRoute
   '/multi/drive-settings/': typeof MultiDriveSettingsIndexRoute
@@ -101,11 +101,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/auth/login': typeof AuthLoginRoute
+  '/multi/analytics': typeof MultiAnalyticsRoute
   '/multi/drop': typeof MultiDropRoute
   '/multi/events': typeof MultiEventsRoute
   '/multi/notifications': typeof MultiNotificationsRoute
   '/multi/requests': typeof MultiRequestsRoute
-  '/multi/team': typeof MultiTeamRoute
   '/multi/upload': typeof MultiUploadRoute
   '/multi': typeof MultiIndexRoute
   '/multi/drive-settings': typeof MultiDriveSettingsIndexRoute
@@ -116,11 +116,11 @@ export interface FileRoutesById {
   '/multi': typeof MultiRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
   '/auth/login': typeof AuthLoginRoute
+  '/multi/analytics': typeof MultiAnalyticsRoute
   '/multi/drop': typeof MultiDropRoute
   '/multi/events': typeof MultiEventsRoute
   '/multi/notifications': typeof MultiNotificationsRoute
   '/multi/requests': typeof MultiRequestsRoute
-  '/multi/team': typeof MultiTeamRoute
   '/multi/upload': typeof MultiUploadRoute
   '/multi/': typeof MultiIndexRoute
   '/multi/drive-settings/': typeof MultiDriveSettingsIndexRoute
@@ -132,11 +132,11 @@ export interface FileRouteTypes {
     | '/multi'
     | '/rss.xml'
     | '/auth/login'
+    | '/multi/analytics'
     | '/multi/drop'
     | '/multi/events'
     | '/multi/notifications'
     | '/multi/requests'
-    | '/multi/team'
     | '/multi/upload'
     | '/multi/'
     | '/multi/drive-settings/'
@@ -145,11 +145,11 @@ export interface FileRouteTypes {
     | '/'
     | '/rss.xml'
     | '/auth/login'
+    | '/multi/analytics'
     | '/multi/drop'
     | '/multi/events'
     | '/multi/notifications'
     | '/multi/requests'
-    | '/multi/team'
     | '/multi/upload'
     | '/multi'
     | '/multi/drive-settings'
@@ -159,11 +159,11 @@ export interface FileRouteTypes {
     | '/multi'
     | '/rss.xml'
     | '/auth/login'
+    | '/multi/analytics'
     | '/multi/drop'
     | '/multi/events'
     | '/multi/notifications'
     | '/multi/requests'
-    | '/multi/team'
     | '/multi/upload'
     | '/multi/'
     | '/multi/drive-settings/'
@@ -213,13 +213,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MultiUploadRouteImport
       parentRoute: typeof MultiRoute
     }
-    '/multi/team': {
-      id: '/multi/team'
-      path: '/team'
-      fullPath: '/multi/team'
-      preLoaderRoute: typeof MultiTeamRouteImport
-      parentRoute: typeof MultiRoute
-    }
     '/multi/requests': {
       id: '/multi/requests'
       path: '/requests'
@@ -248,6 +241,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MultiDropRouteImport
       parentRoute: typeof MultiRoute
     }
+    '/multi/analytics': {
+      id: '/multi/analytics'
+      path: '/analytics'
+      fullPath: '/multi/analytics'
+      preLoaderRoute: typeof MultiAnalyticsRouteImport
+      parentRoute: typeof MultiRoute
+    }
     '/auth/login': {
       id: '/auth/login'
       path: '/auth/login'
@@ -266,22 +266,22 @@ declare module '@tanstack/react-router' {
 }
 
 interface MultiRouteChildren {
+  MultiAnalyticsRoute: typeof MultiAnalyticsRoute
   MultiDropRoute: typeof MultiDropRoute
   MultiEventsRoute: typeof MultiEventsRoute
   MultiNotificationsRoute: typeof MultiNotificationsRoute
   MultiRequestsRoute: typeof MultiRequestsRoute
-  MultiTeamRoute: typeof MultiTeamRoute
   MultiUploadRoute: typeof MultiUploadRoute
   MultiIndexRoute: typeof MultiIndexRoute
   MultiDriveSettingsIndexRoute: typeof MultiDriveSettingsIndexRoute
 }
 
 const MultiRouteChildren: MultiRouteChildren = {
+  MultiAnalyticsRoute: MultiAnalyticsRoute,
   MultiDropRoute: MultiDropRoute,
   MultiEventsRoute: MultiEventsRoute,
   MultiNotificationsRoute: MultiNotificationsRoute,
   MultiRequestsRoute: MultiRequestsRoute,
-  MultiTeamRoute: MultiTeamRoute,
   MultiUploadRoute: MultiUploadRoute,
   MultiIndexRoute: MultiIndexRoute,
   MultiDriveSettingsIndexRoute: MultiDriveSettingsIndexRoute,

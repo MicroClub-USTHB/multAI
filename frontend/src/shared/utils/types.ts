@@ -4,6 +4,8 @@ export type NavLink = {
   icon?: React.ComponentType;
   isActive?: boolean;
   items?: Array<NavLink>;
+  /** Hidden from everyone but admins. */
+  adminOnly?: boolean;
 };
 
 export type NavData = {
