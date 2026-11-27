@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.core.exceptions import AppException
 from app.deps.cookie_auth import get_current_staff_user
 from app.schema.response.web.staff_user import StaffUserSchema
+from app.service.mcdi_roles import resolve_staff_role
 from db.generated.models import StaffUser
 
 logger = logging.getLogger(__name__)
@@ -76,11 +77,14 @@ async def mcdi_callback(
         raise AppException.unauthorized("No email provided by MCDI")
 
     normalized_email = email.strip().lower()
-    staff_user = await container.staff_user_querier.get_staff_user_by_email(
-        email=normalized_email
+    role = resolve_staff_role(mcdi_data)
+    if role is None:
+        raise AppException.forbidden(
+            "Only Multimedia or Development members can access the dashboard"
+        )
+    await container.staff_user_querier.upsert_staff_user_from_sso(
+        email=normalized_email, role=role.value
     )
-    if not staff_user:
-        raise AppException.unauthorized("Not authorized for admin panel")
 
     token = mcdi_data.get("token")
     if not token:

@@ -140,6 +140,19 @@ class Settings(BaseSettings):
     MCDI_BASE_URL: str = "https://mcid.microclub.info/api"
     MCDI_SERVER_ID: str = ""
     MCDI_REDIRECT_URI_WEB: str = ""
+    # MCDI (Discord) role names -> staff role. Matching is case-insensitive.
+    # Highest wins: admin > multi_team_lead > multi. No match = no access.
+    MCDI_ADMIN_ROLES: list[str] = [
+        "Development",
+        "Web Development",
+        "Mobile Development",
+        "Dev Leads",
+        "Dev manager",
+        "DevProjectManager",
+        "MC Website Dev",
+    ]
+    MCDI_TEAM_LEAD_ROLES: list[str] = ["Multimedia Leads", "Multimedia Manager"]
+    MCDI_MULTI_ROLES: list[str] = ["Multimedia", "MCC multimedia"]
 
     # Shared key HR-Events uses to call /internal/* endpoints
     HR_EVENTS_SERVICE_KEY: str = ""
