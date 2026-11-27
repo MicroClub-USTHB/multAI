@@ -61,6 +61,57 @@ body {
   }
 }
 
+/* Splash screen (BrandSplash). Everything stops under prefers-reduced-motion. */
+.splash-hop {
+  transform-origin: 50% 100%;
+  animation: splash-hop 1.5s cubic-bezier(0.33, 0, 0.4, 1) infinite;
+}
+.splash-shadow {
+  width: 6rem;
+  height: 0.9rem;
+  margin-top: 0.6rem;
+  border-radius: 9999px;
+  background: rgba(217, 221, 255, 0.16);
+  animation: splash-shadow 1.5s cubic-bezier(0.33, 0, 0.4, 1) infinite;
+}
+.splash-look {
+  animation: splash-look 3s ease-in-out infinite;
+}
+.splash-blink {
+  transform-box: fill-box;
+  transform-origin: 50% 55%;
+  animation: splash-blink 3s infinite;
+}
+.splash-word {
+  animation: rise-in 900ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both;
+}
+
+@keyframes splash-hop {
+  0%, 100% { transform: translateY(0) scale(1.14, 0.86); }
+  14% { transform: translateY(-14px) scale(0.93, 1.09); }
+  50% { transform: translateY(-46px) scale(0.98, 1.03); }
+  86% { transform: translateY(-14px) scale(0.93, 1.09); }
+}
+@keyframes splash-shadow {
+  0%, 100% { transform: scale(1.1); opacity: 0.55; }
+  50% { transform: scale(0.55); opacity: 0.2; }
+}
+@keyframes splash-blink {
+  0%, 62%, 70%, 100% { transform: scaleY(1); }
+  66% { transform: scaleY(0.08); }
+}
+@keyframes splash-look {
+  0%, 12%, 100% { transform: translateX(0); }
+  22%, 40% { transform: translateX(-3px); }
+  52%, 58% { transform: translateX(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-hop, .splash-shadow, .splash-look, .splash-blink, .splash-word {
+    animation: none;
+  }
+}
+
 :root {
   --background: oklch(0.9838 0.0035 247.8583);
   --foreground: oklch(0.1284 0.0267 261.5937);
