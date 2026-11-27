@@ -1,5 +1,6 @@
 import { Loader2 } from 'lucide-react';
 
+import { BrandSplash } from '@/components/BrandSplash';
 import { cn } from '@/shared/utils/helpers';
 
 interface LoadingSpinnerProps {
@@ -58,16 +59,11 @@ interface LoadingPageProps {
 }
 
 export function LoadingPage({
-  message = 'Loading...',
+  message = 'Loading',
   className,
 }: LoadingPageProps) {
-  return (
-    <div
-      className={cn('flex items-center justify-center min-h-screen', className)}
-    >
-      <LoadingSpinner size='lg' text={message} showText />
-    </div>
-  );
+  // The animated logo replaces the spinner and text; the message is read aloud only.
+  return <BrandSplash label={message} className={className} />;
 }
 
 interface LoadingOverlayProps {
