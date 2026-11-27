@@ -1,0 +1,225 @@
+import io
+import random
+import string
+import uuid
+from dataclasses import dataclass
+from datetime import timedelta
+from fastapi import UploadFile
+from miniopy_async.commonconfig import CopySource
+from miniopy_async.error import S3Error
+from miniopy_async.api import Minio
+
+from app.core.utils import check_extension
+from app.core.exceptions import AppException
+from app.core.constant import (
+    DEFAULT_CONTENT_TYPE,
+    DOCUMENTS_BUCKET_NAME as CORE_DOCUMENTS_BUCKET_NAME,
+    IMAGES_BUCKET_NAME as CORE_IMAGES_BUCKET_NAME,
+    WA_SIM_BUCKET_NAME as CORE_WA_SIM_BUCKET_NAME,
+)
+
+
+# Re-export bucket names for compatibility with existing imports.
+IMAGES_BUCKET_NAME = CORE_IMAGES_BUCKET_NAME
+DOCUMENTS_BUCKET_NAME = CORE_DOCUMENTS_BUCKET_NAME
+WA_SIM_BUCKET_NAME = CORE_WA_SIM_BUCKET_NAME
+
+
+async def init_minio_client(
+    minio_host: str,
+    minio_port: int,
+    minio_root_user: str,
+    minio_root_password: str,
+    *,
+    public_endpoint: str = "",
+    public_secure: bool = True,
+    region: str = "us-east-1",
+) -> None:
+    Bucket.client = Minio(
+        f"{minio_host}:{minio_port}",
+        access_key=minio_root_user,
+        secret_key=minio_root_password,
+        secure=False,
+    )
+
+    # Presigned URLs are handed to browsers, so they must be signed for the
+    # host the browser reaches (SigV4 covers the Host header). That host is
+    # not the internal one, so a second client signs them. The region is passed
+    # explicitly: without it the client would call GetBucketLocation on the
+    # public host from inside the container before signing.
+    Bucket.signing_client = (
+        Minio(
+            public_endpoint,
+            access_key=minio_root_user,
+            secret_key=minio_root_password,
+            secure=public_secure,
+            region=region,
+        )
+        if public_endpoint
+        else None
+    )
+
+    for bucket_name in [IMAGES_BUCKET_NAME, DOCUMENTS_BUCKET_NAME, WA_SIM_BUCKET_NAME]:
+        if not await Bucket.client.bucket_exists(bucket_name):
+            await Bucket.client.make_bucket(bucket_name)
+
+
+@dataclass(frozen=True)
+class ObjectStat:
+    size: int
+    content_type: str
+
+
+class Bucket:
+    bucket_name: str
+    file_prefix: str
+    client: Minio
+    # Only set when a public endpoint is configured; see init_minio_client.
+    signing_client: Minio | None = None
+
+    def __init__(self, bucket_name: str, file_prefix: str):
+        self.bucket_name = bucket_name
+        self.file_prefix = file_prefix
+
+    def _object_path(self, object_name: str) -> str:
+        if self.file_prefix:
+            return f"{self.file_prefix}/{object_name}"
+        return object_name
+
+    async def put(self, file: UploadFile, object_name: str | None = None) -> str:
+        if object_name is None:
+            object_name = str(uuid.uuid4())
+
+        if file.content_type is None:
+            file.content_type = DEFAULT_CONTENT_TYPE
+
+        if file.filename is None:
+            file.filename = object_name
+
+        await self.client.put_object(
+            bucket_name=self.bucket_name,
+            object_name=self._object_path(object_name),
+            data=file.file,
+            length=-1,
+            part_size=10 * 1024 * 1024,
+            content_type=file.content_type,
+            metadata={
+                "filename": file.filename,
+            },
+        )
+        return object_name
+
+    async def get(self, object_name: str) -> tuple[bytes, str, str]:
+        try:
+            res = await self.client.get_object(
+                bucket_name=self.bucket_name,
+                object_name=self._object_path(object_name),
+            )
+        except S3Error as e:
+            if e.code == "NoSuchKey":
+                raise AppException.not_found("File not found")
+            else:
+                raise e
+
+        data = await res.read()
+        content_type = res.content_type if res.content_type else DEFAULT_CONTENT_TYPE
+        filename = res.headers.get("x-amz-meta-filename", f"{object_name}")
+
+        res.close()
+        return (data, filename, content_type)
+
+    async def delete(self, object_name: str) -> None:
+        await self.client.remove_object(
+            bucket_name=self.bucket_name,
+            object_name=self._object_path(object_name),
+        )
+
+    async def put_bytes(
+        self,
+        *,
+        data: bytes,
+        object_name: str,
+        content_type: str,
+        filename: str | None = None,
+    ) -> str:
+        await self.client.put_object(
+            bucket_name=self.bucket_name,
+            object_name=self._object_path(object_name),
+            data=io.BytesIO(data),
+            length=len(data),
+            part_size=10 * 1024 * 1024,
+            content_type=content_type,
+            metadata={"filename": filename or object_name},
+        )
+        return object_name
+
+    async def copy(self, *, source_object_name: str, target_object_name: str) -> str:
+        await self.client.copy_object(
+            bucket_name=self.bucket_name,
+            object_name=self._object_path(target_object_name),
+            source=CopySource(
+                self.bucket_name,
+                self._object_path(source_object_name),
+            ),
+        )
+        return target_object_name
+
+    async def presigned_put_url(self, object_name: str, *, expires_seconds: int) -> str:
+        signer = self.signing_client or self.client
+        return await signer.presigned_put_object(
+            bucket_name=self.bucket_name,
+            object_name=self._object_path(object_name),
+            expires=timedelta(seconds=expires_seconds),
+        )
+
+    async def stat(self, object_name: str) -> ObjectStat | None:
+        try:
+            result = await self.client.stat_object(
+                bucket_name=self.bucket_name,
+                object_name=self._object_path(object_name),
+            )
+        except S3Error as e:
+            if e.code == "NoSuchKey":
+                return None
+            raise
+        return ObjectStat(
+            size=result.size or 0,
+            content_type=result.content_type or DEFAULT_CONTENT_TYPE,
+        )
+
+
+image_ext_content_type_map = {
+    "apng": ["image/apng"],
+    "avif": ["image/avif"],
+    "gif": ["image/gif"],
+    "jpeg": ["image/jpeg"],
+    "jpg": ["image/jpeg"],
+    "png": ["image/png", "image/x-citrix-png"],
+    "svg": ["image/svg+xml"],
+    "webp": ["image/webp"],
+    "ico": ["image/x-icon", "image/vnd.microsoft.icon"],
+}
+
+
+class ImageBucket(Bucket):
+    def __init__(self, file_prefix: str):
+        super().__init__(IMAGES_BUCKET_NAME, file_prefix)
+
+    async def put(self, file: UploadFile, object_name: str | None = None) -> str:
+        check_extension(file, image_ext_content_type_map)
+        return await super().put(file, object_name)
+
+
+class DocumentBucket(Bucket):
+    def __init__(self, file_prefix: str):
+        super().__init__(DOCUMENTS_BUCKET_NAME, file_prefix)
+
+
+class WaSimBucket(Bucket):
+    def __init__(self) -> None:
+        super().__init__(WA_SIM_BUCKET_NAME, "")
+
+    async def put(self, file: UploadFile, object_name: str | None = None) -> str:
+        if object_name is None:
+            object_name = "".join(random.choice(string.digits) for _ in range(16))
+        return await super().put(file, object_name)

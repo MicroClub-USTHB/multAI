@@ -1,0 +1,58 @@
+# Secrets and local config: must never be baked into an image.
+.env
+.env.*
+!.env.example
+!.env.staging.example
+*.pem
+*.key
+*firebase-adminsdk*.json
+firebase-credentials.json
+**/service-account*.json
+
+# VCS / tooling / editors
+.git
+.gitignore
+.github
+.claude
+.superpowers
+.vscode
+.idea
+.DS_Store
+**/.DS_Store
+
+# Python artefacts and local environments
+.venv
+venv
+.uv-cache
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+coverage_report.txt
+htmlcov
+*.db
+*.sqlite3
+
+# Not needed at runtime
+tests
+docs
+mobile-quickstart
+typings
+scripts
+makefile
+Makefile
+docker-compose*.yml
+deploy
+Dockerfile
+.dockerignore
+*.md
+db/schema.sql
+
+# Local model cache / data
+insightface
+*.onnx

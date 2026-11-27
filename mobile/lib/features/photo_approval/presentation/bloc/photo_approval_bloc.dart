@@ -1,0 +1,127 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/errors/failure_handler.dart';
+import '../../../../core/errors/error_presentation.dart';
+import '../../domain/entities/photo_approval_entity.dart';
+import '../../domain/usecases/get_approvals_usecase.dart';
+import '../../domain/usecases/decide_photo_approval_usecase.dart';
+
+part 'photo_approval_event.dart';
+part 'photo_approval_state.dart';
+
+class PhotoApprovalBloc extends Bloc<PhotoApprovalEvent, PhotoApprovalState> {
+  final GetApprovalsUsecase _getApprovals;
+  final DecidePhotoApprovalUseCase _decideApproval;
+  final FailureHandler _failureHandler;
+
+  PhotoApprovalBloc({
+    required GetApprovalsUsecase getApprovals,
+    required DecidePhotoApprovalUseCase decideApproval,
+    FailureHandler? failureHandler,
+  }) : _getApprovals = getApprovals,
+       _decideApproval = decideApproval,
+       _failureHandler = failureHandler ?? FailureHandler.instance,
+       super(PhotoApprovalInitial()) {
+    on<LoadApprovals>(_onLoadApprovals);
+    on<LoadPendingApprovals>(_onLoadPending);
+    on<ApprovePhoto>(_onApprove);
+    on<RejectPhoto>(_onReject);
+  }
+
+  Future<void> _onLoadApprovals(
+    LoadApprovals event,
+    Emitter<PhotoApprovalState> emit,
+  ) async {
+    emit(PhotoApprovalLoading());
+
+    final result = await _getApprovals(
+      GetApprovalsParams(status: event.status),
+    );
+
+    result.fold(
+      (failure) {
+        _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
+        emit(
+          PhotoApprovalError(
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
+          ),
+        );
+      },
+      (approvals) {
+        final pending = approvals.where((a) => a.decision.isPending).toList();
+        final history = approvals.where((a) => !a.decision.isPending).toList();
+        emit(PhotoApprovalLoaded(pending: pending, history: history));
+      },
+    );
+  }
+
+  Future<void> _onLoadPending(
+    LoadPendingApprovals event,
+    Emitter<PhotoApprovalState> emit,
+  ) async {
+    add(LoadApprovals(status: 'pending'));
+  }
+
+  Future<void> _onApprove(
+    ApprovePhoto event,
+    Emitter<PhotoApprovalState> emit,
+  ) async {
+    emit(PhotoApprovalDeciding(photoId: event.photoId));
+
+    final result = await _decideApproval(
+      DecidePhotoParams(photoId: event.photoId, decision: 'approved'),
+    );
+
+    result.fold(
+      (failure) {
+        _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
+        emit(
+          PhotoApprovalError(
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
+          ),
+        );
+      },
+      (photoStatus) {
+        emit(
+          PhotoApprovalDecisionSuccess(
+            photoId: event.photoId,
+            decision: 'approved',
+            photoStatus: photoStatus,
+          ),
+        );
+        add(LoadApprovals());
+      },
+    );
+  }
+
+  Future<void> _onReject(
+    RejectPhoto event,
+    Emitter<PhotoApprovalState> emit,
+  ) async {
+    emit(PhotoApprovalDeciding(photoId: event.photoId));
+
+    final result = await _decideApproval(
+      DecidePhotoParams(photoId: event.photoId, decision: 'rejected'),
+    );
+
+    result.fold(
+      (failure) {
+        _failureHandler.logFailure(failure, 'PhotoApprovalBloc');
+        emit(
+          PhotoApprovalError(
+            errorPresentation: _failureHandler.getErrorPresentation(failure),
+          ),
+        );
+      },
+      (photoStatus) {
+        emit(
+          PhotoApprovalDecisionSuccess(
+            photoId: event.photoId,
+            decision: 'rejected',
+            photoStatus: photoStatus,
+          ),
+        );
+        add(LoadApprovals());
+      },
+    );
+  }
+}

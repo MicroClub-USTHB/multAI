@@ -1,0 +1,199 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:dartz/dartz.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:multai_mobile/core/constants/storage_keys.dart';
+import 'package:multai_mobile/core/storage/app_local_storage.dart';
+import '../../../../core/errors/failure.dart';
+import '../../domain/entities/album_entity.dart';
+import '../../domain/repositories/album_repository.dart';
+
+class AlbumRepositoryImpl implements AlbumRepository {
+  final AppLocalStorage _localStorage;
+  static const String _legacyAlbumsKey = 'user_albums';
+
+  AlbumRepositoryImpl({required AppLocalStorage localStorage})
+    : _localStorage = localStorage;
+
+  /// Albums are private to the account that created them, so both the index
+  /// and the album folders are namespaced by the signed-in user id. Without
+  /// this, a second account signing in on the same device saw the previous
+  /// account's albums (they are stored device-wide in shared preferences).
+  String? get _accountId {
+    final id = _localStorage.getString(StorageKeys.currentUserId);
+    return (id == null || id.isEmpty) ? null : id;
+  }
+
+  String get _albumsKey {
+    final id = _accountId;
+    return id == null ? _legacyAlbumsKey : '${_legacyAlbumsKey}_$id';
+  }
+
+  @override
+  Future<Either<Failure, List<AlbumEntity>>> getAlbums() async {
+    try {
+      final data = _localStorage.getString(_albumsKey);
+      if (data == null || data.isEmpty) return const Right([]);
+
+      final List<dynamic> jsonList = jsonDecode(data) as List<dynamic>;
+      final albums = jsonList
+          .map((e) => AlbumEntity.fromJson(e as Map<String, dynamic>))
+          .toList();
+
+      albums.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return Right(albums);
+    } catch (e) {
+      debugPrint('Failed to load albums: $e');
+      return Left(CacheFailure('Failed to load albums: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AlbumEntity>> createAlbum(String name) async {
+    try {
+      if (name.trim().isEmpty) {
+        return const Left(ValidationFailure('Album name cannot be empty'));
+      }
+
+      final existing = await getAlbums();
+      return existing.fold((failure) => Left(failure), (albums) async {
+        final exists = albums.any(
+          (a) => a.name.toLowerCase() == name.trim().toLowerCase(),
+        );
+        if (exists) {
+          return const Left(
+            ValidationFailure('An album with this name already exists'),
+          );
+        }
+
+        final album = AlbumEntity(
+          name: name.trim(),
+          photoCount: 0,
+          createdAt: DateTime.now(),
+        );
+
+        final updated = [album, ...albums];
+        await _saveAlbums(updated);
+
+        return Right(album);
+      });
+    } catch (e) {
+      debugPrint('Failed to create album: $e');
+      return Left(CacheFailure('Failed to create album: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> addPhotosToAlbum(
+    String albumName,
+    List<String> photoPaths,
+  ) async {
+    try {
+      final albumsResult = await getAlbums();
+      return await albumsResult.fold((failure) async => Left(failure), (
+        albums,
+      ) async {
+        final albumIndex = albums.indexWhere((a) => a.name == albumName);
+        if (albumIndex == -1) {
+          return const Left(ValidationFailure('Album not found'));
+        }
+
+        final dir = await _getAlbumDir(albumName);
+        if (!await dir.exists()) {
+          await dir.create(recursive: true);
+        }
+
+        final addedPaths = <String>[];
+        for (final path in photoPaths) {
+          final file = File(path);
+          if (!await file.exists()) continue;
+
+          final ext = path.contains('.')
+              ? path.split('.').last.toLowerCase()
+              : 'jpg';
+          final fileName =
+              '${DateTime.now().microsecondsSinceEpoch}_${addedPaths.length}.$ext';
+          final copy = await file.copy('${dir.path}/$fileName');
+          addedPaths.add(copy.path);
+        }
+
+        if (addedPaths.isEmpty) {
+          return const Left(ValidationFailure('No valid photos to add'));
+        }
+
+        final album = albums[albumIndex];
+        final updated = [...albums];
+        updated[albumIndex] = album.copyWith(
+          photoCount: album.photoCount + addedPaths.length,
+          coverPhotoPath: album.coverPhotoPath ?? addedPaths.first,
+        );
+        await _saveAlbums(updated);
+
+        return const Right(null);
+      });
+    } catch (e) {
+      debugPrint('Failed to add photos to album: $e');
+      return Left(CacheFailure('Failed to add photos: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<String>>> getAlbumPhotos(String albumName) async {
+    try {
+      final dir = await _getAlbumDir(albumName);
+      if (!await dir.exists()) return const Right([]);
+
+      final files = await dir
+          .list()
+          .where((e) => e is File)
+          .cast<File>()
+          .toList();
+
+      return Right(files.map((f) => f.path).toList());
+    } catch (e) {
+      debugPrint('Failed to get album photos: $e');
+      return Left(CacheFailure('Failed to get album photos: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteAlbum(String name) async {
+    try {
+      final albumsResult = await getAlbums();
+      return await albumsResult.fold((failure) async => Left(failure), (
+        albums,
+      ) async {
+        final updated = albums.where((a) => a.name != name).toList();
+        await _saveAlbums(updated);
+
+        // Try to delete local album directory if it exists
+        try {
+          final dir = await _getAlbumDir(name);
+          if (await dir.exists()) {
+            await dir.delete(recursive: true);
+          }
+        } catch (_) {}
+
+        return const Right(null);
+      });
+    } catch (e) {
+      debugPrint('Failed to delete album: $e');
+      return Left(CacheFailure('Failed to delete album: $e'));
+    }
+  }
+
+  Future<void> _saveAlbums(List<AlbumEntity> albums) async {
+    final jsonList = albums.map((a) => a.toJson()).toList();
+    await _localStorage.setString(_albumsKey, jsonEncode(jsonList));
+  }
+
+  Future<Directory> _getAlbumDir(String albumName) async {
+    final base = await getApplicationDocumentsDirectory();
+    final id = _accountId;
+    final scope = id == null ? '' : '${id}_';
+    return Directory(
+      '${base.path}/album_$scope${Uri.encodeComponent(albumName)}',
+    );
+  }
+}

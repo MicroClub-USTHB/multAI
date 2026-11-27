@@ -1,0 +1,90 @@
+# MultiAI: host Caddy site. Install as /etc/caddy/sites/multai.caddy, then
+#   caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
+# Caddy gets and renews the Let's Encrypt certificate by itself.
+#
+# Routing (one host, so the staff auth cookie never needs CORS or SameSite=None):
+#   /api/internal/*  -> 404 here. HR-Events calls the sync endpoint over the
+#                       host loopback (127.0.0.1:18000), never through the internet.
+#   /api/*           -> FastAPI on 127.0.0.1:18000, prefix stripped
+#                       (/api/staff/x reaches the app as /staff/x)
+#   everything else  -> the web app (frontend/) on 127.0.0.1:13000
+#
+# A second site below serves the S3 API so browsers can PUT photos straight to
+# MinIO with the presigned URLs the API hands out.
+multai.164-68-103-224.sslip.io {
+	encode zstd gzip
+
+	# Largest legitimate request is an image upload (the app caps one image at 5 MB).
+	request_body {
+		max_size 25MB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		-Server
+	}
+
+	# Must come before the /api/* handler.
+	handle /api/internal/* {
+		respond "Not found" 404
+	}
+
+	handle_path /api/* {
+		reverse_proxy 127.0.0.1:18000 {
+			health_uri /health
+			health_interval 30s
+			transport http {
+				response_header_timeout 120s
+			}
+		}
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:13000
+	}
+}
+
+# ---- S3 (MinIO) for direct browser uploads ---------------------------------
+# Presigned URLs are signed for THIS host (MINIO_PUBLIC_ENDPOINT = S3_HOST), and
+# SigV4 covers the Host header, so it must reach MinIO unchanged: reverse_proxy
+# keeps the incoming Host by default. Do NOT add `header_up Host ...`.
+# CORS is set by MinIO (MINIO_API_CORS_ALLOW_ORIGIN in compose.prod.yml); add no
+# Access-Control-* headers here or browsers see duplicates.
+# Keep S3_HOST in sync with /opt/multai/.env (or edit the default below).
+{$S3_HOST:s3.multai.164-68-103-224.sslip.io} {
+	# No `encode`: photos are already compressed, and re-encoding a signed
+	# response is pointless work.
+
+	# The app caps one image at 5 MB (MAX_IMAGE_SIZE); 25MB leaves headroom,
+	# same as the app site above.
+	request_body {
+		max_size 25MB
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		-Server
+	}
+
+	# MinIO's own admin/health endpoints are not for the internet. Object keys
+	# live under /<bucket>/..., and no bucket is named "minio".
+	handle /minio/* {
+		respond "Not found" 404
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:19000 {
+			# Slow phone uploads: wait generously for MinIO's response.
+			transport http {
+				dial_timeout 5s
+				response_header_timeout 300s
+			}
+			# Do not buffer: stream bodies to MinIO as they arrive.
+			flush_interval -1
+		}
+	}
+}

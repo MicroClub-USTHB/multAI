@@ -1,0 +1,395 @@
+# MultiAI backend, production stack for the shared VPS (one compose project).
+#
+# Lives at /opt/multai/compose.yml next to /opt/multai/.env. Run it through
+# /opt/multai/deploy.sh (CD does), or by hand:
+#   cd /opt/multai && docker compose --env-file .env up -d --wait
+#
+# Networking
+#   backend   no outside access (internal). Postgres, Redis, NATS, MinIO, the API,
+#             the workers and the web container talk here (http://api:8000).
+#   egress    normal bridge. ONLY containers that must call the internet are on
+#             it (API: MCDI + Google OAuth; email/notification/drive/upload
+#             workers: Resend, FCM, Google Drive). A host port can only be
+#             published from a non-internal network, so the API and web are here too.
+# Published ports, all on 127.0.0.1 only: 18000 (API), 13000 (web), 19000 (MinIO S3 API).
+# Host Caddy fronts them
+# (deploy/multai.caddy) and HR-Events reaches /internal/events through the
+# host loopback (http://host.docker.internal:18000), never through Caddy.
+
+name: multai
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-image: &image ghcr.io/microclub-usthb/multai-back:${IMAGE_TAG:-latest}
+
+# Topology is fixed here on purpose so a bad .env cannot point a service at the
+# wrong host. .env carries secrets and tunables only.
+x-topology: &topology
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: "5432"
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  NATS_HOST: nats
+  NATS_PORT: "4222"
+  MINIO_HOST: minio
+  MINIO_API_PORT: "9000"
+  FACE_EMBEDDING_PROVIDERS: CPUExecutionProvider
+  FIREBASE_CREDENTIALS_PATH: /run/secrets/firebase-credentials.json
+
+x-app: &app
+  image: *image
+  restart: unless-stopped
+  init: true
+  env_file: .env
+  environment: *topology
+  networks: [backend]
+  logging: *logging
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: ["ALL"]
+  stop_grace_period: 30s
+  # The host-wide Watchtower (/opt/watchtower) only touches labelled containers: it pulls
+  # the new image of the same tag and recreates them. Data services are never labelled.
+  labels:
+    com.centurylinklabs.watchtower.enable: "true"
+
+x-worker: &worker
+  <<: *app
+  # Updated after the API (which applies the migrations on start).
+  labels:
+    com.centurylinklabs.watchtower.enable: "true"
+    com.centurylinklabs.watchtower.depends-on: "api"
+  cpus: 0.5
+  mem_limit: 192m
+  pids_limit: 64
+  depends_on:
+    postgres: {condition: service_healthy}
+    nats: {condition: service_healthy}
+    redis: {condition: service_healthy}
+
+services:
+  # ---- data plane ---------------------------------------------------------
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
+    # Sized for a ~512 MB container: 128 MB shared buffers, few connections.
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - effective_cache_size=320MB
+      - -c
+      - max_connections=50
+      - -c
+      - work_mem=4MB
+      - -c
+      - maintenance_work_mem=48MB
+      - -c
+      - max_wal_size=512MB
+      - -c
+      - wal_compression=on
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [backend]
+    cpus: 1.0
+    mem_limit: 512m
+    pids_limit: 128
+    shm_size: 64m
+    logging: *logging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # Sessions, rate limits and the token blacklist live here: cap memory and
+    # only ever evict keys that carry a TTL.
+    command:
+      - sh
+      - -c
+      - exec redis-server --requirepass "$$REDIS_PASSWORD" --maxmemory 96mb --maxmemory-policy volatile-lru --save 300 1
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}
+    volumes:
+      - redis_data:/data
+    networks: [backend]
+    cpus: 0.25
+    mem_limit: 128m
+    pids_limit: 32
+    logging: *logging
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  nats:
+    image: nats:2.10-alpine
+    restart: unless-stopped
+    command:
+      - -js
+      - -sd
+      - /data
+      - -a
+      - 0.0.0.0
+      - -m
+      - "8222"
+      - --user
+      - ${NATS_USER:?set NATS_USER in .env}
+      - --pass
+      - ${NATS_PASSWORD:?set NATS_PASSWORD in .env}
+    volumes:
+      - nats_data:/data
+    networks: [backend]
+    cpus: 0.25
+    mem_limit: 96m
+    pids_limit: 32
+    logging: *logging
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8222/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?set MINIO_ROOT_USER in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD in .env}
+      # CORS lives here and ONLY here (Caddy adds none), so browsers uploading
+      # straight to https://${S3_HOST} get exactly one Access-Control-Allow-Origin.
+      MINIO_API_CORS_ALLOW_ORIGIN: https://${MULTAI_HOST:?set MULTAI_HOST in .env}
+    volumes:
+      - minio_data:/data
+    # The S3 API (9000) is published on loopback for host Caddy (s3 host in
+    # multai.caddy). A host port cannot be published from an internal network,
+    # hence egress. The console (9001) is never published.
+    ports:
+      - "127.0.0.1:19000:9000"
+    networks: [backend, egress]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    cpus: 0.5
+    mem_limit: 384m
+    pids_limit: 128
+    logging: *logging
+
+  # ---- application --------------------------------------------------------
+  api:
+    <<: *app
+    # Presigned upload URLs are signed for the host browsers reach (S3_HOST,
+    # proxied to MinIO by Caddy). Workers never sign URLs, so only the API gets this.
+    environment:
+      <<: *topology
+      MINIO_PUBLIC_ENDPOINT: ${S3_HOST:?set S3_HOST in .env}
+      MINIO_PUBLIC_SECURE: "true"
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      # Watchtower cannot run a migration step, so the API applies pending migrations
+      # (alembic upgrade head) before it starts serving. false = skip.
+      MIGRATE_ON_START: ${MIGRATE_ON_START:-true}
+    # Same server as the image CMD, preceded by the optional migration.
+    command:
+      - sh
+      - -c
+      - 'if [ "$${MIGRATE_ON_START}" = true ]; then alembic upgrade head; fi && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1 --proxy-headers --forwarded-allow-ips "*"'
+    networks: [backend, egress]
+    ports:
+      - "127.0.0.1:18000:8000"
+    # The first face enrolment loads buffalo_l: measured ~830 MB peak RSS once
+    # loaded (230 MB before), so 1152m leaves ~40% headroom.
+    cpus: 1.5
+    mem_limit: 1152m
+    pids_limit: 128
+    volumes:
+      - insightface_models:/home/app/.insightface
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      nats: {condition: service_healthy}
+      minio: {condition: service_started}
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4).status == 200 else 1)"
+      interval: 15s
+      timeout: 6s
+      retries: 5
+      start_period: 45s
+
+  # The web SSR server (frontend/). Its image is built by the same CD run as the backend;
+  # its tag (MULTAI_FRONT_TAG) is independent of the backend tag (IMAGE_TAG).
+  web:
+    image: ghcr.io/microclub-usthb/multai-front:${MULTAI_FRONT_TAG:-latest}
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      SERVER_URL: http://127.0.0.1:3000
+      API_PROXY_TARGET: http://api:8000
+    ports:
+      - "127.0.0.1:13000:3000"
+    networks: [backend, egress]
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 0.5
+    pids_limit: 128
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/healthz || exit 1"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      api: {condition: service_healthy}
+
+  # ---- workers (same image, one process each) ------------------------------
+  # Staging ran 6 of the 9 workers; `make run-workers` (the source of truth)
+  # runs all 9. event-lifecycle, upload-reconciler and drive-sync are added
+  # here: without event-lifecycle events never activate or archive.
+  photo-worker:
+    <<: *worker
+    command: ["python", "-m", "app.worker.photo_worker.main"]
+    cpus: 2.0
+    mem_limit: 1152m
+    pids_limit: 128
+    volumes:
+      - insightface_models:/home/app/.insightface
+    depends_on:
+      postgres: {condition: service_healthy}
+      nats: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      minio: {condition: service_started}
+
+  email-worker:
+    <<: *worker
+    networks: [backend, egress]
+    command: ["python", "-m", "app.worker.email_worker.main"]
+
+  upload-group-worker:
+    <<: *worker
+    networks: [backend, egress]
+    command: ["python", "-m", "app.worker.upload_group_worker.main"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      nats: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      minio: {condition: service_started}
+
+  drive-sync-worker:
+    <<: *worker
+    networks: [backend, egress]
+    command: ["python", "-m", "app.worker.drive_sync.main"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      nats: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      minio: {condition: service_started}
+
+  audit-worker:
+    <<: *worker
+    command: ["python", "-m", "app.worker.audit.main"]
+
+  storage-cleaner:
+    <<: *worker
+    command: ["python", "-m", "app.worker.storage_cleaner.main"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      nats: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      minio: {condition: service_started}
+
+  event-lifecycle-worker:
+    <<: *worker
+    command: ["python", "-m", "app.worker.event_lifecycle.main"]
+
+  upload-reconciler:
+    <<: *worker
+    command: ["python", "-m", "app.worker.upload_reconciler.main"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      nats: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      minio: {condition: service_started}
+
+  # Push notifications need the Firebase service-account file at
+  # /opt/multai/secrets/firebase-credentials.json; enable with
+  # COMPOSE_PROFILES=firebase in .env once it is there.
+  notification-worker:
+    <<: *worker
+    profiles: ["firebase"]
+    networks: [backend, egress]
+    command: ["python", "-m", "app.worker.notification.main"]
+    volumes:
+      - ./secrets/firebase-credentials.json:/run/secrets/firebase-credentials.json:ro
+
+  # ---- one-shot jobs (profile "tools": never part of `up`) ------------------
+  migrate:
+    <<: *app
+    profiles: ["tools"]
+    restart: "no"
+    command: ["alembic", "upgrade", "head"]
+    cpus: 0.5
+    mem_limit: 256m
+    pids_limit: 64
+    depends_on:
+      postgres: {condition: service_healthy}
+
+  # Downloads the buffalo_l face model into the shared volume once.
+  models-init:
+    <<: *app
+    profiles: ["tools"]
+    restart: "no"
+    networks: [backend, egress]
+    entrypoint: ["sh", "-c"]
+    command:
+      - >-
+        test -f /home/app/.insightface/models/buffalo_l/det_10g.onnx ||
+        python -c "from insightface.app import FaceAnalysis; FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])"
+    cpus: 1.0
+    mem_limit: 1024m
+    pids_limit: 64
+    volumes:
+      - insightface_models:/home/app/.insightface
+
+volumes:
+  postgres_data:
+  redis_data:
+  nats_data:
+  minio_data:
+  insightface_models:
+
+networks:
+  backend:
+    internal: true
+  egress:
+    driver: bridge
