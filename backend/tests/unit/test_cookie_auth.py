@@ -94,19 +94,18 @@ async def test_get_current_staff_user_missing_email() -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_current_staff_user_not_found() -> None:
+async def test_get_current_staff_user_without_allowed_role() -> None:
     container = MagicMock(spec=Container)
     container.redis = MagicMock()
     container.mcdi_service = MagicMock()
     container.mcdi_service.validate_token_cached = AsyncMock(
-        return_value={"member": {"email": "unknown@microclub.info"}}
+        return_value={"member": {"email": "unknown@microclub.info"}, "roles": []}
     )
     container.staff_user_querier = MagicMock()
-    container.staff_user_querier.get_staff_user_by_email = AsyncMock(return_value=None)
 
     with pytest.raises(HTTPException) as exc_info:
         await get_current_staff_user(container=container, token="valid_token")
-    assert exc_info.value.status_code == 401
+    assert exc_info.value.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -116,7 +115,10 @@ async def test_get_current_staff_user_success() -> None:
     user = _create_staff_user(StaffRole.ADMIN)
     container.mcdi_service = MagicMock()
     container.mcdi_service.validate_token_cached = AsyncMock(
-        return_value={"member": {"email": "test@microclub.info"}}
+        return_value={
+            "member": {"email": "test@microclub.info"},
+            "roles": [{"roleName": "Dev Leads"}],
+        }
     )
     container.staff_user_querier = MagicMock()
     container.staff_user_querier.get_staff_user_by_email = AsyncMock(return_value=user)

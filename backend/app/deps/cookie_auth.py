@@ -2,6 +2,7 @@ from typing import Annotated
 from fastapi import Cookie, Depends
 from app.container import Container, get_container
 from app.core.exceptions import AppException
+from app.service.mcdi_roles import resolve_staff_role
 from db.generated.models import StaffRole, StaffUser
 
 
@@ -30,14 +31,21 @@ async def get_current_staff_user(
     if not email:
         raise AppException.unauthorized("Invalid MCDI payload: missing email")
 
+    role = resolve_staff_role(mcdi_data)
+    if role is None:
+        raise AppException.forbidden("Multimedia or Development role required")
+
     normalized_email = email.strip().lower()
-    # 2. Get local StaffUser by email
+    # Access comes from MCDI roles; the table is only a profile row for FKs.
     staff_user = await container.staff_user_querier.get_staff_user_by_email(
         email=normalized_email
     )
+    if staff_user is None or _role_value(staff_user.role) != role.value:
+        staff_user = await container.staff_user_querier.upsert_staff_user_from_sso(
+            email=normalized_email, role=role.value
+        )
     if staff_user is None:
-        raise AppException.unauthorized("Staff user not found or not authorized")
-
+        raise AppException.unauthorized("Could not load staff profile")
     return staff_user
 
 

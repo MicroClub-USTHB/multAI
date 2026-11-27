@@ -26,6 +26,15 @@ RETURNING id, email, role, created_at, updated_at, password
 """
 
 
+UPSERT_STAFF_USER_FROM_SSO = """-- name: upsert_staff_user_from_sso \\:one
+INSERT INTO staff_users (email, password, role)
+VALUES (:p1, '!mcdi-sso-only', :p2)
+ON CONFLICT (email) DO UPDATE
+SET role = EXCLUDED.role, updated_at = NOW()
+RETURNING id, email, role, created_at, updated_at, password
+"""
+
+
 DELETE_STAFF_USER = """-- name: delete_staff_user \\:one
 DELETE FROM staff_users
 WHERE id = :p1
@@ -99,6 +108,19 @@ class AsyncQuerier:
 
     async def create_multi(self, *, email: Optional[str], password: str, role: Any) -> Optional[models.StaffUser]:
         row = (await self._conn.execute(sqlalchemy.text(CREATE_MULTI), {"p1": email, "p2": password, "p3": role})).first()
+        if row is None:
+            return None
+        return models.StaffUser(
+            id=row[0],
+            email=row[1],
+            role=row[2],
+            created_at=row[3],
+            updated_at=row[4],
+            password=row[5],
+        )
+
+    async def upsert_staff_user_from_sso(self, *, email: Optional[str], role: Any) -> Optional[models.StaffUser]:
+        row = (await self._conn.execute(sqlalchemy.text(UPSERT_STAFF_USER_FROM_SSO), {"p1": email, "p2": role})).first()
         if row is None:
             return None
         return models.StaffUser(
