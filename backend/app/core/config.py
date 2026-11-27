@@ -127,9 +127,11 @@ class Settings(BaseSettings):
     FACE_ENCRYPTION_KEY: str
     FIREBASE_CREDENTIALS_PATH: str
 
-    # Resend Email Configuration
-    RESEND_API_KEY: str = ""
-    EMAIL_FROM: str = "onboarding@resend.dev"
+    # Transactional email over an HTTP API (POST {base}/messages, bearer key).
+    # EMAIL_FROM must be on a domain verified with the email provider.
+    EMAIL_HTTP_API_KEY: str = ""
+    EMAIL_HTTP_BASE_URL: str = "https://app.bortocall.org/v1"
+    EMAIL_FROM: str = ""
 
     # MCDI Configuration
     MCDI_PROJECT_ID: str = ""

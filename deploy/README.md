@@ -187,4 +187,4 @@ Checklist when turning this on:
    events never activate or archive; without `drive-sync` approved uploads never
    reach Drive.
 3. Staging had the app on internal-only networks, so API and workers could not
-   call MCDI, Google, Resend or FCM; here those containers are also on `egress`.
+   call MCDI, Google, the email API or FCM; here those containers are also on `egress`.

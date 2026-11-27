@@ -9,7 +9,7 @@
 #             the workers and the web container talk here (http://api:8000).
 #   egress    normal bridge. ONLY containers that must call the internet are on
 #             it (API: MCDI + Google OAuth; email/notification/drive/upload
-#             workers: Resend, FCM, Google Drive). A host port can only be
+#             workers: email API, FCM, Google Drive). A host port can only be
 #             published from a non-internal network, so the API and web are here too.
 # Published ports, all on 127.0.0.1 only: 18000 (API), 13000 (web), 19000 (MinIO S3 API).
 # Host Caddy fronts them
