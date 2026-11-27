@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     app_name: str = "multAI"
     environment: str = "dev"
     debug: bool = True
+    FRONTEND_URL: str = ""  # falls back to CORS_ORIGINS[0] when empty
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://localhost:5173",

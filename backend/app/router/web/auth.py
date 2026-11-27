@@ -48,8 +48,9 @@ async def mcdi_callback(
     container: Container = Depends(get_container),
 ) -> RedirectResponse:
     frontend_url = (
-        settings.CORS_ORIGINS[0] if settings.CORS_ORIGINS else "http://localhost:5173"
-    )
+        settings.FRONTEND_URL
+        or (settings.CORS_ORIGINS[0] if settings.CORS_ORIGINS else "http://localhost:5173")
+    ).rstrip("/")
 
     if error:
         logger.warning("mcdi_callback error=%s desc=%s", error, error_description)
