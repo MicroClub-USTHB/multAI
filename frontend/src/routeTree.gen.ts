@@ -18,6 +18,7 @@ import { Route as MultiTeamRouteImport } from './routes/multi/team'
 import { Route as MultiRequestsRouteImport } from './routes/multi/requests'
 import { Route as MultiNotificationsRouteImport } from './routes/multi/notifications'
 import { Route as MultiEventsRouteImport } from './routes/multi/events'
+import { Route as MultiDropRouteImport } from './routes/multi/drop'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as MultiDriveSettingsIndexRouteImport } from './routes/multi/drive-settings/index'
 
@@ -66,6 +67,11 @@ const MultiEventsRoute = MultiEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => MultiRoute,
 } as any)
+const MultiDropRoute = MultiDropRouteImport.update({
+  id: '/drop',
+  path: '/drop',
+  getParentRoute: () => MultiRoute,
+} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/multi': typeof MultiRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
   '/auth/login': typeof AuthLoginRoute
+  '/multi/drop': typeof MultiDropRoute
   '/multi/events': typeof MultiEventsRoute
   '/multi/notifications': typeof MultiNotificationsRoute
   '/multi/requests': typeof MultiRequestsRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/auth/login': typeof AuthLoginRoute
+  '/multi/drop': typeof MultiDropRoute
   '/multi/events': typeof MultiEventsRoute
   '/multi/notifications': typeof MultiNotificationsRoute
   '/multi/requests': typeof MultiRequestsRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/multi': typeof MultiRouteWithChildren
   '/rss.xml': typeof RssDotxmlRoute
   '/auth/login': typeof AuthLoginRoute
+  '/multi/drop': typeof MultiDropRoute
   '/multi/events': typeof MultiEventsRoute
   '/multi/notifications': typeof MultiNotificationsRoute
   '/multi/requests': typeof MultiRequestsRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/multi'
     | '/rss.xml'
     | '/auth/login'
+    | '/multi/drop'
     | '/multi/events'
     | '/multi/notifications'
     | '/multi/requests'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/'
     | '/rss.xml'
     | '/auth/login'
+    | '/multi/drop'
     | '/multi/events'
     | '/multi/notifications'
     | '/multi/requests'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/multi'
     | '/rss.xml'
     | '/auth/login'
+    | '/multi/drop'
     | '/multi/events'
     | '/multi/notifications'
     | '/multi/requests'
@@ -229,6 +241,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MultiEventsRouteImport
       parentRoute: typeof MultiRoute
     }
+    '/multi/drop': {
+      id: '/multi/drop'
+      path: '/drop'
+      fullPath: '/multi/drop'
+      preLoaderRoute: typeof MultiDropRouteImport
+      parentRoute: typeof MultiRoute
+    }
     '/auth/login': {
       id: '/auth/login'
       path: '/auth/login'
@@ -247,6 +266,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface MultiRouteChildren {
+  MultiDropRoute: typeof MultiDropRoute
   MultiEventsRoute: typeof MultiEventsRoute
   MultiNotificationsRoute: typeof MultiNotificationsRoute
   MultiRequestsRoute: typeof MultiRequestsRoute
@@ -257,6 +277,7 @@ interface MultiRouteChildren {
 }
 
 const MultiRouteChildren: MultiRouteChildren = {
+  MultiDropRoute: MultiDropRoute,
   MultiEventsRoute: MultiEventsRoute,
   MultiNotificationsRoute: MultiNotificationsRoute,
   MultiRequestsRoute: MultiRequestsRoute,
