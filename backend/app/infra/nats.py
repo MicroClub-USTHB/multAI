@@ -10,8 +10,11 @@ from pydantic import BaseModel
 from app.core.config import settings
 from app.core.constant import (
     AUDIT_EVENT_SUBJECT,
+    FINAL_BUCKET_CLEANUP_STREAM,
     FINAL_BUCKET_CLEANUP_SUBJECT,
     NOTIFICATION_EVENT_SUBJECT,
+    PHOTO_PROCESS_STREAM,
+    UPLOAD_GROUP_IMPORT_STREAM,
     UPLOAD_GROUP_IMPORT_SUBJECT,
 )
 from app.core.logger import logger
@@ -46,15 +49,15 @@ SUBJECT_TO_STREAM: dict[str, str] = {
     NatsSubjects.USER_LOGOUT.value: "auth_stream",
     NatsSubjects.NOTIFICATION_EVENT.value: "notification_stream",
     NatsSubjects.AUDIT_EVENT.value: "audit_stream",
-    NatsSubjects.STAFF_UPLOAD_GROUP_IMPORT_REQUESTED.value: "upload_group_stream",
+    NatsSubjects.STAFF_UPLOAD_GROUP_IMPORT_REQUESTED.value: UPLOAD_GROUP_IMPORT_STREAM,
     NatsSubjects.STAFF_UPLOAD_GROUP_CREATED.value: "upload_group_stream",
     NatsSubjects.STAFF_UPLOAD_GROUP_APPROVED.value: "upload_group_stream",
     NatsSubjects.STAFF_UPLOAD_GROUP_REJECTED.value: "upload_group_stream",
-    NatsSubjects.FINAL_BUCKET_CLEANUP.value: "cleanup_stream",
+    NatsSubjects.FINAL_BUCKET_CLEANUP.value: FINAL_BUCKET_CLEANUP_STREAM,
     NatsSubjects.STAFF_UPLOAD_REQUEST_CREATED.value: "upload_request_stream",
     NatsSubjects.STAFF_UPLOAD_REQUEST_APPROVED.value: "upload_request_stream",
     NatsSubjects.STAFF_UPLOAD_REQUEST_REJECTED.value: "upload_request_stream",
-    NatsSubjects.PHOTO_PROCESS.value: "photo_process_stream",
+    NatsSubjects.PHOTO_PROCESS.value: PHOTO_PROCESS_STREAM,
     NatsSubjects.PHOTO_DRIVE_SYNC_REQUESTED.value: "drive_sync_stream",
     NatsSubjects.EMAIL_SEND_OTP.value: "email_stream",
 }
