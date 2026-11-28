@@ -111,3 +111,16 @@ UPDATE photos
 SET storage_cleaned_at = NOW()
 WHERE id = $1
 RETURNING *;
+
+-- name: ListEventPhotosForStaff :many
+SELECT p.*,
+  (SELECT COUNT(*) FROM photo_faces pf2 WHERE pf2.photo_id = p.id)::int AS face_count
+FROM photos p
+WHERE p.event_id = $1
+ORDER BY p.created_at DESC, p.id
+LIMIT $2 OFFSET $3;
+
+-- name: CountEventPhotosForStaff :one
+SELECT COUNT(*)
+FROM photos p
+WHERE p.event_id = $1;
