@@ -15,6 +15,7 @@ FINAL_BUCKET_CLEANUP_DURABLE_NAME = "ai-final-bucket-cleaner"
 UPLOAD_GROUP_IMPORT_SUBJECT = "staff.upload_group.import.requested"
 UPLOAD_GROUP_IMPORT_STREAM = "staff-upload-group-import"
 UPLOAD_GROUP_IMPORT_DURABLE_NAME = "staff-upload-group-import-worker"
+PHOTO_PROCESS_STREAM = "photo_processing"
 
 
 class AuditEventType(str, Enum):

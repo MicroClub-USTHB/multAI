@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -5,10 +6,12 @@ from fastapi.responses import RedirectResponse
 
 from app.container import Container, get_container
 from app.core.exceptions import AppException
-from app.deps.cookie_auth import get_current_staff_user
+from app.deps.cookie_auth import get_current_staff_user, require_admin_staff
 from app.infra.google_drive import GoogleDriveClient
 from app.schema.request.staff.drive import GoogleDriveImportRequest
 from app.schema.request.staff.drive_import import DriveImportUrlsRequest
+from app.schema.request.staff.drive_drop import DriveDropRequest
+
 from app.schema.response.staff.drive import (
     DriveBrowseResponse,
     DriveItemSchema,
@@ -21,6 +24,9 @@ from app.schema.response.staff.drive import (
 )
 from app.schema.response.staff.drive_import import DriveImportUrlsResponse
 from app.schema.response.staff.uploads import UploadRequestSchema
+from app.schema.response.staff.drive_drop import DriveDropResponse
+from app.service.drive_folder import extract_drive_folder_id
+
 from app.service.staff_drive import SelectedDriveFile
 from db.generated.models import StaffUser
 
@@ -231,3 +237,43 @@ async def import_drive_urls(
         upload_request=UploadRequestSchema.from_details(upload_request),
         imported_photo_count=len(upload_request.photos),
     )
+
+@router.post("/drop", response_model=DriveDropResponse)
+async def drop_drive_folder(
+    req: DriveDropRequest,
+    current_staff_user: StaffUser = Depends(require_admin_staff),
+    container: Container = Depends(get_container),
+) -> DriveDropResponse:
+    """Import every photo in a Drive folder (subfolders included) and process it.
+
+    Skips the team-lead review: the photos are promoted to final storage and the
+    face-matching jobs are queued as soon as the import finishes. Admin only.
+    Progress is readable from GET /uploads/groups/{group_id}.
+    """
+    folder_id = extract_drive_folder_id(req.folder_url)
+
+    if req.event_id is not None:
+        event_id = req.event_id
+    else:
+        assert req.new_event is not None
+        now = datetime.now(timezone.utc)
+        event = await container.event_service.create_event(
+            name=req.new_event.name.strip(),
+            event_date=req.new_event.event_date or now,
+            end_date=req.new_event.end_date or req.new_event.event_date or now,
+            created_by=current_staff_user.id,
+        )
+        event_id = event.id
+
+    group = await container.upload_requests_service.create_group_from_folder(
+        event_id=event_id,
+        folder_id=folder_id,
+        visibility=req.visibility,
+        day_number=req.day_number,
+        requested_by=current_staff_user,
+        recursive=True,
+        auto_approve=True,
+        use_api_key=not req.use_my_drive,
+    )
+    return DriveDropResponse(group_id=group.group.id, event_id=event_id)
+

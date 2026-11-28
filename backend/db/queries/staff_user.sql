@@ -41,3 +41,10 @@ RETURNING *;
 DELETE FROM staff_users
 WHERE id = $1
 RETURNING *;
+
+-- name: UpsertStaffUserFromSso :one
+INSERT INTO staff_users (email, password, role)
+VALUES ($1, '!mcdi-sso-only', $2)
+ON CONFLICT (email) DO UPDATE
+SET role = EXCLUDED.role, updated_at = NOW()
+RETURNING *;

@@ -10,7 +10,6 @@ import {
   Search,
   SettingsIcon,
   TrashIcon,
-  UsersRound,
 } from 'lucide-react';
 
 import { useSidebar } from '@/shared/ui/';
@@ -52,11 +51,6 @@ export function GlobalSearch({
                 <Megaphone />
                 <span>Events</span>
                 <CommandShortcut>⌘E</CommandShortcut>
-              </CommandItem>
-              <CommandItem>
-                <UsersRound />
-                <span>Users</span>
-                <CommandShortcut>⌘U</CommandShortcut>
               </CommandItem>
               <CommandItem>
                 <SettingsIcon />

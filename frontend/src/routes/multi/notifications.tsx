@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react'
 
 import type { MultiNotification } from '@/features/multi/notifications/types'
 
+import { EmptyState } from '@/components/EmptyState';
+import { PageHeader } from '@/components/PageHeader';
 import { MultiNotificationsApiError } from '@/features/multi/notifications/api'
 import { useMultiNotifications } from '@/features/multi/notifications/hooks'
 import {
@@ -84,15 +86,11 @@ function MultiNotificationsPage() {
 	return (
 		<div className='flex-1 space-y-4 p-4 md:p-6'>
 			<div className='flex flex-col gap-3 md:flex-row md:items-end md:justify-between'>
-				<div className='space-y-2'>
-					<p className='text-muted-foreground text-xs font-medium uppercase tracking-[0.2em]'>
-						Multi user
-					</p>
-					<h1 className='text-3xl font-semibold tracking-tight'>Notifications</h1>
-					<p className='text-muted-foreground max-w-2xl text-sm'>
-						See your latest notifications and mark them as read.
-					</p>
-				</div>
+				<PageHeader
+					eyebrow='Staff dashboard'
+					title='Notifications'
+					description='See your latest notifications and mark them as read.'
+				/>
 
 				<div className='flex flex-wrap gap-2'>
 					<Button
@@ -173,9 +171,10 @@ function MultiNotificationsPage() {
 							<Skeleton className='h-24 w-full rounded-xl' />
 						</div>
 					) : notifications.length === 0 ? (
-						<div className='border-border/60 rounded-lg border border-dashed p-6 text-center'>
-							<p className='text-base font-medium'>No notifications yet</p>
-						</div>
+						<EmptyState
+							title='No notifications yet'
+							description='New activity from your events will show up here.'
+						/>
 					) : visibleNotifications.length === 0 ? (
 						<div className='border-border/60 rounded-lg border border-dashed p-6 text-center'>
 							<p className='text-base font-medium'>No items here</p>

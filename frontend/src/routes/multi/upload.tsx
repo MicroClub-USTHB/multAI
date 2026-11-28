@@ -1,20 +1,23 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
+import { z } from 'zod';
 
+import { PageHeader } from '@/components/PageHeader';
 import { DriveImportCard } from '@/features/multi/drive-import/components/drive-import-card';
-import { EventSelect } from '@/features/multi/media-upload/components/event-select';
+import { EventPicker } from '@/features/multi/media-upload/components/event-picker';
 import { UploadDropzone } from '@/features/multi/media-upload/components/upload-dropzone';
 import { UploadList } from '@/features/multi/media-upload/components/upload-list';
 import { UploadSummary } from '@/features/multi/media-upload/components/upload-summary';
 import { useBulkUpload } from '@/features/multi/media-upload/hooks';
-import { Alert, AlertDescription, AlertTitle } from '@/shared/ui';
 
 export const Route = createFileRoute('/multi/upload')({
   component: RouteComponent,
+  validateSearch: z.object({ event: z.string().optional() }),
 });
 
 function RouteComponent() {
-  const [eventId, setEventId] = useState<string | null>(null);
+  const { event } = Route.useSearch();
+  const [eventId, setEventId] = useState<string | null>(event ?? null);
   const {
     items,
     stats,
@@ -28,37 +31,30 @@ function RouteComponent() {
   } = useBulkUpload(eventId);
 
   return (
-    <div className="flex-1 space-y-6 p-4 md:p-6">
-      <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">
-          Upload &amp; Storage
-        </h1>
-        <p className="text-muted-foreground max-w-2xl text-sm">
-          Upload event photos directly from your computer instead of Google
-          Drive. Pick an event, then drag in as many photos as you need.
-        </p>
-      </div>
+    <div className="space-y-8 p-4 md:p-6">
+      <PageHeader
+        eyebrow="Staff dashboard"
+        title="Upload photos"
+        description="Choose the event, then drag in as many photos as you need. Uploads continue in the background."
+      />
 
       <DriveImportCard />
 
-      <div className="space-y-3">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold">Upload from this computer</h2>
-          <p className="text-muted-foreground text-sm">
-            Choose an event, then drag in photos to upload them directly to
-            storage.
-          </p>
-        </div>
+      <section className="space-y-3">
+        <h2 className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase">
+          1 · Choose an event
+        </h2>
+        <EventPicker value={eventId} onChange={setEventId} />
+      </section>
 
-        <EventSelect value={eventId} onChange={setEventId} />
-
+      <section className="space-y-3">
+        <h2 className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase">
+          2 · Add photos
+        </h2>
         {!eventId ? (
-          <Alert>
-            <AlertTitle>Choose an event first</AlertTitle>
-            <AlertDescription>
-              Photos are uploaded straight into the event you select above.
-            </AlertDescription>
-          </Alert>
+          <div className="border-border text-muted-foreground rounded-2xl border border-dashed p-8 text-center text-sm">
+            Pick an event above to start uploading.
+          </div>
         ) : (
           <>
             <UploadDropzone onFilesSelected={addFiles} />
@@ -69,14 +65,10 @@ function RouteComponent() {
               onPauseAll={pauseAll}
               onContinueAll={continueAll}
             />
-            <UploadList
-              items={items}
-              onRetry={retryOne}
-              onRemove={removeItem}
-            />
+            <UploadList items={items} onRetry={retryOne} onRemove={removeItem} />
           </>
         )}
-      </div>
+      </section>
     </div>
   );
 }

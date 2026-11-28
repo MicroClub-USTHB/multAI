@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     app_name: str = "multAI"
     environment: str = "dev"
     debug: bool = True
+    FRONTEND_URL: str = ""  # falls back to CORS_ORIGINS[0] when empty
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://localhost:5173",
@@ -106,6 +107,8 @@ class Settings(BaseSettings):
     FACE_EMBEDDING_DET_HEIGHT: int = 640
 
     # Google Drive OAuth
+    # API key (Drive API only) for reading folders shared as "anyone with the link".
+    GOOGLE_API_KEY: str = ""
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = ""
@@ -136,9 +139,22 @@ class Settings(BaseSettings):
     # MCDI Configuration
     MCDI_PROJECT_ID: str = ""
     MCDI_API_KEY: str = ""
-    MCDI_BASE_URL: str = "https://mcid.microclub.info/api"
+    MCDI_BASE_URL: str = "https://mcid-api.microclub.info/api"
     MCDI_SERVER_ID: str = ""
     MCDI_REDIRECT_URI_WEB: str = ""
+    # MCDI (Discord) role names -> staff role. Matching is case-insensitive.
+    # Highest wins: admin > multi_team_lead > multi. No match = no access.
+    MCDI_ADMIN_ROLES: list[str] = [
+        "Development",
+        "Web Development",
+        "Mobile Development",
+        "Dev Leads",
+        "Dev manager",
+        "DevProjectManager",
+        "MC Website Dev",
+    ]
+    MCDI_TEAM_LEAD_ROLES: list[str] = ["Multimedia Leads", "Multimedia Manager"]
+    MCDI_MULTI_ROLES: list[str] = ["Multimedia", "MCC multimedia"]
 
     # Shared key HR-Events uses to call /internal/* endpoints
     HR_EVENTS_SERVICE_KEY: str = ""

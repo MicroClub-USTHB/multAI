@@ -1,15 +1,26 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
-import { Button } from '@/shared/ui';
+import { getRoleLandingPath } from '@/features/common/auth/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { LoadingPage } from '@/shared/ui/loading';
 
 export const Route = createFileRoute('/')({ component: App });
 
+/** The site root has no content: signed-in staff go to their page, everyone else to the login. */
 function App() {
-  return (
-    <div className="space-x-4 p-8">
-      <Link to="/multi">
-        <Button>Dashboard</Button>
-      </Link>
-    </div>
-  );
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (isAuthenticated) {
+      navigate({ to: getRoleLandingPath(user?.role), replace: true });
+    } else {
+      navigate({ to: '/auth/login', replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate, user?.role]);
+
+  return <LoadingPage message='Redirecting' />;
 }

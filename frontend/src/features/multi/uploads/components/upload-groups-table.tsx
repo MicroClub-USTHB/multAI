@@ -1,3 +1,4 @@
+import { EmptyState } from '@/components/EmptyState';
 import {
   Badge,
   Button,
@@ -90,8 +91,11 @@ export function UploadGroupsTable({ groups, onReview, canModerate }: UploadGroup
           })
         ) : (
           <TableRow>
-            <TableCell colSpan={6} className="h-24 text-center text-sm">
-              No pending upload groups.
+            <TableCell colSpan={6} className="p-0">
+              <EmptyState
+                title="Nothing to review"
+                description="Upload requests from the team will wait here for approval."
+              />
             </TableCell>
           </TableRow>
         )}

@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import type { NavData } from '@/shared/utils/types';
 
+import { BrandLogoFull } from '@/components/BrandLogo';
 import { useAuth } from '@/hooks/useAuth';
 import { GlobalSearch } from '@/shared/ui';
 import {
@@ -46,15 +47,20 @@ export function AppSidebar({
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" render={<Link to="/" />}>
-                <div className="flex flex-1 items-center justify-center space-x-4 text-sm leading-tight">
-                  <span className="truncate text-xl font-medium">MultAI</span>
-                </div>
+                <span className="block h-7 px-1">
+                  <BrandLogoFull tone="light" className="h-7! w-auto! dark:hidden" />
+                  <BrandLogoFull tone="dark" className="hidden h-7! w-auto! dark:block" />
+                </span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <NavMain items={navData.main} />
+          <NavMain
+            items={navData.main.filter(
+              (item) => !item.adminOnly || user?.role === 'admin',
+            )}
+          />
           <NavSecondary items={navData.secondary} className="mt-auto" />
         </SidebarContent>
         <SidebarFooter>

@@ -657,8 +657,16 @@ class UploadRequestsService:
         visibility: str,
         day_number: int | None,
         requested_by: StaffUser,
+        recursive: bool = False,
+        auto_approve: bool = False,
+        use_api_key: bool = False,
     ) -> UploadRequestGroupDetails:
-        await self.staff_drive_service.get_access_token_for_staff_user(requested_by.id)
+        if use_api_key:
+            self._require_api_key()
+        else:
+            await self.staff_drive_service.get_access_token_for_staff_user(
+                requested_by.id
+            )
         try:
             upload_group = (
                 await self.upload_request_group_querier.create_upload_request_group(
@@ -687,6 +695,9 @@ class UploadRequestsService:
                 requested_by=requested_by.id,
                 visibility=visibility,
                 day_number=day_number,
+                recursive=recursive,
+                auto_approve=auto_approve,
+                use_api_key=use_api_key,
                 submitted_at=datetime.now(timezone.utc),
             ).model_dump(mode="json"),
         )
@@ -945,12 +956,22 @@ class UploadRequestsService:
 
         return results
 
+    @staticmethod
+    def _require_api_key() -> str:
+        if not settings.GOOGLE_API_KEY:
+            raise AppException.bad_request(
+                "GOOGLE_API_KEY is not configured on the server"
+            )
+        return settings.GOOGLE_API_KEY
+
     async def process_group_import(  # noqa: C901
         self,
         *,
         group_id: uuid.UUID,
         visibility: str,
         day_number: int | None,
+        recursive: bool = False,
+        use_api_key: bool = False,
     ) -> UploadRequestGroupDetails | None:
         upload_group = await self.upload_request_group_querier.start_upload_request_group_processing(
             id=group_id
@@ -992,16 +1013,22 @@ class UploadRequestsService:
         created_requests: list[UploadRequestDetails] = []
         photo_inputs: list[UploadPhotoInput] = []
         try:
-            access_token = (
-                await self.staff_drive_service.get_access_token_for_staff_user(
-                    requested_by.id
+            if use_api_key:
+                access_token = GoogleDriveClient.api_key_credential(
+                    self._require_api_key()
                 )
-            )
+            else:
+                access_token = (
+                    await self.staff_drive_service.get_access_token_for_staff_user(
+                        requested_by.id
+                    )
+                )
             if upload_group.folder_id is None:
                 raise AppException.bad_request("Upload group has no folder_id")
             folder_files = await GoogleDriveClient.list_folder_files(
                 access_token=access_token,
                 folder_id=upload_group.folder_id,
+                recursive=recursive,
             )
             folder_files = sorted(
                 folder_files, key=lambda file: (file.name.lower(), file.id)
