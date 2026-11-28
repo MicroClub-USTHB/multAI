@@ -100,7 +100,7 @@ export function DriveImportCard() {
         <CardDescription>
           Paste individual Drive file links to create a new event. Files are
           copied into MinIO and automatically approved, then face processing
-          starts. Uses the Drive account connected in Drive Settings.
+          starts. Uses the Drive account connected to MultiAI.
         </CardDescription>
       </CardHeader>
 
