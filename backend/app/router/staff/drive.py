@@ -238,5 +238,6 @@ async def drop_drive_folder(
         requested_by=current_staff_user,
         recursive=True,
         auto_approve=True,
+        use_api_key=not req.use_my_drive,
     )
     return DriveDropResponse(group_id=group.group.id, event_id=event_id)
