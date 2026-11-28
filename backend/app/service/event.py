@@ -149,8 +149,8 @@ class EventService:
         if not event:
             raise AppException.not_found("Invalid QR Code")
 
-        if event.status == "archived":
-            raise AppException.forbidden("This event is already closed.")
+        # Archived events stay joinable: people scan the QR code after the event
+        # to receive the photos they appear in.
 
         # 2. Check if already joined
         is_member = await self.p_querier.is_user_in_event(
