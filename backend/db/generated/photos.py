@@ -115,6 +115,41 @@ class ListEventPhotosForUserRow:
     face_count: int
 
 
+LIST_EVENT_PHOTOS_FOR_STAFF = """-- name: list_event_photos_for_staff \\:many
+SELECT p.id, p.event_id, p.uploaded_by, p.storage_key, p.taken_at, p.day_number, p.visibility, p.status, p.created_at, p.drive_file_id, p.drive_synced_at, p.source, p.storage_cleaned_at,
+  (SELECT COUNT(*) FROM photo_faces pf2 WHERE pf2.photo_id = p.id)\\:\\:int AS face_count
+FROM photos p
+WHERE p.event_id = :p1
+ORDER BY p.created_at DESC, p.id
+LIMIT :p2 OFFSET :p3
+"""
+
+
+@dataclasses.dataclass()
+class ListEventPhotosForStaffRow:
+    id: uuid.UUID
+    event_id: uuid.UUID
+    uploaded_by: Optional[uuid.UUID]
+    storage_key: str
+    taken_at: Optional[datetime.datetime]
+    day_number: Optional[int]
+    visibility: str
+    status: Any
+    created_at: datetime.datetime
+    drive_file_id: Optional[str]
+    drive_synced_at: Optional[datetime.datetime]
+    source: str
+    storage_cleaned_at: Optional[datetime.datetime]
+    face_count: int
+
+
+COUNT_EVENT_PHOTOS_FOR_STAFF = """-- name: count_event_photos_for_staff \\:one
+SELECT COUNT(*)
+FROM photos p
+WHERE p.event_id = :p1
+"""
+
+
 LIST_PHOTOS_DUE_FOR_STORAGE_CLEANUP = """-- name: list_photos_due_for_storage_cleanup \\:many
 SELECT p.id, p.event_id, p.uploaded_by, p.storage_key, p.taken_at, p.day_number, p.visibility, p.status, p.created_at, p.drive_file_id, p.drive_synced_at, p.source, p.storage_cleaned_at
 FROM photos p
@@ -249,6 +284,32 @@ class AsyncQuerier:
             source=row[11],
             storage_cleaned_at=row[12],
         )
+
+    async def list_event_photos_for_staff(self, *, event_id: uuid.UUID, limit: int, offset: int) -> AsyncIterator[ListEventPhotosForStaffRow]:
+        result = await self._conn.stream(sqlalchemy.text(LIST_EVENT_PHOTOS_FOR_STAFF), {"p1": event_id, "p2": limit, "p3": offset})
+        async for row in result:
+            yield ListEventPhotosForStaffRow(
+                id=row[0],
+                event_id=row[1],
+                uploaded_by=row[2],
+                storage_key=row[3],
+                taken_at=row[4],
+                day_number=row[5],
+                visibility=row[6],
+                status=row[7],
+                created_at=row[8],
+                drive_file_id=row[9],
+                drive_synced_at=row[10],
+                source=row[11],
+                storage_cleaned_at=row[12],
+                face_count=row[13],
+            )
+
+    async def count_event_photos_for_staff(self, *, event_id: uuid.UUID) -> Optional[int]:
+        row = (await self._conn.execute(sqlalchemy.text(COUNT_EVENT_PHOTOS_FOR_STAFF), {"p1": event_id})).first()
+        if row is None:
+            return None
+        return row[0]
 
     async def get_drive_file_id_for_photo(self, *, final_storage_key: Optional[str]) -> Optional[Optional[str]]:
         row = (await self._conn.execute(sqlalchemy.text(GET_DRIVE_FILE_ID_FOR_PHOTO), {"p1": final_storage_key})).first()
