@@ -20,7 +20,8 @@ const formatDate = (value: string) =>
 /** Events as cards, so the target of an upload is always visible. */
 export function EventPicker({ value, onChange, disabled }: EventPickerProps) {
   const { data: events, isLoading } = useMultiEventsQuery();
-  const options = (events ?? []).filter((event) => event.status !== 'archived');
+  // Archived events stay selectable: photos often arrive after an event has ended.
+  const options = events ?? [];
 
   if (isLoading) {
     return (
@@ -35,7 +36,7 @@ export function EventPicker({ value, onChange, disabled }: EventPickerProps) {
   if (options.length === 0) {
     return (
       <p className='text-muted-foreground text-sm'>
-        No open events. Create one in HR-Events first.
+        No events yet. Create one in HR-Events first.
       </p>
     );
   }
@@ -65,6 +66,11 @@ export function EventPicker({ value, onChange, disabled }: EventPickerProps) {
               <span className='text-muted-foreground mt-1 flex items-center gap-1.5 text-xs'>
                 <CalendarDays className='size-3.5' />
                 {formatDate(event.eventDate)}
+                {event.status === 'archived' ? (
+                  <span className='bg-muted ml-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide'>
+                    Archived
+                  </span>
+                ) : null}
               </span>
             </span>
             <span
