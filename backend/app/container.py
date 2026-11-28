@@ -39,6 +39,7 @@ from db.generated import notifications as notification_queries
 from db.generated import audit as audit_queries
 from db.generated import stats as stats_queries
 
+from app.service.drive_import import DriveImportService
 from app.service.event import EventService
 from app.service.stats import StatsService
 from app.worker.notification.notification_queue import NotificationQueue
@@ -145,6 +146,12 @@ class Container:
         self.event_service = EventService(
             e_querier=self.event_querier,
             p_querier=self.participant_querier,
+        )
+
+        self.drive_import_service = DriveImportService(
+            event_service=self.event_service,
+            upload_requests_service=self.upload_requests_service,
+            staff_drive_service=self.staff_drive_service,
         )
 
         self.photo_approval_service = PhotoApprovalService(

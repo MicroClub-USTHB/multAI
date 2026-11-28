@@ -107,6 +107,8 @@ class Settings(BaseSettings):
     FACE_EMBEDDING_DET_HEIGHT: int = 640
 
     # Google Drive OAuth
+    # API key (Drive API only) for reading folders shared as "anyone with the link".
+    GOOGLE_API_KEY: str = ""
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = ""
@@ -137,7 +139,7 @@ class Settings(BaseSettings):
     # MCDI Configuration
     MCDI_PROJECT_ID: str = ""
     MCDI_API_KEY: str = ""
-    MCDI_BASE_URL: str = "https://mcid.microclub.info/api"
+    MCDI_BASE_URL: str = "https://mcid-api.microclub.info/api"
     MCDI_SERVER_ID: str = ""
     MCDI_REDIRECT_URI_WEB: str = ""
     # MCDI (Discord) role names -> staff role. Matching is case-insensitive.

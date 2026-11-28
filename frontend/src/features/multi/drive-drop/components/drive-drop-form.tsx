@@ -59,8 +59,7 @@ export function DriveDropForm({ isSubmitting, error, onSubmit }: DriveDropFormPr
           autoComplete="off"
         />
         <p className="text-xs text-muted-foreground">
-          Share the folder with the Google account connected to MultiAI. Subfolders are
-          included.
+          The folder must be shared as “Anyone with the link”. Subfolders are included.
         </p>
       </div>
 

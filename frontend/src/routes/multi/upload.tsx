@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 
 import { PageHeader } from '@/components/PageHeader';
+import { DriveImportCard } from '@/features/multi/drive-import/components/drive-import-card';
 import { EventPicker } from '@/features/multi/media-upload/components/event-picker';
 import { UploadDropzone } from '@/features/multi/media-upload/components/upload-dropzone';
 import { UploadList } from '@/features/multi/media-upload/components/upload-list';
@@ -36,6 +37,8 @@ function RouteComponent() {
         title="Upload photos"
         description="Choose the event, then drag in as many photos as you need. Uploads continue in the background."
       />
+
+      <DriveImportCard />
 
       <section className="space-y-3">
         <h2 className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase">

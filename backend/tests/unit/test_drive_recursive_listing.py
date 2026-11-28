@@ -33,3 +33,15 @@ async def test_recursive_listing_walks_subfolders(monkeypatch: pytest.MonkeyPatc
         access_token="t", folder_id="root", recursive=True
     )
     assert sorted(f.id for f in deep) == ["a.jpg", "b.png"]
+
+
+def test_credentials_api_key_vs_oauth() -> None:
+    headers, params = GoogleDriveClient._credentials(
+        GoogleDriveClient.api_key_credential("K123"), {"alt": "media"}
+    )
+    assert headers == {}
+    assert params == {"alt": "media", "key": "K123"}
+
+    headers, params = GoogleDriveClient._credentials("ya29.token", {"alt": "media"})
+    assert headers == {"Authorization": "Bearer ya29.token"}
+    assert params == {"alt": "media"}

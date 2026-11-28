@@ -29,6 +29,7 @@ async def _handle_message(data: bytes) -> None:
             visibility=event.visibility,
             day_number=event.day_number,
             recursive=event.recursive,
+            use_api_key=event.use_api_key,
         )
         if not event.auto_approve or details is None:
             return
