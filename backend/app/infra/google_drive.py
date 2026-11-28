@@ -1,5 +1,7 @@
 import asyncio
 import json
+import logging
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -17,6 +19,58 @@ from app.core.constant import (
 )
 
 GOOGLE_DRIVE_LIST_FILES_URL = "https://www.googleapis.com/drive/v3/files"
+
+logger = logging.getLogger(__name__)
+
+# Google throttles anonymous-looking clients (urllib's default agent, bursts)
+# with 429s, 5xx and an HTML "automated queries" page. Identify ourselves,
+# pace API-key downloads, and back off before giving up.
+_USER_AGENT = "multai-drive-import/1.0"
+_RETRY_DELAYS_SECONDS = (3, 10, 30, 60, 120)
+_API_KEY_DOWNLOAD_PAUSE_SECONDS = 0.4
+
+
+def _is_retryable(status: int, body: str) -> bool:
+    if status in (408, 429) or status >= 500:
+        return True
+    lowered = body.lower()
+    return "automated queries" in lowered or "ratelimitexceeded" in lowered.replace(
+        " ", ""
+    ) or "userratelimit" in lowered
+
+
+def _urlopen_with_retry(
+    request: urllib.request.Request, timeout: int
+) -> tuple[bytes, Message]:
+    """urlopen that backs off and retries on Google throttling. Blocking."""
+    request.add_header("User-Agent", _USER_AGENT)
+    attempt = 0
+    while True:
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                return response.read(), response.headers
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="ignore")
+            if attempt < len(_RETRY_DELAYS_SECONDS) and _is_retryable(exc.code, body):
+                delay = _RETRY_DELAYS_SECONDS[attempt]
+                logger.warning(
+                    "google_drive throttled (HTTP %s), retry %d in %ss",
+                    exc.code,
+                    attempt + 1,
+                    delay,
+                )
+                time.sleep(delay)
+                attempt += 1
+                continue
+            raise urllib.error.HTTPError(
+                exc.url, exc.code, body or exc.reason, exc.headers, None
+            ) from exc
+        except urllib.error.URLError:
+            if attempt < len(_RETRY_DELAYS_SECONDS):
+                time.sleep(_RETRY_DELAYS_SECONDS[attempt])
+                attempt += 1
+                continue
+            raise
 
 
 @dataclass
@@ -339,6 +393,8 @@ class GoogleDriveClient:
         headers, params = GoogleDriveClient._credentials(
             access_token, {"alt": "media", "supportsAllDrives": "true"}
         )
+        if access_token.startswith(API_KEY_CREDENTIAL_PREFIX):
+            await asyncio.sleep(_API_KEY_DOWNLOAD_PAUSE_SECONDS)
         content, _, _ = await GoogleDriveClient._get_bytes(
             GOOGLE_DRIVE_FILES_URL.format(file_id=urllib.parse.quote(file_id, safe="")),
             headers=headers,
@@ -587,10 +643,10 @@ class GoogleDriveClient:
                 final_url, headers=headers or {}, method="GET"
             )
             try:
-                with urllib.request.urlopen(request, timeout=15) as response:
-                    return json.loads(response.read().decode("utf-8"))
+                body, _ = _urlopen_with_retry(request, timeout=15)
+                return json.loads(body.decode("utf-8"))
             except urllib.error.HTTPError as exc:
-                details = exc.read().decode("utf-8", errors="ignore")
+                details = exc.msg if isinstance(exc.msg, str) else ""
                 raise AppException.bad_request(
                     f"{error_context} failed: {details or exc.reason}"
                 ) from exc
@@ -615,14 +671,12 @@ class GoogleDriveClient:
                 final_url, headers=headers or {}, method="GET"
             )
             try:
-                with urllib.request.urlopen(request, timeout=30) as response:
-                    body = response.read()
-                    response_headers: Message = response.headers
-                    content_type = response_headers.get_content_type()
-                    file_name = response_headers.get_filename() or ""
-                    return body, content_type, file_name
+                body, response_headers = _urlopen_with_retry(request, timeout=30)
+                content_type = response_headers.get_content_type()
+                file_name = response_headers.get_filename() or ""
+                return body, content_type, file_name
             except urllib.error.HTTPError as exc:
-                details = exc.read().decode("utf-8", errors="ignore")
+                details = exc.msg if isinstance(exc.msg, str) else ""
                 raise AppException.bad_request(
                     f"Google file download failed: {details or exc.reason}"
                 ) from exc
