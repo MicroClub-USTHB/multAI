@@ -20,6 +20,7 @@ import { Route as MultiEventsRouteImport } from './routes/multi/events'
 import { Route as MultiDropRouteImport } from './routes/multi/drop'
 import { Route as MultiAnalyticsRouteImport } from './routes/multi/analytics'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as MultiEventsEventIdRouteImport } from './routes/multi/events_.$eventId'
 
 const RssDotxmlRoute = RssDotxmlRouteImport.update({
   id: '/rss.xml',
@@ -76,6 +77,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MultiEventsEventIdRoute = MultiEventsEventIdRouteImport.update({
+  id: '/events_/$eventId',
+  path: '/events/$eventId',
+  getParentRoute: () => MultiRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/multi/requests': typeof MultiRequestsRoute
   '/multi/upload': typeof MultiUploadRoute
   '/multi/': typeof MultiIndexRoute
+  '/multi/events/$eventId': typeof MultiEventsEventIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/multi/requests': typeof MultiRequestsRoute
   '/multi/upload': typeof MultiUploadRoute
   '/multi': typeof MultiIndexRoute
+  '/multi/events/$eventId': typeof MultiEventsEventIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/multi/requests': typeof MultiRequestsRoute
   '/multi/upload': typeof MultiUploadRoute
   '/multi/': typeof MultiIndexRoute
+  '/multi/events_/$eventId': typeof MultiEventsEventIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/multi/requests'
     | '/multi/upload'
     | '/multi/'
+    | '/multi/events/$eventId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/multi/requests'
     | '/multi/upload'
     | '/multi'
+    | '/multi/events/$eventId'
   id:
     | '__root__'
     | '/'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/multi/requests'
     | '/multi/upload'
     | '/multi/'
+    | '/multi/events_/$eventId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -243,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/multi/events_/$eventId': {
+      id: '/multi/events_/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/multi/events/$eventId'
+      preLoaderRoute: typeof MultiEventsEventIdRouteImport
+      parentRoute: typeof MultiRoute
+    }
   }
 }
 
@@ -254,6 +273,7 @@ interface MultiRouteChildren {
   MultiRequestsRoute: typeof MultiRequestsRoute
   MultiUploadRoute: typeof MultiUploadRoute
   MultiIndexRoute: typeof MultiIndexRoute
+  MultiEventsEventIdRoute: typeof MultiEventsEventIdRoute
 }
 
 const MultiRouteChildren: MultiRouteChildren = {
@@ -264,6 +284,7 @@ const MultiRouteChildren: MultiRouteChildren = {
   MultiRequestsRoute: MultiRequestsRoute,
   MultiUploadRoute: MultiUploadRoute,
   MultiIndexRoute: MultiIndexRoute,
+  MultiEventsEventIdRoute: MultiEventsEventIdRoute,
 }
 
 const MultiRouteWithChildren = MultiRoute._addFileChildren(MultiRouteChildren)

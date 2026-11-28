@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Calendar, Check, Copy, Download, QrCode, Upload } from 'lucide-react'
+import { Calendar, Check, Copy, Download, Images, QrCode, Upload } from 'lucide-react'
 import { useState } from 'react'
 import QRCode from 'react-qr-code'
 
@@ -113,15 +113,19 @@ export function EventCard({ event }: EventCardProps) {
 						</Button>
 					</div>
 				</div>
-				{event.status !== 'archived' ? (
+				<div className="grid grid-cols-2 gap-2">
 					<Button
-						render={<Link to="/multi/upload" search={{ event: event.id }} />}
-						className="w-full"
+						variant="outline"
+						render={<Link to="/multi/events/$eventId" params={{ eventId: event.id }} />}
 					>
-						<Upload className="mr-2 size-4" />
-						Upload photos
+						<Images className="mr-2 size-4" />
+						Photos
 					</Button>
-				) : null}
+					<Button render={<Link to="/multi/upload" search={{ event: event.id }} />}>
+						<Upload className="mr-2 size-4" />
+						Upload
+					</Button>
+				</div>
 			</CardContent>
 
 			<Dialog open={isQrOpen} onOpenChange={setIsQrOpen}>
