@@ -17,6 +17,9 @@ class DriveDropRequest(BaseModel):
     new_event: DriveDropNewEvent | None = None
     visibility: Literal["private", "public"] = "private"
     day_number: int | None = Field(default=None, ge=1)
+    # False: read a public folder with the server's API key.
+    # True: read it through the staff member's connected Google Drive.
+    use_my_drive: bool = False
 
     @model_validator(mode="after")
     def _one_event_source(self) -> "DriveDropRequest":

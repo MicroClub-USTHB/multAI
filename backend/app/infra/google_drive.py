@@ -49,8 +49,29 @@ class GoogleDriveFileDownload:
     content: bytes
 
 
+API_KEY_CREDENTIAL_PREFIX = "apikey:"
+
+
 class GoogleDriveClient:
     _drive_folder_mime_type = "application/vnd.google-apps.folder"
+
+    @staticmethod
+    def api_key_credential(api_key: str) -> str:
+        """Wrap an API key so it can travel where an OAuth access token does.
+
+        Only works on files and folders shared as "anyone with the link".
+        """
+        return f"{API_KEY_CREDENTIAL_PREFIX}{api_key}"
+
+    @staticmethod
+    def _credentials(
+        credential: str, query_params: dict[str, str]
+    ) -> tuple[dict[str, str], dict[str, str]]:
+        """Return (headers, query_params) for either an OAuth token or an API key."""
+        if credential.startswith(API_KEY_CREDENTIAL_PREFIX):
+            key = credential[len(API_KEY_CREDENTIAL_PREFIX) :]
+            return {}, {**query_params, "key": key}
+        return {"Authorization": f"Bearer {credential}"}, query_params
 
     @staticmethod
     def _require_str(data: dict[str, object], key: str) -> str:
@@ -211,13 +232,14 @@ class GoogleDriveClient:
         access_token: str,
         file_id: str,
     ) -> GoogleDriveFileMetadata:
+        headers, params = GoogleDriveClient._credentials(
+            access_token,
+            {"fields": "id,name,mimeType,size", "supportsAllDrives": "true"},
+        )
         data = await GoogleDriveClient._get_json(
             GOOGLE_DRIVE_FILES_URL.format(file_id=urllib.parse.quote(file_id, safe="")),
-            headers={"Authorization": f"Bearer {access_token}"},
-            query_params={
-                "fields": "id,name,mimeType,size",
-                "supportsAllDrives": "true",
-            },
+            headers=headers,
+            query_params=params,
             error_context="Google Drive file metadata request",
         )
         size_raw = data.get("size", "0")
@@ -314,13 +336,13 @@ class GoogleDriveClient:
             access_token=access_token,
             file_id=file_id,
         )
+        headers, params = GoogleDriveClient._credentials(
+            access_token, {"alt": "media", "supportsAllDrives": "true"}
+        )
         content, _, _ = await GoogleDriveClient._get_bytes(
             GOOGLE_DRIVE_FILES_URL.format(file_id=urllib.parse.quote(file_id, safe="")),
-            headers={"Authorization": f"Bearer {access_token}"},
-            query_params={
-                "alt": "media",
-                "supportsAllDrives": "true",
-            },
+            headers=headers,
+            query_params=params,
         )
         return GoogleDriveFileDownload(metadata=metadata, content=content)
 
@@ -368,11 +390,14 @@ class GoogleDriveClient:
             }
             if next_page_token is not None:
                 query_params["pageToken"] = next_page_token
+            headers, params = GoogleDriveClient._credentials(
+                access_token, query_params
+            )
 
             data = await GoogleDriveClient._get_json(
                 GOOGLE_DRIVE_LIST_FILES_URL,
-                headers={"Authorization": f"Bearer {access_token}"},
-                query_params=query_params,
+                headers=headers,
+                query_params=params,
                 error_context="Google Drive folder listing request",
             )
 
