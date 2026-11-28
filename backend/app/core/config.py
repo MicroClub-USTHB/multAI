@@ -139,7 +139,7 @@ class Settings(BaseSettings):
     # MCDI Configuration
     MCDI_PROJECT_ID: str = ""
     MCDI_API_KEY: str = ""
-    MCDI_BASE_URL: str = "https://mcid.microclub.info/api"
+    MCDI_BASE_URL: str = "https://mcid-api.microclub.info/api"
     MCDI_SERVER_ID: str = ""
     MCDI_REDIRECT_URI_WEB: str = ""
     # MCDI (Discord) role names -> staff role. Matching is case-insensitive.
